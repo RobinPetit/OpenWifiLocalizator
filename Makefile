@@ -1,3 +1,4 @@
-pdf:
-	pdflatex OWL.tex
-	pdflatex OWL.tex
+report:
+	make -C report/ report
+
+.PHONY: report
