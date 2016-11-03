@@ -14,6 +14,7 @@
 \usepackage{changepage}
 \usepackage{imakeidx}
 \usepackage{rotating}
+\usepackage{tcolorbox}
 
 \graphicspath{{./images/}}
 
@@ -88,5 +89,101 @@ Nous avons dans un premier temps choisi de développer sur Android. Ce n'est pas
   C'est en 1990 qu'une première connexion est établie entre un ordinateur et un serveur.  Il ne s'agit la que d'une première étape dans le WorldWideWeb.  C'est entre 1997 et 2000 que va réellement se développer le Wifi.  Un standard concernant la technologie sans fil est définit (par les laboratoires Bell et l'Institute of Electrical and Electronics Engineers).\\
   Depuis 2009, de plus en plus d'entreprise propose un service de Wi-Fi gratuitement à leurs client.  On peut le retrouver dans les restaurants, le train, les aeroports, ...
   % Source: http://www.ucopia.com/fr/actualites/lhistoire-du-wi-fi/
+  \subsection{Méthodes de localisation}
+  Il existe plusieurs méthodes pour se repérer à partir des points d'accès wifi.
+  
+  \subsubsection{Méthode dites par propagation}
+    Cette méthode utilise la trilatération pour déterminer la position actuelle. On peut décomposer cette méthode en plusieurs étapes :
+    \begin{enumerate}
+      \item On collecte la qualité de signal d'au moins trois points d'accès wifi.
+      \item Pour chacun de ces points d'accès, on détermine la distance à celui-ci via une formule prenant en compte la qualité du signal.
+      \item À partir de ces distance, on peut "générer" trois cercles et garder un point contenu dans l'intersection de ces cerlces.
+    \end{enumerate}
+    
+    \paragraph{Détermination de la distance}
+      La formule utilisée pour la détermination de la distance est la suivante :
+      \[d = 10^{\left(\cfrac{27,55-20\log(f)+\left|s\right|}{20}\right)}\]
+      Où \begin{itemize}
+        \item[] $f$ est la fréquence (généralement 2.4Ghz ou 5.0 GHz)
+        \item[] $s$ est la qualité du signal (mesuré en $dBm$)
+      \end{itemize}     
+    
+    \paragraph{Trilateration}
+      Soient $x$ et $y$ la position courante de l'utilisateur, $x_{\lambda}$, $y_{\lambda}$ et $r_{\lambda}$ (où $1 \leq \lambda \leq 3$) est le postion et la distance de chaque émetteur.
+      \begin{align}
+        (x-x_{1})^{2}+(y-y_{1})^{2} = r_{1}^{2} \\
+        (x-x_{2})^{2}+(y-y_{2})^{2} = r_{2}^{2} \\
+        (x-x_{3})^{2}+(y-y_{3})^{2} = r_{3}^{2}
+      \end{align}
+      On développe les produits remarquables.
+      \begin{align}
+        x^{2}-2xx_{1}+x_{1}^{2}+y^{2}-2yy_{1}+y_{1}^{2} = r_{1}^{2} \\
+        x^{2}-2xx_{2}+x_{2}^{2}+y^{2}-2yy_{2}+y_{2}^{2} = r_{2}^{2} \\
+        x^{2}-2xx_{3}+x_{3}^{2}+y^{2}-2yy_{3}+y_{3}^{2} = r_{3}^{2}
+      \end{align}
+      On soustrait $(4)$ et $(5)$ ainsi que $(5)$ et $(6)$.
+      \begin{center}
+        $\left \{
+        \begin{array}{c c}
+          -2xx_{1}+2xx_{2}+x_{1}^{2}-x_{2}^{2}-2yy_{1}+2yy_{2}+y_{1}^{2}-y_{2}^{2} = r_{1}^{2}-r_{2}^{2} \\
+          -2xx_{2}+2xx_{3}+x_{2}^{2}-x_{3}^{2}-2yy_{2}+2yy_{3}+y_{2}^{2}-y_{3}^{2} = r_{2}^{2}-r_{3}^{2}
+        \end{array}
+        \right.$
+      \end{center}
+      \begin{center}
+        $\left \{
+        \begin{array}{c c}
+          -2xx_{1}+2xx_{2}-2yy_{1}+2yy_{2} = r_{1}^{2}-r_{2}^{2}-y_{1}^{2}+y_{2}^{2}-x_{1}^{2}+x_{2}^{2} \\
+          -2xx_{2}+2xx_{3}-2yy_{2}+2yy_{3} = r_{2}^{2}-r_{3}^{2}-y_{2}^{2}+y_{3}^{2}-x_{2}^{2}+x_{3}^{2}
+        \end{array}
+        \right.$
+      \end{center}
+      \begin{center}
+        $\left \{
+        \begin{array}{c c}
+          x(2x_{2}-2x_{1})+y(2y_{2}-2y_{1}) = r_{1}^{2}-r_{2}^{2}-y_{1}^{2}+y_{2}^{2}-x_{1}^{2}+x_{2}^{2} \\
+          x(2x_{3}-2x_{2})+y(2y_{3}-2y_{2}) = r_{2}^{2}-r_{3}^{2}-y_{2}^{2}+y_{3}^{2}-x_{2}^{2}+x_{3}^{2}
+        \end{array}
+        \right.$
+      \end{center}
+      On remplace ces valeurs par des symbols plus "parlant".
+      \begin{center}
+        $\left \{
+        \begin{array}{c c}
+          Ax+By = C \\
+          Dx+Ey = F
+        \end{array}
+        \right.$
+      \end{center}
+      On developpe pour $x$.
+      \begin{align*}
+        x &= \frac{C-B(\frac{F-Dx}{E})}{A} \\
+        x &= \frac{CE-BF+BDx}{EA} \\
+        EAx &= CE-BF+BDx \\
+        x &= \frac{CE-BF}{EA-BD}
+      \end{align*}
+      On developpe pour $y$.
+      \begin{align*}
+        y &= \frac{F-D(\frac{C-By}{A})}{E} \\
+        y &= \frac{FA-DC+DBy}{AE} \\
+        AEy &= FA-DC+DBy \\
+        y &= \frac{CE-BF}{EA-BD}
+      \end{align*}
+
+    \begin{tcolorbox}[title=Avantages :]
+      \begin{itemize}
+        \item Rapidité de mise en place
+      \end{itemize}
+    \end{tcolorbox}
+    \begin{tcolorbox}[title=Désavantages :]
+      \begin{itemize}
+        \item Difficulté de mise à jour de la base de donnée.
+        \item La qualité du signal peut fortement varié en fonction de :
+          \begin{itemize}
+            \item la quantité de personnes présentent sur le point d'accès.
+            \item divers éléments externe tels que des murs, ...
+          \end{itemize}
+      \end{itemize}
+    \end{tcolorbox}
 
 \end{document}
