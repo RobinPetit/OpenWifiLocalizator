@@ -38,12 +38,13 @@ class App(t.Tk):
         self.left_moved = False
         self.left_src = None
         self.tmp_line_id = None
+        self.cv_image_coord = [0, 0]
 
     def create_widgets(self, **options):
         self.canvas = t.Canvas(self, width=options['c_width'], height=options['c_height'])
         self.canvas.pack()
         self.chose_background_image()
-        self.alpha_scale = t.Scale(self, from_=0, to=255,
+        self.alpha_scale = t.Scale(self, from_=1, to=255,
             command=lambda v: self.make_bg_image(v), orient=t.HORIZONTAL)
         self.alpha_scale.set(App.ALPHA_INITIAL_VALUE)
         self.alpha_scale.pack()
@@ -69,16 +70,22 @@ class App(t.Tk):
     def chose_background_image(self):
         self.background_file_name = t.filedialog.askopenfilename()
         self.bg_template = Image.open(self.background_file_name)
+        self.bg_image_size = self.bg_template.size
         self.make_bg_image(App.ALPHA_INITIAL_VALUE)
 
     def make_bg_image(self, alpha):
         self.bg_template.putalpha(int(alpha))
         self.bg_image = ImageTk.PhotoImage(self.bg_template)
-        self.cv_image_id = self.canvas.create_image(0, 0, image=self.bg_image, anchor='nw')
+        if not hasattr(self, 'cv_image_id'):
+            self.cv_image_id = self.canvas.create_image(self.cv_image_coord[0],
+                self.cv_image_coord[1], image=self.bg_image, anchor='nw')
+        else:
+            self.canvas.itemconfig(self.cv_image_id, image=self.bg_image)
 
     def add_node(self, x, y):
-        new_id = self.canvas.create_oval(x-App.NODE_SIZE, y-App.NODE_SIZE, x+App.NODE_SIZE, y+App.NODE_SIZE, fill='red')
-        print('Adding new node with id', new_id)
+        node_coord = x-App.NODE_SIZE, y-App.NODE_SIZE, x+App.NODE_SIZE, y+App.NODE_SIZE
+        new_id = self.canvas.create_oval(*node_coord, fill='red')
+        # print('Adding new node with id', new_id)
         self.nodes[new_id] = (x, y)
 
     # events handling code
@@ -99,6 +106,20 @@ class App(t.Tk):
         if self.left_src is not None and self.tmp_line_id is not None:
             self.canvas.delete(self.tmp_line_id)
             self.tmp_line_id = self.canvas.create_line(self.initial_click_coord[0], self.initial_click_coord[1], ev.x, ev.y)
+        else:
+            self.cv_image_new_coord = [self.cv_image_coord[0]+ev.x-self.click_coord[0], self.cv_image_coord[1]+ev.y-self.click_coord[1]]
+            self.check_image_coords(self.cv_image_new_coord)
+            self.canvas.coords(self.cv_image_id, *self.cv_image_new_coord)
+
+    def check_image_coords(self, coords):
+        if coords[0] > 0:
+            coords[0] = 0
+        elif coords[0] < int(self.canvas['width']) - self.bg_image_size[0]:
+            coords[0] = int(self.canvas['width']) - self.bg_image_size[0]
+        if coords[1] > 0:
+            coords[1] = 0
+        elif coords[1] < int(self.canvas['height']) - self.bg_image_size[1]:
+            coords[1] = int(self.canvas['height']) - self.bg_image_size[1]
 
     def handle_right_click_mvt(self, ev):
         print('RC MOVING')
@@ -111,7 +132,9 @@ class App(t.Tk):
         if self.left_src is not None:
             self.initial_click_coord = self.nodes[self.left_src]
             print(self.initial_click_coord)
-            self.tmp_line_id = 0  # self.canvas.create_line(self.initial_click_coord[0], self.initial_click_coord[1], ev.x, ev.y)
+            self.tmp_line_id = 0
+        else:
+            self.click_coord = [ev.x, ev.y]
         self.left_click_time = time()
 
     def handle_wheel_click(self, ev):
@@ -133,6 +156,10 @@ class App(t.Tk):
             if end is not None:
                 # to do, store the link somewhere to be saved in file
                 self.canvas.create_line(self.initial_click_coord[0], self.initial_click_coord[1], self.nodes[end][0], self.nodes[end][1])
+        elif self.left_moved:
+            self.cv_image_coord[0] += ev.x-self.click_coord[0]
+            self.cv_image_coord[1] += ev.y-self.click_coord[1]
+            self.check_image_coords(self.cv_image_coord)
         elif float(time() - self.left_click_time) <= App.CLICK_TIME_SENSIBILITY:
             self.add_node(ev.x, ev.y)
         self.left_moved = False
@@ -144,7 +171,7 @@ class App(t.Tk):
         print('WR')
 
 def main():
-    app = App(c_width=600, c_height=600)
+    app = App(c_width=400, c_height=400)
     app.mainloop()
 
 if __name__ == '__main__':
