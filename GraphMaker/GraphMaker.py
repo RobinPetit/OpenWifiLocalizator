@@ -22,6 +22,23 @@ class Node:
         else:
             self.name_ = n
 
+class Edge:
+    def __init__(self, weight, coords):
+        self.weight_ = weight
+        self.coords = coords
+
+    def coord(self, c=None):
+        if c is None:
+            return self.coords
+        else:
+            self.coords = c
+
+    def weight(self, w=None):
+        if w is None:
+            return self.weight_
+        else:
+            self.weight_ = w
+
 '''
     Available operations:
         + left click to create a new node
@@ -131,8 +148,8 @@ class App(t.Tk):
             self.canvas.coords(self.cv_image_id, *self.cv_image_new_coord)
             x_offset, y_offset = (self.cv_image_new_coord[i]-self.cv_image_coord[i] for i in range(2))
             for edge_id in self.edges:
-                self.canvas.coords(edge_id, self.edges[edge_id][0]+x_offset, self.edges[edge_id][1]+y_offset,
-                    self.edges[edge_id][2]+x_offset, self.edges[edge_id][3]+y_offset)
+                self.canvas.coords(edge_id, self.edges[edge_id].coord()[0]+x_offset, self.edges[edge_id].coord()[1]+y_offset,
+                    self.edges[edge_id].coord()[2]+x_offset, self.edges[edge_id].coord()[3]+y_offset)
             for node_id in self.nodes:
                 self.canvas.coords(node_id, self.nodes[node_id].coord()[0]+x_offset, self.nodes[node_id].coord()[1]+y_offset,
                     self.nodes[node_id].coord()[2]+x_offset, self.nodes[node_id].coord()[3]+y_offset)
@@ -191,13 +208,13 @@ class App(t.Tk):
                     edge_id = self.canvas.create_line(*self.initial_click_coord,
                         self.nodes[end].coord()[0]+App.NODE_SIZE, self.nodes[end].coord()[1]+App.NODE_SIZE,
                         width=2.5)
-                    self.edges[edge_id] = self.canvas.coords(edge_id)
+                    self.edges[edge_id] = Edge(self.configure_edge(), self.canvas.coords(edge_id))
             else:
                 self.cv_image_coord = self.canvas.coords(self.cv_image_id)
                 for node_id in self.nodes:
                     self.nodes[node_id].coord(self.canvas.coords(node_id))
                 for edge_id in self.edges:
-                    self.edges[edge_id] = self.canvas.coords(edge_id)
+                    self.edges[edge_id].coord(self.canvas.coords(edge_id))
         elif float(time() - self.left_click_time) <= App.CLICK_TIME_SENSIBILITY:
             self.add_node(ev.x, ev.y)
         self.left_moved = False
@@ -209,13 +226,22 @@ class App(t.Tk):
         print('WR')
 
     def configure_node(self):
-     toplevel = t.Toplevel(self)
-     t.Label(toplevel, text="Node Name: ").grid(row=0, column=0)
-     name = t.StringVar()
-     t.Entry(toplevel, textvariable=name).grid(row=0, column=1)
-     t.Button(toplevel, text='Ok', command=toplevel.destroy).grid(row=1)
-     toplevel.wait_window()
-     return name.get()
+        toplevel = t.Toplevel(self)
+        t.Label(toplevel, text='Node Name: ').grid(row=0, column=0)
+        name = t.StringVar()
+        t.Entry(toplevel, textvariable=name).grid(row=0, column=1)
+        t.Button(toplevel, text='Ok', command=toplevel.destroy).grid(row=1)
+        toplevel.wait_window()
+        return name.get()
+
+    def configure_edge(self):
+        toplevel = t.Toplevel(self)
+        t.Label(toplevel, text='Edge Weight').grid(row=0, column=0)
+        value = t.StringVar()
+        t.Entry(toplevel, textvariable=value).grid(row=0, column=1)
+        t.Button(toplevel, text='Ok', command=toplevel.destroy).grid(row=1)
+        toplevel.wait_window()
+        return float(value.get())
 
 def main():
     app = App(c_width=400, c_height=400)
