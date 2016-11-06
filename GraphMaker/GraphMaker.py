@@ -35,6 +35,7 @@ class App(t.Tk):
 
     def init_variables(self):
         self.nodes = dict()
+        self.edges = dict()
         self.left_moved = False
         self.left_src = None
         self.tmp_line_id = None
@@ -84,15 +85,14 @@ class App(t.Tk):
 
     def add_node(self, x, y):
         node_coord = x-App.NODE_SIZE, y-App.NODE_SIZE, x+App.NODE_SIZE, y+App.NODE_SIZE
-        new_id = self.canvas.create_oval(*node_coord, fill='red')
+        node_id = self.canvas.create_oval(*node_coord, fill='red')
         # print('Adding new node with id', new_id)
-        self.nodes[new_id] = (x, y)
+        self.nodes[node_id] = self.canvas.coords(node_id)
 
     # events handling code
 
     def get_selected_el(self, x, y, d=3):
         tmp = self.canvas.find_overlapping(x-d, y-d, x+d, y+d)
-        print(tmp)
         i = 1
         while i < len(tmp) and (tmp[i] <= self.cv_image_id or tmp[i] == self.tmp_line_id):
             i += 1
@@ -104,12 +104,23 @@ class App(t.Tk):
     def handle_left_click_mvt(self, ev):
         self.left_moved = True
         if self.left_src is not None and self.tmp_line_id is not None:
-            self.canvas.delete(self.tmp_line_id)
-            self.tmp_line_id = self.canvas.create_line(self.initial_click_coord[0], self.initial_click_coord[1], ev.x, ev.y)
+            current_coords = self.canvas.coords(self.tmp_line_id)
+            self.canvas.coords(self.tmp_line_id, current_coords[0], current_coords[1], ev.x, ev.y)
         else:
             self.cv_image_new_coord = [self.cv_image_coord[0]+ev.x-self.click_coord[0], self.cv_image_coord[1]+ev.y-self.click_coord[1]]
             self.check_image_coords(self.cv_image_new_coord)
             self.canvas.coords(self.cv_image_id, *self.cv_image_new_coord)
+            x_offset, y_offset = (self.cv_image_new_coord[i]-self.cv_image_coord[i] for i in range(2))
+            for edge_id in self.edges:
+                self.canvas.coords(edge_id, self.edges[edge_id][0]+x_offset, self.edges[edge_id][1]+y_offset,
+                    self.edges[edge_id][2]+x_offset, self.edges[edge_id][3]+y_offset)
+            for node_id in self.nodes:
+                self.canvas.coords(node_id, self.nodes[node_id][0]+x_offset, self.nodes[node_id][1]+y_offset,
+                    self.nodes[node_id][2]+x_offset, self.nodes[node_id][3]+y_offset)
+
+    def verify_in(self, coords):
+        return 0 >= coords[0] >= int(self.canvas['width'])-self.bg_image_size[0] and \
+               0 >= coords[1] >= int(self.canvas['height'])-self.bg_image_size[1]
 
     def check_image_coords(self, coords):
         if coords[0] > 0:
@@ -130,9 +141,10 @@ class App(t.Tk):
     def handle_left_click(self, ev):
         self.left_src = self.get_selected_el(ev.x, ev.y)
         if self.left_src is not None:
-            self.initial_click_coord = self.nodes[self.left_src]
-            print(self.initial_click_coord)
-            self.tmp_line_id = 0
+            self.initial_click_coord = [self.nodes[self.left_src][0]+App.NODE_SIZE,
+                self.nodes[self.left_src][1]+App.NODE_SIZE]
+            self.tmp_line_id = self.canvas.create_line(*self.initial_click_coord,
+                *self.initial_click_coord, width=2.5)
         else:
             self.click_coord = [ev.x, ev.y]
         self.left_click_time = time()
@@ -150,16 +162,23 @@ class App(t.Tk):
         print('WD')
 
     def handle_left_release(self, ev):
-        if self.left_moved and self.tmp_line_id is not None:
-            end = self.get_selected_el(ev.x, ev.y)
-            self.canvas.delete(self.tmp_line_id)
-            if end is not None:
-                # to do, store the link somewhere to be saved in file
-                self.canvas.create_line(self.initial_click_coord[0], self.initial_click_coord[1], self.nodes[end][0], self.nodes[end][1])
-        elif self.left_moved:
-            self.cv_image_coord[0] += ev.x-self.click_coord[0]
-            self.cv_image_coord[1] += ev.y-self.click_coord[1]
-            self.check_image_coords(self.cv_image_coord)
+        if self.left_moved:
+            if self.tmp_line_id is not None:
+                end = self.get_selected_el(ev.x, ev.y)
+                self.canvas.delete(self.tmp_line_id)
+                self.tmp_line_id = None
+                if end is not None:
+                    # to do, store the link somewhere to be saved in file
+                    edge_id = self.canvas.create_line(*self.initial_click_coord,
+                        self.nodes[end][0]+App.NODE_SIZE, self.nodes[end][1]+App.NODE_SIZE,
+                        width=2.5)
+                    self.edges[edge_id] = self.canvas.coords(edge_id)
+            else:
+                self.cv_image_coord = self.canvas.coords(self.cv_image_id)
+                for node_id in self.nodes:
+                    self.nodes[node_id] = self.canvas.coords(node_id)
+                for edge_id in self.edges:
+                    self.edges[edge_id] = self.canvas.coords(edge_id)
         elif float(time() - self.left_click_time) <= App.CLICK_TIME_SENSIBILITY:
             self.add_node(ev.x, ev.y)
         self.left_moved = False
