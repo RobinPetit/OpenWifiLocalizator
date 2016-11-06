@@ -202,9 +202,16 @@ class App(t.Tk):
         else:
             print('\t\tERROR')
 
-    # TODO edit node and edges by right click
     def handle_right_click(self, ev):
-        print('RC')
+        selected = self.get_selected_el(ev.x, ev.y)
+        if selected is None:
+            return
+        if selected in self.nodes:
+            self.nodes[selected].name(self.configure_node(self.nodes[selected].name()))
+        elif selected in self.edges:
+            self.edges[selected].weight(self.configure_edge(self.edges[selected].weight()))
+        else:
+            print('\t\tERROR')
 
     def handle_wheel_up(self, ev):
         print('WU')
@@ -240,19 +247,21 @@ class App(t.Tk):
     def handle_wheel_release(self, ev):
         print('WR')
 
-    def configure_node(self):
+    def configure_node(self, current_name=''):
         toplevel = t.Toplevel(self)
         t.Label(toplevel, text='Node Name: ').grid(row=0, column=0)
         name = t.StringVar()
+        name.set(current_name)
         t.Entry(toplevel, textvariable=name).grid(row=0, column=1)
         t.Button(toplevel, text='Ok', command=toplevel.destroy).grid(row=1)
         toplevel.wait_window()
         return name.get()
 
-    def configure_edge(self):
+    def configure_edge(self, current_weight=''):
         toplevel = t.Toplevel(self)
         t.Label(toplevel, text='Edge Weight').grid(row=0, column=0)
         value = t.StringVar()
+        value.set(str(current_weight))
         t.Entry(toplevel, textvariable=value).grid(row=0, column=1)
         t.Button(toplevel, text='Ok', command=toplevel.destroy).grid(row=1)
         toplevel.wait_window()
