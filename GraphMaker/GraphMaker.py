@@ -5,10 +5,29 @@ from tkinter import filedialog as fdialog
 from PIL import Image, ImageTk
 from time import time
 
+class Node:
+    def __init__(self, name, coords):
+        self.name_ = name
+        self.coords = coords
+
+    def coord(self, c=None):
+        if c is None:
+            return self.coords
+        else:
+            self.coords = c
+
+    def name(self, n=None):
+        if n is None:
+            return self.name_
+        else:
+            self.name_ = n
+
 '''
     Available operations:
         + left click to create a new node
-        + right click on a node to edit
+        + right click on a node to edit it
+        + left click on a node + move to create an edge
+        + left click on the image + move to move the background
 '''
 class App(t.Tk):
     ALPHA_INITIAL_VALUE=128
@@ -87,7 +106,7 @@ class App(t.Tk):
         node_coord = x-App.NODE_SIZE, y-App.NODE_SIZE, x+App.NODE_SIZE, y+App.NODE_SIZE
         node_id = self.canvas.create_oval(*node_coord, fill='red')
         # print('Adding new node with id', new_id)
-        self.nodes[node_id] = self.canvas.coords(node_id)
+        self.nodes[node_id] = Node(self.configure_node(), self.canvas.coords(node_id))
 
     # events handling code
 
@@ -115,8 +134,8 @@ class App(t.Tk):
                 self.canvas.coords(edge_id, self.edges[edge_id][0]+x_offset, self.edges[edge_id][1]+y_offset,
                     self.edges[edge_id][2]+x_offset, self.edges[edge_id][3]+y_offset)
             for node_id in self.nodes:
-                self.canvas.coords(node_id, self.nodes[node_id][0]+x_offset, self.nodes[node_id][1]+y_offset,
-                    self.nodes[node_id][2]+x_offset, self.nodes[node_id][3]+y_offset)
+                self.canvas.coords(node_id, self.nodes[node_id].coord()[0]+x_offset, self.nodes[node_id].coord()[1]+y_offset,
+                    self.nodes[node_id].coord()[2]+x_offset, self.nodes[node_id].coord()[3]+y_offset)
 
     def verify_in(self, coords):
         return 0 >= coords[0] >= int(self.canvas['width'])-self.bg_image_size[0] and \
@@ -141,8 +160,8 @@ class App(t.Tk):
     def handle_left_click(self, ev):
         self.left_src = self.get_selected_el(ev.x, ev.y)
         if self.left_src is not None:
-            self.initial_click_coord = [self.nodes[self.left_src][0]+App.NODE_SIZE,
-                self.nodes[self.left_src][1]+App.NODE_SIZE]
+            self.initial_click_coord = [self.nodes[self.left_src].coord()[0]+App.NODE_SIZE,
+                self.nodes[self.left_src].coord()[1]+App.NODE_SIZE]
             self.tmp_line_id = self.canvas.create_line(*self.initial_click_coord,
                 *self.initial_click_coord, width=2.5)
         else:
@@ -170,13 +189,13 @@ class App(t.Tk):
                 if end is not None:
                     # to do, store the link somewhere to be saved in file
                     edge_id = self.canvas.create_line(*self.initial_click_coord,
-                        self.nodes[end][0]+App.NODE_SIZE, self.nodes[end][1]+App.NODE_SIZE,
+                        self.nodes[end].coord()[0]+App.NODE_SIZE, self.nodes[end].coord()[1]+App.NODE_SIZE,
                         width=2.5)
                     self.edges[edge_id] = self.canvas.coords(edge_id)
             else:
                 self.cv_image_coord = self.canvas.coords(self.cv_image_id)
                 for node_id in self.nodes:
-                    self.nodes[node_id] = self.canvas.coords(node_id)
+                    self.nodes[node_id].coord(self.canvas.coords(node_id))
                 for edge_id in self.edges:
                     self.edges[edge_id] = self.canvas.coords(edge_id)
         elif float(time() - self.left_click_time) <= App.CLICK_TIME_SENSIBILITY:
@@ -188,6 +207,15 @@ class App(t.Tk):
 
     def handle_wheel_release(self, ev):
         print('WR')
+
+    def configure_node(self):
+     toplevel = t.Toplevel(self)
+     t.Label(toplevel, text="Node Name: ").grid(row=0, column=0)
+     name = t.StringVar()
+     t.Entry(toplevel, textvariable=name).grid(row=0, column=1)
+     t.Button(toplevel, text='Ok', command=toplevel.destroy).grid(row=1)
+     toplevel.wait_window()
+     return name.get()
 
 def main():
     app = App(c_width=400, c_height=400)
