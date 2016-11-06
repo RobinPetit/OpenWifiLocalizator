@@ -186,8 +186,23 @@ class App(t.Tk):
         self.left_click_time = time()
 
     def handle_wheel_click(self, ev):
-        print('WC')
+        selected = self.get_selected_el(ev.x, ev.y)
+        if selected is None:
+            return
+        if selected in self.nodes:
+            node_center = self.nodes[selected].coord()[:2]
+            node_center = [c+App.NODE_SIZE for c in node_center]
+            self.canvas.delete(selected)
+            for edge_id in self.edges:
+                if node_center in (self.edges[edge_id].coord()[:2], self.edges[edge_id].coord()[2:4]):
+                    self.canvas.delete(edge_id)
+        elif selected in self.edges:
+            self.canvas.delete(selected)
+            del self.edges[selected]
+        else:
+            print('\t\tERROR')
 
+    # TODO edit node and edges by right click
     def handle_right_click(self, ev):
         print('RC')
 
