@@ -1,0 +1,62 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage[top=2cm, bottom=2cm, left=2.5cm, right=2.5cm]{geometry}
+\usepackage{tcolorbox}
+
+\title{INFO-F308 : Projet d'année \\ OpenWifiLocalizator (O.W.L.)}
+\author{Rémy Detobel, Denis Hoornaert, Nathan Licardo, Robin Petit}
+
+\begin{document}
+
+\maketitle
+
+\section{Introdution}
+  Avant d'entrer dans les détails concernant l'implémentation de notre projet, il est intéressant d'introduire, dans les grandes lignes, l'objectif de réalisation du projet mais également le but final de ce dernier.\\
+Nous avons donc décidé, dans le cadre du cours Info-f308, de réaliser une application permettant à tout étudiant (ou visiteur) se trouvant sur l'un des campus de l'ULB de pouvoir se diriger au sein de ce dernier mais également de trouver la direction d'un auditoire se trouvant sur le campus "courant" ou de rediriger l'étudiant sur le bon campus dans le cas ou il serait actuellement au mauvais endroit. Afin de pouvoir localiser l'étudiant nous avons opté pour une technique de triangulation. Ce procédé est utilisé dans les GPS et bon nombre de systèmes de localisation. Les détails concernant l'implémentation de notre système seront donnés dans la suite de ce rapport.\\
+L'objectif utltime de ce projet sera de présenter notre travail à un large public. Il sera donc intéressant de "vulgariser" notre travail et de montrer une application concrète. Pour ce faire nous déveloperons une application mobile (cf partie Implémantation).
+
+\section{Système de localisation}
+  La méthode du Signal Strength Map (plus communément noté SSM) est une méthode se distinguant fortement de la méthode par propagation. En effet, alors que dans la méthode par propagation on calculait l'emplacement actuel via la qualité des signaux, dans la méthode utilisant un SSM, on va simplement identifier l'ensemble des point d'accès nous entourant. Une fois cette ensemble déterminé, on localisera l'emplacement actuel comme le point d'une carte possédant le même ensemble (ou sous ensemble).
+  En d'autre mots, on va cartographier un campus selon ses points d'accès. Cette carte pourra aussi être vue comme un schéma ensembliste (ou chaque zone couverte par un wifi est un ensemble) ainsi, la localisation devient une simple recherche parmi plusieurs ensembles.
+    
+\section{Implémentation}
+  Dans le cadre de ce projet nous avons donc décidé de développer une application permettant aux étudiants "perdus" de se géolocaliser au sein d'un campus directement via une application mobile. Il nous était donc nécessaire de choisir une plateforme intéressantes pour porter notre application. Le système d'exploitation retenu a été, dans un premier temps, le système Android. Il s'agit en effet d'un OS open-source et extrèmement utilisé ce qui rend notre application facilement accessible pour un large public. L'aspect open-source nous permettra également d'avoir accès de manière aisée aux données utilisateur tel que l'emplacement en temps réel (Android offrant la souplesse adéquate).\\
+L'application sera donc développée en Java (utilisé sur Android). Afin de localiser l'utilisateur au sein du campus de manière précise nous avons décidé d'utiliser les bornes wifi comme expliqué précédement. Il nous fallait donc avoir accès aux propriétés des bornes wifi au sein de l'application. Pour ce faire on utilisera l'API "WifiManager" qui nous permet d'obtenir les différentes informations concernant le réseau wifi connecté et les différents réseau accessibles.\\
+Nous avons dans un premier temps choisi de développer sur Android. Ce n'est pas pour cela que nous nous fermons la possiblité de porter le programme sur IOS. Il est toutefois important de tenir compte du fait que l'accès aux données de l'utilisateur sont beaucoup plus complèxes sur IOS. L'API "WifiManager" n'existe pas non plus. Le développement sur la plateforme d'Apple fait donc partie des éléments que nous nous résrvons de faire uniquement dans le cas ou l'on aurait assez de temps pour le faire correctement.
+    
+    \begin{center}
+      \begin{tcolorbox}[title=Avantages :]
+        \begin{itemize}
+          \item ...
+        \end{itemize}
+      \end{tcolorbox}
+      \begin{tcolorbox}[title=Désavantages :]
+        \begin{itemize}
+          \item ...
+        \end{itemize}
+      \end{tcolorbox}
+    \end{center}
+
+\section{Plan de travail}
+  \begin{itemize}
+    \item Prototype :
+      \begin{enumerate}
+        \item Prise de contacte avec le Département des infrastructures, Service "Projets et Constructions"
+        \item Définir une structure XML
+        \item Implémentation de Dijkstra en java (version PC)
+        \item Implémentation d'un scan des wifi en java (version PC)
+        \item Mise en place d'un programme permettant la maintenance des graphes (Python3)
+      \end{enumerate}
+    \item Printemps des sciences:
+      \begin{enumerate}
+        \item Extension du graphe
+        \item Schématiser les plans
+        \item Transposition du prototype sur Android
+      \end{enumerate}
+  \end{itemize}
+
+
+\end{document}
