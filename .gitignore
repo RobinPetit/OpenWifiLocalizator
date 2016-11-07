@@ -3,3 +3,11 @@
 *.aux
 *.log
 *.out
+
+### PROTOTYPE ###
+
+# Netbeans Project
+/prototype/nbproject/*
+/prototype/OWL/nbproject/private/
+/prototype/build.xml
+/prototype/manifest.mf
