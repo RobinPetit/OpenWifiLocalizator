@@ -5,6 +5,13 @@
  */
 package be.ulb.owl.xml;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
 
@@ -14,26 +21,29 @@ import org.jdom2.input.SAXBuilder;
  */
 public class ReadXML {
     
-//    Example
-//      On crée une instance de SAXBuilder
-//      SAXBuilder sxb = new SAXBuilder();
-//      try
-//      {
-//         //On crée un nouveau document JDOM avec en argument le fichier XML
-//         //Le parsing est terminé ;)
-//         document = sxb.build(new File("Exercice2.xml"));
-//      }
-//      catch(Exception e){}
-//
-//      //On initialise un nouvel élément racine avec l'élément racine du document.
-//      racine = document.getRootElement();
+    private static Element rootElem;
     
     
     public static void loadXML(String filename) {
-        
+        loadXML(new File(filename));
+    }
+    
+    public static void loadXML(File file) {
         SAXBuilder sxb = new SAXBuilder();
         
+        Document document = null;
+        try {
+            document = sxb.build(file);
+        } catch (JDOMException | IOException ex) {
+            Logger.getLogger(ReadXML.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
+        if(document != null) {
+            rootElem = document.getRootElement();
+        }
     }
+    
+    
+    
     
 }

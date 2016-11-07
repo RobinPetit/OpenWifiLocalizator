@@ -8,8 +8,14 @@ Robin Petit - *000408282*
 
 ## Convention
 ```
+static Object CONSTANT;
+
 public void foo(Object param) {
-    // Code
+    if(param == CONSTANT) {
+        // Code
+    } else {
+        // Other code
+    }
 }
 ```
 **CamelCase**      
