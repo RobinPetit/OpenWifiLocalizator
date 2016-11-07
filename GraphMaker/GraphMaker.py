@@ -3,7 +3,76 @@
 import tkinter as t
 from tkinter import filedialog as fdialog
 from PIL import Image, ImageTk
-from time import time
+from time import time, sleep
+from os import system
+
+class AP:
+
+    def __init__(self, key):
+        self.key = key
+        self.values = []
+
+    def avg (self):
+        res = 0
+        for elem in self.values:
+            res += elem
+        return res/len(self.values)
+
+    def add (self, dbm):
+        self.values.append(dbm)
+
+    def text (self):
+        return '<wifi BSS="'+self.key+'" max="'+str(abs(min(self.values)))+'" min="'+str(abs(max(self.values)))+'" avg="'+str(abs(self.avg()))+'"/wifi>'
+
+class AccesPointList:
+
+    def __init__(self, network = "wlp3s0", tmpfile = "temp.txt", iterations = 5, wait = 2):
+        self.network = network
+        self.tmpfile = tmpfile
+        self.iter = iterations
+        self.wait = wait
+        self.elements = []
+
+    def text (self):
+        output = '<listWifi>\n'
+        for elem in self.elements:
+            output += elem.text()+'\n'
+        output += '</listWifi>'
+        return output
+
+    def findAP (self, key):
+        for elem in self.elements:
+            if (key == elem.key):
+                return elem
+        return None
+
+    def extractData (self, lines):
+        key = ""
+        for line in lines:
+            line = line.strip()
+            if (line[:3] == "BSS" and line[:8] != "BSS Load"):
+                key = line[4:21]
+                if (self.findAP(key) == None):
+                    self.elements.append(AP(key))
+            elif (line[:6] == "signal"):
+                tmp = line[8:]
+                tmp = float(tmp[:len(tmp)-4])
+                elem = self.findAP(key)
+                elem.add(tmp)
+
+    def scan (self):
+        for i in range(self.iter):
+            system("iw dev "+self.network+" scan > "+self.tmpfile)
+            file = open(self.tmpfile)
+            lines = file.readlines()
+            file.close()
+            self.extractData(lines)
+            sleep(self.wait)
+
+# À utiliser de la manière suivante :
+#    tmp = AccesPointList()
+#    tmp.scan()
+#    tmp.text()
 
 class Node:
     def __init__(self, name, coords):
