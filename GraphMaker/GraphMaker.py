@@ -8,6 +8,7 @@ from time import time, sleep
 from os import system, remove
 from os.path import relpath, splitext
 from xml.etree import ElementTree
+from math import sqrt
 
 class AP:
     def __init__(self, key):
@@ -221,8 +222,19 @@ class App(t.Tk):
         if ext == 'xml':
             self.load_xml()
         elif ext in ['bmp', 'jpg', 'jpe', 'jpeg', 'png', 'tif', 'tiff']:
+            self.metre_length_on_plan = self.ask_metre_length()
+            print('One metre is then {} pixels'.format(self.metre_length_on_plan))
             self.background_file_name = self.file_name
             self.chose_background_image()
+
+    def ask_metre_length(self):
+        toplevel = t.Toplevel(self)
+        nb_pixels = t.StringVar()
+        t.Label(toplevel, text='Enter length (in pixels) of a meter on the given plan: ').grid(row=0, column=0)
+        t.Entry(toplevel, textvariable=nb_pixels).grid(row=0, column=1)
+        t.Button(toplevel, text='Ok', command=toplevel.destroy).grid(row=1)
+        toplevel.wait_window()
+        return int(nb_pixels.get())
 
     def chose_background_image(self):
         self.bg_template = Image.open(self.background_file_name)
@@ -359,8 +371,11 @@ class App(t.Tk):
                 self.canvas.delete(self.tmp_line_id)
                 self.tmp_line_id = None
                 if end is not None:
+                    node_coord = self.nodes[end].coord()
+                    final_point = [node_coord[i]+App.NODE_SIZE for i in range(2)]
+                    distance = App.dist(self.initial_click_coord, final_point)
                     try:
-                        weight = self.configure_edge()
+                        weight = self.configure_edge(distance/self.metre_length_on_plan)
                     except:
                         return
                     edge_id = self.canvas.create_line(*self.initial_click_coord,
@@ -408,7 +423,7 @@ class App(t.Tk):
         toplevel = t.Toplevel(self)
         t.Label(toplevel, text='Edge Weight').grid(row=0, column=0)
         value = t.StringVar()
-        value.set(str(current_weight))
+        value.set('{:.2f}'.format(current_weight))
         t.Entry(toplevel, textvariable=value).grid(row=0, column=1)
         t.Button(toplevel, text='Ok', command=toplevel.destroy).grid(row=1)
         toplevel.wait_window()
@@ -418,6 +433,7 @@ class App(t.Tk):
 
     def text(self, nb_tab=0):
         text = ('\t' * (nb_tab+1)) + '<background_image path="{}" coord="{}" />\n'.format(relpath(self.background_file_name), tuple(self.cv_image_coord))
+        text += ('\t' * (nb_tab+1)) + '<distance_unit value="{}" />\n'.format(self.metre_length_on_plan)
         plan_name = 'XXX'
         for node_id in self.nodes:
             text+= self.nodes[node_id].text(nb_tab+1)
@@ -433,7 +449,8 @@ class App(t.Tk):
     def load_xml(self):
         xml_tree = ElementTree.parse(self.file_name)
         root = xml_tree.getroot()
-        bg_image = root.findall('background_image')[0]
+        self.metre_length_on_plan = int(root.find('distance_unit').get('value'))
+        bg_image = root.find('background_image')
         self.background_file_name = bg_image.get('path')
         self.chose_background_image()
         self.cv_image_coord = [float(value.strip()) for value in bg_image.get('coord')[1:-1].split(',')]
@@ -464,6 +481,10 @@ class App(t.Tk):
             beg_coord = [c + App.NODE_SIZE for c in self.nodes[extremities_ids[0]].coord()[:2]]
             edge_id = self.canvas.create_line(*beg_coord, *end_coord, width=App.EDGE_WIDTH)
             self.add_edge(float(edge.get('weight')), edge_id, extremities)
+
+    @staticmethod
+    def dist(a, b):
+        return sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
 
 def main():
     app = App(c_width=800, c_height=800)
