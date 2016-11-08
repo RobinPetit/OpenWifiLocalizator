@@ -5,7 +5,8 @@ from tkinter import filedialog as fdialog
 from PIL import Image, ImageTk
 from time import time, sleep
 from os import system, remove
-from os.path import relpath
+from os.path import relpath, splitext
+from xml.etree import ElementTree
 
 class AP:
     def __init__(self, key):
@@ -13,10 +14,7 @@ class AP:
         self.values = []
 
     def avg (self):
-        res = 0
-        for elem in self.values:
-            res += elem
-        return res/len(self.values)
+        return sum(self.values)/len(self.values)
 
     def add (self, dbm):
         self.values.append(dbm)
@@ -69,6 +67,21 @@ class AccessPointList:
             sleep(self.wait)
         remove(self.tmpfile)
 
+class StaticAccessPointList:
+    def fromXml(self, xml_tree):
+        self.elements = list()
+        for wifi in xml_tree.iter('wifi'):
+            self.elements.append(wifi)
+
+    def text(self, nb_tab=0):
+        output = ('\t' * nb_tab) + '<listWifi>\n'
+        for elem in self.elements:
+            _ = '<wifi BSS="{}" max="{}" min="{}" avg="{}" />' \
+                .format(elem.get('BSS'), elem.get('max'), elem.get('min'), elem.get('avg'))
+            output += ('\t' * (nb_tab+1)) + _ + '\n'
+        output += ('\t' * nb_tab) + '</listWifi>'
+        return output
+
 # À utiliser de la manière suivante :
 #    tmp = AccessPointList()
 #    tmp.scan()
@@ -79,6 +92,7 @@ class Node:
         self.name_ = name
         self.coords = coords
         self.access_points_ = access_points
+        self.color = 'green' if access_points is not None else 'red'
 
     def coord(self, c=None):
         if c is None:
@@ -100,15 +114,16 @@ class Node:
 
     # TODO: handle aliases
     def text(self, nb_tab=0):
-        text = ('\t' * (nb_tab61)) + '<coord x="{}" y="{}" />\n'.format(*self.coord())
+        text = ('\t' * (nb_tab+1)) + '<coord x="{}" y="{}" />\n'.format(*self.coord())
         if self.access_points_ is not None:
             text += self.access_points_.text(nb_tab+1)
         return '{0}<point id="{1}">\n{2}\n{0}</point>\n'.format('\t'*nb_tab, self.name(), text)
 
 class Edge:
-    def __init__(self, weight, coords):
+    def __init__(self, weight, coords, extremity_ids):
         self.weight_ = weight
         self.coords = coords
+        self.extremity_ids = extremity_ids
 
     def coord(self, c=None):
         if c is None:
@@ -121,6 +136,9 @@ class Edge:
             return self.weight_
         else:
             self.weight_ = w
+
+    def text(self, nb_tab=0):
+        return ('\t'*nb_tab) + '<edge beg="{}" end="{}" weight="{}" />\n'.format(*self.extremity_ids, self.weight())
 
 '''
     Available operations:
@@ -146,15 +164,19 @@ class App(t.Tk):
     CLICK_TIME_SENSIBILITY = 0.1  # maximum time before click and release to be accepted
 
     NODE_SIZE = 10
+    EDGE_WIDTH = 2.5
 
     NETWORK_ID = 'wlp2s0'  # Change this according to your network device id
+
+    AUTO_SAVE_XML = False
 
     def __init__(self, save_file='save.xml', **options):
         super().__init__()
         self.init_variables()
         self.create_widgets(**options)
         self.save_file = save_file
-        self.protocol("WM_DELETE_WINDOW", lambda: (self.save_to_xml(), self.destroy()))
+        if App.AUTO_SAVE_XML:
+            self.protocol("WM_DELETE_WINDOW", lambda: (self.save_to_xml(), self.destroy()))
 
     def init_variables(self):
         self.nodes = dict()
@@ -167,7 +189,7 @@ class App(t.Tk):
     def create_widgets(self, **options):
         self.canvas = t.Canvas(self, width=options['c_width'], height=options['c_height'])
         self.canvas.pack()
-        self.chose_background_image()
+        self.open_file()  # self.chose_background_image()
         self.alpha_scale = t.Scale(self, from_=1, to=255,
             command=lambda v: self.make_bg_image(v), orient=t.HORIZONTAL)
         self.alpha_scale.set(App.ALPHA_INITIAL_VALUE)
@@ -191,8 +213,16 @@ class App(t.Tk):
         for event in canvas_callbacks:
             self.canvas.bind(event, canvas_callbacks[event])
 
+    def open_file(self):
+        self.file_name = t.filedialog.askopenfilename(initialdir='../plans/')
+        ext = splitext(self.file_name)[1].lower()[1:]
+        if ext == 'xml':
+            self.load_xml()
+        elif ext in ['bmp', 'jpg', 'jpe', 'jpeg', 'png', 'tif', 'tiff']:
+            self.background_file_name = self.file_name
+            self.chose_background_image()
+
     def chose_background_image(self):
-        self.background_file_name = t.filedialog.askopenfilename(initialdir='../plans/')
         self.bg_template = Image.open(self.background_file_name)
         self.bg_image_size = self.bg_template.size
         self.make_bg_image(App.ALPHA_INITIAL_VALUE)
@@ -206,12 +236,19 @@ class App(t.Tk):
         else:
             self.canvas.itemconfig(self.cv_image_id, image=self.bg_image)
 
-    def add_node(self, x, y):
-        node_coord = x-App.NODE_SIZE, y-App.NODE_SIZE, x+App.NODE_SIZE, y+App.NODE_SIZE
-        node_id = self.canvas.create_oval(*node_coord, fill='red')
-        # print('Adding new node with id', new_id)
+    def create_node(self, x, y):
         name, access_points = self.configure_node()
+        if name == '' or name in [self.nodes[n].name() for n in self.nodes]:
+            return
+        node_coord = x-App.NODE_SIZE, y-App.NODE_SIZE, x+App.NODE_SIZE, y+App.NODE_SIZE
+        node_id = self.canvas.create_oval(*node_coord, fill='green' if access_points is not None else 'red')
+        self.add_node(name, node_id, access_points)
+
+    def add_node(self, name, node_id, access_points):
         self.nodes[node_id] = Node(name, self.canvas.coords(node_id), access_points)
+
+    def add_edge(self, weight, edge_id, extremities):
+        self.edges[edge_id] = Edge(weight, self.canvas.coords(edge_id), extremities)
 
     # events handling code
 
@@ -268,7 +305,7 @@ class App(t.Tk):
             self.initial_click_coord = [self.nodes[self.left_src].coord()[0]+App.NODE_SIZE,
                 self.nodes[self.left_src].coord()[1]+App.NODE_SIZE]
             _ = self.initial_click_coord + self.initial_click_coord
-            self.tmp_line_id = self.canvas.create_line(*_, width=2.5)
+            self.tmp_line_id = self.canvas.create_line(*_, width=App.EDGE_WIDTH)
         else:
             self.click_coord = [ev.x, ev.y]
         self.left_click_time = time()
@@ -299,6 +336,8 @@ class App(t.Tk):
             self.nodes[selected].name(name)
             if access_points is not None:
                 self.nodes[selected].access_points(access_points)
+                self.color = 'green'
+                self.canvas.itemconfig(selected, fill='green')
         elif selected in self.edges:
             self.edges[selected].weight(self.configure_edge(self.edges[selected].weight()))
         else:
@@ -321,7 +360,8 @@ class App(t.Tk):
                     edge_id = self.canvas.create_line(*self.initial_click_coord,
                         self.nodes[end].coord()[0]+App.NODE_SIZE, self.nodes[end].coord()[1]+App.NODE_SIZE,
                         width=2.5)
-                    self.edges[edge_id] = Edge(self.configure_edge(), self.canvas.coords(edge_id))
+                    extremity_ids = (self.nodes[self.get_selected_el(*self.initial_click_coord)].name(), self.nodes[end].name())
+                    self.add_edge(self.configure_edge(), edge_id, extremity_ids)
             else:
                 self.cv_image_coord = self.canvas.coords(self.cv_image_id)
                 for node_id in self.nodes:
@@ -329,7 +369,7 @@ class App(t.Tk):
                 for edge_id in self.edges:
                     self.edges[edge_id].coord(self.canvas.coords(edge_id))
         elif float(time() - self.left_click_time) <= App.CLICK_TIME_SENSIBILITY:
-            self.add_node(ev.x, ev.y)
+            self.create_node(ev.x, ev.y)
         self.left_moved = False
 
     def handle_right_release(self, ev):
@@ -374,14 +414,45 @@ class App(t.Tk):
         text = ('\t' * (nb_tab+1)) + '<background_image path="{}" coord="{}" />\n'.format(relpath(self.background_file_name), tuple(self.cv_image_coord))
         plan_name = 'XXX'
         for node_id in self.nodes:
-            node = self.nodes[node_id]
-            text+= node.text(nb_tab+1)
+            text+= self.nodes[node_id].text(nb_tab+1)
+        for edge_id in self.edges:
+            text += self.edges[edge_id].text(nb_tab+1)
         return '<plan nom="{}">\n{}\n</plan>\n'.format(plan_name, text)
 
     def save_to_xml(self):
         content = self.text()
         with open(self.save_file, 'w') as save_file:
             save_file.write(content)
+
+    def load_xml(self):
+        xml_tree = ElementTree.parse(self.file_name)
+        root = xml_tree.getroot()
+        bg_image = root.findall('background_image')[0]
+        self.background_file_name = bg_image.get('path')
+        self.chose_background_image()
+        self.cv_image_coord = [float(value.strip()) for value in bg_image.get('coord')[1:-1].split(',')]
+        self.canvas.coords(self.cv_image_id, *self.cv_image_coord)
+        for point in xml_tree.findall('point'):
+            coord = point.find('coord')
+            x, y = float(coord.get('x')), float(coord.get('y'))
+            coord = x-App.NODE_SIZE, y-App.NODE_SIZE, x+App.NODE_SIZE, y+App.NODE_SIZE
+            listWifi = point.find('listWifi')
+            if listWifi is None:
+                access_points = None
+            else:
+                access_points = StaticAccessPointList()
+                access_points.fromXml(listWifi)
+                access_points.text()
+            node_id = self.canvas.create_oval(*coord, fill='green' if access_points is not None else 'red')
+            self.add_node(point.attrib['id'], node_id, access_points)
+        for edge in xml_tree.findall('edge'):
+            extremities = edge.get('beg'), edge.get('end')
+            extremities_ids = [[node_id for node_id in self.nodes \
+                if self.nodes[node_id].name() == extremity][0] for extremity in extremities]
+            end_coord = [c + App.NODE_SIZE for c in self.nodes[extremities_ids[1]].coord()[:2]]
+            beg_coord = [c + App.NODE_SIZE for c in self.nodes[extremities_ids[0]].coord()[:2]]
+            edge_id = self.canvas.create_line(*beg_coord, *end_coord, width=App.EDGE_WIDTH)
+            self.add_edge(float(edge.get('weight')), edge_id, extremities)
 
 def main():
     app = App(c_width=400, c_height=400)
