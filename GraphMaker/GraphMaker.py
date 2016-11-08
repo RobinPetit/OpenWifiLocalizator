@@ -2,6 +2,7 @@
 
 import tkinter as t
 from tkinter import filedialog as fdialog
+from tkinter import messagebox as mbox
 from PIL import Image, ImageTk
 from time import time, sleep
 from os import system, remove
@@ -168,15 +169,16 @@ class App(t.Tk):
 
     NETWORK_ID = 'wlp2s0'  # Change this according to your network device id
 
-    AUTO_SAVE_XML = False
-
-    def __init__(self, save_file='save.xml', **options):
+    def __init__(self, **options):
         super().__init__()
         self.init_variables()
         self.create_widgets(**options)
-        self.save_file = save_file
-        if App.AUTO_SAVE_XML:
-            self.protocol("WM_DELETE_WINDOW", lambda: (self.save_to_xml(), self.destroy()))
+        self.protocol("WM_DELETE_WINDOW", self.on_exit)
+
+    def on_exit(self):
+        if mbox.askquestion('Quit', 'Do you want to save before leaving?') == 'yes':
+            self.save_to_xml(fdialog.asksaveasfilename(defaultextension='xml', filetypes=[('XML Files', '.xml')], initialdir='./'))
+        self.destroy()
 
     def init_variables(self):
         self.nodes = dict()
@@ -419,9 +421,9 @@ class App(t.Tk):
             text += self.edges[edge_id].text(nb_tab+1)
         return '<plan nom="{}">\n{}\n</plan>\n'.format(plan_name, text)
 
-    def save_to_xml(self):
+    def save_to_xml(self, path):
         content = self.text()
-        with open(self.save_file, 'w') as save_file:
+        with open(path, 'w') as save_file:
             save_file.write(content)
 
     def load_xml(self):
