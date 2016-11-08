@@ -321,8 +321,9 @@ class App(t.Tk):
             node_center = [c+App.NODE_SIZE for c in node_center]
             self.canvas.delete(selected)
             for edge_id in self.edges:
-                if node_center in (self.edges[edge_id].coord()[:2], self.edges[edge_id].coord()[2:4]):
+                if selected in self.edges[edge_id].extreimity_ids:
                     self.canvas.delete(edge_id)
+            del self.nodes[selected]
         elif selected in self.edges:
             self.canvas.delete(selected)
             del self.edges[selected]
@@ -358,12 +359,15 @@ class App(t.Tk):
                 self.canvas.delete(self.tmp_line_id)
                 self.tmp_line_id = None
                 if end is not None:
-                    # to do, store the link somewhere to be saved in file
+                    try:
+                        weight = self.configure_edge()
+                    except:
+                        return
                     edge_id = self.canvas.create_line(*self.initial_click_coord,
                         self.nodes[end].coord()[0]+App.NODE_SIZE, self.nodes[end].coord()[1]+App.NODE_SIZE,
                         width=2.5)
                     extremity_ids = (self.nodes[self.get_selected_el(*self.initial_click_coord)].name(), self.nodes[end].name())
-                    self.add_edge(self.configure_edge(), edge_id, extremity_ids)
+                    self.add_edge(weight, edge_id, extremity_ids)
             else:
                 self.cv_image_coord = self.canvas.coords(self.cv_image_id)
                 for node_id in self.nodes:
@@ -434,6 +438,10 @@ class App(t.Tk):
         self.chose_background_image()
         self.cv_image_coord = [float(value.strip()) for value in bg_image.get('coord')[1:-1].split(',')]
         self.canvas.coords(self.cv_image_id, *self.cv_image_coord)
+        self.load_points(xml_tree)
+        self.load_edges(xml_tree)
+
+    def load_points(self, xml_tree):
         for point in xml_tree.findall('point'):
             coord = point.find('coord')
             x, y = float(coord.get('x')), float(coord.get('y'))
@@ -444,9 +452,10 @@ class App(t.Tk):
             else:
                 access_points = StaticAccessPointList()
                 access_points.fromXml(listWifi)
-                access_points.text()
             node_id = self.canvas.create_oval(*coord, fill='green' if access_points is not None else 'red')
             self.add_node(point.attrib['id'], node_id, access_points)
+
+    def load_edges(self, xml_tree):
         for edge in xml_tree.findall('edge'):
             extremities = edge.get('beg'), edge.get('end')
             extremities_ids = [[node_id for node_id in self.nodes \
@@ -457,7 +466,7 @@ class App(t.Tk):
             self.add_edge(float(edge.get('weight')), edge_id, extremities)
 
 def main():
-    app = App(c_width=400, c_height=400)
+    app = App(c_width=800, c_height=800)
     app.mainloop()
 
 if __name__ == '__main__':
