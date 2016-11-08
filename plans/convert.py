@@ -3,6 +3,8 @@
 from glob import glob
 from os import system
 
-for pdf_file in glob('**/*.pdf', recursive=True):
-    print('Converting {}'.format(pdf_file))
-    system('convert -density 150 "{}" -quality 100 "{}".png'.format(pdf_file, pdf_file[:-4]))
+pdf_files = glob('**/*.pdf', recursive=True)
+for i in range(len(pdf_files)):
+    print('\r{:2.2f}%'.format(100*i/len(pdf_files)), end='')
+    system('convert -density 150 "{}" -quality 100 "{}".png'.format(pdf_files[i], pdf_files[i][:-4]))
+print('\r100.00% completed!')
