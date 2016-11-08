@@ -3,3 +3,10 @@
 *.aux
 *.log
 *.out
+
+# Vim files
+*.swp
+*.swo
+
+# Hidden directories
+plans/

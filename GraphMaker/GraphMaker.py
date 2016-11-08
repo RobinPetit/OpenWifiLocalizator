@@ -4,10 +4,10 @@ import tkinter as t
 from tkinter import filedialog as fdialog
 from PIL import Image, ImageTk
 from time import time, sleep
-from os import system
+from os import system, remove
+from os.path import relpath
 
 class AP:
-
     def __init__(self, key):
         self.key = key
         self.values = []
@@ -22,22 +22,22 @@ class AP:
         self.values.append(dbm)
 
     def text (self):
-        return '<wifi BSS="'+self.key+'" max="'+str(abs(min(self.values)))+'" min="'+str(abs(max(self.values)))+'" avg="'+str(abs(self.avg()))+'"/wifi>'
+        return '<wifi BSS="{}" max="{:2.1f}" min="{:2.1f}" avg="{:2.1f}" />' \
+               .format(self.key, -min(self.values), -max(self.values), -self.avg())
 
-class AccesPointList:
-
+class AccessPointList:
     def __init__(self, network = "wlp3s0", tmpfile = "temp.txt", iterations = 5, wait = 2):
         self.network = network
         self.tmpfile = tmpfile
-        self.iter = iterations
+        self.iters = iterations
         self.wait = wait
         self.elements = []
 
-    def text (self):
-        output = '<listWifi>\n'
+    def text (self, nb_tab=0):
+        output = ('\t' * nb_tab) + '<listWifi>\n'
         for elem in self.elements:
-            output += elem.text()+'\n'
-        output += '</listWifi>'
+            output += ('\t' * (nb_tab+1)) + elem.text()+'\n'
+        output += ('\t' * nb_tab) + '</listWifi>'
         return output
 
     def findAP (self, key):
@@ -61,23 +61,24 @@ class AccesPointList:
                 elem.add(tmp)
 
     def scan (self):
-        for i in range(self.iter):
-            system("iw dev "+self.network+" scan > "+self.tmpfile)
-            file = open(self.tmpfile)
-            lines = file.readlines()
-            file.close()
-            self.extractData(lines)
+        cmd = "iw dev {}  scan > {}".format(self.network, self.tmpfile)
+        for i in range(self.iters):
+            system(cmd)
+            with open(self.tmpfile) as file:
+                self.extractData(file.readlines())
             sleep(self.wait)
+        remove(self.tmpfile)
 
 # À utiliser de la manière suivante :
-#    tmp = AccesPointList()
+#    tmp = AccessPointList()
 #    tmp.scan()
 #    tmp.text()
 
 class Node:
-    def __init__(self, name, coords):
+    def __init__(self, name, coords, access_points):
         self.name_ = name
         self.coords = coords
+        self.access_points_ = access_points
 
     def coord(self, c=None):
         if c is None:
@@ -90,6 +91,19 @@ class Node:
             return self.name_
         else:
             self.name_ = n
+
+    def access_points(self, ap=None):
+        if ap is None:
+            return self.acces_points_
+        else:
+            self.access_points_ = ap
+
+    # TODO: handle aliases
+    def text(self, nb_tab=0):
+        text = ('\t' * (nb_tab61)) + '<coord x="{}" y="{}" />\n'.format(*self.coord())
+        if self.access_points_ is not None:
+            text += self.access_points_.text(nb_tab+1)
+        return '{0}<point id="{1}">\n{2}\n{0}</point>\n'.format('\t'*nb_tab, self.name(), text)
 
 class Edge:
     def __init__(self, weight, coords):
@@ -133,10 +147,14 @@ class App(t.Tk):
 
     NODE_SIZE = 10
 
-    def __init__(self, **options):
+    NETWORK_ID = 'wlp2s0'  # Change this according to your network device id
+
+    def __init__(self, save_file='save.xml', **options):
         super().__init__()
         self.init_variables()
         self.create_widgets(**options)
+        self.save_file = save_file
+        self.protocol("WM_DELETE_WINDOW", lambda: (self.save_to_xml(), self.destroy()))
 
     def init_variables(self):
         self.nodes = dict()
@@ -174,7 +192,7 @@ class App(t.Tk):
             self.canvas.bind(event, canvas_callbacks[event])
 
     def chose_background_image(self):
-        self.background_file_name = t.filedialog.askopenfilename()
+        self.background_file_name = t.filedialog.askopenfilename(initialdir='../plans/')
         self.bg_template = Image.open(self.background_file_name)
         self.bg_image_size = self.bg_template.size
         self.make_bg_image(App.ALPHA_INITIAL_VALUE)
@@ -192,7 +210,8 @@ class App(t.Tk):
         node_coord = x-App.NODE_SIZE, y-App.NODE_SIZE, x+App.NODE_SIZE, y+App.NODE_SIZE
         node_id = self.canvas.create_oval(*node_coord, fill='red')
         # print('Adding new node with id', new_id)
-        self.nodes[node_id] = Node(self.configure_node(), self.canvas.coords(node_id))
+        name, access_points = self.configure_node()
+        self.nodes[node_id] = Node(name, self.canvas.coords(node_id), access_points)
 
     # events handling code
 
@@ -248,8 +267,8 @@ class App(t.Tk):
         if self.left_src is not None:
             self.initial_click_coord = [self.nodes[self.left_src].coord()[0]+App.NODE_SIZE,
                 self.nodes[self.left_src].coord()[1]+App.NODE_SIZE]
-            self.tmp_line_id = self.canvas.create_line(*self.initial_click_coord,
-                *self.initial_click_coord, width=2.5)
+            _ = self.initial_click_coord + self.initial_click_coord
+            self.tmp_line_id = self.canvas.create_line(*_, width=2.5)
         else:
             self.click_coord = [ev.x, ev.y]
         self.left_click_time = time()
@@ -276,7 +295,10 @@ class App(t.Tk):
         if selected is None:
             return
         if selected in self.nodes:
-            self.nodes[selected].name(self.configure_node(self.nodes[selected].name()))
+            name, access_points = self.configure_node(self.nodes[selected].name())
+            self.nodes[selected].name(name)
+            if access_points is not None:
+                self.nodes[selected].access_points(access_points)
         elif selected in self.edges:
             self.edges[selected].weight(self.configure_edge(self.edges[selected].weight()))
         else:
@@ -317,14 +339,24 @@ class App(t.Tk):
         print('WR')
 
     def configure_node(self, current_name=''):
-        toplevel = t.Toplevel(self)
-        t.Label(toplevel, text='Node Name: ').grid(row=0, column=0)
+        self.toplevel = t.Toplevel(self)
+        t.Label(self.toplevel, text='Node Name: ').grid(row=0, column=0)
         name = t.StringVar()
         name.set(current_name)
-        t.Entry(toplevel, textvariable=name).grid(row=0, column=1)
-        t.Button(toplevel, text='Ok', command=toplevel.destroy).grid(row=1)
-        toplevel.wait_window()
-        return name.get()
+        t.Entry(self.toplevel, textvariable=name).grid(row=0, column=1)
+        t.Button(self.toplevel, text='Ok', command=self.toplevel.destroy).grid(row=1)
+        self.ap = None
+        t.Button(self.toplevel, text='Scan access points', command=self.scan).grid(row=1, column=1)
+        self.toplevel.wait_window()
+        ap = self.ap
+        del self.ap
+        return name.get(), ap
+
+    def scan(self):
+        self.toplevel.wm_title('Scanning access points...')
+        self.ap = AccessPointList(network=App.NETWORK_ID, iterations=2)
+        self.ap.scan()
+        self.toplevel.wm_title('access points scanned')
 
     def configure_edge(self, current_weight=''):
         toplevel = t.Toplevel(self)
@@ -336,9 +368,25 @@ class App(t.Tk):
         toplevel.wait_window()
         return float(value.get())
 
+    # Save functions
+
+    def text(self, nb_tab=0):
+        text = ('\t' * (nb_tab+1)) + '<background_image path="{}" coord="{}" />\n'.format(relpath(self.background_file_name), tuple(self.cv_image_coord))
+        plan_name = 'XXX'
+        for node_id in self.nodes:
+            node = self.nodes[node_id]
+            text+= node.text(nb_tab+1)
+        return '<plan nom="{}">\n{}\n</plan>\n'.format(plan_name, text)
+
+    def save_to_xml(self):
+        content = self.text()
+        with open(self.save_file, 'w') as save_file:
+            save_file.write(content)
+
 def main():
     app = App(c_width=400, c_height=400)
     app.mainloop()
 
 if __name__ == '__main__':
+    print('Be sure to run this script as root to be able to scan for networks')
     main()
