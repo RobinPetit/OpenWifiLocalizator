@@ -5,77 +5,73 @@
  */
 package be.ulb.owl.xml;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 
 /**
- *
+ * Example code... Need to be dev :P
+ * 
  * @author Detobel36
  */
 public class ReadXML {
     
-    private static Element rootElem;
+    private static final String ns = null;
     
     
-    /**
-     * Load XML File
-     * 
-     * @param filename name of the file wich must be load
-     */
-    public static void loadXML(String filename) {
-        loadXML(new File(filename));
-    }
-    
-    /**
-     * Load XML File
-     * 
-     * @param file file which must be load
-     */
-    public static void loadXML(File file) {
-        SAXBuilder sxb = new SAXBuilder();
-        
-        Document document = null;
+    public List parse(Reader in) throws XmlPullParserException, IOException {
         try {
-            document = sxb.build(file);
-        } catch (JDOMException | IOException ex) {
-            Logger.getLogger(ReadXML.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        if(document != null) {
-            rootElem = document.getRootElement();
+            XmlPullParserFactory parserFactory = XmlPullParserFactory.newInstance();
+            XmlPullParser parser = parserFactory.newPullParser();
+            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+            parser.setInput(in);
+            parser.nextToken();
+            return readFeed(parser);
+        } finally {
+            in.close();
         }
     }
     
-    private void loadXMLInfo() {
-        List<Element> listBatiment = rootElem.getChildren("batiment");
+    private List readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
+        List entries = new ArrayList();
         
-        for(Element batiment : listBatiment) {
-            // Ici
+        parser.require(XmlPullParser.START_TAG, ns, "feed");
+        while (parser.next() != XmlPullParser.END_TAG) {
+            if (parser.getEventType() != XmlPullParser.START_TAG) {
+                continue;
+            }
+            String name = parser.getName();
+            // Starts by looking for the entry tag
+            if (name.equals("entry")) {
+                // Read here
+                //entries.add(readEntry(parser));
+            } else {
+                skip(parser);
+            }
         }
-        
-//        On crée une List contenant tous les noeuds "etudiant" de l'Element racine
-//        List listEtudiants = racine.getChildren("etudiant");
-//
-//        //On crée un Iterator sur notre liste
-//        Iterator i = listEtudiants.iterator();
-//        while(i.hasNext())
-//        {
-//           //On recrée l'Element courant à chaque tour de boucle afin de
-//           //pouvoir utiliser les méthodes propres aux Element comme :
-//           //sélectionner un nœud fils, modifier du texte, etc...
-//           Element courant = (Element)i.next();
-//           //On affiche le nom de l’élément courant
-//           System.out.println(courant.getChild("nom").getText());
-//        }
+        return entries;
     }
     
+    private void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
+        if (parser.getEventType() != XmlPullParser.START_TAG) {
+            throw new IllegalStateException();
+        }
+        int depth = 1;
+        while (depth != 0) {
+            switch (parser.next()) {
+                case XmlPullParser.END_TAG:
+                    depth--;
+                    break;
+                case XmlPullParser.START_TAG:
+                    depth++;
+                    break;
+            }
+        }
+    }
     
 }
