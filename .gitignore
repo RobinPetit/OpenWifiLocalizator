@@ -10,3 +10,6 @@
 
 # Hidden directories
 plans/
+
+*.xml
+!./XML plans/*.xml
