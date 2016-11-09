@@ -10,6 +10,9 @@ from os.path import relpath, splitext
 from xml.etree import ElementTree
 from math import sqrt
 
+SET_TABS_IN_XML = True
+TAB = {True: '\t', False: ''}[SET_TABS_IN_XML]
+
 class AP:
     def __init__(self, key):
         self.key = key
@@ -34,10 +37,10 @@ class AccessPointList:
         self.elements = []
 
     def text (self, nb_tab=0):
-        output = ('\t' * nb_tab) + '<listWifi>\n'
+        output = (TAB * nb_tab) + '<listWifi>\n'
         for elem in self.elements:
-            output += ('\t' * (nb_tab+1)) + elem.text()+'\n'
-        output += ('\t' * nb_tab) + '</listWifi>'
+            output += (TAB * (nb_tab+1)) + elem.text()+'\n'
+        output += (TAB * nb_tab) + '</listWifi>'
         return output
 
     def findAP (self, key):
@@ -76,12 +79,12 @@ class StaticAccessPointList:
             self.elements.append(wifi)
 
     def text(self, nb_tab=0):
-        output = ('\t' * nb_tab) + '<listWifi>\n'
+        output = (TAB * nb_tab) + '<listWifi>\n'
         for elem in self.elements:
             _ = '<wifi BSS="{}" max="{}" min="{}" avg="{}" />' \
                 .format(elem.get('BSS'), elem.get('max'), elem.get('min'), elem.get('avg'))
-            output += ('\t' * (nb_tab+1)) + _ + '\n'
-        output += ('\t' * nb_tab) + '</listWifi>'
+            output += (TAB * (nb_tab+1)) + _ + '\n'
+        output += (TAB * nb_tab) + '</listWifi>'
         return output
 
 # À utiliser de la manière suivante :
@@ -116,10 +119,10 @@ class Node:
 
     # TODO: handle aliases
     def text(self, nb_tab=0):
-        text = ('\t' * (nb_tab+1)) + '<coord x="{}" y="{}" />\n'.format(*self.coord())
+        text = (TAB * (nb_tab+1)) + '<coord x="{}" y="{}" />\n'.format(*self.coord())
         if self.access_points_ is not None:
             text += self.access_points_.text(nb_tab+1)
-        return '{0}<point id="{1}">\n{2}\n{0}</point>\n'.format('\t'*nb_tab, self.name(), text)
+        return '{0}<point id="{1}">\n{2}\n{0}</point>\n'.format(TAB*nb_tab, self.name(), text)
 
 class Edge:
     def __init__(self, weight, coords, extremity_ids):
@@ -140,7 +143,7 @@ class Edge:
             self.weight_ = w
 
     def text(self, nb_tab=0):
-        return ('\t'*nb_tab) + '<edge beg="{}" end="{}" weight="{}" />\n'.format(*self.extremity_ids, self.weight())
+        return (TAB*nb_tab) + '<edge beg="{}" end="{}" weight="{}" />\n'.format(*self.extremity_ids, self.weight())
 
 '''
     Available operations:
@@ -432,8 +435,8 @@ class App(t.Tk):
     # Save functions
 
     def text(self, nb_tab=0):
-        text = ('\t' * (nb_tab+1)) + '<background_image path="{}" coord="{}" />\n'.format(relpath(self.background_file_name), tuple(self.cv_image_coord))
-        text += ('\t' * (nb_tab+1)) + '<distance_unit value="{}" />\n'.format(self.metre_length_on_plan)
+        text = (TAB * (nb_tab+1)) + '<background_image path="{}" coord="{}" />\n'.format(relpath(self.background_file_name), tuple(self.cv_image_coord))
+        text += (TAB * (nb_tab+1)) + '<distance_unit value="{}" />\n'.format(self.metre_length_on_plan)
         plan_name = 'XXX'
         for node_id in self.nodes:
             text+= self.nodes[node_id].text(nb_tab+1)
