@@ -190,4 +190,27 @@ Nous avons dans un premier temps choisi de développer sur Android. Ce n'est pas
       \end{itemize}
     \end{tcolorbox}
 
+\section{Traitement du graphe}
+	\subsection{Utilisation de la triangulation}
+		Le graphe manipulé sera représenté par $\Gamma = (V, E)$, avec $V$ l'ensemble des locaux accessibles ainsi que l'ensemble des points additionnels dans les couloirs
+		afin de relier les locaux entre eux, et $E$ l'ensemble des liens permettant de joindre les nœuds.
+
+		L'idée initiale était de lier le graphe des nœuds avec un graphe des bornes Wi-Fi et de diminuer les poids des arêtes d'une constante $K \gneqq 0$ pour les arêtes
+		ayant une borne à une des deux extrémités. Ce cas aurait laissé la possibilité d'avoir des arêtes de poids négatif, et donc un algorithme classique tel que Dijkstra
+		ou A* n'aurait pas été possible.
+
+		Nous avions donc pensé qu'un algorithme plus général tel que \textit{Bellman-Ford} serait nécessaire (afin de gérer les poids négatifs), et pour pouvoir diminuer
+		les calculs, faire une passe de \textit{Floyd-Warshall} au préalable afin de pouvoir élaguer tous les chemins en cours de calcul, de poids supérieur à la borne
+		donnée par Floyd-Warshall.
+
+	\subsection{Utilisation de la SSM}
+		Cependant, le fait d'utiliser une SSM rend la localisation plus simple~: il n'est plus nécessaire de maintenir un graphe des bornes, et donc il n'y a plus
+		qu'un seul graphe, à savoir celui des locaux (dans lequel seront stockées les informations relatives aux réseaux). Cela retire la nécessité de retirer une
+		constante $K$ et donc, il n'y a plus de risque d'avoir des arêtes de poids négatif.
+
+		Dès lors, un algorithme standard tel que Dijkstra ou A* peut être utilisé. C'est A* qui sera implémenté ici car il est de complexité $O(\abs E)$ dans
+		le pire des cas, alors que Dijkstra est de complexité $O(\abs E + \abs V\log\abs V)$ dans le pire des cas.
+
+		Le gain est permis par l'utilisation d'une heuristique qui nous suffira amplement ici.
+
 \end{document}
