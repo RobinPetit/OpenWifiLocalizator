@@ -124,7 +124,6 @@ class Node:
         else:
             self.aliases_ = list(a)
 
-    # TODO: handle aliases
     def text(self, nb_tab=0):
         text = (TAB * (nb_tab+1)) + '<coord x="{}" y="{}" />\n'.format(*self.coord())
         if self.access_points() is not None:
