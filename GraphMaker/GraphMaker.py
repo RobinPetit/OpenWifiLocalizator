@@ -492,7 +492,7 @@ class App(t.Tk):
         for point in xml_tree.findall('point'):
             coord = point.find('coord')
             x, y = float(coord.get('x')), float(coord.get('y'))
-            coord = x-App.NODE_SIZE, y-App.NODE_SIZE, x+App.NODE_SIZE, y+App.NODE_SIZE
+            coord = x, y, x+2*App.NODE_SIZE, y+2*App.NODE_SIZE
             listWifi = point.find('listWifi')
             if listWifi is None:
                 access_points = None
