@@ -15,7 +15,7 @@
 \usepackage{imakeidx}
 \usepackage{rotating}
 \usepackage{tcolorbox}
-\usepackage{amsmath}
+\usepackage{amsmath, amssymb,  commath}
 \usepackage{tcolorbox}
 
 \graphicspath{{./images/}}
@@ -72,60 +72,60 @@
 
 \section{Introdution}
 Avant d'entrer dans les détails concernant l'implémentation de notre projet, il est intéressant d'introduire, dans les grandes lignes, l'objectif de réalisation du projet mais également le but final de ce dernier.\\
-Nous avons donc décidé, dans le cadre du cours Info-f308, de réaliser une application permettant à tout étudiant (ou visiteur) se trouvant sur l'un des campus de l'ULB de pouvoir se diriger au sein de ce dernier. L'idée principale de notre projet était, de pouvoir rediriger un nouvel étudiant (ou un individu ne connaisant pas le campus surlequel il se trouve) vers un auditoire cible. Afin de pouvoir localiser avec précision l'individu en question, nous sommes parti de l'idée de la triangulation. Cette technique est notament utilisée dans les GPS. Les détails concernant l'implémentation de notre système seront donnés dans la suite de ce rapport.\\
-L'objectif utltime de ce projet sera de présenter notre travail à un large public. Il sera donc intéressant de \og vulgariser \fg{} notre programme et de montrer une application concrète. Pour ce faire nous déveloperons une application mobile (cf partie Implémantation).\\\\
-Afin de réaliser notre projet nous avons eu besoin d'informations précises concernant l'ULB. Nous tenons donc à remercier monsieur Delcroix Bruno qui nous à permis d'accéder aux plans des campus concerné et donc de mettre en place notre application.
+Nous avons donc décidé, dans le cadre du cours Info-f308, de réaliser une application permettant à tout étudiant (ou visiteur) se trouvant sur l'un des campus de l'ULB de pouvoir se diriger au sein de ce dernier. L'idée principale de notre projet est de pouvoir rediriger un nouvel étudiant (ou un individu ne connaissant pas le campus sur lequel il se trouve) vers un auditoire cible. Afin de pouvoir localiser avec précision l'individu en question, nous sommes parti de l'idée de la triangulation. Cette technique est notamment utilisée dans les GPS. Les détails concernant l'implémentation de notre système seront donnés dans la suite de ce rapport.\\
+L'objectif ultime de ce projet sera de présenter notre travail à un large public. Il sera donc intéressant de \og vulgariser \fg{} notre programme et de montrer une application concrète. Pour ce faire nous développerons une application mobile (cf partie Implémantation).\\\\
+Afin de réaliser notre projet nous avons eu besoin d'informations précises concernant l'ULB. Nous tenons donc à remercier M. Bruno Delcroix qui nous à permis d'accéder aux plans des campus concernés et donc de mettre en place notre application.
 
 
 \newpage
-\section{Etat de l'art}
-
-\section{Plan}
-
 \section{Implémentation}
-Dans le cadre de ce projet nous avons donc décidé de développer une application permettant aux étudiants "perdus" de se géolocaliser au sein d'un campus directement via une application mobile. Il nous était donc nécessaire de choisir une plateforme intéressantes pour porter notre application. Le système d'exploitation retenu a été, dans un premier temps, le système Android. La raison de notre choix repose principalement sur l'aspect \og ouvert \fg{} de la plate-forme. Il nous est en effet possible d'accéder aux données liées au réseau Wi-fi.\\
-L'application sera donc développée en Java (langage Android). Afin de localiser l'utilisateur au sein du campus de manière précise nous avons décidé d'utiliser les bornes wifi comme expliqué précédement. Il nous fallait donc avoir accès aux propriétés des bornes wifi au sein de l'application. Pour ce faire on utilisera l'API "WifiManager" qui nous permet d'obtenir les différentes informations concernant le réseau wifi connecté et les différents réseaux accessibles.\\
-Nous avons dans un premier temps choisi de développer sur Android. Ce n'est pas pour cela que nous nous fermons la possiblité de porter le programme sur IOS. Il est toutefois important de tenir compte du fait que l'accès aux données de l'utilisateur sont beaucoup plus complèxes sur IOS. L'API "WifiManager" n'existe pas non plus. Le développement sur la plateforme d'Apple fait donc partie des éléments que nous nous résrvons de faire uniquement dans le cas ou l'on aurait assez de temps pour le faire correctement.
+Dans le cadre de ce projet nous avons donc décidé de développer une application permettant aux étudiants i"perdus" de se géolocaliser au sein d'un campus directement via une application mobile. Il nous était donc nécessaire de choisir une plateforme intéressantes pour porter notre application. Le système d'exploitation retenu a été, dans un premier temps, le système Android. La raison de notre choix repose principalement sur l'aspect \og~ouvert~\fg{} de la plate-forme. Il nous est en effet possible d'accéder aux données liées aux réseaux Wi-Fi.\\
+L'application sera donc développée en Java (langage Android). Afin de localiser l'utilisateur au sein du campus de manière précise nous avons décidé d'utiliser les bornes Wi-Fi comme expliqué précédemment. Il nous fallait donc avoir accès aux propriétés des bornes Wi-Fi au sein de l'application. Pour ce faire on utilisera l'API \textit{WifiManager} qui nous permet d'obtenir les différentes informations concernant les réseaux Wi-Fi connectés et les différents réseaux accessibles.\\
+Nous avons dans un premier temps choisi de développer sur Android. Ce n'est pas pour cela que nous nous fermons la possibilité de porter le programme sur iOS. Il est toutefois important de tenir compte du fait que l'accès aux données de l'utilisateur sont beaucoup plus complexes et limitées sur iOS. L'API \textit{WifiManager} n'existe pas non plus, et nous n'en avons pas d'équivalent. Le développement sur la plateforme d'Apple fait donc partie des éléments que nous nous réservons de faire uniquement dans le cas ou l'on aurait assez de temps pour le faire correctement.
 
-\section{Wifi}
-  Avant de décrire le fonctionnement et l'origine du Wi-Fi, voici comment le Larousse le définit: ``Réseau local hertzien (sans fil) à haut débit destiné aux liaisons d'équipements informatiques dans un cadre domestique ou professionnel.''.
-  Le terme ``Wi-fi'' vient de: ``Wireless Fidelity'' (qui est en oposition à ``Hi-Fi'' qui est généralement associé lui aux appareils sonore).\\
-  C'est en 1990 qu'une première connexion est établie entre un ordinateur et un serveur.  Il ne s'agit la que d'une première étape dans le WorldWideWeb.  C'est entre 1997 et 2000 que va réellement se développer le Wifi.  Un standard concernant la technologie sans fil est définit (par les laboratoires Bell et l'Institute of Electrical and Electronics Engineers).\\
-  Depuis 2009, de plus en plus d'entreprise propose un service de Wi-Fi gratuitement à leurs client.  On peut le retrouver dans les restaurants, le train, les aeroports, ...
+\section{Wi-Fi}
+  Avant de décrire le fonctionnement et l'origine du Wi-Fi, voici comment le Larousse le définit~: «~Réseau local hertzien (sans fil) à haut débit destiné aux liaisons d'équipements informatiques dans un cadre domestique ou professionnel.~»
+  Le terme «~Wi-Fi~» vient de: «~Wireless Fidelity~» (qui est en opposition à «~Hi-Fi~» qui est généralement associé lui aux appareils sonores).\\
+  C'est en 1990 qu'une première connexion est établie entre un ordinateur et un serveur.  Il ne s'agit la que d'une première étape dans le \textit{World Wide Web}. C'est entre 1997 et 2000 que va réellement se développer le Wi-Fi. Un standard concernant la technologie sans fil est définit (par les laboratoires Bell et l'\textit{Institute of Electrical and Electronics Engineers}).\\
+  Depuis 2009, de plus en plus d'entreprise proposent un service de Wi-Fi gratuitement à leurs clients.  On peut le retrouver dans les restaurants, les trains, les aéroports, etc.
   % Source: http://www.ucopia.com/fr/actualites/lhistoire-du-wi-fi/
   \subsection{Méthodes de localisation}
-  Il existe plusieurs méthodes pour se repérer à partir des points d'accès wifi.
-  
+  Il existe plusieurs méthodes pour se repérer à partir des points d'accès Wi-Fi.
+
   \subsubsection{Méthode dites par propagation}
-    Cette méthode utilise la trilatération pour déterminer la position actuelle. On peut décomposer cette méthode en plusieurs étapes :
+    Cette méthode utilise la trilatération pour déterminer la position actuelle. On peut décomposer cette méthode en plusieurs étapes~:
     \begin{enumerate}
-      \item On collecte la qualité de signal d'au moins trois points d'accès wifi.
-      \item Pour chacun de ces points d'accès, on détermine la distance à celui-ci via une formule prenant en compte la qualité du signal.
-      \item À partir de ces distance, on peut "générer" trois cercles et garder un point contenu dans l'intersection de ces cerlces.
+      \item on collecte la qualité de signal d'au moins trois points d'accès wifi~;
+      \item pour chacun de ces points d'accès, on détermine la distance à celui-ci via une formule prenant en compte la qualité du signal~;
+      \item à partir de ces distances, on peut «~générer~» trois cercles et garder un point contenu dans l'intersection de ces cercles\footnote{Mathématiquement, trois cercles s'intersectent en un et un seul point. Cependant, toutes interférences prises en comptes, on peut visualiser les cercles comme ayant une \textit{épaisseur} correspondant à l'incertitude. On peut alors parler d'\textit{un point de l'intersection des trois cercles.}}.
     \end{enumerate}
-    
+
     \paragraph{Détermination de la distance}
-      La formule utilisée pour la détermination de la distance est la suivante :
-      \[d = 10^{\left(\cfrac{27,55-20\log(f)+\left|s\right|}{20}\right)}\]
-      Où \begin{itemize}
-        \item[] $f$ est la fréquence (généralement 2.4Ghz ou 5.0 GHz)
-        \item[] $s$ est la qualité du signal (mesuré en $dBm$)
-      \end{itemize}     
-    
+      La formule utilisée pour la détermination de la distance est la suivante~:
+      \[d_f(s) = 10^{\alpha_f(s)},\]
+	  où~:
+	  \[\alpha_f(s) = \frac{27,55-20\log_{10}(f)+\abs s}{20},\]
+      avec~:
+	  \begin{itemize}
+        \item[] $f$ est la fréquence (généralement 2.4Ghz ou 5.0 GHz)~;
+        \item[] $s$ est la qualité du signal (mesuré en $dBm$).
+      \end{itemize}
+
     \paragraph{Trilateration}
-      Soient $x$ et $y$ la position courante de l'utilisateur, $x_{\lambda}$, $y_{\lambda}$ et $r_{\lambda}$ (où $1 \leq \lambda \leq 3$) est le postion et la distance de chaque émetteur.
+      Soient $(x, y) \in \mathbb R^2$ la position actuelle de l'utilisateur, $x_{\lambda}$, $y_{\lambda}$ et $r_{\lambda}$ (où $1 \leq \lambda \leq 3$) est le position et la distance de chaque
+	  émetteur. Alors on peut écrire~:
       \begin{align}
-        (x-x_{1})^{2}+(y-y_{1})^{2} = r_{1}^{2} \\
-        (x-x_{2})^{2}+(y-y_{2})^{2} = r_{2}^{2} \\
-        (x-x_{3})^{2}+(y-y_{3})^{2} = r_{3}^{2}
+        (x-x_{1})^{2}+(y-y_{1})^{2} = r_{1}^{2}, \\
+        (x-x_{2})^{2}+(y-y_{2})^{2} = r_{2}^{2}, \\
+        (x-x_{3})^{2}+(y-y_{3})^{2} = r_{3}^{2}.
       \end{align}
-      On développe les produits remarquables.
+      On développe les produits remarquables~:
       \begin{align}
         x^{2}-2xx_{1}+x_{1}^{2}+y^{2}-2yy_{1}+y_{1}^{2} = r_{1}^{2} \\
         x^{2}-2xx_{2}+x_{2}^{2}+y^{2}-2yy_{2}+y_{2}^{2} = r_{2}^{2} \\
         x^{2}-2xx_{3}+x_{3}^{2}+y^{2}-2yy_{3}+y_{3}^{2} = r_{3}^{2}
       \end{align}
-      On soustrait $(4)$ et $(5)$ ainsi que $(5)$ et $(6)$.
+      On soustrait $(4)$ à $(5)$ ainsi que $(5)$ à $(6)$~:
       \begin{center}
         $\left \{
         \begin{array}{c c}
@@ -150,7 +150,7 @@ Nous avons dans un premier temps choisi de développer sur Android. Ce n'est pas
         \end{array}
         \right.$
       \end{center}
-      On remplace ces valeurs par des symbols plus "parlant".
+      On remplace ces valeurs constantes par des symboles plus \textit{parlant}.
       \begin{center}
         $\left \{
         \begin{array}{c c}
@@ -159,14 +159,14 @@ Nous avons dans un premier temps choisi de développer sur Android. Ce n'est pas
         \end{array}
         \right.$
       \end{center}
-      On developpe pour $x$.
+      On développe d'abord pour $x$~:
       \begin{align*}
         x &= \frac{C-B(\frac{F-Dx}{E})}{A} \\
         x &= \frac{CE-BF+BDx}{EA} \\
         EAx &= CE-BF+BDx \\
         x &= \frac{CE-BF}{EA-BD}
       \end{align*}
-      On developpe pour $y$.
+      On développe ensuite pour $y$~:
       \begin{align*}
         y &= \frac{F-D(\frac{C-By}{A})}{E} \\
         y &= \frac{FA-DC+DBy}{AE} \\
@@ -176,17 +176,17 @@ Nous avons dans un premier temps choisi de développer sur Android. Ce n'est pas
 
     \begin{tcolorbox}[title=Avantages :]
       \begin{itemize}
-        \item Rapidité de mise en place
+        \item Rapidité de mise en place.
       \end{itemize}
     \end{tcolorbox}
     \begin{tcolorbox}[title=Désavantages :]
       \begin{itemize}
-        \item Difficulté de mise à jour de la base de donnée.
-        \item La qualité du signal peut fortement varié en fonction de :
+        \item Difficulté de mise à jour de la base de donnée~;
+        \item la qualité du signal peut fortement varier en fonction de~:
           \begin{itemize}
-            \item la quantité de personnes présentent sur le point d'accès.
-            \item divers éléments externe tels que des murs, ...
-          \end{itemize}
+            \item la quantité de personnes présentent sur le point d'accès~;
+            \item divers éléments externe tels que des murs, etc.
+	      \end{itemize}
       \end{itemize}
     \end{tcolorbox}
 
