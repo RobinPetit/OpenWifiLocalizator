@@ -129,7 +129,6 @@ class Node:
         text = (TAB * (nb_tab+1)) + '<coord x="{}" y="{}" />\n'.format(*self.coord())
         if self.access_points() is not None:
             text += self.access_points().text(nb_tab+1)
-        print(self.aliases())
         if self.aliases() and len(self.aliases()) > 0:
             text += (TAB*(nb_tab+1)) + '<aliases>\n'
             for alias in self.aliases():
@@ -363,13 +362,14 @@ class App(t.Tk):
         if selected is None:
             return
         if selected in self.nodes:
-            name, access_points, aliases = self.configure_node(self.nodes[selected].name())
+            print('giving these aliases: ', self.nodes[selected].aliases())
+            name, access_points, aliases = self.configure_node(self.nodes[selected].name(), self.nodes[selected].aliases())
             self.nodes[selected].name(name)
+            self.nodes[selected].aliases(aliases)
             if access_points is not None:
                 self.nodes[selected].access_points(access_points)
                 self.color = 'green'
                 self.canvas.itemconfig(selected, fill='green')
-                self.nodes[selected].aliases(aliases)
         elif selected in self.edges:
             self.edges[selected].weight(self.configure_edge(self.edges[selected].weight()))
         else:
@@ -426,6 +426,8 @@ class App(t.Tk):
         self.aliases = list(current_aliases)
         self.lb = t.Listbox(self.toplevel, listvar=self.aliases)
         self.lb.grid(row=1, column=0, rowspan=3)
+        for alias in self.aliases:
+            self.lb.insert(t.END, alias)
         self.alias = t.StringVar()
         t.Entry(self.toplevel, textvariable=self.alias).grid(row=1, column=1)
         t.Button(self.toplevel, text='Add alias', command=lambda: (self.lb.insert(t.END, self.alias.get()), self.aliases.append(self.alias.get()))).grid(row=2, column=1)
@@ -499,7 +501,14 @@ class App(t.Tk):
                 access_points = StaticAccessPointList()
                 access_points.fromXml(listWifi)
             node_id = self.canvas.create_oval(*coord, fill='green' if access_points is not None else 'red')
-            self.add_node(point.attrib['id'], node_id, access_points)
+            aliases = point.find('aliases')
+            if aliases is not None:
+                loaded_aliases = list()
+                for alias in aliases.findall('alias'):
+                    loaded_aliases.append(alias.text)
+            else:
+                loaded_aliases = list()
+            self.add_node(point.attrib['id'], node_id, access_points, loaded_aliases)
 
     def load_edges(self, xml_tree):
         for edge in xml_tree.findall('edge'):
