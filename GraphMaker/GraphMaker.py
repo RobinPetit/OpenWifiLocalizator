@@ -93,11 +93,12 @@ class StaticAccessPointList:
 #    tmp.text()
 
 class Node:
-    def __init__(self, name, coords, access_points):
+    def __init__(self, name, coords, access_points, aliases=tuple()):
         self.name_ = name
         self.coords = coords
         self.access_points_ = access_points
         self.color = 'green' if access_points is not None else 'red'
+        self.aliases_ = list(aliases)
 
     def coord(self, c=None):
         if c is None:
@@ -113,15 +114,27 @@ class Node:
 
     def access_points(self, ap=None):
         if ap is None:
-            return self.acces_points_
+            return self.access_points_
         else:
             self.access_points_ = ap
+
+    def aliases(self, a=None):
+        if a is None:
+            return self.aliases_
+        else:
+            self.aliases_ = list(a)
 
     # TODO: handle aliases
     def text(self, nb_tab=0):
         text = (TAB * (nb_tab+1)) + '<coord x="{}" y="{}" />\n'.format(*self.coord())
-        if self.access_points_ is not None:
-            text += self.access_points_.text(nb_tab+1)
+        if self.access_points() is not None:
+            text += self.access_points().text(nb_tab+1)
+        print(self.aliases())
+        if self.aliases() and len(self.aliases()) > 0:
+            text += (TAB*(nb_tab+1)) + '<aliases>\n'
+            for alias in self.aliases():
+                text += (TAB*(nb_tab+2)) + '<alias>{}</alias>\n'.format(alias)
+            text += (TAB*(nb_tab+1)) + '</aliases>'
         return '{0}<point id="{1}">\n{2}\n{0}</point>\n'.format(TAB*nb_tab, self.name(), text)
 
 class Edge:
@@ -254,15 +267,15 @@ class App(t.Tk):
             self.canvas.itemconfig(self.cv_image_id, image=self.bg_image)
 
     def create_node(self, x, y):
-        name, access_points = self.configure_node()
+        name, access_points, aliases = self.configure_node()
         if name == '' or name in [self.nodes[n].name() for n in self.nodes]:
             return
         node_coord = x-App.NODE_SIZE, y-App.NODE_SIZE, x+App.NODE_SIZE, y+App.NODE_SIZE
         node_id = self.canvas.create_oval(*node_coord, fill='green' if access_points is not None else 'red')
-        self.add_node(name, node_id, access_points)
+        self.add_node(name, node_id, access_points, aliases)
 
-    def add_node(self, name, node_id, access_points):
-        self.nodes[node_id] = Node(name, self.canvas.coords(node_id), access_points)
+    def add_node(self, name, node_id, access_points, aliases=tuple()):
+        self.nodes[node_id] = Node(name, self.canvas.coords(node_id), access_points, aliases)
 
     def add_edge(self, weight, edge_id, extremities):
         self.edges[edge_id] = Edge(weight, self.canvas.coords(edge_id), extremities)
@@ -350,12 +363,13 @@ class App(t.Tk):
         if selected is None:
             return
         if selected in self.nodes:
-            name, access_points = self.configure_node(self.nodes[selected].name())
+            name, access_points, aliases = self.configure_node(self.nodes[selected].name())
             self.nodes[selected].name(name)
             if access_points is not None:
                 self.nodes[selected].access_points(access_points)
                 self.color = 'green'
                 self.canvas.itemconfig(selected, fill='green')
+                self.nodes[selected].aliases(aliases)
         elif selected in self.edges:
             self.edges[selected].weight(self.configure_edge(self.edges[selected].weight()))
         else:
@@ -402,19 +416,31 @@ class App(t.Tk):
     def handle_wheel_release(self, ev):
         print('WR')
 
-    def configure_node(self, current_name=''):
+    def configure_node(self, current_name='', current_aliases=tuple()):
         self.toplevel = t.Toplevel(self)
         t.Label(self.toplevel, text='Node Name: ').grid(row=0, column=0)
         name = t.StringVar()
         name.set(current_name)
         t.Entry(self.toplevel, textvariable=name).grid(row=0, column=1)
-        t.Button(self.toplevel, text='Ok', command=self.toplevel.destroy).grid(row=1)
+        #self.aliases = t.ListVar(values=current_aliases)
+        self.aliases = list(current_aliases)
+        self.lb = t.Listbox(self.toplevel, listvar=self.aliases)
+        self.lb.grid(row=1, column=0, rowspan=3)
+        self.alias = t.StringVar()
+        t.Entry(self.toplevel, textvariable=self.alias).grid(row=1, column=1)
+        t.Button(self.toplevel, text='Add alias', command=lambda: (self.lb.insert(t.END, self.alias.get()), self.aliases.append(self.alias.get()))).grid(row=2, column=1)
+        t.Button(self.toplevel, text='Remove alias', command=lambda: self.lb.delete(t.ANCHOR)).grid(row=3, column=1)
+        t.Button(self.toplevel, text='Ok', command=self.toplevel.destroy).grid(row=4, column=0)
         self.ap = None
-        t.Button(self.toplevel, text='Scan access points', command=self.scan).grid(row=1, column=1)
+        t.Button(self.toplevel, text='Scan access points', command=self.scan).grid(row=4, column=1)
         self.toplevel.wait_window()
         ap = self.ap
+        aliases = self.aliases
         del self.ap
-        return name.get(), ap
+        del self.lb
+        del self.alias
+        del self.aliases
+        return name.get(), ap, aliases
 
     def scan(self):
         self.toplevel.wm_title('Scanning access points...')
