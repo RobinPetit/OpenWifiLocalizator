@@ -16,36 +16,22 @@
 
 \section{Introdution}
 	Avant d'entrer dans les détails de l'implémentation de notre projet, il est intéressant d'en introduire l'objectif dans les grandes lignes.
-	Nous avons décidé de réaliser une application permettant à tout étudiant (ou visiteur) se trouvant sur l'un des campus de l'ULB de pouvoir se diriger au sein de ce dernier.
-	L'application permettra de trouver un auditoire sur le campus souhaité. Afin de localiser un étudiant sur le campus nous avons décidé de nous baser sur les bornes Wi-Fi.
-	L'objectif ultime de ce projet sera de présenter notre travail à un large public. Il sera donc intéressant de \textit{vulgariser} notre travail et de montrer
-	une application concrète. Pour ce faire nous développerons une application mobile (c.f. Section~\ref{sec:Implémentation}).
+	Nous avons décidé de réaliser une application mobile permettant à tout étudiant (ou visiteur) se trouvant sur l'un des campus de l'ULB de pouvoir se diriger au sein de ce dernier, de trouver le chemin le plus court vers un autre endroit sur le campus, de trouver un auditoire sur le campus souhaité et de se localiser dans à l'ULB.
+	Dans le cadre de ce projet, nous allons utiliser les points d'accès WIFI présant sur les campus de l'ULB pour localiser un utilisateur.
+
+\section{Modélisation des campus et manipulation}
+	Les campus seront représentés par des graphes dont les nœuds sont les locaux accessibles et les arêtes sont les liens qui permettent de se rendre de l'un à l'autre, pondérés par la distance entre les locaux.\\
+	Afin de trouver le plus court chemin entre deux locaux, un simple algorithme de plus court chemin sera appliqué sur le graphe. Le graphe sera donc non-orienté, avec des arêtes de poids positif (par définition d'une métrique), ce qui nous permet d'utiliser un algorithme connu tel que l'algorithme de Dijkstra, voire une variante heuristique telle que A* pour un calcul plus rapide.
 
 \section{Système de localisation}
-	Comme expliqué dans l'introduction, le système de localisation sera basé sur les points d'accès Wi-Fi. Plusieurs techniques de localisation existent.
-	Dans le cadre de ce projet nous allons utiliser une \textit{Signal Strength Map} (que nous noterons plus communément \textit{SSM}).
-	Le principe est que pour chaque point du graphe, on va identifier et enregistrer l'ensemble des points d'accès couvrant cet endroit.
+	Comme expliqué dans l'introduction, le système de localisation sera basé sur les points d'accès Wi-Fi. Plusieurs techniques de localisation existent. Dans le cadre de ce projet nous allons utiliser une \textit{Signal Strength Map} (que nous noterons plus communément \textit{SSM}). Le principe est que pour chaque noeud du graphe, on va identifier et enregistrer l'ensemble des points d'accès couvrant cet endroit.
 	Ainsi, quand une personne voudra connaître sa position, il lui suffira d'identifier les points d'accès l'entourant pour connaitre le nœud du graphe le plus proche de lui.
 	Cette technique peut-être considérée comme une cartographie de la qualité de signal des points d'accès Wi-Fi d'un campus.
 
-\section{Implémentation}\label{sec:Implémentation}
-	\subsection{Plateforme de développement}
-		Dans le cadre de ce projet nous avons donc décidé de développer une application permettant aux étudiants «~perdus~» de se géolocaliser au sein d'un campus directement
-		via une application mobile. Le système d'exploitation retenu a été, dans un premier temps, le système Android. Notre choix est du au simple fait que ce système permet un
-		accès aisé aux données Wi-Fi. Il nous sera donc possible de récupérer les informations des routeurs avoisinants.
-
-		L'application sera donc développée en Java qui est un langage courant sur Android. Afin d'avoir accès aux données Wi-Fi de l'utilisateur (bornes, intensité, etc.) nous
-		avons trouvé une API (WifiManager) permettant d'avoir accès à ces informations facilement.
-
-		Nous ne fermons pas la porte à iOS, il est toutefois important de tenir compte de la difficulté d'accès aux données Wi-Fi sur cette plate-forme.
-
-	\subsection{Manipulation du graphe}
-		Les campus seront représentés par des graphes dont les nœuds sont les locaux accessibles et les arêtes sont les liens qui permettent de se rendre de l'un à l'autre,
-		pondérés par la distance entre les locaux.
-
-		Afin de trouver le plus court chemin entre deux locaux, un simple algorithme de plus court chemin sera appliqué sur le graphe.
-		Le graphe sera donc non-orienté, avec des arêtes de poids positif (par définition d'une métrique), ce qui nous permet d'utiliser un algorithme connu tel que
-		l'algorithme de Dijkstra, voire une variante heuristique telle que A* pour un calcul plus rapide.
+\section{Plateforme de développement}
+	Le système d'exploitation retenu a est le système \textit{Android}. Notre choix est motivé par le fait que ce système permet un accès aisé aux données des points d'accès Wi-Fi avoisinants et par le fait que la plateforme \textit{Android} est installée sur une grande part des \textit{smartphones} présents sur le marché.\\
+	L'application sera donc développée en Java et sur base du framework distribué par \textit{Android}. C'est dans ce dernier que nous trouvons un outil nommé \textit{WifiManager} qui va nous permettre d'avoir accès aux données concernant les point d'accès Wi-Fi avoisinant.\\
+	La plateforme \textit{iOS} a aussi été considérée, cependant, il n'existe pas sur cette plateforme un outil comparable à \textit{WifiManager}. C'est pourquoi nous nous contenterons, dans un premier temps, de développer une application sur la plateforme \textit{Android}.
 
 \section{Plan de travail}
   \begin{itemize}
@@ -64,6 +50,5 @@
 	    \item transposition du prototype sur Android.
 	  \end{enumerate}
   \end{itemize}
-
-
+  
 \end{document}
