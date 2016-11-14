@@ -46,7 +46,7 @@ public class Map {
      */
     private void loadXMLMap() {
         // new File("XML maps" + File.separator + _name);
-        // @TODO
+        // @TODO load XML file
     }
     
     
