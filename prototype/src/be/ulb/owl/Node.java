@@ -5,10 +5,78 @@
  */
 package be.ulb.owl;
 
+import java.util.ArrayList;
+
 /**
- *
+ * Point on a specific plan
+ * 
  * @author Detobel36
  */
 public class Node {
+    
+    private ArrayList<Path> _listPath;
+    private ArrayList<String> _listAlias;
+    
+    private final Map _parent_map;
+    private final float _x;
+    private final float _y;
+    private final String _name;
+    
+    
+    /**
+     * Init a node
+     * 
+     * @param parent_map 
+     */
+    public Node(Map parent_map, float x, float y, String name) {
+        this._listPath = new ArrayList<Path>();
+        this._listAlias = new ArrayList<String>();
+        
+        this._x = x;
+        this._y = y;
+        this._name = name;
+        this._parent_map = parent_map;
+    }
+    
+    /**
+     * Add an alias to this node
+     * 
+     * @param alias the alias who must be add
+     */
+    public void addAlias(String alias) {
+        this._listAlias.add(alias);
+    }
+    
+    /**
+     * Check if the current Node have this name
+     * 
+     * @param name the name who must be tested
+     * @return True if this node have this name
+     */
+    public boolean isNode(String name) {
+        return this._name.equals(name) || this._listAlias.contains(name);
+    }
+    
+    /**
+     * Get the parent map
+     * 
+     * @return the map object
+     */
+    public Map getParentMap() {
+        return _parent_map;
+    }
+    
+    
+    /**
+     * Add a path to an other Node
+     * 
+     * @param toNode the distination node
+     * @param distance distance between this node and the other
+     */
+    public void addPath(Node toNode, int distance) {
+        Path newPath = new Path(this, toNode, distance);
+        _listPath.add(newPath);
+    }
+    
     
 }
