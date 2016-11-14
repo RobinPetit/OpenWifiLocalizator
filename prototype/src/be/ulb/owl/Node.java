@@ -18,7 +18,7 @@ public class Node {
     private ArrayList<String> _listAlias;
     private ArrayList<Wifi> _listWifi;
     
-    private final Map _parent_map;
+    private final Map _parentMap;
     private final float _x;
     private final float _y;
     private final String _name;
@@ -27,13 +27,13 @@ public class Node {
     /**
      * Init a node
      * 
-     * @param parent_map map where is this node
+     * @param parentMap map where is this node
      * @param x x position of th node
      * @param y y position of the node
      * @param name of the node
      * @param listWifi list of all wifi capted on this point
      */
-    public Node(Map parent_map, float x, float y, String name, 
+    public Node(Map parentMap, float x, float y, String name, 
             ArrayList<Wifi> listWifi) {
         
         this._listPath = new ArrayList<Path>();
@@ -43,7 +43,7 @@ public class Node {
         this._x = x;
         this._y = y;
         this._name = name;
-        this._parent_map = parent_map;
+        this._parentMap = parentMap;
     }
     
     /**
@@ -83,7 +83,7 @@ public class Node {
      * @return the map object
      */
     public Map getParentMap() {
-        return _parent_map;
+        return _parentMap;
     }
     
     public float getX() {
