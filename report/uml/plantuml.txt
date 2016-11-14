@@ -1,0 +1,65 @@
+@startuml
+title OpenWifiLocalizator - Class Diagram
+ 
+'accessibilité
+skinparam classAttributeIconSize 0
+ 
+'pas d'ombre
+skinparam shadowing false
+ 
+'taille de l'image
+skinparam dpi 200
+ 
+'couleurs
+skinparam class {
+  BackgroundColor AliceBlue
+  ArrowColor CornflowerBlue
+  BorderColor CornflowerBlue
+}
+skinparam stereotypeCBackgroundColor OldLace
+ 
+' Définition des class
+ 
+class Noeud {
+  - listeChemin : ArrayList
+  - plan : Plan
+}
+ 
+class Chemin {
+  - noeud1 : Noeud
+  - noeud2 : Noeud
+  + getNextNoeud(Noeud) : Noeud
+  + haveAccess(Noeud) : Boolean
+}
+ 
+class Plan {
+  - listeNoeud : ArrayList
+}
+ 
+class TrouverCoursChemin {
+  {static} trouverChemin(Noeud, Noeud) : ArrayList
+}
+
+class Wifi {
+  - min : float
+  - max : float
+  - avg : float
+}
+
+class Scanner {
+  - network : String
+  - accesPoints : HashMap
+  - r : Runtime
+  - avg(ArrayList) : float
+  - getData() : BufferedReader
+  - parse(BufferedReader) : void
+  + scan() : ArrayList<Wifi>
+  + text() : String
+}
+
+' Définition des liens
+Noeud  *-  Chemin
+Noeud  -*  Chemin
+Plan  *-  Noeud
+Wifi -- Scanner
+@enduml
