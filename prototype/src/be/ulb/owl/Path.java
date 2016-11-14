@@ -53,5 +53,14 @@ public class Path {
         return _nodeOne;
     }
     
+    /**
+     * Get distance
+     * 
+     * @return the distance between two point
+     */
+    public float getDistance() {
+        return _distance;
+    }
+    
     
 }

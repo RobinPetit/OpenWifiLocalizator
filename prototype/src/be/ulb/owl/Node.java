@@ -16,6 +16,7 @@ public class Node {
     
     private ArrayList<Path> _listPath;
     private ArrayList<String> _listAlias;
+    private ArrayList<Wifi> _listWifi;
     
     private final Map _parent_map;
     private final float _x;
@@ -26,11 +27,18 @@ public class Node {
     /**
      * Init a node
      * 
-     * @param parent_map 
+     * @param parent_map map where is this node
+     * @param x x position of th node
+     * @param y y position of the node
+     * @param name of the node
+     * @param listWifi list of all wifi capted on this point
      */
-    public Node(Map parent_map, float x, float y, String name) {
+    public Node(Map parent_map, float x, float y, String name, 
+            ArrayList<Wifi> listWifi) {
+        
         this._listPath = new ArrayList<Path>();
         this._listAlias = new ArrayList<String>();
+        this._listWifi = listWifi;
         
         this._x = x;
         this._y = y;
@@ -46,6 +54,18 @@ public class Node {
     public void addAlias(String alias) {
         this._listAlias.add(alias);
     }
+    
+    /**
+     * Add a path to an other Node
+     * 
+     * @param toNode the distination node
+     * @param distance distance between this node and the other
+     */
+    public void addPath(Node toNode, int distance) {
+        Path newPath = new Path(this, toNode, distance);
+        _listPath.add(newPath);
+    }
+    
     
     /**
      * Check if the current Node have this name
@@ -66,17 +86,12 @@ public class Node {
         return _parent_map;
     }
     
-    
-    /**
-     * Add a path to an other Node
-     * 
-     * @param toNode the distination node
-     * @param distance distance between this node and the other
-     */
-    public void addPath(Node toNode, int distance) {
-        Path newPath = new Path(this, toNode, distance);
-        _listPath.add(newPath);
+    public float getX() {
+        return _x;
     }
     
+    public float getY() {
+        return _y;
+    }
     
 }
