@@ -1,4 +1,4 @@
-package com.ulbmap.aninterface;
+package com.ulbmap.ulbmap;
 
 import org.junit.Test;
 
