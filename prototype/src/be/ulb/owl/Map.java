@@ -5,8 +5,16 @@
  */
 package be.ulb.owl;
 
-import java.io.File;
+import be.ulb.owl.xml.XMLUtils;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 /**
  *
@@ -45,8 +53,36 @@ public class Map {
      * Load XML from this map
      */
     private void loadXMLMap() {
-        // new File("XML maps" + File.separator + _name);
-        // @TODO load XML file
+        try {
+            FileReader XMLFile = new FileReader(_name);
+            XmlPullParserFactory parserFactory = XmlPullParserFactory.newInstance();
+            XmlPullParser parser = parserFactory.newPullParser();
+            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+            parser.setInput(XMLFile);
+            parser.nextToken();
+            
+            ArrayList entries = new ArrayList();
+            
+            String ns = null;
+            parser.require(XmlPullParser.START_TAG, ns, "feed");
+            while (parser.next() != XmlPullParser.END_TAG) {
+                if (parser.getEventType() != XmlPullParser.START_TAG) {
+                    continue;
+                }
+                String name = parser.getName();
+                // TODO
+                // Starts by looking for the entry tag
+                if (name.equals("entry")) {
+                    // Read here
+                    //entries.add(readEntry(parser));
+                } else {
+                    XMLUtils.skip(parser);
+                }
+            }
+            
+        } catch (IOException | XmlPullParserException ex) {
+            Logger.getLogger(Map.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     

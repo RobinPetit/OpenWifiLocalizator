@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<infos>
-    <batiment nom="SU">
-        <plan nom="S_UA_1">
-            <point id="203">
-                <alias>Super local</alias>
-                <coord x="1" y="2" />
-                <listWifi>
-                    <wifi BSS="00:26:cb:4e:0d:63" max="-68" min="-58" avg="-63" />
-                    <wifi BSS="00:26:cb:4e:0c:64" max="-77" min="-66" avg="-72" />
-                </listWifi>
-            </point>
-        </plan>
-    </batiment>
-</infos>
+<plan nom="S_UA_1">
+    <point id="203">
+        <alias>Super local</alias>
+        <coord x="1" y="2" />
+        <listWifi>
+            <wifi BSS="00:26:cb:4e:0d:63" max="-68" min="-58" avg="-63" />
+            <wifi BSS="00:26:cb:4e:0c:64" max="-77" min="-66" avg="-72" />
+        </listWifi>
+    </point>
+</plan>

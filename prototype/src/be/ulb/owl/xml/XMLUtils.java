@@ -19,7 +19,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
  * 
  * @author Detobel36
  */
-public class ReadXML {
+public class XMLUtils {
     
     private static final String ns = null;
     
@@ -57,7 +57,7 @@ public class ReadXML {
         return entries;
     }
     
-    private void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
+    public static void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
         if (parser.getEventType() != XmlPullParser.START_TAG) {
             throw new IllegalStateException();
         }
