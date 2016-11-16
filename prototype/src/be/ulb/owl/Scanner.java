@@ -74,12 +74,8 @@ public class Scanner {
 
     public String text () {
         String res = "";
-        Set set = _accesPoints.entrySet();
-        Iterator i = set.iterator();
-        while (i.hasNext()) {
-            Map.Entry me = (Map.Entry)i.next();
-            ArrayList<Float> tmp = (ArrayList)me.getValue();
-            res += me.getKey()+" : "+avg(tmp)+"\n";
+        for(String bss : _accesPoints.keySet()) {
+            res += bss + " : " + avg(_accesPoints.get(bss)) + "\n";
         }
         return res;
     }
