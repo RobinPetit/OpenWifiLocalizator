@@ -16,10 +16,10 @@ public class OWL {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        
+
         // Create a map for test
-        new Map("ExampleXML");
-        
+        new Plan("ExampleXML");
+
     }
-    
+
 }
