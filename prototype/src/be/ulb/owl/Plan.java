@@ -20,39 +20,39 @@ import org.xmlpull.v1.XmlPullParserFactory;
  *
  * @author Detobel36
  */
-public class Map {
-    
+public class Plan {
+
     private final String _name;
     private ArrayList<Node> _listNode;
-    
+
     /**
      * Create a map <b>and</b> load XML file from this map
-     * 
+     *
      * @param name of the map
      */
-    public Map(String name) {
+    public Plan(String name) {
         this(name, true);
     }
-    
+
     /**
      * Create a map
-     * 
+     *
      * @param name name of the map
-     * @param loadMap True if we must load XML file from this map
+     * @param loadPlan True if we must load XML file from this map
      */
-    public Map(String name, boolean loadMap) {
+    public Plan(String name, boolean loadPlan) {
         _listNode = new ArrayList<Node>();
-        
+
         _name = name;
-        if(loadMap) {
-            loadXMLMap();
+        if(loadPlan) {
+            loadXMLPlan();
         }
     }
-    
+
     /**
      * Load XML from this map
      */
-    private void loadXMLMap() {
+    private void loadXMLPlan() {
         try {
             FileReader XMLFile = new FileReader(_name);
             XmlPullParserFactory parserFactory = XmlPullParserFactory.newInstance();
@@ -60,9 +60,9 @@ public class Map {
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(XMLFile);
             parser.nextToken();
-            
+
             ArrayList entries = new ArrayList();
-            
+
             String ns = null;
             parser.require(XmlPullParser.START_TAG, ns, "feed");
             while (parser.next() != XmlPullParser.END_TAG) {
@@ -79,11 +79,11 @@ public class Map {
                     XMLUtils.skip(parser);
                 }
             }
-            
+
         } catch (IOException | XmlPullParserException ex) {
-            Logger.getLogger(Map.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Plan.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    
+
+
 }
