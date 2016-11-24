@@ -18,7 +18,7 @@ public class OWL {
     public static void main(String[] args) {
         // TODO code application logic here
 
-        // Create a map for test
+        // Create a plan for test
         new Plan("ExampleXML");
 
     }

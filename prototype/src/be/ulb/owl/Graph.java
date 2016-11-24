@@ -14,12 +14,12 @@ import java.util.ArrayList;
 public class Graph {
     
     private Scanner _scanner;
-    private ArrayList<Map> _maps;
+    private ArrayList<Plan> _plans;
     
     
     public Graph () {
         _scanner = new Scanner();
-        _maps  = new ArrayList<Map>();
+        _plans  = new ArrayList<Plan>();
     }
     
     public ArrayList<Path> bestPath(Node nodeFrom, Node nodeTo) {

@@ -71,9 +71,11 @@ public class Scanner {
         for (int i = 0; i < 5; i++) {
             parse(getData());
         }
-        for(Map.Entry<String, ArrayList<Float>> e : _accesPoints.entrySet()) {
-            ArrayList<Float> values = e.getValue();
-            temp.add(new Wifi(e.getKey(), Collections.max(values), Collections.min(values), avg(values)));
+        
+        for(String key : _accesPoints.keySet()) {
+            ArrayList<Float> values = _accesPoints.get(key);
+            temp.add(new Wifi(key, Collections.max(values), 
+                    Collections.min(values), avg(values)));
         }
         return temp;
     }
