@@ -54,55 +54,59 @@ public class XMLUtils {
     }
     
     
-    
-    public List parse(Reader in) throws XmlPullParserException, IOException {
-        try {
-            XmlPullParserFactory parserFactory = XmlPullParserFactory.newInstance();
-            XmlPullParser parser = parserFactory.newPullParser();
-            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-            parser.setInput(in);
-            parser.nextToken();
-            return readFeed(parser);
-        } finally {
-            in.close();
-        }
+    public static boolean isSpace(XmlPullParser parser) throws XmlPullParserException {
+        return parser.getEventType() == XmlPullParser.TEXT && parser.getName()== null;
     }
     
-    private List readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
-        List entries = new ArrayList();
-        
-        parser.require(XmlPullParser.START_TAG, ns, "feed");
-        while (parser.next() != XmlPullParser.END_TAG) {
-            if (parser.getEventType() != XmlPullParser.START_TAG) {
-                continue;
-            }
-            String name = parser.getName();
-            // Starts by looking for the entry tag
-            if (name.equals("entry")) {
-                // Read here
-                //entries.add(readEntry(parser));
-            } else {
-                skip(parser);
-            }
-        }
-        return entries;
-    }
     
-    public static void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
-        if (parser.getEventType() != XmlPullParser.START_TAG) {
-            throw new IllegalStateException();
-        }
-        int depth = 1;
-        while (depth != 0) {
-            switch (parser.next()) {
-                case XmlPullParser.END_TAG:
-                    depth--;
-                    break;
-                case XmlPullParser.START_TAG:
-                    depth++;
-                    break;
-            }
-        }
-    }
+//    public List parse(Reader in) throws XmlPullParserException, IOException {
+//        try {
+//            XmlPullParserFactory parserFactory = XmlPullParserFactory.newInstance();
+//            XmlPullParser parser = parserFactory.newPullParser();
+//            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+//            parser.setInput(in);
+//            parser.nextToken();
+//            return readFeed(parser);
+//        } finally {
+//            in.close();
+//        }
+//    }
+    
+//    private List readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
+//        List entries = new ArrayList();
+//        
+//        parser.require(XmlPullParser.START_TAG, ns, "feed");
+//        while (parser.next() != XmlPullParser.END_TAG) {
+//            if (parser.getEventType() != XmlPullParser.START_TAG) {
+//                continue;
+//            }
+//            String name = parser.getName();
+//            // Starts by looking for the entry tag
+//            if (name.equals("entry")) {
+//                // Read here
+//                //entries.add(readEntry(parser));
+//            } else {
+//                skip(parser);
+//            }
+//        }
+//        return entries;
+//    }
+//    
+//    public static void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
+//        if (parser.getEventType() != XmlPullParser.START_TAG) {
+//            throw new IllegalStateException();
+//        }
+//        int depth = 1;
+//        while (depth != 0) {
+//            switch (parser.next()) {
+//                case XmlPullParser.END_TAG:
+//                    depth--;
+//                    break;
+//                case XmlPullParser.START_TAG:
+//                    depth++;
+//                    break;
+//            }
+//        }
+//    }
     
 }

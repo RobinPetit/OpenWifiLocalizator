@@ -19,8 +19,8 @@ public class OWL {
         // TODO code application logic here
 
         // Create a plan for test
-        new Plan("ExampleXML");
-
+//        new Plan("ExampleXML");
+        new Plan("ExampleXML2");
     }
     
     

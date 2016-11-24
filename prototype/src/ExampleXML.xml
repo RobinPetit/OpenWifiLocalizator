@@ -8,4 +8,13 @@
             <wifi BSS="00:26:cb:4e:0c:64" max="-77" min="-66" avg="-72" />
         </listWifi>
     </point>
+    <point id="204">
+        <alias>Super local2</alias>
+        <coord x="4" y="6" />
+        <listWifi>
+            <wifi BSS="00:26:cb:4e:0d:63" max="-69" min="-48" avg="-60" />
+            <wifi BSS="00:26:cb:4e:0c:64" max="-87" min="-77" avg="-81" />
+            <wifi BSS="00:26:cb:4e:0c:64" max="-67" min="-56" avg="-62" />
+        </listWifi>
+    </point>
 </plan>
