@@ -66,18 +66,16 @@ public class Scanner {
         }
     }
 
-    public void scan () {
+    public ArrayList<Wifi> scan () {
+        ArrayList<Wifi> temp = new ArrayList<Wifi>();
         for (int i = 0; i < 5; i++) {
             parse(getData());
         }
-    }
-
-    public String text () {
-        String res = "";
-        for(String bss : _accesPoints.keySet()) {
-            res += bss + " : " + avg(_accesPoints.get(bss)) + "\n";
+        for(Map.Entry<String, ArrayList<Float>> e : _accesPoints.entrySet()) {
+            ArrayList<Float> values = e.getValue();
+            temp.add(new Wifi(e.getKey(), Collections.max(values), Collections.min(values), avg(values)));
         }
-        return res;
+        return temp;
     }
 
 }
