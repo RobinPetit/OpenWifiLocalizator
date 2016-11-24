@@ -5,10 +5,15 @@
  */
 package be.ulb.owl.xml;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -22,6 +27,32 @@ import org.xmlpull.v1.XmlPullParserFactory;
 public class XMLUtils {
     
     private static final String ns = null;
+    
+    
+    /**
+     * Read XML File and return a XMLPullParser
+     * 
+     * @param name of the file who must be read
+     * @return XmlPullParser
+     */
+    public static XmlPullParser readXMLFile(String name) {
+        XmlPullParser parser = null;
+        try {
+            InputStream url = XMLUtils.class.getResourceAsStream("/"+name+".xml");
+            Reader XMLFile = new BufferedReader(new InputStreamReader(url));
+            //Reader XMLFile = new FileReader(name);
+            XmlPullParserFactory parserFactory = XmlPullParserFactory.newInstance();
+            parser = parserFactory.newPullParser();
+            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+            parser.setInput(XMLFile);
+            //parser.nextToken();
+        } catch (XmlPullParserException ex) {
+            Logger.getLogger(XMLUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return parser;
+    }
+    
     
     
     public List parse(Reader in) throws XmlPullParserException, IOException {

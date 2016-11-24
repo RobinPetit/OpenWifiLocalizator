@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plan nom="S_UA_1">
+<plan name="S_UA_1">
     <point id="203">
         <alias>Super local</alias>
         <coord x="1" y="2" />
