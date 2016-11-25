@@ -1,0 +1,181 @@
+<plan nom="XXX">
+	<background_image path="plans/P_F_2 SВminaires_FOND DE PLAN.png" coord="(-163.0, -586.0)" />
+	<distance_unit value="40" />
+	<point id="OFCouloir6">
+		<coord x="282.0" y="358.0" />
+		<listWifi>
+			<wifi BSS="00:26:cb:4e:07:f1" max="33.0" min="27.0" avg="31.5" />
+			<wifi BSS="00:26:cb:4d:d9:40" max="52.0" min="52.0" avg="52.0" />
+			<wifi BSS="00:0c:e6:00:d1:3c" max="87.0" min="85.0" avg="85.5" />
+			<wifi BSS="00:16:b6:e7:0e:34" max="80.0" min="76.0" avg="77.3" />
+			<wifi BSS="00:26:cb:4e:07:f0" max="33.0" min="28.0" avg="30.3" />
+			<wifi BSS="00:26:cb:4e:04:50" max="69.0" min="69.0" avg="69.0" />
+			<wifi BSS="78:40:e4:5c:ce:dd" max="80.0" min="80.0" avg="80.0" />
+			<wifi BSS="00:26:cb:4d:d9:41" max="49.0" min="49.0" avg="49.0" />
+			<wifi BSS="00:26:cb:4e:04:51" max="69.0" min="69.0" avg="69.0" />
+			<wifi BSS="00:26:cb:a0:98:c1" max="55.0" min="55.0" avg="55.0" />
+			<wifi BSS="00:0c:e6:00:d2:a4" max="77.0" min="74.0" avg="75.5" />
+			<wifi BSS="00:26:cb:a0:aa:c1" max="72.0" min="72.0" avg="72.0" />
+		</listWifi>		<aliases>
+			<alias>OF.2080</alias>
+			<alias>FORUM.H</alias>
+		</aliases>
+	</point>
+	<point id="OFCouloir7">
+		<coord x="284.0" y="284.0" />
+		<listWifi>
+			<wifi BSS="00:26:cb:4e:07:f1" max="58.0" min="45.0" avg="49.2" />
+			<wifi BSS="00:26:cb:a0:98:c0" max="58.0" min="58.0" avg="58.0" />
+			<wifi BSS="00:26:cb:4d:d9:40" max="57.0" min="53.0" avg="56.2" />
+			<wifi BSS="00:0c:e6:00:d1:0c" max="85.0" min="85.0" avg="85.0" />
+			<wifi BSS="00:26:cb:4e:04:50" max="50.0" min="50.0" avg="50.0" />
+			<wifi BSS="00:16:b6:e7:0e:34" max="87.0" min="87.0" avg="87.0" />
+			<wifi BSS="00:26:cb:4e:04:51" max="50.0" min="47.0" avg="48.5" />
+			<wifi BSS="00:26:cb:a0:aa:c0" max="54.0" min="54.0" avg="54.0" />
+			<wifi BSS="d4:6d:50:f2:c7:73" max="92.0" min="92.0" avg="92.0" />
+			<wifi BSS="00:0c:e6:00:d1:3c" max="82.0" min="82.0" avg="82.0" />
+			<wifi BSS="00:26:cb:4e:07:f0" max="47.0" min="47.0" avg="47.0" />
+			<wifi BSS="00:26:cb:4d:d9:41" max="53.0" min="53.0" avg="53.0" />
+		</listWifi>		<aliases>
+			<alias>FORUM.G</alias>
+		</aliases>
+	</point>
+	<point id="CouloirOF1">
+		<coord x="282.0" y="914.0" />
+		<listWifi>
+			<wifi BSS="00:26:cb:4e:07:f1" max="69.0" min="61.0" avg="63.8" />
+			<wifi BSS="00:0c:e6:00:cf:b3" max="84.0" min="82.0" avg="83.0" />
+			<wifi BSS="00:26:cb:4e:04:51" max="83.0" min="83.0" avg="83.0" />
+			<wifi BSS="00:26:cb:4d:d9:40" max="65.0" min="48.0" avg="60.8" />
+			<wifi BSS="00:0c:e6:00:d2:a4" max="81.0" min="77.0" avg="79.5" />
+			<wifi BSS="d0:57:4c:cb:4a:71" max="84.0" min="84.0" avg="84.0" />
+			<wifi BSS="00:26:cb:a0:98:c0" max="44.0" min="36.0" avg="41.8" />
+			<wifi BSS="00:26:cb:4e:07:f0" max="71.0" min="70.0" avg="70.5" />
+			<wifi BSS="78:40:e4:5c:ce:dd" max="86.0" min="85.0" avg="85.5" />
+			<wifi BSS="6e:b0:ce:34:71:4f" max="90.0" min="90.0" avg="90.0" />
+			<wifi BSS="ec:08:6b:5b:21:e0" max="88.0" min="88.0" avg="88.0" />
+			<wifi BSS="00:16:b6:e7:0e:34" max="90.0" min="90.0" avg="90.0" />
+			<wifi BSS="00:26:cb:a0:98:c1" max="43.0" min="43.0" avg="43.0" />
+			<wifi BSS="00:26:cb:4d:d9:41" max="65.0" min="65.0" avg="65.0" />
+		</listWifi>		<aliases>
+			<alias>OF.2070</alias>
+		</aliases>
+	</point>
+	<point id="OFCouloir2">
+		<coord x="283.0" y="848.0" />
+		<listWifi>
+			<wifi BSS="00:26:cb:4e:07:f1" max="67.0" min="59.0" avg="61.2" />
+			<wifi BSS="00:26:cb:a0:98:c0" max="31.0" min="31.0" avg="31.0" />
+			<wifi BSS="ec:08:6b:5b:21:e0" max="83.0" min="81.0" avg="81.8" />
+			<wifi BSS="00:0c:e6:00:d2:a4" max="81.0" min="70.0" avg="77.2" />
+			<wifi BSS="00:0c:e6:00:d1:0c" max="84.0" min="80.0" avg="81.6" />
+			<wifi BSS="00:26:cb:4e:07:f0" max="67.0" min="59.0" avg="62.8" />
+			<wifi BSS="00:26:cb:a0:98:c1" max="31.0" min="31.0" avg="31.0" />
+			<wifi BSS="00:26:cb:4d:d9:40" max="49.0" min="49.0" avg="49.0" />
+			<wifi BSS="00:26:cb:4d:d9:41" max="49.0" min="49.0" avg="49.0" />
+			<wifi BSS="00:16:b6:e7:0e:34" max="89.0" min="89.0" avg="89.0" />
+			<wifi BSS="00:0c:e6:00:d1:36" max="85.0" min="78.0" avg="81.5" />
+		</listWifi>		<aliases>
+			<alias>OF.2072</alias>
+			<alias>OF.2068</alias>
+		</aliases>
+	</point>
+	<point id="OFCouloir8">
+		<coord x="490.0" y="286.0" />
+		<listWifi>
+			<wifi BSS="00:26:cb:4e:07:f1" max="70.0" min="65.0" avg="68.0" />
+			<wifi BSS="00:26:cb:a0:aa:c1" max="59.0" min="52.0" avg="54.4" />
+			<wifi BSS="00:0c:e6:00:d1:0c" max="78.0" min="72.0" avg="74.4" />
+			<wifi BSS="00:0c:e6:00:d1:3c" max="83.0" min="74.0" avg="76.2" />
+			<wifi BSS="00:26:cb:a0:98:c0" max="79.0" min="79.0" avg="79.0" />
+			<wifi BSS="00:26:cb:4d:d9:40" max="79.0" min="79.0" avg="79.0" />
+			<wifi BSS="00:26:cb:4e:04:50" max="33.0" min="26.0" avg="30.8" />
+			<wifi BSS="00:26:cb:4e:04:51" max="33.0" min="27.0" avg="31.2" />
+			<wifi BSS="00:26:cb:a0:aa:c0" max="58.0" min="51.0" avg="53.8" />
+			<wifi BSS="00:26:cb:4d:d9:41" max="80.0" min="80.0" avg="80.0" />
+			<wifi BSS="00:0c:e6:00:cf:b3" max="94.0" min="88.0" avg="89.2" />
+			<wifi BSS="00:26:cb:4e:07:f0" max="70.0" min="67.0" avg="68.0" />
+			<wifi BSS="00:26:cb:4e:0e:e0" max="86.0" min="85.0" avg="85.3" />
+		</listWifi>		<aliases>
+			<alias>FORUM.G</alias>
+			<alias>FORUM.F</alias>
+		</aliases>
+	</point>
+	<point id="OFCouloir3">
+		<coord x="281.0" y="713.0" />
+		<listWifi>
+			<wifi BSS="00:26:cb:4e:07:f1" max="61.0" min="54.0" avg="57.6" />
+			<wifi BSS="00:26:cb:4e:04:51" max="74.0" min="74.0" avg="74.0" />
+			<wifi BSS="78:40:e4:5c:ce:dd" max="64.0" min="64.0" avg="64.0" />
+			<wifi BSS="00:26:cb:4d:d9:40" max="46.0" min="39.0" avg="42.4" />
+			<wifi BSS="00:0c:e6:00:d2:a4" max="73.0" min="70.0" avg="72.4" />
+			<wifi BSS="00:0c:e6:00:d1:36" max="77.0" min="73.0" avg="75.2" />
+			<wifi BSS="00:0c:e6:00:d1:3c" max="83.0" min="82.0" avg="82.4" />
+			<wifi BSS="00:0c:e6:00:d1:0c" max="82.0" min="81.0" avg="81.8" />
+			<wifi BSS="00:26:cb:a0:98:c0" max="51.0" min="49.0" avg="50.3" />
+			<wifi BSS="00:26:cb:4e:04:50" max="74.0" min="74.0" avg="74.0" />
+			<wifi BSS="00:26:cb:a0:98:c1" max="52.0" min="49.0" avg="51.0" />
+			<wifi BSS="00:26:cb:4d:d9:41" max="42.0" min="42.0" avg="42.0" />
+			<wifi BSS="00:26:cb:a0:aa:c1" max="83.0" min="83.0" avg="83.0" />
+			<wifi BSS="00:26:cb:4e:07:f0" max="59.0" min="54.0" avg="56.7" />
+			<wifi BSS="ec:08:6b:5b:21:e0" max="80.0" min="80.0" avg="80.0" />
+			<wifi BSS="00:26:cb:a0:aa:c0" max="80.0" min="80.0" avg="80.0" />
+			<wifi BSS="00:16:b6:e7:0e:34" max="85.0" min="85.0" avg="85.0" />
+		</listWifi>		<aliases>
+			<alias>OF.2074</alias>
+			<alias>OF.2066</alias>
+		</aliases>
+	</point>
+	<point id="OFCouloir4">
+		<coord x="282.0" y="594.0" />
+		<listWifi>
+			<wifi BSS="00:26:cb:4e:07:f1" max="55.0" min="47.0" avg="50.0" />
+			<wifi BSS="00:0c:e6:00:d1:0c" max="76.0" min="76.0" avg="76.0" />
+			<wifi BSS="00:16:b6:e7:0e:34" max="88.0" min="82.0" avg="85.2" />
+			<wifi BSS="00:0c:e6:00:d1:3c" max="80.0" min="78.0" avg="78.8" />
+			<wifi BSS="00:26:cb:4e:07:f0" max="53.0" min="48.0" avg="51.0" />
+			<wifi BSS="00:0c:e6:00:d1:36" max="82.0" min="82.0" avg="82.0" />
+			<wifi BSS="00:0c:e6:00:cf:b3" max="85.0" min="83.0" avg="83.4" />
+			<wifi BSS="00:26:cb:4e:04:51" max="76.0" min="74.0" avg="74.5" />
+			<wifi BSS="00:26:cb:a0:aa:c0" max="78.0" min="78.0" avg="78.0" />
+			<wifi BSS="00:26:cb:a0:98:c0" max="60.0" min="51.0" avg="57.0" />
+			<wifi BSS="00:26:cb:a0:98:c1" max="60.0" min="51.0" avg="57.0" />
+			<wifi BSS="00:26:cb:4e:04:50" max="74.0" min="74.0" avg="74.0" />
+			<wifi BSS="78:40:e4:5c:ce:dd" max="87.0" min="64.0" avg="75.7" />
+			<wifi BSS="00:26:cb:4d:d9:40" max="24.0" min="24.0" avg="24.0" />
+		</listWifi>		<aliases>
+			<alias>OF.2064</alias>
+			<alias>OF.2076</alias>
+		</aliases>
+	</point>
+	<point id="OFCouloir5">
+		<coord x="283.0" y="477.0" />
+		<listWifi>
+			<wifi BSS="00:26:cb:4e:07:f1" max="47.0" min="43.0" avg="44.4" />
+			<wifi BSS="00:26:cb:a0:98:c0" max="62.0" min="62.0" avg="62.0" />
+			<wifi BSS="00:26:cb:4d:d9:40" max="52.0" min="48.0" avg="50.4" />
+			<wifi BSS="00:0c:e6:00:d1:0c" max="83.0" min="77.0" avg="80.4" />
+			<wifi BSS="00:0c:e6:00:d1:3c" max="82.0" min="79.0" avg="81.4" />
+			<wifi BSS="00:0c:e6:00:d2:a4" max="78.0" min="71.0" avg="74.6" />
+			<wifi BSS="00:26:cb:a0:98:c1" max="59.0" min="59.0" avg="59.0" />
+			<wifi BSS="78:40:e4:5c:ce:dd" max="64.0" min="56.0" avg="60.5" />
+			<wifi BSS="00:26:cb:4d:d9:41" max="52.0" min="46.0" avg="49.2" />
+			<wifi BSS="00:26:cb:4e:07:f0" max="47.0" min="43.0" avg="44.5" />
+			<wifi BSS="00:26:cb:4e:04:50" max="69.0" min="64.0" avg="66.3" />
+			<wifi BSS="00:26:cb:4e:04:51" max="69.0" min="64.0" avg="66.3" />
+			<wifi BSS="00:26:cb:a0:aa:c0" max="73.0" min="73.0" avg="73.0" />
+			<wifi BSS="00:0c:e6:00:d1:36" max="88.0" min="88.0" avg="88.0" />
+		</listWifi>		<aliases>
+			<alias>OF.2058</alias>
+			<alias>OF.2078</alias>
+		</aliases>
+	</point>
+	<edge beg="OFCouloir6" end="OFCouloir5" weight="2.98" />
+	<edge beg="OFCouloir2" end="CouloirOF1" weight="1.65" />
+	<edge beg="OFCouloir7" end="OFCouloir8" weight="5.15" />
+	<edge beg="OFCouloir3" end="OFCouloir2" weight="3.38" />
+	<edge beg="OFCouloir4" end="OFCouloir3" weight="2.98" />
+	<edge beg="OFCouloir7" end="OFCouloir6" weight="1.85" />
+	<edge beg="OFCouloir5" end="OFCouloir4" weight="2.93" />
+
+</plan>

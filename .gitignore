@@ -12,4 +12,4 @@
 plans/
 
 *.xml
-!./XML plans/*.xml
+!./XML maps/*.xml
