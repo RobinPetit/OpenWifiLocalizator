@@ -14,3 +14,6 @@ plan_de_travail/
 
 *.xml
 !./XML maps/*.xml
+
+# Python cache
+*/__pycache__/*
