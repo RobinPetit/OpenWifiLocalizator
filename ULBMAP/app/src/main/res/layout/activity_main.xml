@@ -12,9 +12,11 @@
 
     <ImageView
         android:id="@+id/plan"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:adjustViewBounds="false"
+        android:scaleType="fitCenter"
         android:src="@drawable/plaine"
     />
 </RelativeLayout>
