@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import tkinter as t
+from tkinter import ttk
 from tkinter import filedialog as fdialog
 from tkinter import messagebox as mbox
 from PIL import Image, ImageTk
@@ -10,8 +11,12 @@ from os.path import relpath, splitext
 from xml.etree import ElementTree
 from math import sqrt
 
+from config import Config
+
+
 SET_TABS_IN_XML = True
 TAB = {True: '\t', False: ''}[SET_TABS_IN_XML]
+
 
 class AP:
     def __init__(self, key):
@@ -28,9 +33,11 @@ class AP:
         return '<wifi BSS="{}" max="{:2.1f}" min="{:2.1f}" avg="{:2.1f}" />' \
                .format(self.key, -min(self.values), -max(self.values), -self.avg())
 
+
 class AccessPointList:
-    def __init__(self, network = "wlp3s0", tmpfile = "temp.txt", iterations = 5, wait = 2):
-        self.network = network
+
+    def __init__(self, tmpfile = "temp.txt", iterations = 5, wait = 2):
+        self.network = Config.NETWORK_INTERFACE
         self.tmpfile = tmpfile
         self.iters = iterations
         self.wait = wait
@@ -62,15 +69,19 @@ class AccessPointList:
                 tmp = float(tmp[:len(tmp)-4])
                 elem = self.findAP(key)
                 elem.add(tmp)
+                print(key + " signal fond with " + str(tmp))
+
 
     def scan (self):
-        cmd = "iw dev {}  scan > {}".format(self.network, self.tmpfile)
+        cmd = "sudo iw dev {}  scan > {}".format(self.network, self.tmpfile)
         for i in range(self.iters):
             system(cmd)
             with open(self.tmpfile) as file:
+                print("Test " + str(i))
                 self.extractData(file.readlines())
             sleep(self.wait)
         remove(self.tmpfile)
+
 
 class StaticAccessPointList:
     def fromXml(self, xml_tree):
@@ -156,6 +167,7 @@ class Edge:
     def text(self, nb_tab=0):
         return (TAB*nb_tab) + '<edge beg="{}" end="{}" weight="{}" />\n'.format(*self.extremity_ids, self.weight())
 
+
 '''
     Available operations:
         + left click to create a new node
@@ -181,8 +193,6 @@ class App(t.Tk):
 
     NODE_SIZE = 10
     EDGE_WIDTH = 2.5
-
-    NETWORK_ID = 'wlp2s0'  # Change this according to your network device id
 
     def __init__(self, **options):
         super().__init__()
@@ -233,22 +243,32 @@ class App(t.Tk):
     def open_file(self):
         self.file_name = t.filedialog.askopenfilename(initialdir='../plans/')
         ext = splitext(self.file_name)[1].lower()[1:]
+
         if ext == 'xml':
             self.load_xml()
+
         elif ext in ['bmp', 'jpg', 'jpe', 'jpeg', 'png', 'tif', 'tiff']:
             self.metre_length_on_plan = self.ask_metre_length()
-            print('One metre is then {} pixels'.format(self.metre_length_on_plan))
-            self.background_file_name = self.file_name
-            self.chose_background_image()
+
+            if self.metre_length_on_plan != None:
+                print('One metre is then {} pixels'.format(self.metre_length_on_plan))
+                self.background_file_name = self.file_name
+                self.chose_background_image()
+            else:
+                self.destroy()
+
 
     def ask_metre_length(self):
         toplevel = t.Toplevel(self)
         nb_pixels = t.StringVar()
         t.Label(toplevel, text='Enter length (in pixels) of a meter on the given plan: ').grid(row=0, column=0)
-        t.Entry(toplevel, textvariable=nb_pixels).grid(row=0, column=1)
-        t.Button(toplevel, text='Ok', command=toplevel.destroy).grid(row=1)
+        entry = t.Entry(toplevel, textvariable=nb_pixels)
+        entry.grid(row=1, column=0)
+        entry.focus_set()
+        t.Button(toplevel, text='Ok', command=toplevel.destroy).grid(row=2)
+        toplevel.bind('<Return>', lambda x: toplevel.destroy())
         toplevel.wait_window()
-        return int(nb_pixels.get())
+        return int(nb_pixels.get()) if (nb_pixels.get().isnumeric() and nb_pixels.get() != "") else None
 
     def chose_background_image(self):
         self.bg_template = Image.open(self.background_file_name)
@@ -410,10 +430,12 @@ class App(t.Tk):
         self.left_moved = False
 
     def handle_right_release(self, ev):
-        print('RR')
+        if(Config.DEBUG):
+            print('RR')
 
     def handle_wheel_release(self, ev):
-        print('WR')
+        if(Config.DEBUG):
+            print('WR')
 
     def configure_node(self, current_name='', current_aliases=tuple()):
         self.toplevel = t.Toplevel(self)
@@ -445,7 +467,7 @@ class App(t.Tk):
 
     def scan(self):
         self.toplevel.wm_title('Scanning access points...')
-        self.ap = AccessPointList(network=App.NETWORK_ID, iterations=2)
+        self.ap = AccessPointList(iterations=5)
         self.ap.scan()
         self.toplevel.wm_title('access points scanned')
 
