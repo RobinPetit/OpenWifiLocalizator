@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import tkinter as t
-from tkinter import ttk
 from tkinter import filedialog as fdialog
 from tkinter import messagebox as mbox
 from PIL import Image, ImageTk
