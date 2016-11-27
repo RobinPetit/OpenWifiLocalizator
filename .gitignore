@@ -10,6 +10,7 @@
 
 # Hidden directories
 plans/
+plan_de_travail/
 
 *.xml
 !./XML maps/*.xml
