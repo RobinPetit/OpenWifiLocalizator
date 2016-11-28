@@ -1,4 +1,4 @@
-Projet d'année BA3 Informatique ULB
+Projet d'année BA3 Informatique `ULB`
 
 **Rémy Detobel** - *000408013*                        
 **Denis Hoornaert** - *000413326*                        
