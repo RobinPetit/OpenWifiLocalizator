@@ -72,7 +72,7 @@ class AccessPointList:
 
 
     def scan (self):
-        cmd = "sudo iw dev {}  scan > {}".format(self.network, self.tmpfile)
+        cmd = "iw dev {}  scan > {}".format(self.network, self.tmpfile)
         for i in range(self.iters):
             system(cmd)
             with open(self.tmpfile) as file:
