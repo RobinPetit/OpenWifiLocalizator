@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener,O
                         break;
                     case 1:
                         imageView.setImageResource(R.drawable.solbosch);
+                        break;
                 }
 
             }
