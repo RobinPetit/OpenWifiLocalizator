@@ -195,6 +195,7 @@ class App(t.Tk):
 
     def __init__(self, **options):
         super().__init__()
+        self.wm_title("GraphMaker")
         self.init_variables()
         self.create_widgets(**options)
         self.protocol("WM_DELETE_WINDOW", self.on_exit)
@@ -214,7 +215,7 @@ class App(t.Tk):
 
     def create_widgets(self, **options):
         self.canvas = t.Canvas(self, width=options['c_width'], height=options['c_height'])
-        self.canvas.pack()
+        self.canvas.pack(fill="both", expand="YES")
         self.open_file()  # self.chose_background_image()
         self.alpha_scale = t.Scale(self, from_=1, to=255,
             command=lambda v: self.make_bg_image(v), orient=t.HORIZONTAL)
@@ -503,6 +504,7 @@ class App(t.Tk):
 
         return '<plan nom="{}">\n{}\n</plan>\n'.format(plan_name, text)
 
+
     def save_to_xml(self, path):
         content = self.text()
         with open(path, 'w') as save_file:
@@ -517,8 +519,8 @@ class App(t.Tk):
         self.chose_background_image()
         self.cv_image_coord = [float(value.strip()) for value in bg_image.get('coord')[1:-1].split(',')]
         self.canvas.coords(self.cv_image_id, *self.cv_image_coord)
-        self.load_points(xml_tree)
-        self.load_edges(xml_tree)
+        self.load_points(root.find('nodes'))
+        self.load_edges(root.find('edges'))
 
     def load_points(self, xml_tree):
         for point in xml_tree.findall('node'):
@@ -541,8 +543,10 @@ class App(t.Tk):
                 loaded_aliases = list()
             self.add_node(point.attrib['id'], node_id, access_points, loaded_aliases)
 
+
     def load_edges(self, xml_tree):
-        for edge in xml_tree.findall('edge'):
+        internalEdge = xml_tree.find('internal')
+        for edge in internalEdge.findall('edge'):
             extremities = edge.get('beg'), edge.get('end')
             extremities_ids = [[node_id for node_id in self.nodes \
                 if self.nodes[node_id].name() == extremity][0] for extremity in extremities]
@@ -550,6 +554,10 @@ class App(t.Tk):
             beg_coord = [c + App.NODE_SIZE for c in self.nodes[extremities_ids[0]].coord()[:2]]
             edge_id = self.canvas.create_line(*beg_coord, *end_coord, width=App.EDGE_WIDTH)
             self.add_edge(float(edge.get('weight')), edge_id, extremities)
+
+        externalEdge = xml_tree.find('external')
+        # TODO load external edges
+
 
     @staticmethod
     def dist(a, b):
