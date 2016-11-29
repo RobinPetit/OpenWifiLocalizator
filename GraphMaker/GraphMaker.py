@@ -258,7 +258,6 @@ class App(t.Tk):
             else:
                 self.destroy()
 
-
     def ask_metre_length(self):
         toplevel = t.Toplevel(self)
         nb_pixels = t.StringVar()
@@ -343,10 +342,12 @@ class App(t.Tk):
             coords[1] = int(self.canvas['height']) - self.bg_image_size[1]
 
     def handle_right_click_mvt(self, ev):
-        print('RC MOVING')
+        if Config.DEBUG:
+            print('RC MOVING')
 
     def handle_wheel_click_mvt(self, ev):
-        print('WC MOVING')
+        if Config.DEBUG:
+            print('WC MOVING')
 
     def handle_left_click(self, ev):
         self.left_src = self.get_selected_el(ev.x, ev.y)
@@ -382,7 +383,8 @@ class App(t.Tk):
         if selected is None:
             return
         if selected in self.nodes:
-            print('giving these aliases: ', self.nodes[selected].aliases())
+            if Config.DEBUG:
+                print('giving these aliases: ', self.nodes[selected].aliases())
             name, access_points, aliases = self.configure_node(self.nodes[selected].name(), self.nodes[selected].aliases())
             self.nodes[selected].name(name)
             self.nodes[selected].aliases(aliases)
@@ -396,10 +398,12 @@ class App(t.Tk):
             print('\t\tERROR')
 
     def handle_wheel_up(self, ev):
-        print('WU')
+        if Config.DEBUG:
+            print('WU')
 
     def handle_wheel_down(self, ev):
-        print('WD')
+        if Config.DEBUG:
+            print('WD')
 
     def handle_left_release(self, ev):
         if self.left_moved:
@@ -546,8 +550,8 @@ class App(t.Tk):
 
 
     def load_edges(self, xml_tree):
-        internalEdge = xml_tree.find('internal')
-        for edge in internalEdge.findall('edge'):
+        internal_edge = xml_tree.find('internal')
+        for edge in internal_edge.findall('edge'):
             extremities = edge.get('beg'), edge.get('end')
             extremities_ids = [[node_id for node_id in self.nodes \
                 if self.nodes[node_id].name() == extremity][0] for extremity in extremities]
@@ -556,7 +560,7 @@ class App(t.Tk):
             edge_id = self.canvas.create_line(*beg_coord, *end_coord, width=App.EDGE_WIDTH)
             self.add_edge(float(edge.get('weight')), edge_id, extremities)
 
-        externalEdge = xml_tree.find('external')
+        external_edge = xml_tree.find('external')
         # TODO load external edges
 
 
