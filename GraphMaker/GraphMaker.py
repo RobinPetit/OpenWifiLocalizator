@@ -46,7 +46,7 @@ class AccessPointList:
         output = (TAB * nb_tab) + '<listWifi>\n'
         for elem in self.elements:
             output += (TAB * (nb_tab+1)) + elem.text()+'\n'
-        output += (TAB * nb_tab) + '</listWifi>'
+        output += (TAB * nb_tab) + '</listWifi>\n'
         return output
 
     def findAP (self, key):
@@ -94,7 +94,7 @@ class StaticAccessPointList:
             _ = '<wifi BSS="{}" max="{}" min="{}" avg="{}" />' \
                 .format(elem.get('BSS'), elem.get('max'), elem.get('min'), elem.get('avg'))
             output += (TAB * (nb_tab+1)) + _ + '\n'
-        output += (TAB * nb_tab) + '</listWifi>'
+        output += (TAB * nb_tab) + '</listWifi>\n'
         return output
 
 # À utiliser de la manière suivante :
@@ -143,7 +143,7 @@ class Node:
             for alias in self.aliases():
                 text += (TAB*(nb_tab+2)) + '<alias>{}</alias>\n'.format(alias)
             text += (TAB*(nb_tab+1)) + '</aliases>'
-        return '{0}<node id="{1}">\n{2}\n{0}</node>\n'.format(TAB*nb_tab, self.name(), text)
+        return '{0}<node id="{1}">\n{2}{0}</node>\n'.format(TAB*nb_tab, self.name(), text)
 
 class Edge:
     def __init__(self, weight, coords, extremity_ids):
@@ -216,7 +216,7 @@ class App(t.Tk):
     def create_widgets(self, **options):
         self.canvas = t.Canvas(self, width=options['c_width'], height=options['c_height'])
         self.canvas.pack(fill="both", expand="YES")
-        self.open_file()  # self.chose_background_image()
+        self.open_file()
         self.alpha_scale = t.Scale(self, from_=1, to=255,
             command=lambda v: self.make_bg_image(v), orient=t.HORIZONTAL)
         self.alpha_scale.set(App.ALPHA_INITIAL_VALUE)
@@ -241,7 +241,7 @@ class App(t.Tk):
             self.canvas.bind(event, canvas_callbacks[event])
 
     def open_file(self):
-        self.file_name = t.filedialog.askopenfilename(initialdir='../plans/')
+        self.file_name = t.filedialog.askopenfilename(initialdir=Config.MAPS_PATH)
         ext = splitext(self.file_name)[1].lower()[1:]
 
         if ext == 'xml':
@@ -251,7 +251,8 @@ class App(t.Tk):
             self.metre_length_on_plan = self.ask_metre_length()
 
             if self.metre_length_on_plan != None:
-                print('One metre is then {} pixels'.format(self.metre_length_on_plan))
+                if Config.DEBUG:
+                    print('One metre is then {} pixels'.format(self.metre_length_on_plan))
                 self.background_file_name = self.file_name
                 self.chose_background_image()
             else:
@@ -443,7 +444,6 @@ class App(t.Tk):
         name = t.StringVar()
         name.set(current_name)
         t.Entry(self.toplevel, textvariable=name).grid(row=0, column=1)
-        #self.aliases = t.ListVar(values=current_aliases)
         self.aliases = list(current_aliases)
         self.lb = t.Listbox(self.toplevel, listvar=self.aliases)
         self.lb.grid(row=1, column=0, rowspan=3)
@@ -484,25 +484,25 @@ class App(t.Tk):
     # Save functions
 
     def text(self, nb_tab=0):
-        text = (TAB * (nb_tab+1)) + '<background_image path="{}" coord="{}" />\n'.format(relpath(self.background_file_name), tuple(self.cv_image_coord))
+        text = (TAB * (nb_tab+1)) + '<background_image coord="{}" />\n'.format(tuple(self.cv_image_coord))
         text += (TAB * (nb_tab+1)) + '<distance_unit value="{}" />\n'.format(self.metre_length_on_plan)
-        plan_name = 'XXX'
-        text += (TAB * (nb_tab+1)) + '<nodes>'
+        plan_name = relpath(splitext(self.background_file_name)[0], Config.MAPS_PATH)
+        text += (TAB * (nb_tab+1)) + '<nodes>\n'
         for node_id in self.nodes:
-            text+= self.nodes[node_id].text(nb_tab+1)
-        text += (TAB * (nb_tab+1)) + '</nodes>'
+            text += self.nodes[node_id].text(nb_tab+2)
+        text += (TAB * (nb_tab+1)) + '</nodes>\n'
 
-        text += (TAB * (nb_tab+1)) + '<edges>'
-        text += (TAB * (nb_tab+2)) + '<internal>'
+        text += (TAB * (nb_tab+1)) + '<edges>\n'
+        text += (TAB * (nb_tab+2)) + '<internal>\n'
         for edge_id in self.edges:
-            text += self.edges[edge_id].text(nb_tab+2)
-        text += (TAB * (nb_tab+2)) + '</internal>'
+            text += self.edges[edge_id].text(nb_tab+3)
+        text += (TAB * (nb_tab+2)) + '</internal>\n'
 
-        # TODO ajouter les externals 
+        # TODO ajouter les externals
 
         text += (TAB * (nb_tab+1)) + '</edges>'
 
-        return '<plan nom="{}">\n{}\n</plan>\n'.format(plan_name, text)
+        return '<plan name="{}">\n{}\n</plan>\n'.format(plan_name, text)
 
 
     def save_to_xml(self, path):
@@ -515,14 +515,15 @@ class App(t.Tk):
         root = xml_tree.getroot()
         self.metre_length_on_plan = int(root.find('distance_unit').get('value'))
         bg_image = root.find('background_image')
-        self.background_file_name = bg_image.get('path')
+        self.background_file_name = Config.MAPS_PATH + root.get('name') + '.png'
+        #self.background_file_name = bg_image.get('path')
         self.chose_background_image()
         self.cv_image_coord = [float(value.strip()) for value in bg_image.get('coord')[1:-1].split(',')]
         self.canvas.coords(self.cv_image_id, *self.cv_image_coord)
-        self.load_points(root.find('nodes'))
+        self.load_nodes(root.find('nodes'))
         self.load_edges(root.find('edges'))
 
-    def load_points(self, xml_tree):
+    def load_nodes(self, xml_tree):
         for point in xml_tree.findall('node'):
             coord = point.find('coord')
             x, y = float(coord.get('x')), float(coord.get('y'))

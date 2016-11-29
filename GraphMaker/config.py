@@ -2,7 +2,8 @@
 class Config:
 
     # Change this according to your network device id
-    NETWORK_INTERFACE = 'wlo1'
+    NETWORK_INTERFACE = 'wlp2s0'
     # Debug Mode
     DEBUG = True
-
+    # MAPS location
+    MAPS_PATH = '../plans/PLANS/'
