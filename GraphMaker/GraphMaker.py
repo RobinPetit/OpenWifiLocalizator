@@ -10,7 +10,7 @@ from os.path import relpath, splitext
 from xml.etree import ElementTree
 from math import sqrt
 
-from config import Config
+from Config import Config
 
 
 SET_TABS_IN_XML = True
