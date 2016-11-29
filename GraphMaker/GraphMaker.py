@@ -143,7 +143,7 @@ class Node:
             for alias in self.aliases():
                 text += (TAB*(nb_tab+2)) + '<alias>{}</alias>\n'.format(alias)
             text += (TAB*(nb_tab+1)) + '</aliases>'
-        return '{0}<point id="{1}">\n{2}\n{0}</point>\n'.format(TAB*nb_tab, self.name(), text)
+        return '{0}<node id="{1}">\n{2}\n{0}</node>\n'.format(TAB*nb_tab, self.name(), text)
 
 class Edge:
     def __init__(self, weight, coords, extremity_ids):
@@ -486,10 +486,21 @@ class App(t.Tk):
         text = (TAB * (nb_tab+1)) + '<background_image path="{}" coord="{}" />\n'.format(relpath(self.background_file_name), tuple(self.cv_image_coord))
         text += (TAB * (nb_tab+1)) + '<distance_unit value="{}" />\n'.format(self.metre_length_on_plan)
         plan_name = 'XXX'
+        text += (TAB * (nb_tab+1)) + '<nodes>'
         for node_id in self.nodes:
             text+= self.nodes[node_id].text(nb_tab+1)
+        text += (TAB * (nb_tab+1)) + '</nodes>'
+
+        text += (TAB * (nb_tab+1)) + '<edges>'
+        text += (TAB * (nb_tab+2)) + '<internal>'
         for edge_id in self.edges:
-            text += self.edges[edge_id].text(nb_tab+1)
+            text += self.edges[edge_id].text(nb_tab+2)
+        text += (TAB * (nb_tab+2)) + '</internal>'
+
+        # TODO ajouter les externals 
+
+        text += (TAB * (nb_tab+1)) + '</edges>'
+
         return '<plan nom="{}">\n{}\n</plan>\n'.format(plan_name, text)
 
     def save_to_xml(self, path):
@@ -510,7 +521,7 @@ class App(t.Tk):
         self.load_edges(xml_tree)
 
     def load_points(self, xml_tree):
-        for point in xml_tree.findall('point'):
+        for point in xml_tree.findall('node'):
             coord = point.find('coord')
             x, y = float(coord.get('x')), float(coord.get('y'))
             coord = x, y, x+2*App.NODE_SIZE, y+2*App.NODE_SIZE

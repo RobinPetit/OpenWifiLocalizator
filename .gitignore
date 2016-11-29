@@ -15,5 +15,8 @@ plan_de_travail/
 *.xml
 !./XML maps/*.xml
 
+# Hide config file
+GraphMaker/config.py
+
 # Python cache
 */__pycache__/*
