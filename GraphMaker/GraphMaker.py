@@ -492,18 +492,12 @@ class App(t.Frame):
 
     def __init__(self, master, **options):
         super().__init__(master)
-        self.init_variables()
         self.create_widgets(**options)
 
     def on_exit(self):
         if mbox.askquestion('Quit', 'Do you want to save before leaving?') == 'yes':
             self.save_to_xml(fdialog.asksaveasfilename(defaultextension='xml',
                              filetypes=[('XML Files', '.xml')], initialdir='./'))
-
-    def init_variables(self):
-        #self.nodes = dict()
-        #self.edges = dict()
-        pass
 
     def create_widgets(self, **options):
         self.canvas = EditableGraphCanvas(self, width=options['c_width'], height=options['c_height'])
@@ -513,7 +507,6 @@ class App(t.Frame):
             command=lambda v: self.canvas.set_bg_image(v), orient=t.HORIZONTAL)
         self.alpha_scale.set(App.ALPHA_INITIAL_VALUE)
         self.alpha_scale.pack()
-        # self.bind_events()
 
     def open_file(self):
         self.file_name = t.filedialog.askopenfilename(initialdir=Config.MAPS_PATH)
@@ -593,7 +586,6 @@ class App(t.Frame):
         self.metre_length_on_plan = int(root.find('distance_unit').get('value'))
         bg_image = root.find('background_image')
         self.background_file_name = Config.MAPS_PATH + root.get('name') + '.png'
-        #self.background_file_name = bg_image.get('path')
         self.chose_background_image()
         self.cv_image_coord = [float(value.strip()) for value in bg_image.get('coord')[1:-1].split(',')]
         self.canvas.coords(self.cv_image_id, *self.cv_image_coord)
