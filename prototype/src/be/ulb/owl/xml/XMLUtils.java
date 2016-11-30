@@ -55,7 +55,19 @@ public class XMLUtils {
     
     
     public static boolean isSpace(XmlPullParser parser) throws XmlPullParserException {
-        return parser.getEventType() == XmlPullParser.TEXT && parser.getName()== null;
+        return parser.getEventType() == XmlPullParser.TEXT && 
+                (parser.getName() == null || parser.getName().equalsIgnoreCase(""));
+    }
+    
+    public static void removeSpace(XmlPullParser parser) throws XmlPullParserException, IOException {
+        while(isSpace(parser)) {
+            parser.next();
+        }
+    }
+    
+    public static void nextAndRemoveSpace(XmlPullParser parser) throws XmlPullParserException, IOException {
+        parser.next();
+        removeSpace(parser);
     }
     
     
