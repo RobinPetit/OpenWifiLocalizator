@@ -20,7 +20,7 @@ public class OWL {
 
         // Create a plan for test
 //        new Plan("ExampleXML");
-        new Plan("ExampleXML2");
+        new Plan("ExampleXML");
     }
     
     

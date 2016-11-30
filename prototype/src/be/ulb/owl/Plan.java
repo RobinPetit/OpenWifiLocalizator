@@ -77,6 +77,7 @@ public class Plan {
                             continue;
                         }
                         
+                        
                         while(parser.getEventType() == XmlPullParser.START_TAG) {
                             
                             if(XMLUtils.isSpace(parser)) {
@@ -85,23 +86,24 @@ public class Plan {
                             }
                             
                             switch(parser.getName()) {
-                                case "point":
-                                    _listNode.add(getNode(parser));
+                                case "nodes":
+                                    loadXMLNodes(parser);
                                     break;
                                     
-                                case "edge":
+                                case "edges":
                                     // TODO
-                                    parser.next();
+                                    loadXMLEdges(parser);
+//                                    parser.next();
                                     break;
                                     
                                 default:
-                                    System.err.println("Obj inconnu: " + 
+                                    System.err.println("Obj inconnu (type: " +
+                                            parser.getEventType() + "): " + 
                                             parser.getName() + " -> " + parser.getText());
                                     parser.next();
                                     break;
                                     
                             }
-                            
                             
                         }
                         
@@ -120,6 +122,31 @@ public class Plan {
             Logger.getLogger(Plan.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+    }
+    
+    
+    private void loadXMLNodes(XmlPullParser parser) throws XmlPullParserException, IOException {
+        while(XMLUtils.isSpace(parser)) {
+            parser.next();
+        }
+        
+        
+        while((parser.getEventType() == XmlPullParser.START_TAG &&
+                parser.getName().equalsIgnoreCase("node")) ||
+                XMLUtils.isSpace(parser)) {
+
+            while(XMLUtils.isSpace(parser)) {
+                parser.next();
+            }
+            _listNode.add(getNode(parser));
+            System.out.println("Node: (type: " +parser.getEventType() + "): " + 
+                            parser.getName() + " -> " + parser.getText());
+        }
+        
+    }
+    
+    private void loadXMLEdges(XmlPullParser parser) throws XmlPullParserException, IOException {
+        parser.next();
     }
     
     
