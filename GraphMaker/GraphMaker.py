@@ -243,6 +243,11 @@ class EditableGraphCanvas(GraphCanvas):
     def image_coord(self):
         return self.cv_image_coord
 
+    def set_bg_coord(self, coord):
+        self.cv_image_coord = coord[:]
+        print('moving bg image onto {}'.format(coord))
+        self.coords(self.cv_image_id, *self.cv_image_coord)
+
     def bind_events(self):
         canvas_callbacks = {
             EditableGraphCanvas.LEFT_CLICK: self.handle_left_click,
@@ -587,8 +592,7 @@ class App(t.Frame):
         bg_image = root.find('background_image')
         self.background_file_name = Config.MAPS_PATH + root.get('name') + '.png'
         self.chose_background_image()
-        self.cv_image_coord = [float(value.strip()) for value in bg_image.get('coord')[1:-1].split(',')]
-        self.canvas.coords(self.cv_image_id, *self.cv_image_coord)
+        self.canvas.set_bg_coord([float(value.strip()) for value in bg_image.get('coord')[1:-1].split(',')])
         self.load_nodes(root.find('nodes'))
         self.load_edges(root.find('edges'))
 
@@ -611,7 +615,7 @@ class App(t.Frame):
                     loaded_aliases.append(alias.text)
             else:
                 loaded_aliases = list()
-            self.add_node(point.attrib['id'], node_id, access_points, loaded_aliases)
+            self.canvas.add_node(point.attrib['id'], node_id, access_points, loaded_aliases)
 
 
     def load_edges(self, xml_tree):
@@ -622,8 +626,8 @@ class App(t.Frame):
                 if self.canvas.nodes()[node_id].name() == extremity][0] for extremity in extremities]
             end_coord = [c + GraphCanvas.NODE_SIZE for c in self.canvas.nodes()[extremities_ids[1]].coord()[:2]]
             beg_coord = [c + GraphCanvas.NODE_SIZE for c in self.canvas.nodes()[extremities_ids[0]].coord()[:2]]
-            edge_id = self.canvas.create_line(*beg_coord, *end_coord, width=App.EDGE_WIDTH)
-            self.add_edge(float(edge.get('weight')), edge_id, extremities)
+            edge_id = self.canvas.create_line(*beg_coord, *end_coord, width=GraphCanvas.EDGE_WIDTH)
+            self.canvas.add_edge(float(edge.get('weight')), edge_id, extremities)
 
         external_edge = xml_tree.find('external')
         # TODO load external edges
