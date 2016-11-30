@@ -17,6 +17,18 @@ from Config import Config
 SET_TABS_IN_XML = True
 TAB = {True: '\t', False: ''}[SET_TABS_IN_XML]
 
+LEFT_CLICK = '<Button-1>'
+WHEEL_CLICK = '<Button-2>'
+RIGHT_CLICK = '<Button-3>'
+WHEEL_UP = '<Button-4>'
+WHEEL_DOWN = '<Button-5>'
+LEFT_RELEASE = '<ButtonRelease-1>'
+WHEEL_RELEASE = '<ButtonRelease-2>'
+RIGHT_RELEASE = '<ButtonRelease-3>'
+LEFT_CLICK_MOTION = '<B1-Motion>'
+WHEEL_CLICK_MOTION = '<B2-Motion>'
+RIGHT_CLICK_MOTION = '<B3-Motion>'
+
 def euclidian_distance(a, b):
     return sqrt(sum([(x-y)*(x-y) for x, y in zip(a, b)]))
 
@@ -197,6 +209,16 @@ class GraphCanvas(t.Canvas):
         self.left_moved = False
         self.cv_image_coord = [0, 0]
         self.px_p_m = 0
+        self.bind_events()
+
+    def bind_events(self):
+        callbacks = {
+            LEFT_RELEASE: self.handle_left_release,
+            LEFT_CLICK: self.handle_left_click,
+            LEFT_CLICK_MOTION: self.handle_left_click_mvt
+        }
+        for event in callbacks:
+            self.bind(event, callbacks[event])
 
     def add_node(self, name, node_id, access_points, aliases=tuple()):
         node = Node(name, self.coords(node_id), access_points, aliases)
@@ -212,12 +234,22 @@ class GraphCanvas(t.Canvas):
     def get_selected_el(self, x, y, d=3):
         tmp = self.find_overlapping(x-d, y-d, x+d, y+d)
         i = 1
-        while i < len(tmp) and (tmp[i] <= self.cv_image_id or tmp[i] == self.tmp_line_id):
+        while i < len(tmp) and tmp[i] <= self.cv_image_id:
             i += 1
         try:
             return tmp[i]
         except:
             return None
+
+    def check_image_coords(self, coords):
+        if coords[0] > 0:
+            coords[0] = 0
+        elif coords[0] < int(self.width()) - self.bg_template.size[0]:
+            coords[0] = int(self.width()) - self.bg_template.size[0]
+        if coords[1] > 0:
+            coords[1] = 0
+        elif coords[1] < int(self.height()) - self.bg_template.size[1]:
+            coords[1] = int(self.height()) - self.bg_template.size[1]
 
     # data setters
 
@@ -266,10 +298,45 @@ class GraphCanvas(t.Canvas):
     def get_pixels_per_metre(self):
         return self.px_p_m
 
+    # events
+
+    def handle_left_click(self, ev):
+        self.click_coord = [ev.x, ev.y]
+        self.left_click_time = time()
+
+    def handle_left_release(self, ev):
+        if self.left_moved:
+            self.cv_image_coord = self.coords(self.cv_image_id)
+            for node_id in self.nodes():
+                self.nodes()[node_id].coord(self.coords(node_id))
+            for edge_id in self.edges():
+                self.edges()[edge_id].coord(self.coords(edge_id))
+        else:
+            if float(time() - self.left_click_time) <= EditableGraphCanvas.CLICK_TIME_SENSIBILITY:
+                element_id = self.get_selected_el(ev.x, ev.y)
+                if element_id in self.nodes():
+                    print('TODO: create a link between local and {}'.format(self.nodes()[element_id].name()))
+                # TODO: select node
+        self.left_moved = False
+
+    def handle_left_click_mvt(self, ev):
+        self.left_moved = True
+        self.cv_image_new_coord = [self.cv_image_coord[0]+ev.x-self.click_coord[0], self.cv_image_coord[1]+ev.y-self.click_coord[1]]
+        self.check_image_coords(self.cv_image_new_coord)
+        self.coords(self.cv_image_id, *self.cv_image_new_coord)
+        x_offset, y_offset = (self.cv_image_new_coord[i]-self.cv_image_coord[i] for i in range(2))
+        for edge_id in self.edges():
+            self.coords(edge_id, self.edges()[edge_id].coord()[0]+x_offset, self.edges()[edge_id].coord()[1]+y_offset,
+                        self.edges()[edge_id].coord()[2]+x_offset, self.edges()[edge_id].coord()[3]+y_offset)
+        for node_id in self.nodes():
+            self.coords(node_id, self.nodes()[node_id].coord()[0]+x_offset, self.nodes()[node_id].coord()[1]+y_offset,
+                        self.nodes()[node_id].coord()[2]+x_offset, self.nodes()[node_id].coord()[3]+y_offset)
+
+        """ TODO: take care of the copy of code right below """
+
     # XML loading
 
     def load_xml(self, path):
-        print(path)
         xml_tree = ElementTree.parse(path)
         root = xml_tree.getroot()
         self.set_pixels_per_metre(int(root.find('distance_unit').get('value')))
@@ -314,21 +381,9 @@ class GraphCanvas(t.Canvas):
             self.add_edge(float(edge.get('weight')), edge_id, extremities)
 
         external_edge = xml_tree.find('external')
-        # TODO load external edges'''
+        # TODO load external edges
 
 class EditableGraphCanvas(GraphCanvas):
-    LEFT_CLICK = '<Button-1>'
-    WHEEL_CLICK = '<Button-2>'
-    RIGHT_CLICK = '<Button-3>'
-    WHEEL_UP = '<Button-4>'
-    WHEEL_DOWN = '<Button-5>'
-    LEFT_RELEASE = '<ButtonRelease-1>'
-    WHEEL_RELEASE = '<ButtonRelease-2>'
-    RIGHT_RELEASE = '<ButtonRelease-3>'
-    LEFT_CLICK_MOTION = '<B1-Motion>'
-    WHEEL_CLICK_MOTION = '<B2-Motion>'
-    RIGHT_CLICK_MOTION = '<B3-Motion>'
-
     CLICK_TIME_SENSIBILITY = 0.1  # maximum time before click and release to be accepted
 
     def __init__(self, master, **options):
@@ -343,17 +398,18 @@ class EditableGraphCanvas(GraphCanvas):
 
     def bind_events(self):
         canvas_callbacks = {
-            EditableGraphCanvas.LEFT_CLICK: self.handle_left_click,
-            EditableGraphCanvas.WHEEL_CLICK: self.handle_wheel_click,
-            EditableGraphCanvas.RIGHT_CLICK: self.handle_right_click,
-            EditableGraphCanvas.WHEEL_DOWN: self.handle_wheel_down,
-            EditableGraphCanvas.WHEEL_UP: self.handle_wheel_up,
-            EditableGraphCanvas.LEFT_RELEASE: self.handle_left_release,
-            EditableGraphCanvas.RIGHT_RELEASE: self.handle_right_release,
-            EditableGraphCanvas.WHEEL_RELEASE: self.handle_wheel_release,
-            EditableGraphCanvas.LEFT_CLICK_MOTION: self.handle_left_click_mvt,
-            EditableGraphCanvas.RIGHT_CLICK_MOTION: self.handle_right_click_mvt,
-            EditableGraphCanvas.WHEEL_CLICK_MOTION: self.handle_wheel_click_mvt}
+            LEFT_CLICK: self.handle_left_click,
+            WHEEL_CLICK: self.handle_wheel_click,
+            RIGHT_CLICK: self.handle_right_click,
+            WHEEL_DOWN: self.handle_wheel_down,
+            WHEEL_UP: self.handle_wheel_up,
+            LEFT_RELEASE: self.handle_left_release,
+            RIGHT_RELEASE: self.handle_right_release,
+            WHEEL_RELEASE: self.handle_wheel_release,
+            LEFT_CLICK_MOTION: self.handle_left_click_mvt,
+            RIGHT_CLICK_MOTION: self.handle_right_click_mvt,
+            WHEEL_CLICK_MOTION: self.handle_wheel_click_mvt
+        }
         # bind canvas events
         for event in canvas_callbacks:
             self.bind(event, canvas_callbacks[event])
@@ -380,16 +436,6 @@ class EditableGraphCanvas(GraphCanvas):
     def verify_in(self, coords):
         return 0 >= coords[0] >= int(self.width())-self.bg_template.size[0] and \
                0 >= coords[1] >= int(self.height())-self.bg_template.size[1]
-
-    def check_image_coords(self, coords):
-        if coords[0] > 0:
-            coords[0] = 0
-        elif coords[0] < int(self.width()) - self.bg_template.size[0]:
-            coords[0] = int(self.width()) - self.bg_template.size[0]
-        if coords[1] > 0:
-            coords[1] = 0
-        elif coords[1] < int(self.height()) - self.bg_template.size[1]:
-            coords[1] = int(self.height()) - self.bg_template.size[1]
 
     def handle_right_click_mvt(self, ev):
         if Config.DEBUG:
@@ -501,7 +547,7 @@ class EditableGraphCanvas(GraphCanvas):
         new_node_toplevel = t.Toplevel(self.toplevel)
         new_node_canvas = GraphCanvas(new_node_toplevel)
         new_node_canvas.load_xml(plan_path)
-        new_node_canvas.pack()
+        new_node_canvas.pack(fill='both', expand='yes')
         new_node_toplevel.wait_window()
 
     def configure_node(self, current_name='', current_aliases=tuple()):
