@@ -168,6 +168,7 @@ class PlanData:
         self.nodes = dict()
         self.internal_edges = dict()
         self.external_edges = list()
+        self.bg_image = None
 
     def add_node(self, node_id, node):
         assert isinstance(node, Node)
@@ -176,6 +177,9 @@ class PlanData:
     def add_edge(self, edge_id, edge):
         assert isinstance(edge, Edge)
         self.internal_edges[edge_id] = edge
+
+    def set_bg_image(self, bg_image):
+        self.bg_image = bg_image
 
     def get_nodes(self):
         return self.nodes
@@ -190,6 +194,9 @@ class GraphCanvas(t.Canvas):
     def __init__(self, master, **options):
         super().__init__(master, **options)
         self.plan_data = PlanData()
+        self.left_moved = False
+        self.cv_image_coord = [0, 0]
+        self.px_p_m = 0
 
     def add_node(self, name, node_id, access_points, aliases=tuple()):
         node = Node(name, self.coords(node_id), access_points, aliases)
@@ -199,11 +206,115 @@ class GraphCanvas(t.Canvas):
         edge = Edge(weight, self.coords(edge_id), extremities)
         self.plan_data.add_edge(edge_id, edge)
 
+    def refresh(self):
+        pass
+
+    def get_selected_el(self, x, y, d=3):
+        tmp = self.find_overlapping(x-d, y-d, x+d, y+d)
+        i = 1
+        while i < len(tmp) and (tmp[i] <= self.cv_image_id or tmp[i] == self.tmp_line_id):
+            i += 1
+        try:
+            return tmp[i]
+        except:
+            return None
+
+    # data setters
+
+    def set_bg_coord(self, coord):
+        self.cv_image_coord = coord[:]
+        print('moving bg image onto {}'.format(coord))
+        self.coords(self.cv_image_id, *self.cv_image_coord)
+
+    def set_bg_image(self, alpha, image_path=None):
+        if not hasattr(self, 'bg_template'):
+            if image_path is None:
+                raise ValueError('first call to `EditableGraphCanvas.set_bg_image` '
+                                 'needs to precise a non-`None` image')
+        if image_path is not None:
+            assert isinstance(image_path, str)
+            self.bg_template = Image.open(image_path)
+        self.bg_template.putalpha(int(alpha))
+        self.bg_image = ImageTk.PhotoImage(self.bg_template)
+        if not hasattr(self, 'cv_image_id'):
+            self.cv_image_id = self.create_image(self.cv_image_coord[0],
+                self.cv_image_coord[1], image=self.bg_image, anchor='nw')
+        else:
+            self.itemconfig(self.cv_image_id, image=self.bg_image)
+
+    def set_pixels_per_metre(self, px_p_m):
+        assert isinstance(px_p_m, int)
+        self.px_p_m = px_p_m
+
+    # data getters
+
+    def image_coord(self):
+        return self.cv_image_coord
+
     def width(self):
         return self['width']
 
     def height(self):
         return self['height']
+
+    def nodes(self):
+        return self.plan_data.get_nodes()
+
+    def edges(self):
+        return self.plan_data.get_edges()
+
+    def get_pixels_per_metre(self):
+        return self.px_p_m
+
+    # XML loading
+
+    def load_xml(self, path):
+        print(path)
+        xml_tree = ElementTree.parse(path)
+        root = xml_tree.getroot()
+        self.set_pixels_per_metre(int(root.find('distance_unit').get('value')))
+        bg_image = root.find('background_image')
+        background_file_name = Config.MAPS_PATH + root.get('name') + '.png'
+        self.set_bg_image(App.ALPHA_INITIAL_VALUE, background_file_name)
+        self.set_bg_coord([float(value.strip()) for value in bg_image.get('coord')[1:-1].split(',')])
+        self.load_nodes(root.find('nodes'))
+        self.load_edges(root.find('edges'))
+
+    def load_nodes(self, xml_tree):
+        for point in xml_tree.findall('node'):
+            coord = point.find('coord')
+            x, y = float(coord.get('x')), float(coord.get('y'))
+            coord = x, y, x+2*GraphCanvas.NODE_SIZE, y+2*GraphCanvas.NODE_SIZE
+            listWifi = point.find('listWifi')
+            if listWifi is None:
+                access_points = None
+            else:
+                access_points = StaticAccessPointList()
+                access_points.fromXml(listWifi)
+            node_id = self.create_oval(*coord, fill='green' if access_points is not None else 'red')
+            aliases = point.find('aliases')
+            if aliases is not None:
+                loaded_aliases = list()
+                for alias in aliases.findall('alias'):
+                    loaded_aliases.append(alias.text)
+            else:
+                loaded_aliases = list()
+            self.add_node(point.attrib['id'], node_id, access_points, loaded_aliases)
+
+
+    def load_edges(self, xml_tree):
+        internal_edge = xml_tree.find('internal')
+        for edge in internal_edge.findall('edge'):
+            extremities = edge.get('beg'), edge.get('end')
+            extremities_ids = [[node_id for node_id in self.nodes() \
+                if self.nodes()[node_id].name() == extremity][0] for extremity in extremities]
+            end_coord = [c + GraphCanvas.NODE_SIZE for c in self.nodes()[extremities_ids[1]].coord()[:2]]
+            beg_coord = [c + GraphCanvas.NODE_SIZE for c in self.nodes()[extremities_ids[0]].coord()[:2]]
+            edge_id = self.create_line(*beg_coord, *end_coord, width=GraphCanvas.EDGE_WIDTH)
+            self.add_edge(float(edge.get('weight')), edge_id, extremities)
+
+        external_edge = xml_tree.find('external')
+        # TODO load external edges'''
 
 class EditableGraphCanvas(GraphCanvas):
     LEFT_CLICK = '<Button-1>'
@@ -227,26 +338,8 @@ class EditableGraphCanvas(GraphCanvas):
         self.bind_events()
 
     def init_variables(self):
-        self.left_moved = False
         self.left_src = None
         self.tmp_line_id = None
-        self.cv_image_coord = [0, 0]
-        self.px_p_m = 0
-
-    def set_pixels_per_metre(self, px_p_m):
-        assert isinstance(px_p_m, int)
-        self.px_p_m = px_p_m
-
-    def get_pixels_per_metre(self):
-        return self.px_p_m
-
-    def image_coord(self):
-        return self.cv_image_coord
-
-    def set_bg_coord(self, coord):
-        self.cv_image_coord = coord[:]
-        print('moving bg image onto {}'.format(coord))
-        self.coords(self.cv_image_id, *self.cv_image_coord)
 
     def bind_events(self):
         canvas_callbacks = {
@@ -265,40 +358,7 @@ class EditableGraphCanvas(GraphCanvas):
         for event in canvas_callbacks:
             self.bind(event, canvas_callbacks[event])
 
-    def set_bg_image(self, alpha, image_template=None):
-        if not hasattr(self, 'bg_template'):
-            if image_template is None:
-                raise ValueError('first call to `AditableGraphCanvas.set_bg_image` '
-                                 'needs to precise a non-`None` image')
-        if image_template is not None:
-            self.bg_template = image_template
-        self.bg_template.putalpha(int(alpha))
-        self.bg_image = ImageTk.PhotoImage(self.bg_template)
-        if not hasattr(self, 'cv_image_id'):
-            self.cv_image_id = self.create_image(self.cv_image_coord[0],
-                self.cv_image_coord[1], image=self.bg_image, anchor='nw')
-        else:
-            self.itemconfig(self.cv_image_id, image=self.bg_image)
-
-    # data getters
-
-    def nodes(self):
-        return self.plan_data.get_nodes()
-
-    def edges(self):
-        return self.plan_data.get_edges()
-
     # events handling code
-
-    def get_selected_el(self, x, y, d=3):
-        tmp = self.find_overlapping(x-d, y-d, x+d, y+d)
-        i = 1
-        while i < len(tmp) and (tmp[i] <= self.cv_image_id or tmp[i] == self.tmp_line_id):
-            i += 1
-        try:
-            return tmp[i]
-        except:
-            return None
 
     def handle_left_click_mvt(self, ev):
         self.left_moved = True
@@ -433,24 +493,45 @@ class EditableGraphCanvas(GraphCanvas):
         if(Config.DEBUG):
             print('WR')
 
+    def get_external_node(self):
+        assert hasattr(self, 'toplevel') and self.toplevel is not None
+        plan_path = t.filedialog.askopenfilename(initialdir=Config.MAPS_PATH, filetypes=[('XML Files', '.xml')])
+        if plan_path == '' or plan_path is None:
+            print('ERROR')  # TODO: handle properly with a popup
+        new_node_toplevel = t.Toplevel(self.toplevel)
+        new_node_canvas = GraphCanvas(new_node_toplevel)
+        new_node_canvas.load_xml(plan_path)
+        new_node_canvas.pack()
+        new_node_toplevel.wait_window()
+
     def configure_node(self, current_name='', current_aliases=tuple()):
+        # TODO: Refactor this into a brand new class
         self.toplevel = t.Toplevel(self)
+        # Name
         t.Label(self.toplevel, text='Node Name: ').grid(row=0, column=0)
         name = t.StringVar()
         name.set(current_name)
         t.Entry(self.toplevel, textvariable=name).grid(row=0, column=1)
         self.aliases = list(current_aliases)
-        self.lb = t.Listbox(self.toplevel, listvar=self.aliases)
+        # Aliases
+        self.aliases_group = t.LabelFrame(self.toplevel, text='Aliases Management', padx=5, pady=5, relief=t.SUNKEN, borderwidth=3)
+        self.aliases_group.grid(row=1, column=0, columnspan=2)
+        self.lb = t.Listbox(self.aliases_group, listvar=self.aliases)
         self.lb.grid(row=1, column=0, rowspan=3)
         for alias in self.aliases:
             self.lb.insert(t.END, alias)
         self.alias = t.StringVar()
-        t.Entry(self.toplevel, textvariable=self.alias).grid(row=1, column=1)
-        t.Button(self.toplevel, text='Add alias', command=lambda: (self.lb.insert(t.END, self.alias.get()), self.aliases.append(self.alias.get()))).grid(row=2, column=1)
-        t.Button(self.toplevel, text='Remove alias', command=lambda: self.lb.delete(t.ANCHOR)).grid(row=3, column=1)
-        t.Button(self.toplevel, text='Ok', command=self.toplevel.destroy).grid(row=4, column=0)
+        t.Entry(self.aliases_group, textvariable=self.alias).grid(row=1, column=1)
+        t.Button(self.aliases_group, text='Add alias', command=lambda: (self.lb.insert(t.END, self.alias.get()), self.aliases.append(self.alias.get()))).grid(row=2, column=1)
+        t.Button(self.aliases_group, text='Remove alias', command=lambda: self.lb.delete(t.ANCHOR)).grid(row=3, column=1)
+        # External edges
+        self.ext_edges_group = t.LabelFrame(self.toplevel, text='External edges', padx=5, pady=5, relief=t.SUNKEN, borderwidth=3)
+        self.ext_edges_group.grid(row=4, column=0, columnspan=2)
+        t.Button(self.ext_edges_group, text='Add external edge from this node', command=lambda: self.get_external_node()).grid(row=4, column=0)
+        # Validation & scan
+        t.Button(self.toplevel, text='Ok', command=self.toplevel.destroy).grid(row=5, column=0)
         self.ap = None
-        t.Button(self.toplevel, text='Scan access points', command=self.scan).grid(row=4, column=1)
+        t.Button(self.toplevel, text='Scan access points', command=self.scan).grid(row=5, column=1)
         self.toplevel.wait_window()
         ap = self.ap
         aliases = self.aliases
@@ -458,6 +539,7 @@ class EditableGraphCanvas(GraphCanvas):
         del self.lb
         del self.alias
         del self.aliases
+        del self.toplevel
         return name.get(), ap, aliases
 
     def configure_edge(self, current_weight=''):
@@ -518,7 +600,7 @@ class App(t.Frame):
         ext = splitext(self.file_name)[1].lower()[1:]
 
         if ext == 'xml':
-            self.load_xml()
+            self.canvas.load_xml(self.file_name)
 
         elif ext in ['bmp', 'jpg', 'jpe', 'jpeg', 'png', 'tif', 'tiff']:
             px_p_m = self.ask_metre_length()
@@ -527,7 +609,7 @@ class App(t.Frame):
                 if Config.DEBUG:
                     print('One metre is then {} pixels'.format(px_p_m))
                 self.background_file_name = self.file_name
-                self.chose_background_image()
+                self.canvas.set_bg_image(App.ALPHA_INITIAL_VALUE, self.background_file_name)
             else:
                 self.destroy()
 
@@ -542,11 +624,6 @@ class App(t.Frame):
         toplevel.bind('<Return>', lambda _: toplevel.destroy())
         toplevel.wait_window()
         return int(nb_pixels.get()) if (nb_pixels.get().isnumeric() and nb_pixels.get() != "") else None
-
-    def chose_background_image(self):
-        self.bg_template = Image.open(self.background_file_name)
-        self.bg_image_size = self.bg_template.size
-        self.canvas.set_bg_image(App.ALPHA_INITIAL_VALUE, self.bg_template)
 
     def scan(self):
         self.toplevel.wm_title('Scanning access points...')
@@ -582,56 +659,6 @@ class App(t.Frame):
         content = self.text()
         with open(path, 'w') as save_file:
             save_file.write(content)
-
-    # load functions
-
-    def load_xml(self):
-        xml_tree = ElementTree.parse(self.file_name)
-        root = xml_tree.getroot()
-        self.metre_length_on_plan = int(root.find('distance_unit').get('value'))
-        bg_image = root.find('background_image')
-        self.background_file_name = Config.MAPS_PATH + root.get('name') + '.png'
-        self.chose_background_image()
-        self.canvas.set_bg_coord([float(value.strip()) for value in bg_image.get('coord')[1:-1].split(',')])
-        self.load_nodes(root.find('nodes'))
-        self.load_edges(root.find('edges'))
-
-    def load_nodes(self, xml_tree):
-        for point in xml_tree.findall('node'):
-            coord = point.find('coord')
-            x, y = float(coord.get('x')), float(coord.get('y'))
-            coord = x, y, x+2*GraphCanvas.NODE_SIZE, y+2*GraphCanvas.NODE_SIZE
-            listWifi = point.find('listWifi')
-            if listWifi is None:
-                access_points = None
-            else:
-                access_points = StaticAccessPointList()
-                access_points.fromXml(listWifi)
-            node_id = self.canvas.create_oval(*coord, fill='green' if access_points is not None else 'red')
-            aliases = point.find('aliases')
-            if aliases is not None:
-                loaded_aliases = list()
-                for alias in aliases.findall('alias'):
-                    loaded_aliases.append(alias.text)
-            else:
-                loaded_aliases = list()
-            self.canvas.add_node(point.attrib['id'], node_id, access_points, loaded_aliases)
-
-
-    def load_edges(self, xml_tree):
-        internal_edge = xml_tree.find('internal')
-        for edge in internal_edge.findall('edge'):
-            extremities = edge.get('beg'), edge.get('end')
-            extremities_ids = [[node_id for node_id in self.canvas.nodes() \
-                if self.canvas.nodes()[node_id].name() == extremity][0] for extremity in extremities]
-            end_coord = [c + GraphCanvas.NODE_SIZE for c in self.canvas.nodes()[extremities_ids[1]].coord()[:2]]
-            beg_coord = [c + GraphCanvas.NODE_SIZE for c in self.canvas.nodes()[extremities_ids[0]].coord()[:2]]
-            edge_id = self.canvas.create_line(*beg_coord, *end_coord, width=GraphCanvas.EDGE_WIDTH)
-            self.canvas.add_edge(float(edge.get('weight')), edge_id, extremities)
-
-        external_edge = xml_tree.find('external')
-        # TODO load external edges
-
 
 def main():
     root = t.Tk()
