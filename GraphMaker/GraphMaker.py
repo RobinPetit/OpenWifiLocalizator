@@ -648,7 +648,7 @@ class EditableGraphCanvas(GraphCanvas):
                     # verify edge is in the other XML as well
                     _ = ElementTree.SubElement(XML_external_edges, 'edge')
                     _.attrib = {'src': node, 'plan': splitext(relpath(self.background_file_name, Config.MAPS_PATH))[0], 'dest': current_name}
-                tree.write(xml_path + '.xml')
+                tree.write(xml_path)
         del self.ap
         del self.lb
         del self.alias
@@ -711,9 +711,6 @@ class App(t.Frame):
 
     def on_exit(self):
         if mbox.askquestion('Quit', 'Do you want to save before leaving?') == 'yes':
-            #self.save_to_xml(fdialog.asksaveasfilename(defaultextension='xml',
-            #                 filetypes=[('XML Files', '.xml')],
-            #                 initialdir=Config.XMLS_PATH))
             self.save_to_xml(Config.XMLS_PATH + splitext(relpath(self.canvas.background_file_name, Config.MAPS_PATH))[0] + '.xml')
 
     def create_widgets(self, **options):
