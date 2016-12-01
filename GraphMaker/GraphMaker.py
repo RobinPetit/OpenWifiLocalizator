@@ -585,29 +585,38 @@ class EditableGraphCanvas(GraphCanvas):
         name.set(current_name)
         t.Entry(self.toplevel, textvariable=name).grid(row=0, column=1)
         self.aliases = list(current_aliases)
+        
         # Aliases
         self.aliases_group = t.LabelFrame(self.toplevel, text='Aliases Management', padx=5, pady=5, relief=t.SUNKEN, borderwidth=3)
         self.aliases_group.grid(row=1, column=0, columnspan=2)
         self.lb = t.Listbox(self.aliases_group, listvar=self.aliases)
         self.lb.grid(row=1, column=0, rowspan=3)
+
+        self.lb.delete(0, t.END)
+
         for alias in self.aliases:
             self.lb.insert(t.END, alias)
+
         self.alias = t.StringVar()
         t.Entry(self.aliases_group, textvariable=self.alias).grid(row=1, column=1)
         t.Button(self.aliases_group, text='Add alias', command=lambda: (self.lb.insert(t.END, self.alias.get()), self.aliases.append(self.alias.get()))).grid(row=2, column=1)
-        t.Button(self.aliases_group, text='Remove alias', command=lambda: self.lb.delete(t.ANCHOR)).grid(row=3, column=1)
+        # self.aliases.remove(0),
+        t.Button(self.aliases_group, text='Remove alias', command=lambda: (self.aliases.remove(self.lb.get(t.ACTIVE)), self.lb.delete(t.ANCHOR))).grid(row=3, column=1)
         if current_name != '':
             # External edges
             self.ext_edges_group = t.LabelFrame(self.toplevel, text='External edges', padx=5, pady=5, relief=t.SUNKEN, borderwidth=3)
             self.ext_edges_group.grid(row=4, column=0, columnspan=2)
             t.Button(self.ext_edges_group, text='Add external edge from this node', command=lambda: self.get_external_node(current_name)).grid(row=4, column=0)
+
         # Validation & scan
         t.Button(self.toplevel, text='Ok', command=self.toplevel.destroy).grid(row=5, column=0)
         self.ap = None
         t.Button(self.toplevel, text='Scan access points', command=self.scan).grid(row=5, column=1)
         self.toplevel.wait_window()
+
         ap = self.ap
         aliases = self.aliases
+
         del self.ap
         del self.lb
         del self.alias
