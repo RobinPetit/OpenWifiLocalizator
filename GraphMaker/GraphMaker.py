@@ -3,6 +3,7 @@
 # tkinter
 import tkinter as t
 from tkinter import filedialog as fdialog
+from tkinter.simpledialog import askfloat
 from tkinter import messagebox as mbox
 from PIL import Image, ImageTk
 from time import time, sleep
@@ -194,8 +195,8 @@ class PlanData:
         assert isinstance(edge, Edge)
         self.internal_edges[edge_id] = edge
 
-    def add_external_edge(self, internal_node, plan_name, external_node):
-        self.external_edges.append((internal_node, plan_name, external_node))
+    def add_external_edge(self, internal_node, plan_name, external_node, weight):
+        self.external_edges.append((internal_node, plan_name, external_node, weight))
 
     def set_bg_image(self, bg_image):
         self.bg_image = bg_image
@@ -574,9 +575,11 @@ class EditableGraphCanvas(GraphCanvas):
             print('ERROR')  # TODO: handle properly with a popup
         node_name = ExternalNodeFinder.find(self.toplevel, plan_path)
         plan_short_name =  purge_plan_name(plan_path, Config.XMLS_PATH)
-        self.create_external_edge(name,plan_short_name, node_name)
-        self.ext_edges_lb.insert(t.END, plan_short_name + EXTERNAL_EDGES_SEPARATOR + node_name)
-        self.ext_edges.append(plan_short_name + EXTERNAL_EDGES_SEPARATOR + node_name)
+        #self.create_external_edge(name,plan_short_name, node_name, weight=askfloat('Edge weight', 'How long is this edge?', minvalue=.0))
+        weight = askfloat('Edge weight', 'How long is this edge? (metres)', minvalue=.0)
+        str_to_add = plan_short_name + EXTERNAL_EDGES_SEPARATOR + node_name + EXTERNAL_EDGES_SEPARATOR + str(weight)
+        self.ext_edges_lb.insert(t.END, str_to_add)
+        self.ext_edges.append(str_to_add)
 
     def configure_node(self, current_name='', current_aliases=tuple()):
         # TODO: Refactor this into a brand new class
@@ -624,11 +627,11 @@ class EditableGraphCanvas(GraphCanvas):
             self.plan_data.remove_external_edges_from(current_name)
             edges_dict = dict()
             for external_edge in self.ext_edges:
-                path, node = external_edge.split(EXTERNAL_EDGES_SEPARATOR)
+                path, node, weight = external_edge.split(EXTERNAL_EDGES_SEPARATOR)
                 if path in edges_dict:
-                    edges_dict[path].append(node)
+                    edges_dict[path].append((node, weight))
                 else:
-                    edges_dict[path] = [node]
+                    edges_dict[path] = [(node, weight)]
             print(edges_dict)
             #for external_edge in self.ext_edges:
             for plan in edges_dict:
@@ -642,12 +645,12 @@ class EditableGraphCanvas(GraphCanvas):
                 for edge in XML_external_edges:
                     if edge.get('dest') == current_name:
                         XML_external_edges.remove(edge)
-                for node in edges_dict[plan]:
+                for node, weight in edges_dict[plan]:
                     #path, node = external_edge.split(EXTERNAL_EDGES_SEPARATOR)
-                    self.create_external_edge(current_name, plan, node)
+                    self.create_external_edge(current_name, plan, node, weight)
                     # verify edge is in the other XML as well
                     _ = ElementTree.SubElement(XML_external_edges, 'edge')
-                    _.attrib = {'src': node, 'plan': splitext(relpath(self.background_file_name, Config.MAPS_PATH))[0], 'dest': current_name}
+                    _.attrib = {'weight': weight, 'src': node, 'plan': splitext(relpath(self.background_file_name, Config.MAPS_PATH))[0], 'dest': current_name}
                 tree.write(xml_path)
         del self.ap
         del self.lb
@@ -675,8 +678,8 @@ class EditableGraphCanvas(GraphCanvas):
         node_id = self.create_oval(*node_coord, fill='green' if access_points is not None else 'red')
         self.add_node(name, node_id, access_points, aliases)
 
-    def create_external_edge(self, internal_node, plan_name, external_node):
-        self.plan_data.add_external_edge(internal_node, plan_name, external_node)
+    def create_external_edge(self, internal_node, plan_name, external_node, weight=.0):
+        self.plan_data.add_external_edge(internal_node, plan_name, external_node, weight)
 
     def scan(self):
         self.toplevel.wm_title('Scanning access points...')
@@ -775,7 +778,7 @@ class App(t.Frame):
         text += (TAB * (nb_tab+2)) + '<external>\n'
         for ext_edge in self.canvas.external_edges():
             # internal_node_name, plan_name, external_node_name = ext_edge
-            text += (TAB * (nb_tab+3)) + '<edge src="{}" plan="{}" dest="{}">\n'.format(*ext_edge)
+            text += (TAB * (nb_tab+3)) + '<edge src="{}" plan="{}" dest="{}" weight="{}">\n'.format(*ext_edge)
         text += (TAB * (nb_tab+2)) + '</external>\n'
         text += (TAB * (nb_tab+1)) + '</edges>\n'
 
