@@ -207,6 +207,9 @@ class PlanData:
     def get_external_edges(self):
         return self.external_edges
 
+    def remove_external_edges_from(self, name):
+        self.external_edges = [edge for edge in self.external_edges if edge[0] != name]
+
 class GraphCanvas(t.Canvas):
     NODE_SIZE = 10
     EDGE_WIDTH = 2.5
@@ -567,11 +570,15 @@ class EditableGraphCanvas(GraphCanvas):
         if plan_path == '' or plan_path is None:
             print('ERROR')  # TODO: handle properly with a popup
         node_name = ExternalNodeFinder.find(self.toplevel, plan_path)
-        self.create_external_edge(name, purge_plan_name(plan_path, Config.XMLS_PATH), node_name)
+        plan_short_name =  purge_plan_name(plan_path, Config.XMLS_PATH)
+        self.create_external_edge(name,plan_short_name, node_name)
+        self.ext_edges_lb.insert(t.END, plan_short_name + ' --- ' + node_name)
+        self.ext_edges.append(plan_short_name + ' --- ' + node_name)
 
     def configure_node(self, current_name='', current_aliases=tuple()):
         # TODO: Refactor this into a brand new class
         self.toplevel = t.Toplevel(self)
+        self.master.master.withdraw()
         # Name
         t.Label(self.toplevel, text='Node Name: ').grid(row=0, column=0)
         name = t.StringVar()
@@ -593,14 +600,28 @@ class EditableGraphCanvas(GraphCanvas):
             # External edges
             self.ext_edges_group = t.LabelFrame(self.toplevel, text='External edges', padx=5, pady=5, relief=t.SUNKEN, borderwidth=3)
             self.ext_edges_group.grid(row=4, column=0, columnspan=2)
-            t.Button(self.ext_edges_group, text='Add external edge from this node', command=lambda: self.get_external_node(current_name)).grid(row=4, column=0)
+            self.ext_edges = list()
+            self.ext_edges_lb = t.Listbox(self.ext_edges_group, listvar=self.ext_edges)
+            for edge in self.external_edges():
+                if edge[0] == current_name:
+                    self.ext_edges_lb.insert(t.END, edge[1] + ' --- ' + edge[2])
+                    self.ext_edges.append(edge[1] + ' --- ' + edge[2])
+            self.ext_edges_lb.grid(row=5, column=0, rowspan=2)
+            t.Button(self.ext_edges_group, text='Add external edge \nfrom this node', command=lambda: self.get_external_node(current_name)).grid(row=5, column=1)
+            t.Button(self.ext_edges_group, text='Remove external edge', command=lambda: (self.ext_edges.remove(self.ext_edges_lb.get(t.ANCHOR)), self.ext_edges_lb.delete(t.ANCHOR))).grid(row=6, column=1)
         # Validation & scan
-        t.Button(self.toplevel, text='Ok', command=self.toplevel.destroy).grid(row=5, column=0)
+        t.Button(self.toplevel, text='Ok', command=self.toplevel.destroy).grid(row=6, column=0)
         self.ap = None
-        t.Button(self.toplevel, text='Scan access points', command=self.scan).grid(row=5, column=1)
+        t.Button(self.toplevel, text='Scan access points', command=self.scan).grid(row=6, column=1)
         self.toplevel.wait_window()
+        self.master.master.deiconify()
         ap = self.ap
         aliases = self.aliases
+        if hasattr(self, 'ext_edges'):
+            self.plan_data.remove_external_edges_from(current_name)
+            for external_edge in self.ext_edges:
+                print(external_edge)
+                self.create_external_edge(current_name, *external_edge.split(' --- '))
         del self.ap
         del self.lb
         del self.alias
