@@ -92,6 +92,10 @@ class AccessPointList:
 
         return find
 
+    def isEmpty(self):
+        return self.elements == None or len(self.elements) == 0
+
+
     def scan(self):
         cmd = "iw dev {}  scan > {}".format(self.network, self.tmpfile)
 
@@ -138,12 +142,17 @@ class StaticAccessPointList:
         output += (TAB * nb_tab) + '</listWifi>\n'
         return output
 
+    def isEmpty(self):
+        return self.elements == None or len(self.elements) == 0
+
+
+
 class Node:
     def __init__(self, name, coords, access_points, aliases=tuple()):
         self.name_ = name
         self.coords = coords
         self.access_points_ = access_points
-        self.color = 'green' if access_points is not None else 'red'
+        self.color = 'green' if (access_points is not None and not access_points.isEmpty()) else 'red'
         self.aliases_ = list(aliases)
 
     def coord(self, c=None):
@@ -537,7 +546,7 @@ class EditableGraphCanvas(GraphCanvas):
             name, access_points, aliases = self.configure_node(self.nodes()[selected].name(), self.nodes()[selected].aliases())
             self.nodes()[selected].name(name)
             self.nodes()[selected].aliases(aliases)
-            if access_points is not None:
+            if access_points is not None and not access_points.isEmpty():
                 self.nodes()[selected].access_points(access_points)
                 self.color = 'green'
                 self.itemconfig(selected, fill='green')
@@ -667,7 +676,8 @@ class EditableGraphCanvas(GraphCanvas):
             return
         node_coord = (x-GraphCanvas.NODE_SIZE, y-GraphCanvas.NODE_SIZE,
                       x+GraphCanvas.NODE_SIZE, y+GraphCanvas.NODE_SIZE)
-        node_id = self.create_oval(*node_coord, fill='green' if access_points is not None else 'red')
+        node_id = self.create_oval(*node_coord, fill='green' if (access_points is not None and \
+                                                         not access_points.isEmpty()) else 'red')
         self.add_node(name, node_id, access_points, aliases)
 
     def create_external_edge(self, internal_node, plan_name, external_node):
