@@ -7,3 +7,5 @@ class Config:
     DEBUG = True
     # MAPS location
     MAPS_PATH = '../plans/PLANS/'
+    # XMLs location
+    XMLS_PATH = '../XML MAPS/'
