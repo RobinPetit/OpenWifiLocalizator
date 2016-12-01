@@ -620,7 +620,7 @@ class EditableGraphCanvas(GraphCanvas):
         name.set(current_name)
         t.Entry(self.toplevel, textvariable=name).grid(row=0, column=1)
         self.aliases = list(current_aliases)
-        
+
         # Aliases
         self.aliases_group = t.LabelFrame(self.toplevel, text='Aliases Management', padx=5, pady=5, relief=t.SUNKEN, borderwidth=3)
         self.aliases_group.grid(row=1, column=0, columnspan=2)
@@ -666,7 +666,7 @@ class EditableGraphCanvas(GraphCanvas):
         t.Entry(toplevel, textvariable=value).grid(row=0, column=1)
         t.Button(toplevel, text='Ok', command=toplevel.destroy).grid(row=1)
         toplevel.bind('<Return>', lambda _: toplevel.destroy())
-        
+
         toplevel.wait_window()
         return float(value.get())
 
@@ -713,12 +713,12 @@ class App(t.Frame):
     def __init__(self, master, **options):
         super().__init__(master)
         self.create_widgets(**options)
+        self.bind('<Control-s>', self.save_dialog_box)
+        self.focus_set()
 
     def on_exit(self):
         if mbox.askquestion('Quit', 'Do you want to save before leaving?') == 'yes':
-            self.save_to_xml(fdialog.asksaveasfilename(defaultextension='xml',
-                             filetypes=[('XML Files', '.xml')],
-                             initialdir=Config.XMLS_PATH))
+            self.save_dialog_box()
 
     def create_widgets(self, **options):
         self.canvas = EditableGraphCanvas(self, width=options['c_width'], height=options['c_height'])
@@ -795,6 +795,11 @@ class App(t.Frame):
         content = self.text()
         with open(path, 'w') as save_file:
             save_file.write(content)
+
+    def save_dialog_box(self, event = None):
+        self.save_to_xml(fdialog.asksaveasfilename(defaultextension='xml',
+                         filetypes=[('XML Files', '.xml')],
+                         initialdir=Config.XMLS_PATH))
 
 def main():
     root = t.Tk()
