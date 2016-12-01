@@ -17,6 +17,8 @@ from Config import Config
 SET_TABS_IN_XML = True
 TAB = {True: '\t', False: ''}[SET_TABS_IN_XML]
 
+EXTERNAL_EDGES_SEPARATOR = ' --- '
+
 LEFT_CLICK = '<Button-1>'
 WHEEL_CLICK = '<Button-2>'
 RIGHT_CLICK = '<Button-3>'
@@ -275,6 +277,7 @@ class GraphCanvas(t.Canvas):
                                  'needs to precise a non-`None` image')
         if image_path is not None:
             assert isinstance(image_path, str)
+            self.background_file_name = image_path
             self.bg_template = Image.open(image_path)
         self.bg_template.putalpha(int(alpha))
         self.bg_image = ImageTk.PhotoImage(self.bg_template)
@@ -572,8 +575,8 @@ class EditableGraphCanvas(GraphCanvas):
         node_name = ExternalNodeFinder.find(self.toplevel, plan_path)
         plan_short_name =  purge_plan_name(plan_path, Config.XMLS_PATH)
         self.create_external_edge(name,plan_short_name, node_name)
-        self.ext_edges_lb.insert(t.END, plan_short_name + ' --- ' + node_name)
-        self.ext_edges.append(plan_short_name + ' --- ' + node_name)
+        self.ext_edges_lb.insert(t.END, plan_short_name + EXTERNAL_EDGES_SEPARATOR + node_name)
+        self.ext_edges.append(plan_short_name + EXTERNAL_EDGES_SEPARATOR + node_name)
 
     def configure_node(self, current_name='', current_aliases=tuple()):
         # TODO: Refactor this into a brand new class
@@ -604,8 +607,8 @@ class EditableGraphCanvas(GraphCanvas):
             self.ext_edges_lb = t.Listbox(self.ext_edges_group, listvar=self.ext_edges)
             for edge in self.external_edges():
                 if edge[0] == current_name:
-                    self.ext_edges_lb.insert(t.END, edge[1] + ' --- ' + edge[2])
-                    self.ext_edges.append(edge[1] + ' --- ' + edge[2])
+                    self.ext_edges_lb.insert(t.END, edge[1] + EXTERNAL_EDGES_SEPARATOR + edge[2])
+                    self.ext_edges.append(edge[1] + EXTERNAL_EDGES_SEPARATOR + edge[2])
             self.ext_edges_lb.grid(row=5, column=0, rowspan=2)
             t.Button(self.ext_edges_group, text='Add external edge \nfrom this node', command=lambda: self.get_external_node(current_name)).grid(row=5, column=1)
             t.Button(self.ext_edges_group, text='Remove external edge', command=lambda: (self.ext_edges.remove(self.ext_edges_lb.get(t.ANCHOR)), self.ext_edges_lb.delete(t.ANCHOR))).grid(row=6, column=1)
@@ -619,9 +622,33 @@ class EditableGraphCanvas(GraphCanvas):
         aliases = self.aliases
         if hasattr(self, 'ext_edges'):
             self.plan_data.remove_external_edges_from(current_name)
+            edges_dict = dict()
             for external_edge in self.ext_edges:
-                print(external_edge)
-                self.create_external_edge(current_name, *external_edge.split(' --- '))
+                path, node = external_edge.split(EXTERNAL_EDGES_SEPARATOR)
+                if path in edges_dict:
+                    edges_dict[path].append(node)
+                else:
+                    edges_dict[path] = [node]
+            print(edges_dict)
+            #for external_edge in self.ext_edges:
+            for plan in edges_dict:
+                xml_path = Config.XMLS_PATH + path + '.xml'
+                tree = ElementTree.ElementTree()
+                root = tree.parse(xml_path)
+                edges_markup = root.find('edges')
+                XML_external_edges = edges_markup.find('external')
+                if XML_external_edges is None:
+                    XML_external_edges = ElementTree.SubElement(edges_markup, 'external')
+                for edge in XML_external_edges:
+                    if edge.get('dest') == current_name:
+                        XML_external_edges.remove(edge)
+                for node in edges_dict[plan]:
+                    #path, node = external_edge.split(EXTERNAL_EDGES_SEPARATOR)
+                    self.create_external_edge(current_name, plan, node)
+                    # verify edge is in the other XML as well
+                    _ = ElementTree.SubElement(XML_external_edges, 'edge')
+                    _.attrib = {'src': node, 'plan': splitext(relpath(self.background_file_name, Config.MAPS_PATH))[0], 'dest': current_name}
+                tree.write(xml_path + '.xml')
         del self.ap
         del self.lb
         del self.alias
@@ -684,9 +711,10 @@ class App(t.Frame):
 
     def on_exit(self):
         if mbox.askquestion('Quit', 'Do you want to save before leaving?') == 'yes':
-            self.save_to_xml(fdialog.asksaveasfilename(defaultextension='xml',
-                             filetypes=[('XML Files', '.xml')],
-                             initialdir=Config.XMLS_PATH))
+            #self.save_to_xml(fdialog.asksaveasfilename(defaultextension='xml',
+            #                 filetypes=[('XML Files', '.xml')],
+            #                 initialdir=Config.XMLS_PATH))
+            self.save_to_xml(Config.XMLS_PATH + splitext(relpath(self.canvas.background_file_name, Config.MAPS_PATH))[0] + '.xml')
 
     def create_widgets(self, **options):
         self.canvas = EditableGraphCanvas(self, width=options['c_width'], height=options['c_height'])
@@ -736,7 +764,7 @@ class App(t.Frame):
     def text(self, nb_tab=0):
         text = (TAB * (nb_tab+1)) + '<background_image coord="{}" />\n'.format(tuple(self.canvas.image_coord()))
         text += (TAB * (nb_tab+1)) + '<distance_unit value="{}" />\n'.format(self.canvas.get_pixels_per_metre())
-        plan_name = purge_plan_name(self.background_file_name, Config.MAPS_PATH)
+        plan_name = purge_plan_name(self.canvas.background_file_name, Config.MAPS_PATH)
         text += (TAB * (nb_tab+1)) + '<nodes>\n'
         for node_id in self.canvas.nodes():
             text += self.canvas.nodes()[node_id].text(nb_tab+2)
