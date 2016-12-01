@@ -349,7 +349,7 @@ class GraphCanvas(t.Canvas):
         self.set_pixels_per_metre(int(root.find('distance_unit').get('value')))
         bg_image = root.find('background_image')
         self.background_file_name = Config.MAPS_PATH + root.get('name') + '.png'
-        self.set_bg_image(App.ALPHA_INITIAL_VALUE, background_file_name)
+        self.set_bg_image(App.ALPHA_INITIAL_VALUE, self.background_file_name)
         self.set_bg_coord([float(value.strip()) for value in bg_image.get('coord')[1:-1].split(',')])
         self.load_nodes(root.find('nodes'))
         self.load_edges(root.find('edges'))
