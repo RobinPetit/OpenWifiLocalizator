@@ -32,6 +32,9 @@ RIGHT_CLICK_MOTION = '<B3-Motion>'
 def euclidian_distance(a, b):
     return sqrt(sum([(x-y)*(x-y) for x, y in zip(a, b)]))
 
+def purge_plan_name(plan, src):
+    return relpath(splitext(plan)[0], src)
+
 class AP:
     def __init__(self, key):
         self.key = key
@@ -46,7 +49,6 @@ class AP:
     def text(self):
         return '<wifi BSS="{}" max="{:2.1f}" min="{:2.1f}" avg="{:2.1f}" />' \
                .format(self.key, -min(self.values), -max(self.values), -self.avg())
-
 
 class AccessPointList:
     def __init__(self, tmpfile = "temp.txt", iterations = 5, wait = 2):
@@ -190,6 +192,10 @@ class PlanData:
         assert isinstance(edge, Edge)
         self.internal_edges[edge_id] = edge
 
+    def add_external_edge(self, internal_node, plan_name, external_node):
+        self.external_edges.append((internal_node, plan_name, external_node))
+        print('NEW EXTERNAL EDGE: {}'.format(self.external_edges[-1]))
+
     def set_bg_image(self, bg_image):
         self.bg_image = bg_image
 
@@ -198,6 +204,9 @@ class PlanData:
 
     def get_edges(self):
         return self.internal_edges
+
+    def get_external_edges(self):
+        return self.external_edges
 
 class GraphCanvas(t.Canvas):
     NODE_SIZE = 10
@@ -295,6 +304,9 @@ class GraphCanvas(t.Canvas):
     def edges(self):
         return self.plan_data.get_edges()
 
+    def external_edges(self):
+        return self.plan_data.get_external_edges()
+
     def get_pixels_per_metre(self):
         return self.px_p_m
 
@@ -305,19 +317,16 @@ class GraphCanvas(t.Canvas):
         self.left_click_time = time()
 
     def handle_left_release(self, ev):
+        ret = False
         if self.left_moved:
+            ret = True
             self.cv_image_coord = self.coords(self.cv_image_id)
             for node_id in self.nodes():
                 self.nodes()[node_id].coord(self.coords(node_id))
             for edge_id in self.edges():
                 self.edges()[edge_id].coord(self.coords(edge_id))
-        else:
-            if float(time() - self.left_click_time) <= EditableGraphCanvas.CLICK_TIME_SENSIBILITY:
-                element_id = self.get_selected_el(ev.x, ev.y)
-                if element_id in self.nodes():
-                    print('TODO: create a link between local and {}'.format(self.nodes()[element_id].name()))
-                # TODO: select node
         self.left_moved = False
+        return ret
 
     def handle_left_click_mvt(self, ev):
         self.left_moved = True
@@ -331,8 +340,6 @@ class GraphCanvas(t.Canvas):
         for node_id in self.nodes():
             self.coords(node_id, self.nodes()[node_id].coord()[0]+x_offset, self.nodes()[node_id].coord()[1]+y_offset,
                         self.nodes()[node_id].coord()[2]+x_offset, self.nodes()[node_id].coord()[3]+y_offset)
-
-        """ TODO: take care of the copy of code right below """
 
     # XML loading
 
@@ -382,6 +389,26 @@ class GraphCanvas(t.Canvas):
 
         external_edge = xml_tree.find('external')
         # TODO load external edges
+
+class SelectableGraphCanvas(GraphCanvas):
+    def __init__(self, master, **options):
+        super().__init__(master, **options)
+
+    def handle_left_release(self, ev):
+        if not super().handle_left_release(ev):
+            if float(time() - self.left_click_time) <= EditableGraphCanvas.CLICK_TIME_SENSIBILITY:
+                element_id = self.get_selected_el(ev.x, ev.y)
+                if element_id in self.nodes():
+                    print('TODO: create a link between local and {}'.format(self.nodes()[element_id].name()))
+                # TODO: select node
+                self.selected = self.nodes()[element_id].name()
+                self.master.destroy()
+
+    def selected_node_name(self):
+        try:
+            return self.selected
+        except:
+            return None
 
 class EditableGraphCanvas(GraphCanvas):
     CLICK_TIME_SENSIBILITY = 0.1  # maximum time before click and release to be accepted
@@ -539,16 +566,15 @@ class EditableGraphCanvas(GraphCanvas):
         if(Config.DEBUG):
             print('WR')
 
-    def get_external_node(self):
+    def get_external_node(self, name):
         assert hasattr(self, 'toplevel') and self.toplevel is not None
-        plan_path = t.filedialog.askopenfilename(initialdir=Config.MAPS_PATH, filetypes=[('XML Files', '.xml')])
+        plan_path = t.filedialog.askopenfilename(initialdir=Config.XMLS_PATH,
+                                                 filetypes=[('XML Files', '.xml')])
         if plan_path == '' or plan_path is None:
             print('ERROR')  # TODO: handle properly with a popup
-        new_node_toplevel = t.Toplevel(self.toplevel)
-        new_node_canvas = GraphCanvas(new_node_toplevel)
-        new_node_canvas.load_xml(plan_path)
-        new_node_canvas.pack(fill='both', expand='yes')
-        new_node_toplevel.wait_window()
+        node_name = ExternalNodeFinder.find(self.toplevel, plan_path)
+        self.create_external_edge(name, purge_plan_name(plan_path, Config.XMLS_PATH), node_name)
+        print('linked with node ' + node_name)
 
     def configure_node(self, current_name='', current_aliases=tuple()):
         # TODO: Refactor this into a brand new class
@@ -570,10 +596,11 @@ class EditableGraphCanvas(GraphCanvas):
         t.Entry(self.aliases_group, textvariable=self.alias).grid(row=1, column=1)
         t.Button(self.aliases_group, text='Add alias', command=lambda: (self.lb.insert(t.END, self.alias.get()), self.aliases.append(self.alias.get()))).grid(row=2, column=1)
         t.Button(self.aliases_group, text='Remove alias', command=lambda: self.lb.delete(t.ANCHOR)).grid(row=3, column=1)
-        # External edges
-        self.ext_edges_group = t.LabelFrame(self.toplevel, text='External edges', padx=5, pady=5, relief=t.SUNKEN, borderwidth=3)
-        self.ext_edges_group.grid(row=4, column=0, columnspan=2)
-        t.Button(self.ext_edges_group, text='Add external edge from this node', command=lambda: self.get_external_node()).grid(row=4, column=0)
+        if current_name != '':
+            # External edges
+            self.ext_edges_group = t.LabelFrame(self.toplevel, text='External edges', padx=5, pady=5, relief=t.SUNKEN, borderwidth=3)
+            self.ext_edges_group.grid(row=4, column=0, columnspan=2)
+            t.Button(self.ext_edges_group, text='Add external edge from this node', command=lambda: self.get_external_node(current_name)).grid(row=4, column=0)
         # Validation & scan
         t.Button(self.toplevel, text='Ok', command=self.toplevel.destroy).grid(row=5, column=0)
         self.ap = None
@@ -607,11 +634,25 @@ class EditableGraphCanvas(GraphCanvas):
         node_id = self.create_oval(*node_coord, fill='green' if access_points is not None else 'red')
         self.add_node(name, node_id, access_points, aliases)
 
+    def create_external_edge(self, internal_node, plan_name, external_node):
+        self.plan_data.add_external_edge(internal_node, plan_name, external_node)
+
     def scan(self):
         self.toplevel.wm_title('Scanning access points...')
         self.ap = AccessPointList(iterations=5)
         self.ap.scan()
         self.toplevel.wm_title('access points scanned')
+
+class ExternalNodeFinder:
+    @staticmethod
+    def find(tkinter_master, plan_path):
+        top = t.Toplevel(tkinter_master)
+        top.title('Select the node to link with current one')
+        cv = SelectableGraphCanvas(top)
+        cv.load_xml(plan_path)
+        cv.pack(fill='both', expand='yes')
+        top.wait_window()
+        return cv.selected_node_name()
 
 '''
     Available operations:
@@ -630,7 +671,8 @@ class App(t.Frame):
     def on_exit(self):
         if mbox.askquestion('Quit', 'Do you want to save before leaving?') == 'yes':
             self.save_to_xml(fdialog.asksaveasfilename(defaultextension='xml',
-                             filetypes=[('XML Files', '.xml')], initialdir='./'))
+                             filetypes=[('XML Files', '.xml')],
+                             initialdir=Config.XMLS_PATH))
 
     def create_widgets(self, **options):
         self.canvas = EditableGraphCanvas(self, width=options['c_width'], height=options['c_height'])
@@ -682,7 +724,7 @@ class App(t.Frame):
     def text(self, nb_tab=0):
         text = (TAB * (nb_tab+1)) + '<background_image coord="{}" />\n'.format(tuple(self.canvas.image_coord()))
         text += (TAB * (nb_tab+1)) + '<distance_unit value="{}" />\n'.format(self.canvas.get_pixels_per_metre())
-        plan_name = relpath(splitext(self.background_file_name)[0], Config.MAPS_PATH)
+        plan_name = purge_plan_name(self.background_file_name, Config.MAPS_PATH)
         text += (TAB * (nb_tab+1)) + '<nodes>\n'
         for node_id in self.canvas.nodes():
             text += self.canvas.nodes()[node_id].text(nb_tab+2)
@@ -693,12 +735,14 @@ class App(t.Frame):
         for edge_id in self.canvas.edges():
             text += self.canvas.edges()[edge_id].text(nb_tab+3)
         text += (TAB * (nb_tab+2)) + '</internal>\n'
+        text += (TAB * (nb_tab+2)) + '<external>\n'
+        for ext_edge in self.canvas.external_edges():
+            # internal_node_name, plan_name, external_node_name = ext_edge
+            text += (TAB * (nb_tab+3)) + '<edge src="{}" plan="{}" dest="{}">\n'.format(*ext_edge)
+        text += (TAB * (nb_tab+2)) + '</external>\n'
+        text += (TAB * (nb_tab+1)) + '</edges>\n'
 
-        # TODO ajouter les externals
-
-        text += (TAB * (nb_tab+1)) + '</edges>'
-
-        return '<plan name="{}">\n{}\n</plan>\n'.format(plan_name, text)
+        return '<plan name="{}">\n{}</plan>\n'.format(plan_name, text)
 
 
     def save_to_xml(self, path):
