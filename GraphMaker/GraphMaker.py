@@ -72,6 +72,8 @@ class AccessPointList:
         return None
 
     def extractData(self, lines):
+        find = False
+
         key = ""
         for line in lines:
             line = line.strip()
@@ -79,6 +81,8 @@ class AccessPointList:
                 key = line[4:21]
                 if (self.findAP(key) == None):
                     self.elements.append(AP(key))
+                    find = True
+
             elif (line[:6] == "signal"):
                 tmp = line[8:]
                 tmp = float(tmp[:len(tmp)-4])
@@ -86,14 +90,36 @@ class AccessPointList:
                 elem.add(tmp)
                 print(key + " signal fond with " + str(tmp))
 
+        return find
+
     def scan(self):
         cmd = "iw dev {}  scan > {}".format(self.network, self.tmpfile)
-        for i in range(self.iters):
-            system(cmd)
+
+        findOne = False
+        i = 0
+        limit = (self.iters*10)
+        while i < self.iters and limit > 0:
+            valeur = system(cmd)
             with open(self.tmpfile) as file:
                 print("Test " + str(i))
-                self.extractData(file.readlines())
-            sleep(self.wait)
+                findOne = self.extractData(file.readlines()) or findOne
+            # sleep(self.wait)
+
+            if(valeur == 0):
+                i += 1
+            elif(Config.DEBUG):
+                print("Command not work: retry !")
+
+            limit -= 1
+
+        if(limit == 0):
+            mbox.showerror("Network Error", "Error with network command")
+            print("Error with network command")
+
+        elif(not findOne):
+            mbox.showerror("Wifi Error", "No Wifi signal find")
+            print("No wifi found")
+
         remove(self.tmpfile)
 
 
