@@ -84,7 +84,7 @@ class AccessPointList:
                 tmp = float(tmp[:len(tmp)-4])
                 elem = self.findAP(key)
                 elem.add(tmp)
-                print(key + " signal fond with " + str(tmp))
+                print(key + " signal found with " + str(tmp))
 
     def scan(self):
         cmd = "iw dev {}  scan > {}".format(self.network, self.tmpfile)
@@ -194,7 +194,6 @@ class PlanData:
 
     def add_external_edge(self, internal_node, plan_name, external_node):
         self.external_edges.append((internal_node, plan_name, external_node))
-        print('NEW EXTERNAL EDGE: {}'.format(self.external_edges[-1]))
 
     def set_bg_image(self, bg_image):
         self.bg_image = bg_image
@@ -264,7 +263,6 @@ class GraphCanvas(t.Canvas):
 
     def set_bg_coord(self, coord):
         self.cv_image_coord = coord[:]
-        print('moving bg image onto {}'.format(coord))
         self.coords(self.cv_image_id, *self.cv_image_coord)
 
     def set_bg_image(self, alpha, image_path=None):
@@ -399,10 +397,8 @@ class SelectableGraphCanvas(GraphCanvas):
             if float(time() - self.left_click_time) <= EditableGraphCanvas.CLICK_TIME_SENSIBILITY:
                 element_id = self.get_selected_el(ev.x, ev.y)
                 if element_id in self.nodes():
-                    print('TODO: create a link between local and {}'.format(self.nodes()[element_id].name()))
-                # TODO: select node
-                self.selected = self.nodes()[element_id].name()
-                self.master.destroy()
+                    self.selected = self.nodes()[element_id].name()
+                    self.master.destroy()
 
     def selected_node_name(self):
         try:
@@ -506,8 +502,6 @@ class EditableGraphCanvas(GraphCanvas):
         if selected is None:
             return
         if selected in self.nodes():
-            if Config.DEBUG:
-                print('giving these aliases: ', self.nodes()[selected].aliases())
             name, access_points, aliases = self.configure_node(self.nodes()[selected].name(), self.nodes()[selected].aliases())
             self.nodes()[selected].name(name)
             self.nodes()[selected].aliases(aliases)
@@ -574,7 +568,6 @@ class EditableGraphCanvas(GraphCanvas):
             print('ERROR')  # TODO: handle properly with a popup
         node_name = ExternalNodeFinder.find(self.toplevel, plan_path)
         self.create_external_edge(name, purge_plan_name(plan_path, Config.XMLS_PATH), node_name)
-        print('linked with node ' + node_name)
 
     def configure_node(self, current_name='', current_aliases=tuple()):
         # TODO: Refactor this into a brand new class
@@ -694,8 +687,6 @@ class App(t.Frame):
             px_p_m = self.ask_metre_length()
             if px_p_m != None:
                 self.canvas.set_pixels_per_metre(px_p_m)
-                if Config.DEBUG:
-                    print('One metre is then {} pixels'.format(px_p_m))
                 self.background_file_name = self.file_name
                 self.canvas.set_bg_image(App.ALPHA_INITIAL_VALUE, self.background_file_name)
             else:
