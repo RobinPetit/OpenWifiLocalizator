@@ -650,7 +650,7 @@ class EditableGraphCanvas(GraphCanvas):
                     self.create_external_edge(current_name, plan, node, weight)
                     # verify edge is in the other XML as well
                     _ = ElementTree.SubElement(XML_external_edges, 'edge')
-                    _.attrib = {'weight': weight, 'src': node, 'plan': splitext(relpath(self.background_file_name, Config.MAPS_PATH))[0], 'dest': current_name}
+                    _.attrib = {'weight': weight, 'beg': node, 'plan': splitext(relpath(self.background_file_name, Config.MAPS_PATH))[0], 'end': current_name}
                 tree.write(xml_path)
         del self.ap
         del self.lb
@@ -778,7 +778,7 @@ class App(t.Frame):
         text += (TAB * (nb_tab+2)) + '<external>\n'
         for ext_edge in self.canvas.external_edges():
             # internal_node_name, plan_name, external_node_name = ext_edge
-            text += (TAB * (nb_tab+3)) + '<edge src="{}" plan="{}" dest="{}" weight="{}">\n'.format(*ext_edge)
+            text += (TAB * (nb_tab+3)) + '<edge beg="{}" plan="{}" end="{}" weight="{}">\n'.format(*ext_edge)
         text += (TAB * (nb_tab+2)) + '</external>\n'
         text += (TAB * (nb_tab+1)) + '</edges>\n'
 
