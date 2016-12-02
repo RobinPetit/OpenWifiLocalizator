@@ -180,6 +180,21 @@ class Edge:
         return (TAB*nb_tab) + '<edge beg="{}" end="{}" weight="{}" />\n' \
                               .format(*self.extremity_ids, self.weight())
 
+class ExternalEdge(Edge):
+    def __init__(self, weight, extremity_ids, plan):
+        super().__init__(weight, [0, 0], extremity_ids)
+        self.plan = plan
+
+    def extremities(self, ext=None):
+        if ext is not None:
+            self.extremity_ids = ext[:]
+        else:
+            return self.extremity_ids
+
+    def text(self, nb_tab=0):
+        return (TAB*(nb_tab)) + '<edge beg="{}" end="{}" weight="{}" plan="{}">' \
+                                .format(*self.extremity_ids, self.weight(), self.plan)
+
 class PlanData:
     def __init__(self):
         self.nodes = dict()
@@ -196,7 +211,7 @@ class PlanData:
         self.internal_edges[edge_id] = edge
 
     def add_external_edge(self, internal_node, plan_name, external_node, weight):
-        self.external_edges.append((internal_node, plan_name, external_node, weight))
+        self.external_edges.append(ExternalEdge(weight, [internal_node, external_node], plan_name))
 
     def set_bg_image(self, bg_image):
         self.bg_image = bg_image
@@ -211,7 +226,7 @@ class PlanData:
         return self.external_edges
 
     def remove_external_edges_from(self, name):
-        self.external_edges = [edge for edge in self.external_edges if edge[0] != name]
+        self.external_edges = [edge for edge in self.external_edges if name not in edge.extremities()]
 
 class GraphCanvas(t.Canvas):
     NODE_SIZE = 10
@@ -575,11 +590,11 @@ class EditableGraphCanvas(GraphCanvas):
             print('ERROR')  # TODO: handle properly with a popup
         node_name = ExternalNodeFinder.find(self.toplevel, plan_path)
         plan_short_name =  purge_plan_name(plan_path, Config.XMLS_PATH)
-        #self.create_external_edge(name,plan_short_name, node_name, weight=askfloat('Edge weight', 'How long is this edge?', minvalue=.0))
         weight = askfloat('Edge weight', 'How long is this edge? (metres)', minvalue=.0)
         str_to_add = plan_short_name + EXTERNAL_EDGES_SEPARATOR + node_name + EXTERNAL_EDGES_SEPARATOR + str(weight)
         self.ext_edges_lb.insert(t.END, str_to_add)
-        self.ext_edges.append(str_to_add)
+        edge = ExternalEdge(weight, [node_name, name], plan_short_name)
+        self.ext_edges.append(edge)
 
     def configure_node(self, current_name='', current_aliases=tuple()):
         # TODO: Refactor this into a brand new class
@@ -609,12 +624,16 @@ class EditableGraphCanvas(GraphCanvas):
             self.ext_edges = list()
             self.ext_edges_lb = t.Listbox(self.ext_edges_group, listvar=self.ext_edges)
             for edge in self.external_edges():
-                if edge[0] == current_name:
-                    self.ext_edges_lb.insert(t.END, edge[1] + EXTERNAL_EDGES_SEPARATOR + edge[2])
-                    self.ext_edges.append(edge[1] + EXTERNAL_EDGES_SEPARATOR + edge[2])
+                ext = edge.extremities()
+                beg, end = ext[0], ext[1] if ext[0] in [n.name() for n in self.nodes()] else ext[1], ext[0]
+                if current_name == beg:
+                    self.ext_edges_lb.insert(t.END, edge.plan + EXTERNAL_EDGES_SEPARATOR + end)
+                    self.ext_edges.append(edge)
             self.ext_edges_lb.grid(row=5, column=0, rowspan=2)
-            t.Button(self.ext_edges_group, text='Add external edge \nfrom this node', command=lambda: self.get_external_node(current_name)).grid(row=5, column=1)
-            t.Button(self.ext_edges_group, text='Remove external edge', command=lambda: (self.ext_edges.remove(self.ext_edges_lb.get(t.ANCHOR)), self.ext_edges_lb.delete(t.ANCHOR))).grid(row=6, column=1)
+            t.Button(self.ext_edges_group, text='Add external edge \nfrom this node',
+                     command=lambda: self.get_external_node(current_name)).grid(row=5, column=1)
+            t.Button(self.ext_edges_group, text='Remove external edge',
+                     command=self.remove_ext_edge).grid(row=6, column=1)
         # Validation & scan
         t.Button(self.toplevel, text='Ok', command=self.toplevel.destroy).grid(row=6, column=0)
         self.ap = None
@@ -627,15 +646,23 @@ class EditableGraphCanvas(GraphCanvas):
             self.plan_data.remove_external_edges_from(current_name)
             edges_dict = dict()
             for external_edge in self.ext_edges:
-                path, node, weight = external_edge.split(EXTERNAL_EDGES_SEPARATOR)
-                if path in edges_dict:
-                    edges_dict[path].append((node, weight))
+                extremities = external_edge.extremities()
+                if current_name == extremities[0]:
+                    end = extremities[1]
                 else:
-                    edges_dict[path] = [(node, weight)]
+                    end = extremities[0]
+                beg = current_name
+                plan = external_edge.plan
+                weight = external_edge.weight()
+                #path, node, weight = external_edge.split(EXTERNAL_EDGES_SEPARATOR)
+                if plan in edges_dict:
+                    edges_dict[plan].append((end, weight))
+                else:
+                    edges_dict[plan] = [(end, weight)]
             print(edges_dict)
             #for external_edge in self.ext_edges:
             for plan in edges_dict:
-                xml_path = Config.XMLS_PATH + path + '.xml'
+                xml_path = Config.XMLS_PATH + plan + '.xml'
                 tree = ElementTree.ElementTree()
                 root = tree.parse(xml_path)
                 edges_markup = root.find('edges')
@@ -650,7 +677,7 @@ class EditableGraphCanvas(GraphCanvas):
                     self.create_external_edge(current_name, plan, node, weight)
                     # verify edge is in the other XML as well
                     _ = ElementTree.SubElement(XML_external_edges, 'edge')
-                    _.attrib = {'weight': weight, 'beg': node, 'plan': splitext(relpath(self.background_file_name, Config.MAPS_PATH))[0], 'end': current_name}
+                    _.attrib = {'weight': str(weight), 'beg': node, 'plan': splitext(relpath(self.background_file_name, Config.MAPS_PATH))[0], 'end': current_name}
                 tree.write(xml_path)
         del self.ap
         del self.lb
@@ -658,6 +685,10 @@ class EditableGraphCanvas(GraphCanvas):
         del self.aliases
         del self.toplevel
         return name.get(), ap, aliases
+
+    def remove_ext_edge(self):
+        del self.ext_edges[self.ext_edges_lb.curselection()]
+        self.ext_edges_lb.delete(t.ANCHOR)
 
     def configure_edge(self, current_weight=''):
         toplevel = t.Toplevel(self)
@@ -778,7 +809,7 @@ class App(t.Frame):
         text += (TAB * (nb_tab+2)) + '<external>\n'
         for ext_edge in self.canvas.external_edges():
             # internal_node_name, plan_name, external_node_name = ext_edge
-            text += (TAB * (nb_tab+3)) + '<edge beg="{}" plan="{}" end="{}" weight="{}">\n'.format(*ext_edge)
+            text += ext_edge.text(nb_tab+3)
         text += (TAB * (nb_tab+2)) + '</external>\n'
         text += (TAB * (nb_tab+1)) + '</edges>\n'
 
