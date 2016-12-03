@@ -1,4 +1,4 @@
-package com.ulbmap.ulbmap;
+package be.ulb.owl.gui;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.util.Log;

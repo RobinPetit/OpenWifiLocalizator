@@ -4,7 +4,7 @@
     android:id="@+id/activity_main"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    tools:context="com.ulbmap.ulbmap.MainActivity">
+    tools:context="be.ulb.owl.MainActivity">
 
 
     <ImageView

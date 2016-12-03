@@ -4,7 +4,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.0"
     defaultConfig {
-        applicationId "com.ulbmap.ulbmap"
+        applicationId "be.ulb.owl"
         minSdkVersion 15
         targetSdkVersion 25
         versionCode 1
