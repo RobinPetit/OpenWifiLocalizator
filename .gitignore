@@ -13,3 +13,14 @@
 /prototype/manifest.mf
 /prototype/build/
 /prototype/dist/
+
+# Vim files
+*.swp
+*.swo
+
+# Hidden directories
+plans/
+
+# Warning !  Hide all plan (could we hide all file here ? :/)
+ULBMAP/app/src/main/res/drawable-hdpi/plaine.png
+ULBMAP/app/src/main/res/drawable-hdpi/solbosch.png

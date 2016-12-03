@@ -1,0 +1,54 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage[top=1.5cm, bottom=2cm, left=2.5cm, right=2.5cm]{geometry}
+\usepackage[french]{babel}
+
+
+\title{INFO-F308 : Projet d'année \\ OpenWifiLocalizator (O.W.L.)}
+\author{Rémy Detobel, Denis Hoornaert, Nathan Licardo, Robin Petit}
+
+\begin{document}
+
+\maketitle
+
+\section{Introdution}
+	Avant d'entrer dans les détails de l'implémentation de notre projet, il est intéressant d'en introduire l'objectif dans les grandes lignes.
+	Nous avons décidé de réaliser une application mobile permettant à tout étudiant (ou visiteur) se trouvant sur l'un des campus de l'ULB de pouvoir se diriger au sein de ce dernier, de trouver le chemin le plus court vers un autre endroit sur le campus, de trouver un auditoire sur le campus souhaité et de se localiser dans à l'ULB.
+	Dans le cadre de ce projet, nous allons utiliser les points d'accès WIFI présant sur les campus de l'ULB pour localiser un utilisateur.
+
+\section{Modélisation des campus et manipulation}
+	Les campus seront représentés par des graphes dont les nœuds sont les locaux accessibles et les arêtes sont les liens qui permettent de se rendre de l'un à l'autre, pondérés par la distance entre les locaux.\\
+	Afin de trouver le plus court chemin entre deux locaux, un simple algorithme de plus court chemin sera appliqué sur le graphe. Le graphe sera donc non-orienté, avec des arêtes de poids positif (par définition d'une métrique), ce qui nous permet d'utiliser un algorithme connu tel que l'algorithme de Dijkstra, voire une variante heuristique telle que A* pour un calcul plus rapide.
+
+\section{Système de localisation}
+	Comme expliqué dans l'introduction, le système de localisation sera basé sur les points d'accès Wi-Fi. Plusieurs techniques de localisation existent. Dans le cadre de ce projet nous allons utiliser une \textit{Signal Strength Map} (que nous noterons plus communément \textit{SSM}). Le principe est que pour chaque noeud du graphe, on va identifier et enregistrer l'ensemble des points d'accès couvrant cet endroit.
+	Ainsi, quand une personne voudra connaître sa position, il lui suffira d'identifier les points d'accès l'entourant pour connaitre le nœud du graphe le plus proche de lui.
+	Cette technique peut-être considérée comme une cartographie de la qualité de signal des points d'accès Wi-Fi d'un campus.
+
+\section{Plateforme de développement}
+	Le système d'exploitation retenu est le système \textit{Android}. Notre choix est motivé par le fait que ce système permet un accès aisé aux données des points d'accès Wi-Fi avoisinants et par le fait que la plateforme \textit{Android} est installée sur une grande part des \textit{smartphones} présents sur le marché.\\
+	L'application sera donc développée en Java et sur base du framework distribué par \textit{Android}. C'est dans ce dernier que nous trouvons un outil nommé \textit{WifiManager} qui va nous permettre d'avoir accès aux données concernant les point d'accès Wi-Fi avoisinant.\\
+	La plateforme \textit{iOS} a aussi été considérée, cependant, il n'existe pas sur cette plateforme un outil comparable à \textit{WifiManager}. C'est pourquoi nous nous contenterons, dans un premier temps, de développer une application sur la plateforme \textit{Android}.
+
+\section{Plan de travail}
+  \begin{itemize}
+	\item Prototype~:
+	  \begin{enumerate}
+	    \item prise de contact avec le département des infrastructures, service «~Projets~et~Constructions~»~;
+	    \item définir une structure XML~;
+	    \item implémentation de l'algorithme de plus court chemin en java (version PC)~;
+	    \item implémentation d'un scan des wifi en java (version PC)~;
+	    \item mise en place d'un programme permettant la maintenance des graphes (Python3/Tkinter)~;
+	  \end{enumerate}
+	\item printemps des sciences~:
+	  \begin{enumerate}
+	    \item extension du graphe au campus entier~;
+	    \item schématiser les plans~;
+	    \item transposition du prototype sur Android.
+	  \end{enumerate}
+  \end{itemize}
+  
+\end{document}
