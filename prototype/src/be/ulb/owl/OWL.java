@@ -18,12 +18,13 @@ public class OWL {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-
+        
+        new Graph();
         // Create a plan for test
-//        System.out.println("Chargement du ExampleXML");
-//        new Plan("ExampleXML");
         System.out.println("Chargement du OF");
-        new Plan("of");
+        Graph.getPlan("of");
+        
+        
     }
     
     

@@ -21,7 +21,6 @@ import org.xmlpull.v1.XmlPullParserException;
 public class Plan {
     
     private static boolean DEBUG = true;
-    private static ArrayList<Plan> _allPlan = new ArrayList<Plan>();
     
     
     private final String _name;
@@ -30,21 +29,25 @@ public class Plan {
     
 
     /**
-     * Create a plan <b>and</b> load XML file from this plan
-     *
+     * Create a plan <b>and</b> load XML file from this plan<br/>
+     * <b>Only call by Graph object</b>
+     * 
      * @param name of the plan
+     * @see Graph#getPlan(java.lang.String) 
      */
-    public Plan(String name) {
+    protected Plan(String name) {
         this(name, true);
     }
 
     /**
      * Create a plan
+     * <b>Only call by Graph object</b>
      *
      * @param name name of the plan
      * @param loadPlan True if we must load XML file from this plan
+     * @see Graph#getPlan(java.lang.String, boolean) 
      */
-    public Plan(String name, boolean loadPlan) {
+    protected Plan(String name, boolean loadPlan) {
         _listNode = new ArrayList<Node>();
         _allBssWifi = new ArrayList<String>();
         
@@ -52,8 +55,6 @@ public class Plan {
         if(loadPlan) {
             loadXMLPlan();
         }
-        
-        _allPlan.add(this);
     }
     
     /**
@@ -90,7 +91,7 @@ public class Plan {
      * @param name the name (or alias) of this nodes
      * @return the list of all node (or empty list if not found)
      */
-    public ArrayList<Node> searchNodeInPlan(String name) {
+    public ArrayList<Node> searchNode(String name) {
         ArrayList<Node> res = new ArrayList<Node>();
         
         for(Node node : _listNode) {
@@ -433,7 +434,7 @@ public class Plan {
                 /// IF external node
                 if(typeEdge.equalsIgnoreCase("external")) {
                     String strPlan = parser.getAttributeValue(null, "plan");
-                    Plan externalPlan = Plan.getPlan(strPlan);
+                    Plan externalPlan = Graph.getPlan(strPlan);
                     if(externalPlan != null) {
                         nodeTwo = externalPlan.getNode(end);
                     }
@@ -506,52 +507,4 @@ public class Plan {
     
     
     
-    /////////////////////////// STATIC ///////////////////////////
-    
-    /**
-     * Search all node which contain a specific alias (no search in name)
-     * 
-     * @param name the name (alias) of this nodes
-     * @return an ArrayList of Node
-     */
-    public static ArrayList<Node> searchNode(String name) {
-        ArrayList<Node> listeNode = new ArrayList<Node>();
-        for(Plan plan : _allPlan) {
-            listeNode.addAll(plan.searchNodeInPlan(name));
-        }
-        return listeNode;
-    }
-    
-    /**
-     * Get a specific plan or <b>create</b> if not exist
-     * 
-     * @param name the name of the specific plan
-     * @return The plan (or null if not found)
-     */
-    public static Plan getPlan(String name) {
-        return getPlan(name, true);
-    }
-    
-    /**
-     * Get a specific plan or <b>create</b> if not exist
-     * 
-     * @param name the name of the specific plan
-     * @param loadIfNotExist try to load if the plan is not found
-     * @return The plan (or null if not found)
-     */
-    public static Plan getPlan(String name, boolean loadIfNotExist) {
-        Plan resPlan = null;
-        for(Plan plan : _allPlan) {
-            if(plan.isName(name)) {
-                return plan;
-            }
-        }
-        
-        if(resPlan == null && loadIfNotExist) {
-            resPlan = new Plan(name);
-        }
-        
-        return resPlan;
-    }
-
 }
