@@ -103,10 +103,20 @@ public class Node {
         return _parentPlan;
     }
     
+    /**
+     * Get X coordinate
+     * 
+     * @return the X coordinate
+     */
     public float getX() {
         return _x;
     }
     
+    /**
+     * Get Y coordinate
+     * 
+     * @return the Y coordinate
+     */
     public float getY() {
         return _y;
     }

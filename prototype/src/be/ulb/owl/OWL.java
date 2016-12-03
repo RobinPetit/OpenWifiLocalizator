@@ -6,7 +6,8 @@
 package be.ulb.owl;
 
 /**
- *
+ * Main file
+ * 
  * @author Detobel36
  */
 public class OWL {

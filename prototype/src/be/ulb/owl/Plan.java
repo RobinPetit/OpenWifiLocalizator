@@ -14,7 +14,8 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 /**
- *
+ * A plan that contains Node, WifiList, ...
+ * 
  * @author Detobel36
  */
 public class Plan {
@@ -45,7 +46,8 @@ public class Plan {
      */
     public Plan(String name, boolean loadPlan) {
         _listNode = new ArrayList<Node>();
-
+        _allBssWifi = new ArrayList<String>();
+        
         _name = name;
         if(loadPlan) {
             loadXMLPlan();
@@ -158,6 +160,12 @@ public class Plan {
                                 
                             case "edges":
                                 XMLLoadEdges(parser);
+                                break;
+                                
+                            case "background_image":
+                            case "distance_unit":
+                                XMLUtils.nextAndRemoveSpace(parser); // Skip START
+                                XMLUtils.nextAndRemoveSpace(parser); // Skip END
                                 break;
                                 
                             default:

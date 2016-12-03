@@ -7,6 +7,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 
+/**
+ * Scan all wifi
+ * 
+ * @author denishoornaert
+ */
 public class Scanner {
 
     private String _network;

@@ -8,18 +8,18 @@ package be.ulb.owl;
 import java.util.ArrayList;
 
 /**
- *
+ * Represent all Plan<br/>
+ * /!\ Currently not true :confused:
+ * 
  * @author Detobel36
  */
 public class Graph {
     
     private Scanner _scanner;
-    private ArrayList<Plan> _plans;
     
     
     public Graph () {
         _scanner = new Scanner();
-        _plans  = new ArrayList<Plan>();
     }
     
     public ArrayList<Path> bestPath(Node nodeFrom, Node nodeTo) {
