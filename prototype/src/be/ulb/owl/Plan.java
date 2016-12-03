@@ -19,11 +19,14 @@ import org.xmlpull.v1.XmlPullParserException;
  */
 public class Plan {
     
+    private static boolean DEBUG = true;
     private static ArrayList<Plan> _allPlan = new ArrayList<Plan>();
     
     
     private final String _name;
     private ArrayList<Node> _listNode;
+    private ArrayList<String> _allBssWifi;
+    
 
     /**
      * Create a plan <b>and</b> load XML file from this plan
@@ -64,25 +67,14 @@ public class Plan {
     
     
     /**
-     * Get a node from this plan from his name <b>or</b> his alias
+     * Get a node from this plan
      * 
      * @param name of the node
      * @return The node or null if not found
      */
     public Node getNode(String name) {
-        return getNode(name, true);
-    }
-    
-    /**
-     * Get a node from this plan
-     * 
-     * @param name of the node
-     * @param checkList check also in alias list
-     * @return The node or null if not found
-     */
-    public Node getNode(String name, boolean checkList) {
         for(Node node : _listNode) {
-            if(node.isNode(name, checkList)) {
+            if(node.isNode(name)) {
                 return node;
             }
         }
@@ -90,10 +82,8 @@ public class Plan {
         return null;
     }
     
-    
-    
     /**
-     * Search all node with a specific name or alias in this plan
+     * Search all node with an specific alias (no search in node name)
      * 
      * @param name the name (or alias) of this nodes
      * @return the list of all node (or empty list if not found)
@@ -102,7 +92,7 @@ public class Plan {
         ArrayList<Node> res = new ArrayList<Node>();
         
         for(Node node : _listNode) {
-            if(node.isNode(name)) {
+            if(node.haveAlias(name)) {
                 res.add(node);
             }
         }
@@ -111,6 +101,32 @@ public class Plan {
     }
     
     
+    /**
+     * Check if a wifi signal (BSS) could be capted in this plan
+     * 
+     * @param bss the plan which must be test
+     * @return True if we can capt it
+     * @see #getListWifiBSS() 
+     */
+    public boolean containsWifiBSS(String bss) {
+        return _allBssWifi.contains(bss);
+    }
+    
+    
+    /**
+     * Get the list of the BSS which could be capted in this plan<br/>
+     * <b>/!\</b> in Java list are reference (clone before modification)
+     * 
+     * @return a list of String which contains all BSS
+     * @see #containsWifiBSS(java.lang.String) 
+     */
+    public ArrayList<String> getListWifiBSS() {
+        return _allBssWifi;
+    }
+    
+    
+    
+    ///////////////////////////// XML /////////////////////////////
     
     /**
      * Load XML from this plan
@@ -135,13 +151,19 @@ public class Plan {
                             !parser.getName().equalsIgnoreCase("plan")) {
                         
                         switch(parser.getName()) {
-
+                            
                             case "nodes":
                                 XMLLoadNodes(parser);
                                 break;
                                 
                             case "edges":
                                 XMLLoadEdges(parser);
+                                break;
+                                
+                            default:
+                                System.err.println("Balise non prise en charge: " 
+                                        + parser.getName());
+                                parser.next();
                                 break;
 
                         }
@@ -161,6 +183,14 @@ public class Plan {
         
     }
     
+    
+    /**
+     * Load all nodes of a XML File
+     * 
+     * @param parser the XML File Iterator
+     * @throws XmlPullParserException
+     * @throws IOException
+     */
     private void XMLLoadNodes(XmlPullParser parser) 
             throws XmlPullParserException, IOException {
         
@@ -192,6 +222,14 @@ public class Plan {
         parser.next(); // Next after the End_tag
     }
     
+    
+    /**
+     * Load One node from a XML File
+     * 
+     * @param parser the XML File Iterator
+     * @throws XmlPullParserException
+     * @throws IOException 
+     */
     private void XMLLoadOneNode(XmlPullParser parser) 
             throws XmlPullParserException, IOException {
         
@@ -243,7 +281,9 @@ public class Plan {
         parser.next(); // Remove End_tag
         
         if(x != Integer.MIN_VALUE && y != Integer.MIN_VALUE && pointId != null) {
+            // Create and add node
             _listNode.add(new Node(this, x, y, pointId, listWifi));
+            
         } else {
             System.err.println("Impossible de créer la node: " + pointId + 
                     " (il manque des informations)");
@@ -252,6 +292,14 @@ public class Plan {
     }
     
     
+    /**
+     * Extract a list of Wifi from the XML File
+     * 
+     * @param parser the XML File Iterator
+     * @return an ArrayList of Wifi
+     * @throws XmlPullParserException
+     * @throws IOException 
+     */
     private ArrayList<Wifi> XMLGetListWifi(XmlPullParser parser) 
             throws XmlPullParserException, IOException {
         
@@ -267,11 +315,15 @@ public class Plan {
                     parser.getName().equalsIgnoreCase("wifi")) {
                 
                 String bss = parser.getAttributeValue(null, "BSS");
-                int max = Integer.parseInt(parser.getAttributeValue(null, "max"));
-                int min = Integer.parseInt(parser.getAttributeValue(null, "min"));
-                int avg = Integer.parseInt(parser.getAttributeValue(null, "avg"));
+                float max = Float.parseFloat(parser.getAttributeValue(null, "max"));
+                float min = Float.parseFloat(parser.getAttributeValue(null, "min"));
+                float avg = Float.parseFloat(parser.getAttributeValue(null, "avg"));
                 
-                listWifi.add(new Wifi(bss, max, min, avg));
+                if(!bss.equals("")) {
+                    listWifi.add(new Wifi(bss, max, min, avg));
+                    _allBssWifi.add(bss);
+                }
+                
                 System.out.println("Création d'un wifi: " + bss + 
                         " min: " + min + " max: "+ max + " avg: " + avg);
             }
@@ -284,6 +336,13 @@ public class Plan {
     }
     
     
+    /**
+     * Load all Edges
+     * 
+     * @param parser the XML File Iterator
+     * @throws XmlPullParserException
+     * @throws IOException 
+     */
     private void XMLLoadEdges(XmlPullParser parser) 
             throws XmlPullParserException, IOException {
         
@@ -323,6 +382,15 @@ public class Plan {
         
     }
     
+    
+    /**
+     * Load a specific Edge
+     * 
+     * @param parser the XML File Iterator
+     * @param typeEdge type of edge "internal" or "external"
+     * @throws XmlPullParserException
+     * @throws IOException 
+     */
     private void XMLLoadSpecificEdges(XmlPullParser parser, String typeEdge) 
             throws XmlPullParserException, IOException {
         
@@ -351,7 +419,7 @@ public class Plan {
                 String end = parser.getAttributeValue(null, "end");
                 float weight = Float.parseFloat(parser.getAttributeValue(null, "weight"));
                 
-                Node nodeOne = getNode(begin, false);
+                Node nodeOne = getNode(begin);
                 Node nodeTwo = null;
                 
                 /// IF external node
@@ -359,11 +427,11 @@ public class Plan {
                     String strPlan = parser.getAttributeValue(null, "plan");
                     Plan externalPlan = Plan.getPlan(strPlan);
                     if(externalPlan != null) {
-                        nodeTwo = externalPlan.getNode(end, false);
+                        nodeTwo = externalPlan.getNode(end);
                     }
                     
                 } else {
-                    nodeTwo = getNode(end, false);
+                    nodeTwo = getNode(end);
                 }
                 
                 if(nodeOne != null && nodeTwo != null) {
@@ -392,32 +460,40 @@ public class Plan {
     }
     
     
+    /**
+     * Print Debug message
+     * 
+     * @param parser the XML File Iterator
+     * @throws XmlPullParserException 
+     */
     private static void XMLDebugParser(XmlPullParser parser) 
             throws XmlPullParserException {
         
-        String type = ""+parser.getEventType();
-        
-        switch(parser.getEventType()) {
-            
-            case XmlPullParser.START_TAG:
-                type = "START_TAG";
-                break;
-                
-            case XmlPullParser.END_TAG:
-                type = "END_TAG";
-                break;
-                
-            case XmlPullParser.TEXT:
-                type = "TEXT";
-                break;
-                
-            case XmlPullParser.END_DOCUMENT:
-                type = "END_DOCUMENT";
-                break;
-                
+        if(Plan.DEBUG) {
+            String type = ""+parser.getEventType();
+
+            switch(parser.getEventType()) {
+
+                case XmlPullParser.START_TAG:
+                    type = "START_TAG";
+                    break;
+
+                case XmlPullParser.END_TAG:
+                    type = "END_TAG";
+                    break;
+
+                case XmlPullParser.TEXT:
+                    type = "TEXT";
+                    break;
+
+                case XmlPullParser.END_DOCUMENT:
+                    type = "END_DOCUMENT";
+                    break;
+
+            }
+            System.out.println(parser.getName() + " (type:" + type + 
+                    " text:" + parser.getText() + ")");
         }
-        System.out.println(parser.getName() + " (type:" + type + 
-                " text:" + parser.getText() + ")");
     }
     
     
@@ -425,10 +501,10 @@ public class Plan {
     /////////////////////////// STATIC ///////////////////////////
     
     /**
-     * Search all node with a specific name or alias
+     * Search all node which contain a specific alias (no search in name)
      * 
-     * @param name the name (or alias) of this nodes
-     * @return 
+     * @param name the name (alias) of this nodes
+     * @return an ArrayList of Node
      */
     public static ArrayList<Node> searchNode(String name) {
         ArrayList<Node> listeNode = new ArrayList<Node>();

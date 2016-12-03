@@ -46,6 +46,7 @@ public class Node {
         this._parentPlan = parentPlan;
     }
     
+    
     /**
      * Add an alias to this node
      * 
@@ -55,18 +56,6 @@ public class Node {
         this._listAlias.add(alias);
     }
     
-    /**
-     * Add a path to an other Node
-     * 
-     * @param toNode the distination node
-     * @param distance distance between this node and the other
-     * 
-     * @deprecated Normaly the Path is created before...
-     */
-    public void addPath(Node toNode, int distance) {
-        Path newPath = new Path(this, toNode, distance);
-        _listPath.add(newPath);
-    }
     
     /**
      * Add a path to an other Node
@@ -81,27 +70,29 @@ public class Node {
         }
     }
     
-    
-    /**
-     * Check if the current Node have this name <b>or</b> this alias
-     * 
-     * @param name the name who must be tested
-     * @return True if this node have this name
-     */
-    public boolean isNode(String name) {
-        return isNode(name, true);
-    }
-    
     /**
      * Check if the current Node have this name
      * 
      * @param name the name who must be tested
-     * @param checkAlias check also if this node have this alias
      * @return True if this node have this name
+     * @see #getName() 
      */
-    public boolean isNode(String name, boolean checkAlias) {
-        return this._name.equals(name) || this._listAlias.contains(name);
+    public boolean isNode(String name) {
+        return this._name.equals(name);
     }
+    
+    
+    /**
+     * Check if this node have this alias
+     * 
+     * @param alias the alias which must be tested
+     * @return True if the node match
+     * @see #getAlias() 
+     */
+    public boolean haveAlias(String alias) {
+        return this._listAlias.contains(alias);
+    }
+    
     
     /**
      * Get the parent plan
@@ -120,8 +111,25 @@ public class Node {
         return _y;
     }
     
+    /**
+     * Get the name of the node
+     * 
+     * @return The name of the node
+     * @see #isNode(java.lang.String)
+     */
     public String getName() {
         return _name;
+    }
+    
+    /**
+     * Get the list of the alias<br/>
+     * <b>/!\</b> Java use reference... Clone befor modification
+     * 
+     * @return An ArrayList of string that contains all alias
+     * @see #isNode(java.lang.String) 
+     */
+    public ArrayList<String> getAlias() {
+        return _listAlias;
     }
     
 }
