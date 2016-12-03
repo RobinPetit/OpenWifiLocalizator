@@ -14,7 +14,6 @@
         android:layout_gravity="center"
         android:adjustViewBounds="false"
         android:scaleType="fitCenter"
-        android:src="@drawable/plaine"
     />
 
     <Button

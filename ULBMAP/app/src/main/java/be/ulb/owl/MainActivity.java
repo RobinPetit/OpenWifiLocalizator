@@ -2,6 +2,7 @@ package be.ulb.owl;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.drawable.Drawable;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,7 +16,9 @@ import android.view.View.OnTouchListener;
 import android.view.View.OnClickListener;
 import android.view.MotionEvent;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import be.ulb.owl.gui.Zoom;
 
@@ -147,22 +150,25 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
      * Switch between the two different global plans
      */
     private void switchPlan(){
-        String[] items = {"Plaine", "Solbosch"};
+        final String[] items = {"plaine", "solbosch", "of"}; // TODO Remove test (of)
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Make your selection");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-            // Do something with the selection
-            switch (item) {
-                case 0:
-                    imageView.setImageResource(R.drawable.plaine);
-                    break;
 
-                case 1:
-                    imageView.setImageResource(R.drawable.solbosch);
-                    break;
-            }
+                String name = items[item];
+                try {
+                    // get input stream
+                    InputStream ims = getAssets().open("IMGMap" + File.separator + name +".png");
+                    // load image as Drawable
+                    Drawable d = Drawable.createFromStream(ims, null);
+                    // set image to ImageView
+                    imageView.setImageDrawable(d);
+                    ims .close();
+                } catch(IOException ex) {
+                    return;
+                }
             }
         });
         AlertDialog alert = builder.create();
@@ -172,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
     /**
      * Search a local
      */
-    private void searchLocal(){
+    private void searchLocal() {
         final String[] items = {"Forum A",
                 "Forum B",
                 "Forum C",
