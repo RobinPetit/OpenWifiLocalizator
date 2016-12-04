@@ -3,10 +3,12 @@ package be.ulb.owl;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
+import android.os.Environment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -21,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import be.ulb.owl.gui.Zoom;
+import be.ulb.owl.utils.LogUtils;
 
 /**
  * Main file for Androit application<br/>
@@ -34,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
         SearchView.OnQueryTextListener {
 
     private static MainActivity instance;
+    private static boolean DEBUG = false;
 
     private Graph graph = null;
     private Zoom zoom = new Zoom();
@@ -52,6 +56,8 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
         super.onCreate(savedInstanceState);
         instance = this;
 
+        initLogSystem();
+        Log.i("Main", "Test");
         setContentView(R.layout.activity_main);
 
         imageView = (ImageView)findViewById(R.id.plan);
@@ -62,6 +68,45 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
         local.setOnClickListener(this);
     }
 
+
+    private void initLogSystem() {
+        if (LogUtils.isExternalStorageWritable() ) {
+            File appDirectory = new File( Environment.getExternalStorageDirectory() + "/ULBMAP" );
+            File logDirectory = new File( appDirectory + "/log" );
+            File logFile = new File( logDirectory, "logcat_" + System.currentTimeMillis() + ".txt" );
+
+            // create app folder
+            if ( !appDirectory.exists() ) {
+                appDirectory.mkdir();
+            }
+
+            // create log folder
+            if ( !logDirectory.exists() ) {
+                logDirectory.mkdir();
+            }
+
+            // clear the previous logcat and then write the new one to the file
+            try {
+                Process process = Runtime.getRuntime().exec( "logcat -c");
+                if(isDebug()) {
+                    process = Runtime.getRuntime().exec( "logcat -f " + logFile + " *:I");
+                } else {
+                    process = Runtime.getRuntime().exec( "logcat -f " + logFile + " *:W");
+                }
+
+            } catch ( IOException e ) {
+                e.printStackTrace();
+            }
+
+            LogUtils.clearLog();
+
+        } /*else if (LogUtils.isExternalStorageReadable() ) {
+            // only readable
+        } else {
+            // not accessible
+        }*/
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -70,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
             graph = new Graph();
         }
         // Create a plan for test
-        System.out.println("Chargement du OF");
+        Log.i(getClass().getName(), "Chargement du OF");
         Graph.getPlan("of");
     }
 
@@ -99,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
      * @return ?
      */
     public boolean onQueryTextSubmit(String text) {
-        System.out.println("text envoyé : "+text);
+        Log.i(getClass().getName(), "text envoyé : "+text);
         return false;
     }
 
@@ -110,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
      * @return ?
      */
     public boolean onQueryTextChange(String text){
-        System.out.println("text modifié : "+text);
+        Log.d(getClass().getName(), "text modifié : "+text);
         return false;
     }
 
@@ -195,13 +240,13 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
                 "Pof 2076",
                 "Pof 2078",
                 "Pof 2080"
-                };
+        };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Locaux");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-                System.out.println("Sélection du local : "+items[item]);
+                Log.i(getClass().getName(), "Sélection du local : "+items[item]);
             }
         });
         AlertDialog alert = builder.create();
@@ -218,6 +263,10 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
      */
     public static MainActivity getInstance() {
         return instance;
+    }
+
+    public static boolean isDebug() {
+        return DEBUG;
     }
 
 }

@@ -5,6 +5,8 @@
  */
 package be.ulb.owl;
 
+import android.util.Log;
+
 import be.ulb.owl.xml.XMLUtils;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,7 +22,7 @@ import org.xmlpull.v1.XmlPullParserException;
  */
 public class Plan {
     
-    private static boolean DEBUG = true;
+    private static boolean DEBUG = false;
     
     
     private final String _name;
@@ -170,7 +172,7 @@ public class Plan {
                                 break;
                                 
                             default:
-                                System.err.println("Balise non prise en charge: " 
+                                Log.e(getClass().getName(), "Balise non prise en charge: "
                                         + parser.getName());
                                 parser.next();
                                 break;
@@ -187,7 +189,7 @@ public class Plan {
             }
             
         } catch (IOException | XmlPullParserException ex) {
-            Logger.getLogger(Plan.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
         
     }
@@ -219,8 +221,8 @@ public class Plan {
                 XMLLoadOneNode(parser);
                 
             } else {
-                System.err.println("Erreur dans le fichier. Problème de "
-                        + "chargement de la node:");
+                Log.e(getClass().getName(), "Erreur dans le fichier (" + this._name + "). " +
+                        "Problème de chargement de la node: " + parser.getName());
                 XMLDebugParser(parser);
                 XMLUtils.nextAndRemoveSpace(parser);
             }
@@ -263,9 +265,8 @@ public class Plan {
                         if(parser.getEventType() == XmlPullParser.TEXT) {
                             listAlias.add(parser.getText());
                         } else {
-                            System.err.println("Erreur avec le "
-                                    + "fichier à paser ! pour le plan: " +
-                                    _name);
+                            Log.e(this.getClass().getName(), "Erreur avec le fichier à paser ! " +
+                                    "Pour le plan: " + _name);
                         }
                         break;
 
@@ -294,8 +295,8 @@ public class Plan {
             _listNode.add(new Node(this, x, y, pointId, listWifi));
             
         } else {
-            System.err.println("Impossible de créer la node: " + pointId + 
-                    " (il manque des informations)");
+            Log.e(getClass().getName(), "Impossible de créer la node: " + pointId + " (il manque " +
+                    "des informations)");
         }
         
     }
@@ -332,9 +333,9 @@ public class Plan {
                     listWifi.add(new Wifi(bss, max, min, avg));
                     _allBssWifi.add(bss);
                 }
-                
-                System.out.println("Création d'un wifi: " + bss + 
-                        " min: " + min + " max: "+ max + " avg: " + avg);
+
+                Log.d(getClass().getName(), "Création d'un wifi: " + bss + " min: " + min +
+                        " max: "+ max + " avg: " + avg);
             }
             
             XMLUtils.nextAndRemoveSpace(parser);
@@ -375,11 +376,11 @@ public class Plan {
                     parser.getName().equalsIgnoreCase("external")) {
                 
                 XMLLoadSpecificEdges(parser, "external");
-                System.out.println("External");
+                Log.d(getClass().getName(), "End External section");
                 
             } else {
-                System.err.println("Erreur dans le fichier. Problème de "
-                        + "chargement de l'edge:");
+                Log.e(getClass().getName(), "Erreur dans le fichier. Problème de chargement de " +
+                        "l'edge: " + parser.getName() + " (Plan: " + _name+ ")");
                 XMLDebugParser(parser);
                 XMLUtils.nextAndRemoveSpace(parser);
             }
@@ -445,19 +446,19 @@ public class Plan {
                 
                 if(nodeOne != null && nodeTwo != null) {
                     new Path(nodeOne, nodeTwo, weight, true);
-                    System.out.println("Création d'un lien entre: " + nodeOne.getName() + 
+                    Log.d(getClass().getName(), "Création d'un lien entre: " + nodeOne.getName() +
                             " et " + nodeTwo.getName() + " (distance: " + weight + ")");
                     
                 } else {
-                    System.err.println("Impossible de faire un lien entre les " +
-                            "points: " + begin + " et " + end + 
-                            " (au moins un des deux noeuds n'a pas été trouvé)");
+                    Log.e(getClass().getName(), "Impossible de faire un lien entre les " +
+                            "points: " + begin + " et " + end + " (au moins un des deux noeuds " +
+                            "n'a pas été trouvé)");
                 }
                 parser.next(); // Next 
                 
             } else {
-                System.err.println("Erreur dans le fichier. Problème de "
-                        + "chargement d'une edge " + typeEdge + ": ");
+                Log.e(getClass().getName(), "Erreur dans le fichier (" + _name + "). Problème de "
+                        + "chargement d'une edge " + typeEdge + ": " + parser.getName());
                 XMLDebugParser(parser);
             }
             
@@ -477,32 +478,30 @@ public class Plan {
      */
     private static void XMLDebugParser(XmlPullParser parser) 
             throws XmlPullParserException {
-        
-        if(Plan.DEBUG) {
-            String type = ""+parser.getEventType();
 
-            switch(parser.getEventType()) {
+        String type = ""+parser.getEventType();
 
-                case XmlPullParser.START_TAG:
-                    type = "START_TAG";
-                    break;
+        switch(parser.getEventType()) {
 
-                case XmlPullParser.END_TAG:
-                    type = "END_TAG";
-                    break;
+            case XmlPullParser.START_TAG:
+                type = "START_TAG";
+                break;
 
-                case XmlPullParser.TEXT:
-                    type = "TEXT";
-                    break;
+            case XmlPullParser.END_TAG:
+                type = "END_TAG";
+                break;
 
-                case XmlPullParser.END_DOCUMENT:
-                    type = "END_DOCUMENT";
-                    break;
+            case XmlPullParser.TEXT:
+                type = "TEXT";
+                break;
 
-            }
-            System.out.println(parser.getName() + " (type:" + type + 
-                    " text:" + parser.getText() + ")");
+            case XmlPullParser.END_DOCUMENT:
+                type = "END_DOCUMENT";
+                break;
+
         }
+        Log.d(Plan.class.getName(), parser.getName() + " (type:" + type + " text:" +
+                parser.getText() + ")");
     }
     
     
