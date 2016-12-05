@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
 
     private void initLogSystem() {
         if (LogUtils.isExternalStorageWritable() ) {
-            File appDirectory = new File( Environment.getExternalStorageDirectory() + "/ULBMAP" );
+            File appDirectory = new File( Environment.getExternalStorageDirectory() + "/OWL" );
             File logDirectory = new File( appDirectory + "/log" );
             File logFile = new File( logDirectory, "logcat_" + System.currentTimeMillis() + ".txt" );
 
