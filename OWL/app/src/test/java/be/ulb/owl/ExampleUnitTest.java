@@ -1,4 +1,4 @@
-package com.ulbmap.ulbmap;
+package be.ulb.owl;
 
 import org.junit.Test;
 

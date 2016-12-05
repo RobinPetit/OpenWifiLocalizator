@@ -21,6 +21,6 @@
 # Hidden directories
 plans/
 
-### ULBMAP ###
+### OWL ###
 
-ULBMAP/app/src/main/assets/IMGMap/
+OWL/app/src/main/assets/IMGMap/
