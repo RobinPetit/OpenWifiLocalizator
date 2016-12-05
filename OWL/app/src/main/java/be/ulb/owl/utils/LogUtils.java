@@ -5,12 +5,11 @@ import android.os.Environment;
 import java.io.File;
 
 /**
- * Created by Detobel36 on 4/12/16.
+ * Created by Detobel36
  */
-
 public class LogUtils {
 
-    private final long maxTimeLog = 12;
+    private static final long MAXTIMELOG = 259200000; // 3 days (i hope)
 
     /* Checks if external storage is available for read and write */
     public static boolean isExternalStorageWritable() {
@@ -32,16 +31,19 @@ public class LogUtils {
     }
 
     public static void clearLog() {
-        File logFolder = new File(Environment.getExternalStorageDirectory() + "/ULBMAP/log");
-        for(File file : logFolder.listFiles()) {
-            if(file.isFile() && file.getName().contains("logcat_")) {
+        File logFolder = new File(Environment.getExternalStorageDirectory() + "/OWL/log");
+        for(File file : logFolder.listFiles().clone()) {
+            if(file != null && file.exists() && file.isFile() && file.getName().contains("logcat_")) {
                 String fileName = file.getName();
                 String[] split = fileName.split("_");
 
                 if(split.length == 2) {
-                    System.currentTimeMillis();
-//                    int split[1]
-                    // TODO reprendre ici
+                    long fileTime = Long.parseLong(split[1]);
+                    long actualTime = System.currentTimeMillis();
+
+                    if(actualTime - fileTime > MAXTIMELOG) {
+                        file.delete();
+                    }
                 }
 
             }

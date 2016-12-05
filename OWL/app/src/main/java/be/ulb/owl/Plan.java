@@ -479,27 +479,7 @@ public class Plan {
     private static void XMLDebugParser(XmlPullParser parser) 
             throws XmlPullParserException {
 
-        String type = ""+parser.getEventType();
-
-        switch(parser.getEventType()) {
-
-            case XmlPullParser.START_TAG:
-                type = "START_TAG";
-                break;
-
-            case XmlPullParser.END_TAG:
-                type = "END_TAG";
-                break;
-
-            case XmlPullParser.TEXT:
-                type = "TEXT";
-                break;
-
-            case XmlPullParser.END_DOCUMENT:
-                type = "END_DOCUMENT";
-                break;
-
-        }
+        String type = XmlPullParser.TYPES[parser.getEventType()];
         Log.d(Plan.class.getName(), parser.getName() + " (type:" + type + " text:" +
                 parser.getText() + ")");
     }
