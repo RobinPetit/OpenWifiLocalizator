@@ -1,6 +1,7 @@
 package be.ulb.owl.utils;
 
 import android.os.Environment;
+import android.util.Log;
 
 import java.io.File;
 
@@ -36,14 +37,21 @@ public class LogUtils {
             for (File file : logFolder.listFiles()) {
                 if (file != null && file.exists() && file.isFile() && file.getName().contains("logcat_")) {
                     String fileName = file.getName();
-                    String[] split = fileName.split("_");
 
-                    if (split.length == 2) {
-                        long fileTime = Long.parseLong(split[1]);
-                        long actualTime = System.currentTimeMillis();
+                    int pos = fileName.lastIndexOf(".");
+                    if(pos != -1 && fileName.substring(pos).equalsIgnoreCase(".txt")) {
+                        String nameWitoutExt = fileName.substring(0, pos);
 
-                        if (actualTime - fileTime > MAXTIMELOG) {
-                            file.delete();
+                        String[] split = nameWitoutExt.split("_");
+
+                        if (split.length == 2) {
+                            long fileTime = Long.parseLong(split[1]);
+                            long actualTime = System.currentTimeMillis();
+
+                            if (actualTime - fileTime > MAXTIMELOG) {
+                                file.delete();
+                                Log.i(LogUtils.class.getName(), "Suppression du fichier: " + file.getName() + " (trop vieux)");
+                            }
                         }
                     }
 
