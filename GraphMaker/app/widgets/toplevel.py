@@ -56,6 +56,9 @@ class NodeConfigurationToplevel(t.Toplevel):
         t.Entry(self.aliases_group, textvariable=self.alias).grid(row=1, column=1)
         t.Button(self.aliases_group, text='Add alias', command=lambda: (self.lb.insert(t.END, self.alias.get()), self.aliases.append(self.alias.get()))).grid(row=2, column=1)
         t.Button(self.aliases_group, text='Remove alias', command=lambda: self.lb.delete(t.ANCHOR)).grid(row=3, column=1)
+        # Add first plan
+        self.wm_attributes("-topmost", 1)
+        self.focus_force()
 
     def create_widgets_external_edges(self):
         # External edges
