@@ -8,7 +8,7 @@ skinparam classAttributeIconSize 0
 skinparam shadowing false
  
 'taille de l'image
-skinparam dpi 200
+skinparam dpi 100
  
 'couleurs
 skinparam class {
@@ -19,47 +19,89 @@ skinparam class {
 skinparam stereotypeCBackgroundColor OldLace
  
 ' Définition des class
- 
-class Noeud {
-  - listeChemin : ArrayList
-  - plan : Plan
+
+class Graph {
+  - _allPlan : ArrayList<Plan>
+  + bestPath(NodeFrom, NodeTo) : ArrayList<Path>
+  + whereAmI() : void
+}
+
+class Node {
+  - _listPath : ArrayList<Path>
+  - _listAlias : ArrayList<String>
+  - _listWifi : ArrayList<Wifi>
+  - _parentPlan : Plan
+  - _x : float
+  - _y : float
+  - _name : String
+  + Node(planParent, x, y, name, listWifi)
+  + addAlias(alias) : void
+  # addPath(newPath) : void
+  + isNode(name) : boolean
+  + haveAlias(alias) : boolean
+  + getParentPlan() : Plan
+  + getX() : float
+  + getY() : float
+  + getName() : String
+  + getAlias() : ArrayList<String>
 }
  
-class Chemin {
-  - noeud1 : Noeud
-  - noeud2 : Noeud
-  + getNextNoeud(Noeud) : Noeud
-  + haveAccess(Noeud) : Boolean
+class Path {
+  - _nodeOne : Node
+  - _nodeTwo : Node
+  - _distance : float
+  + Path(nodeOne, nodeTwo, distance)
+  + containsNode(node) boolean
+  + getOppositeNode(node) : Node
+  + getDistance() : float
 }
  
 class Plan {
-  - listeNoeud : ArrayList
-}
- 
-class TrouverCoursChemin {
-  {static} trouverChemin(Noeud, Noeud) : ArrayList
+  - _name : String
+  - _listNode : ArrayList<Node>
+  - _allBssWifi : ArrayList<String>
+  + Plan(name, loadPlan)
+  + Plan(name)
+  + isName(name) : boolean
+  + getNode(name) : Node
+  + searchNode(name) : ArrayList<Node>
+  + containsWifiBss(bss) : boolean
+  + getListWifiBss() : ArrayList<String>
+  - loadXMLPlan() : void
+  - XMLLoadNodes(parser) : void
+  - XMLLoadOneNode(parser) : void
+  - XMLGetListWifi(parser) : ArrayList<Wifi>
+  - XMLLoadEdges(parser) : void
+  - XMLLoadSpecificEdges(parser, typeEdge) : void
+  - XMLDebugParser(parser) : void
 }
 
 class Wifi {
-  - min : float
-  - max : float
-  - avg : float
+  - _BSS : String
+  - _min : float
+  - _max : float
+  - _avg : float
+  + Wifi(Bss, value)
+  + Wifi(Bss, max, min ,avg)
+  + getBSS() : String
+  
 }
 
 class Scanner {
-  - network : String
-  - accesPoints : HashMap
-  - r : Runtime
+  - _network : String
+  - _accesPoints : HashMap
+  - _r : Runtime
   - avg(ArrayList) : float
   - getData() : BufferedReader
   - parse(BufferedReader) : void
   + scan() : ArrayList<Wifi>
-  + text() : String
 }
 
 ' Définition des liens
-Noeud  *-  Chemin
-Noeud  -*  Chemin
-Plan  *-  Noeud
+Node  *-  Path
+Node  *-  Wifi
+Node  -*  Path
+Graph *- Plan
+Plan  *-  Node
 Wifi -- Scanner
 @enduml
