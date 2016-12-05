@@ -50,7 +50,8 @@ public class LogUtils {
 
                             if (actualTime - fileTime > MAXTIMELOG) {
                                 file.delete();
-                                Log.i(LogUtils.class.getName(), "Suppression du fichier: " + file.getName() + " (trop vieux)");
+                                Log.i(LogUtils.class.getName(), "Suppression du fichier: " +
+                                        file.getName() + " (trop vieux)");
                             }
                         }
                     }
