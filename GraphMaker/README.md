@@ -11,5 +11,9 @@ When writing python code, please follow the given rules:
 
 ## Start 
 
-To start the application run: `python3 GraphMaker.p` **in this folder**
+To start the application run: 
+```
+sudo python3 GraphMaker.p
+```
+**in this folder** (`GraphMaker`)
 
