@@ -40,7 +40,6 @@ class NodeConfigurationToplevel(t.Toplevel):
         self.master.master.master.withdraw()
         self.create_widgets_aliases()
         if self.handle_external_edges:
-            print('handling external edges')
             self.create_widgets_external_edges()
         self.create_widgets_validation()
 

@@ -8,6 +8,7 @@ from xml.etree import ElementTree
 
 from app import App
 from app.Config import Config
+from app.network.access_points import StaticAccessPointList
 
 from time import time
 
@@ -347,6 +348,8 @@ class EditableGraphCanvas(GraphCanvas):
         if self.left_moved:
             if self.tmp_line_id is not None:
                 end = self.get_selected_el(ev.x, ev.y)
+                if end == self.tmp_line_id:
+                    end = None
                 self.delete(self.tmp_line_id)
                 self.tmp_line_id = None
                 if end is not None:
