@@ -6,8 +6,10 @@
 package be.ulb.owl;
 
 import android.os.Environment;
+import android.util.Log;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -114,8 +116,13 @@ public class Graph {
         }
         
         if(resPlan == null && loadIfNotExist) {
-            resPlan = new Plan(name);
-            _allPlan.add(resPlan);
+            try {
+                resPlan = new Plan(name);
+                _allPlan.add(resPlan);
+            } catch (IOException exception) {
+                Log.e(Graph.class.getName(), "Impossible de charger le plan: " + name +
+                        " (e: " + exception.getMessage()+")");
+            }
         }
         
         return resPlan;

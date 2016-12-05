@@ -6,6 +6,7 @@
 package be.ulb.owl.xml;
 
 import android.content.res.AssetManager;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -38,21 +39,17 @@ public class XMLUtils {
      * @param name of the file who must be read
      * @return XmlPullParser
      */
-    public static XmlPullParser readXMLFile(String name) {
+    public static XmlPullParser readXMLFile(String name) throws IOException, XmlPullParserException {
         XmlPullParser parser = null;
-        try {
-            InputStream url = MainActivity.getInstance().getAssets().open("XMLMap"+ File.separator+name + ".xml");
-            // InputStream url = XMLUtils.class.getResourceAsStream("/"+name+".xml");
-            Reader XMLFile = new BufferedReader(new InputStreamReader(url));
-            //Reader XMLFile = new FileReader(name);
-            XmlPullParserFactory parserFactory = XmlPullParserFactory.newInstance();
-            parser = parserFactory.newPullParser();
-            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-            parser.setInput(XMLFile);
-            //parser.nextToken();
-        } catch (XmlPullParserException | IOException ex) {
-            Logger.getLogger(XMLUtils.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        InputStream url = MainActivity.getInstance().getAssets().open("XMLMap"+ File.separator+name + ".xml");
+        // InputStream url = XMLUtils.class.getResourceAsStream("/"+name+".xml");
+        Reader XMLFile = new BufferedReader(new InputStreamReader(url));
+        //Reader XMLFile = new FileReader(name);
+        XmlPullParserFactory parserFactory = XmlPullParserFactory.newInstance();
+        parser = parserFactory.newPullParser();
+        parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+        parser.setInput(XMLFile);
+        //parser.nextToken();
 
         return parser;
     }

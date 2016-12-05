@@ -118,8 +118,8 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
             _graph = new Graph();
         }
         // Create a plan for test
-        Log.i(getClass().getName(), "Chargement du OF");
-        Graph.getPlan("of");
+        Log.i(getClass().getName(), "Chargement du P.F");
+        Graph.getPlan("P.F");
     }
 
 
@@ -208,21 +208,10 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
                 String name = items[item];
                 Plan newPlan = Graph.getPlan(name);
                 if(newPlan != null) {
-
+                    Drawable image = newPlan.getDrawableImage();
+                    _imageView.setImageDrawable(image);
                 }
-                try {
-                    // get input stream
-                    InputStream ims = getAssets().open("IMGMap" + File.separator + name +".png");
-                    // load image as Drawable
-                    Drawable d = Drawable.createFromStream(ims, null);
-                    // set image to ImageView
-                    _imageView.setImageDrawable(d);
-                    ims .close();
-                } catch(IOException ex) {
-                    return;
-                }
-
-                _currentPlan = Graph.getPlan(name);
+                _currentPlan = newPlan;
 
             }
         });

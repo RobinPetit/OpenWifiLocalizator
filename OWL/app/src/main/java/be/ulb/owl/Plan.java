@@ -5,6 +5,7 @@
  */
 package be.ulb.owl;
 
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 
 import be.ulb.owl.xml.XMLUtils;
@@ -61,10 +62,14 @@ public class Plan {
         
         _name = name;
         if(loadPlan) {
-            loadXMLPlan();
+            boolean couldLoad = loadXMLPlan();
+            if(!couldLoad) {
+                throw new IOException("Impossible de charger ce plan " + _name + " (XML introuvable)");
+            }
         }
 
         try {
+            // TODO optimisation ? :/
             _image = main.getAssets().open("IMGMap" + File.separator + _name +".png");
         } catch (IOException e) {
             throw new IOException("Impossible de charger l'image de ce plan (" + _name + ")");
@@ -170,17 +175,47 @@ public class Plan {
     }
 
 
+    /**
+     * Get the image of this map
+     *
+     * @return InputStream which represent the image or null if not found
+     */
+    public InputStream getImage() {
+        return _image;
+    }
+
+
+    /**
+     * Get the image of this map
+     *
+     * @return Drawable which represent the image or null if not found
+     */
+    public Drawable getDrawableImage() {
+        Drawable res = null;
+        if(_image != null) {
+            res = Drawable.createFromStream(_image, null);
+        }
+        return res;
+    }
+
+
     
     ///////////////////////////// XML /////////////////////////////
     
     /**
      * Load XML from this plan
+     *
+     * @return True if plan could be load
      */
-    private void loadXMLPlan() {
+    private boolean loadXMLPlan() {
         try {
             // Init the parser
             XmlPullParser parser = XMLUtils.readXMLFile(_name);
-            
+
+            if(parser == null) {
+                return false;
+            }
+
             // While the
             while(parser.next() != XmlPullParser.END_DOCUMENT) {
                 
@@ -229,9 +264,11 @@ public class Plan {
             }
             
         } catch (IOException | XmlPullParserException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            Log.e(getClass().getName(), ex.getMessage());
+            return false;
         }
-        
+
+        return true;
     }
     
     
