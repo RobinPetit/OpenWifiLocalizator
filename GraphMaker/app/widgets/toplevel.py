@@ -5,6 +5,7 @@ from app.general.constants import *
 from app.data.NodeData import *
 import app.widgets as app_widgets
 from app.Config import Config
+from app.network.access_points import AccessPointList
 
 from xml.etree import ElementTree
 from os.path import splitext, relpath
@@ -156,8 +157,8 @@ class NodeConfigurationToplevel(t.Toplevel):
         self.ext_edges.append(edge)
 
     def scan(self):
-        self.toplevel.wm_title('Scanning access points...')
+        self.wm_title('Scanning access points...')
         self.ap = AccessPointList(iterations=5)
         self.ap.scan()
-        self.toplevel.wm_title('access points scanned')
+        self.wm_title('access points scanned')
 
