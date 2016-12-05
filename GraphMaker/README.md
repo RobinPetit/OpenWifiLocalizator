@@ -9,3 +9,7 @@ When writing python code, please follow the given rules:
 - constants are `ALL_UPPER_CASE`
 - `mixedCase` is **not** welcome in Python code
 
+## Start 
+
+To start the application run: ´python3 GraphMaker.py` **in this folder**
+
