@@ -1,10 +1,30 @@
 from app.general.tkinter_imports import *
+from app.general.functions import purge_plan_name
+from app.general.constants import *
 
 from app.data.NodeData import *
+import app.widgets as app_widgets
+from app.Config import Config
+
+from xml.etree import ElementTree
+from os.path import splitext, relpath
+
+class ExternalNodeFinder:
+    @staticmethod
+    def find(tkinter_master, plan_path):
+        top = t.Toplevel(tkinter_master)
+        top.title('Select the node to link with current one')
+        cv = app_widgets.canvas.SelectableGraphCanvas(top)
+        cv.load_xml(plan_path)
+        cv.pack(fill='both', expand='yes')
+        top.wait_window()
+        return cv.selected_node_name()
+
 
 class NodeConfigurationToplevel(t.Toplevel):
-    def __init__(self, master, node_id='', node_aliases=tuple(), handle_external=False):
+    def __init__(self, master, plan, node_id='', node_aliases=tuple(), handle_external=False):
         super().__init__(master)
+        self.plan_name = plan
         self.node_data = NodeData(node_id, node_aliases)
         self.handle_external_edges = handle_external
         self.init_variables()
@@ -57,7 +77,6 @@ class NodeConfigurationToplevel(t.Toplevel):
         t.Button(self.ext_edges_group, text='Remove external edge',
                  command=self.remove_ext_edge).grid(row=6, column=1)
         # Display at the end to have the correct row number
-        print('PASSED BY EXT EDGES')
 
     def create_widgets_validation(self):
         # Validation & scans
@@ -83,7 +102,8 @@ class NodeConfigurationToplevel(t.Toplevel):
         return ap, aliases
 
     def configure_external_edges(self):
-        self.master.plan_data.remove_external_edges_from(self.node_data.name)
+        current_name = self.node_data.name
+        self.master.plan_data.remove_external_edges_from(current_name)
         edges_dict = dict()
         for external_edge in self.ext_edges:
             extremities = external_edge.extremities()
@@ -112,13 +132,14 @@ class NodeConfigurationToplevel(t.Toplevel):
                     XML_external_edges.remove(edge)
             for node, weight in edges_dict[plan]:
                 #path, node = external_edge.split(EXTERNAL_EDGES_SEPARATOR)
-                self.create_external_edge(current_name, plan, node, weight)
+                self.master.create_external_edge(current_name, plan, node, weight)
                 # verify edge is in the other XML as well
                 _ = ElementTree.SubElement(XML_external_edges, 'edge')
-                _.attrib = {'weight': str(weight), 'beg': node, 'plan': splitext(relpath(self.background_file_name, Config.MAPS_PATH))[0], 'end': current_name}
+                _.attrib = {'weight': str(weight), 'beg': node, 'plan': splitext(relpath(self.plan_name, Config.MAPS_PATH))[0], 'end': current_name}
             tree.write(xml_path)
 
-    def get_external_node(self, name):
+    def get_external_node(self):
+        name = self.node_data.name
         # ask what plan to look for the node on (only XMLs since the nodes must already exist)
         plan_path = t.filedialog.askopenfilename(initialdir=Config.XMLS_PATH,
                                                  filetypes=[('XML Files', '.xml')])
@@ -127,10 +148,11 @@ class NodeConfigurationToplevel(t.Toplevel):
             return
         node_name = ExternalNodeFinder.find(self, plan_path)
         plan_short_name =  purge_plan_name(plan_path, Config.XMLS_PATH)
+        self.plan_name = plan_short_name
         weight = askfloat('Edge weight', 'How long is this edge? (metres)', minvalue=.0)
         str_to_add = plan_short_name + EXTERNAL_EDGES_SEPARATOR + node_name + EXTERNAL_EDGES_SEPARATOR + str(weight)
         self.ext_edges_lb.insert(t.END, str_to_add)
-        edge = ExternalEdge(weight, [node_name, name], plan_short_name)
+        edge = app_widgets.canvas.ExternalEdge(weight, [node_name, name], plan_short_name)
         self.ext_edges.append(edge)
 
     def scan(self):

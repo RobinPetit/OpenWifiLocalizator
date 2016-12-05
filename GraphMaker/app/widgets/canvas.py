@@ -1,7 +1,8 @@
 from PIL import Image, ImageTk
+from app.general.functions import *
 from app.general.tkinter_imports import *
 from app.general.constants import *
-from app.data.PlanData import PlanData
+from app.data.PlanData import *
 from app.widgets.toplevel import NodeConfigurationToplevel
 from xml.etree import ElementTree
 
@@ -9,83 +10,6 @@ from app import App
 from app.Config import Config
 
 from time import time
-
-class Node:
-    def __init__(self, nb, coords, access_points, aliases=tuple()):
-        self.nb = nb
-        self.coords = coords
-        self.access_points_ = access_points
-        self.color = 'green' if access_points is not None else 'red'
-        self.aliases_ = list(aliases)
-
-    def coord(self, c=None):
-        if c is None:
-            return self.coords
-        else:
-            self.coords = c
-
-    def id(self):
-        return self.nb
-
-    def access_points(self, ap=None):
-        if ap is None:
-            return self.access_points_
-        else:
-            self.access_points_ = ap
-
-    def aliases(self, a=None):
-        if a is None:
-            return self.aliases_
-        else:
-            self.aliases_ = list(a)
-
-    def text(self, nb_tab=0):
-        text = (TAB * (nb_tab+1)) + '<coord x="{}" y="{}" />\n'.format(*self.coord())
-        if self.access_points() is not None:
-            text += self.access_points().text(nb_tab+1)
-        if self.aliases() and len(self.aliases()) > 0:
-            text += (TAB*(nb_tab+1)) + '<aliases>\n'
-            for alias in self.aliases():
-                text += (TAB*(nb_tab+2)) + '<alias>{}</alias>\n'.format(alias)
-            text += (TAB*(nb_tab+1)) + '</aliases>\n'
-        return '{0}<node id="{1}">\n{2}{0}</node>\n'.format(TAB*nb_tab, self.id(), text)
-
-class Edge:
-    def __init__(self, weight, coords, extremity_ids):
-        self.weight_ = weight
-        self.coords = coords
-        self.extremity_ids = extremity_ids
-
-    def coord(self, c=None):
-        if c is None:
-            return self.coords
-        else:
-            self.coords = c
-
-    def weight(self, w=None):
-        if w is None:
-            return self.weight_
-        else:
-            self.weight_ = w
-
-    def text(self, nb_tab=0):
-        return (TAB*nb_tab) + '<edge beg="{}" end="{}" weight="{}" />\n' \
-                              .format(*self.extremity_ids, self.weight())
-
-class ExternalEdge(Edge):
-    def __init__(self, weight, extremity_ids, plan):
-        super().__init__(weight, [0, 0], extremity_ids)
-        self.plan = plan
-
-    def extremities(self, ext=None):
-        if ext is not None:
-            self.extremity_ids = ext[:]
-        else:
-            return self.extremity_ids
-
-    def text(self, nb_tab=0):
-        return (TAB*(nb_tab)) + '<edge beg="{}" end="{}" weight="{}" plan="{}">' \
-                                .format(*self.extremity_ids, self.weight(), self.plan)
 
 class GraphCanvas(t.Canvas):
     NODE_SIZE = 10
@@ -452,22 +376,8 @@ class EditableGraphCanvas(GraphCanvas):
         if(Config.DEBUG):
             print('WR')
 
-    def get_external_node(self, name):
-        assert hasattr(self, 'toplevel') and self.toplevel is not None
-        plan_path = t.filedialog.askopenfilename(initialdir=Config.XMLS_PATH,
-                                                 filetypes=[('XML Files', '.xml')])
-        if plan_path == '' or plan_path is None:
-            print('ERROR')  # TODO: handle properly with a popup
-        node_name = ExternalNodeFinder.find(self.toplevel, plan_path)
-        plan_short_name =  purge_plan_name(plan_path, Config.XMLS_PATH)
-        weight = askfloat('Edge weight', 'How long is this edge? (metres)', minvalue=.0)
-        str_to_add = plan_short_name + EXTERNAL_EDGES_SEPARATOR + node_name + EXTERNAL_EDGES_SEPARATOR + str(weight)
-        self.ext_edges_lb.insert(t.END, str_to_add)
-        edge = ExternalEdge(weight, [node_name, name], plan_short_name)
-        self.ext_edges.append(edge)
-
     def configure_node(self, current_name='', current_aliases=tuple()):
-        return NodeConfigurationToplevel(self, current_name, current_aliases, handle_external=True).configure()
+        return NodeConfigurationToplevel(self, self.background_file_name, current_name, current_aliases, handle_external=True).configure()
 
     def remove_ext_edge(self):
         del self.ext_edges[self.ext_edges_lb.curselection()]
@@ -484,7 +394,7 @@ class EditableGraphCanvas(GraphCanvas):
         return float(value.get())
 
     def create_node(self, x, y):
-        access_points, aliases = NodeConfigurationToplevel(self).configure()
+        access_points, aliases = NodeConfigurationToplevel(self, self.background_file_name).configure()
         node_coord = (x-GraphCanvas.NODE_SIZE, y-GraphCanvas.NODE_SIZE,
                       x+GraphCanvas.NODE_SIZE, y+GraphCanvas.NODE_SIZE)
         node_id = self.create_oval(*node_coord, fill='green' if access_points is not None else 'red')

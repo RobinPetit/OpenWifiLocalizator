@@ -89,17 +89,6 @@ class StaticAccessPointList:
         output += (TAB * nb_tab) + '</listWifi>\n'
         return output
 
-class ExternalNodeFinder:
-    @staticmethod
-    def find(tkinter_master, plan_path):
-        top = t.Toplevel(tkinter_master)
-        top.title('Select the node to link with current one')
-        cv = SelectableGraphCanvas(top)
-        cv.load_xml(plan_path)
-        cv.pack(fill='both', expand='yes')
-        top.wait_window()
-        return cv.selected_node_name()
-
 def main():
     root = t.Tk()
     root.wm_title("GraphMaker")
