@@ -5,6 +5,9 @@
 */
 package be.ulb.owl;
 
+import android.os.Environment;
+
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -14,8 +17,10 @@ import java.util.ArrayList;
  * @author Detobel36
  */
 public class Graph {
-    
+
+    private static final String IGNOREPLAN = "Example";
     private static ArrayList<Plan> _allPlan;
+
     private Scanner _scanner;
     
     
@@ -50,10 +55,20 @@ public class Graph {
      * Load all plan in the default folder
      */
     private static void loadAllPlan() {
-        // TODO get all plan in the folder
-//        for(String plan : ) {
-//            getPlan(plan);
-//        }
+        File mapFolder = new File(Environment.getExternalStorageDirectory() + "/OWL/XMLMap");
+
+        if(mapFolder != null && mapFolder.exists() && mapFolder.isDirectory()) {
+
+            for (File plan : mapFolder.listFiles()) {
+                // Check that the plan exist, is a file, have a name AND is not a test plan
+                if(plan != null && plan.exists() && plan.isFile() && !plan.getName().equalsIgnoreCase("") &&
+                        !plan.getName().contains(IGNOREPLAN)) {
+                    getPlan(plan.getName());
+                }
+            }
+
+        }
+
     }
     
     
