@@ -21,6 +21,7 @@ import android.view.MotionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import be.ulb.owl.gui.Zoom;
 import be.ulb.owl.utils.LogUtils;
@@ -39,11 +40,13 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
     private static MainActivity instance;
     private static boolean DEBUG = false;
 
-    private Graph graph = null;
-    private Zoom zoom = new Zoom();
-    private ImageView imageView;
-    private Button changePlan;
-    private Button local;
+    private Graph _graph = null;
+    private Zoom _zoom = new Zoom();
+    private ImageView _imageView;
+    private Button _changePlan;
+    private Button _local;
+
+    private Plan _currentPlan = null;
 
 
     /**
@@ -60,12 +63,12 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
         Log.i("Main", "Test");
         setContentView(R.layout.activity_main);
 
-        imageView = (ImageView)findViewById(R.id.plan);
-        imageView.setOnTouchListener(this);
-        changePlan = (Button) findViewById(R.id.changePlan);
-        changePlan.setOnClickListener(this);
-        local = (Button) findViewById(R.id.local);
-        local.setOnClickListener(this);
+        _imageView = (ImageView)findViewById(R.id.plan);
+        _imageView.setOnTouchListener(this);
+        _changePlan = (Button) findViewById(R.id.changePlan);
+        _changePlan.setOnClickListener(this);
+        _local = (Button) findViewById(R.id.local);
+        _local.setOnClickListener(this);
     }
 
 
@@ -111,8 +114,8 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
     protected void onStart() {
         super.onStart();
 
-        if(graph == null) {
-            graph = new Graph();
+        if(_graph == null) {
+            _graph = new Graph();
         }
         // Create a plan for test
         Log.i(getClass().getName(), "Chargement du OF");
@@ -168,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
      */
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        zoom.start(v,event);
+        _zoom.start(v,event);
         return true;
     }
 
@@ -195,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
      * Switch between the two different global plans
      */
     private void switchPlan(){
-        final String[] items = {"plaine", "solbosch", "of"}; // TODO Remove test (of)
+        final String[] items = {"Plaine", "Solbosch", "P.F"}; // TODO Remove test (P.F)
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Make your selection");
@@ -203,17 +206,24 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
             public void onClick(DialogInterface dialog, int item) {
 
                 String name = items[item];
+                Plan newPlan = Graph.getPlan(name);
+                if(newPlan != null) {
+
+                }
                 try {
                     // get input stream
                     InputStream ims = getAssets().open("IMGMap" + File.separator + name +".png");
                     // load image as Drawable
                     Drawable d = Drawable.createFromStream(ims, null);
                     // set image to ImageView
-                    imageView.setImageDrawable(d);
+                    _imageView.setImageDrawable(d);
                     ims .close();
                 } catch(IOException ex) {
                     return;
                 }
+
+                _currentPlan = Graph.getPlan(name);
+
             }
         });
         AlertDialog alert = builder.create();
@@ -224,23 +234,13 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
      * Search a local
      */
     private void searchLocal() {
-        final String[] items = {"Forum A",
-                "Forum B",
-                "Forum C",
-                "Forum D",
-                "Forum E",
-                "Forum F",
-                "Forum G",
-                "Forum H",
-                "Pof 2058",
-                "Pof 2064",
-                "Pof 2066",
-                "Pof 2070",
-                "Pof 2072",
-                "Pof 2076",
-                "Pof 2078",
-                "Pof 2080"
-        };
+
+        final String[] items;
+        if(_currentPlan != null) {
+            items = (String[]) _currentPlan.getAllAlias().toArray();
+        } else {
+            items = (String[]) Arrays.asList("Exemple1", "Exemple2").toArray();
+        }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Locaux");

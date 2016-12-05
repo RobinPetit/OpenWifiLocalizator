@@ -8,7 +8,10 @@ package be.ulb.owl;
 import android.util.Log;
 
 import be.ulb.owl.xml.XMLUtils;
+
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,13 +24,15 @@ import org.xmlpull.v1.XmlPullParserException;
  * @author Detobel36
  */
 public class Plan {
-    
-    private static boolean DEBUG = false;
+
+    private static final MainActivity main = MainActivity.getInstance();
     
     
     private final String _name;
+    private ArrayList<String> _allAlias; // Cache
     private ArrayList<Node> _listNode;
     private ArrayList<String> _allBssWifi;
+    private InputStream _image;
     
 
     /**
@@ -37,7 +42,7 @@ public class Plan {
      * @param name of the plan
      * @see Graph#getPlan(java.lang.String) 
      */
-    protected Plan(String name) {
+    protected Plan(String name) throws IOException {
         this(name, true);
     }
 
@@ -49,13 +54,20 @@ public class Plan {
      * @param loadPlan True if we must load XML file from this plan
      * @see Graph#getPlan(java.lang.String, boolean) 
      */
-    protected Plan(String name, boolean loadPlan) {
+    protected Plan(String name, boolean loadPlan) throws IOException {
         _listNode = new ArrayList<Node>();
         _allBssWifi = new ArrayList<String>();
+        _allAlias = null;
         
         _name = name;
         if(loadPlan) {
             loadXMLPlan();
+        }
+
+        try {
+            _image = main.getAssets().open("IMGMap" + File.separator + _name +".png");
+        } catch (IOException e) {
+            throw new IOException("Impossible de charger l'image de ce plan (" + _name + ")");
         }
     }
     
@@ -128,8 +140,36 @@ public class Plan {
     public ArrayList<String> getListWifiBSS() {
         return _allBssWifi;
     }
-    
-    
+
+
+    /**
+     * Get the list of all node contain in this plan
+     *
+     * @return an ArrayList with all node from this plan
+     */
+    public ArrayList<Node> getAllNodes() {
+        return _listNode;
+    }
+
+    /**
+     * Get the list of all alias contains in this plan
+     *
+     * @return an ArrayList with String which represent all alias
+     */
+    public ArrayList<String> getAllAlias() {
+        if(_allAlias == null) {
+            _allAlias = new ArrayList<String>();
+
+            for(Node node : _listNode) {
+                _allAlias.addAll(node.getAlias());
+            }
+
+        }
+
+        return _allAlias;
+    }
+
+
     
     ///////////////////////////// XML /////////////////////////////
     
