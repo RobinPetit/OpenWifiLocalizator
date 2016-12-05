@@ -17,11 +17,12 @@ class App(t.Frame):
 
     def __init__(self, master, **options):
         super().__init__(master)
+        self.bind('<Control-s>', self.save_to_xml)
         self.create_widgets(**options)
 
     def on_exit(self):
         if mbox.askquestion('Quit', 'Do you want to save before leaving?') == 'yes':
-            self.save_to_xml(Config.XMLS_PATH + splitext(relpath(self.canvas.background_file_name, Config.MAPS_PATH))[0] + '.xml')
+            self.save_to_xml()
 
     def create_widgets(self, **options):
         self.canvas = EditableGraphCanvas(self, width=options['c_width'], height=options['c_height'])
@@ -92,7 +93,8 @@ class App(t.Frame):
 
         return '<plan name="{}">\n{}</plan>\n'.format(plan_name, text)
 
-    def save_to_xml(self, path):
+    def save_to_xml(self):
+        path = Config.XMLS_PATH + splitext(relpath(self.canvas.background_file_name, Config.MAPS_PATH))[0] + '.xml'
         content = self.text()
         with open(path, 'w') as save_file:
             save_file.write(content)
