@@ -74,7 +74,7 @@ class ExternalEdge(Edge):
             return self.extremity_ids
 
     def text(self, nb_tab=0):
-        return (TAB*(nb_tab)) + '<edge beg="{}" end="{}" weight="{}" plan="{}">' \
+        return (TAB*(nb_tab)) + '<edge beg="{}" end="{}" weight="{}" plan="{}" />' \
                                 .format(*self.extremity_ids, self.weight(), self.plan)
 
 class PlanData:
@@ -90,8 +90,9 @@ class PlanData:
     def add_edge(self, edge_id, edge):
         self.internal_edges[edge_id] = edge
 
-    def add_external_edge(self, internal_node, plan_name, external_node, weight):
-        self.external_edges.append(ExternalEdge(weight, [internal_node, external_node], plan_name))
+    def add_external_edge(self, edge):
+        # internal_node, plan_name, external_node, weight):
+        self.external_edges.append(edge)  #ExternalEdge(weight, [internal_node, external_node], plan_name))
 
     def set_bg_image(self, bg_image):
         self.bg_image = bg_image

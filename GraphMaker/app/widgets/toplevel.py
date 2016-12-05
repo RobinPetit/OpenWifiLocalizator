@@ -66,7 +66,7 @@ class NodeConfigurationToplevel(t.Toplevel):
         self.ext_edges_lb = t.Listbox(self.ext_edges_group, listvar=self.ext_edges)
         for edge in self.master.external_edges():
             ext = edge.extremities()
-            beg, end = (ext[0], ext[1]) if ext[0] in [master.nodes()[n].name() for n in master.nodes()] else (ext[1], ext[0])
+            beg, end = (ext[0], ext[1]) if ext[0] in [self.master.nodes()[n].id() for n in self.master.nodes()] else (ext[1], ext[0])
             # Only consider external edges related to the current node
             if self.node_data.name == beg:
                 self.ext_edges_lb.insert(t.END, edge.plan + EXTERNAL_EDGES_SEPARATOR + end)
@@ -89,7 +89,8 @@ class NodeConfigurationToplevel(t.Toplevel):
         return self.row
 
     def remove_ext_edge(self):
-        del self.ext_edges[self.ext_edges_lb.curselection()]
+        for sel in self.ext_edges_lb.curselection():
+            del self.ext_edges[sel]
         self.ext_edges_lb.delete(t.ANCHOR)
 
     def configure(self):
@@ -148,7 +149,6 @@ class NodeConfigurationToplevel(t.Toplevel):
             return
         node_name = ExternalNodeFinder.find(self, plan_path)
         plan_short_name =  purge_plan_name(plan_path, Config.XMLS_PATH)
-        self.plan_name = plan_short_name
         weight = askfloat('Edge weight', 'How long is this edge? (metres)', minvalue=.0)
         str_to_add = plan_short_name + EXTERNAL_EDGES_SEPARATOR + node_name + EXTERNAL_EDGES_SEPARATOR + str(weight)
         self.ext_edges_lb.insert(t.END, str_to_add)

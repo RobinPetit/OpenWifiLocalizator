@@ -44,6 +44,10 @@ class GraphCanvas(t.Canvas):
         edge = Edge(weight, self.coords(edge_id), extremities)
         self.plan_data.add_edge(edge_id, edge)
 
+    def add_external_edge(self, weight, extremities, plan):
+        edge = ExternalEdge(weight, extremities, plan)
+        self.plan_data.add_external_edge(edge)
+
     def refresh(self):
         pass
 
@@ -197,7 +201,8 @@ class GraphCanvas(t.Canvas):
             self.add_edge(float(edge.get('weight')), edge_id, extremities)
 
         external_edge = xml_tree.find('external')
-        # TODO load external edges
+        for edge in external_edge.findall('edge'):
+            self.add_external_edge(float(edge.get('weight')), [edge.get('beg'), edge.get('end')], edge.get('plan'))
 
 class SelectableGraphCanvas(GraphCanvas):
     def __init__(self, master, **options):
@@ -401,5 +406,5 @@ class EditableGraphCanvas(GraphCanvas):
         self.add_node(self.get_node_id(), node_id, access_points, aliases)
 
     def create_external_edge(self, internal_node, plan_name, external_node, weight=.0):
-        self.plan_data.add_external_edge(internal_node, plan_name, external_node, weight)
+        self.add_external_edge(weight, [internal_node, external_node], plan_name)
 
