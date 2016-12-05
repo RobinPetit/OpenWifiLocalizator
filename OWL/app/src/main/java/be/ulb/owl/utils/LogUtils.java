@@ -32,20 +32,22 @@ public class LogUtils {
 
     public static void clearLog() {
         File logFolder = new File(Environment.getExternalStorageDirectory() + "/OWL/log");
-        for(File file : logFolder.listFiles().clone()) {
-            if(file != null && file.exists() && file.isFile() && file.getName().contains("logcat_")) {
-                String fileName = file.getName();
-                String[] split = fileName.split("_");
+        if(logFolder != null && logFolder.exists()) {
+            for (File file : logFolder.listFiles()) {
+                if (file != null && file.exists() && file.isFile() && file.getName().contains("logcat_")) {
+                    String fileName = file.getName();
+                    String[] split = fileName.split("_");
 
-                if(split.length == 2) {
-                    long fileTime = Long.parseLong(split[1]);
-                    long actualTime = System.currentTimeMillis();
+                    if (split.length == 2) {
+                        long fileTime = Long.parseLong(split[1]);
+                        long actualTime = System.currentTimeMillis();
 
-                    if(actualTime - fileTime > MAXTIMELOG) {
-                        file.delete();
+                        if (actualTime - fileTime > MAXTIMELOG) {
+                            file.delete();
+                        }
                     }
-                }
 
+                }
             }
         }
     }

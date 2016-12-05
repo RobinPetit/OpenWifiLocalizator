@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.ulbmap.ulbmap", appContext.getPackageName());
+        assertEquals("be.ulb.owl", appContext.getPackageName());
     }
 }
