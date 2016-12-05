@@ -11,8 +11,8 @@ from app.Config import Config
 from time import time
 
 class Node:
-    def __init__(self, name, coords, access_points, aliases=tuple()):
-        self.name_ = name
+    def __init__(self, nb, coords, access_points, aliases=tuple()):
+        self.nb = nb
         self.coords = coords
         self.access_points_ = access_points
         self.color = 'green' if access_points is not None else 'red'
@@ -24,11 +24,8 @@ class Node:
         else:
             self.coords = c
 
-    def name(self, n=None):
-        if n is None:
-            return self.name_
-        else:
-            self.name_ = n
+    def id(self):
+        return self.nb
 
     def access_points(self, ap=None):
         if ap is None:
@@ -51,7 +48,7 @@ class Node:
             for alias in self.aliases():
                 text += (TAB*(nb_tab+2)) + '<alias>{}</alias>\n'.format(alias)
             text += (TAB*(nb_tab+1)) + '</aliases>\n'
-        return '{0}<node id="{1}">\n{2}{0}</node>\n'.format(TAB*nb_tab, self.name(), text)
+        return '{0}<node id="{1}">\n{2}{0}</node>\n'.format(TAB*nb_tab, self.id(), text)
 
 class Edge:
     def __init__(self, weight, coords, extremity_ids):
@@ -96,11 +93,15 @@ class GraphCanvas(t.Canvas):
 
     def __init__(self, master, **options):
         super().__init__(master, **options)
+        self.init_variables()
+        self.bind_events()
+
+    def init_variables(self):
         self.plan_data = PlanData()
         self.left_moved = False
         self.cv_image_coord = [0, 0]
         self.px_p_m = 0
-        self.bind_events()
+        self.node_idx = 0
 
     def bind_events(self):
         callbacks = {
@@ -231,7 +232,7 @@ class GraphCanvas(t.Canvas):
         self.set_pixels_per_metre(int(root.find('distance_unit').get('value')))
         bg_image = root.find('background_image')
         self.background_file_name = Config.MAPS_PATH + str(root.get('name')) + '.png'
-        self.set_bg_image(App.ALPHA_INITIAL_VALUE, self.background_file_name)
+        self.set_bg_image(App.App.ALPHA_INITIAL_VALUE, self.background_file_name)
         self.set_bg_coord([float(value.strip()) for value in bg_image.get('coord')[1:-1].split(',')])
         self.load_nodes(root.find('nodes'))
         self.load_edges(root.find('edges'))
@@ -256,6 +257,8 @@ class GraphCanvas(t.Canvas):
             else:
                 loaded_aliases = list()
             self.add_node(point.attrib['id'], node_id, access_points, loaded_aliases)
+            if int(point.attrib['id'])  >= self.node_idx:
+                self.node_idx = int(point.attrib['id']) + 1
 
 
     def load_edges(self, xml_tree):
@@ -263,7 +266,7 @@ class GraphCanvas(t.Canvas):
         for edge in internal_edge.findall('edge'):
             extremities = edge.get('beg'), edge.get('end')
             extremities_ids = [[node_id for node_id in self.nodes() \
-                if self.nodes()[node_id].name() == extremity][0] for extremity in extremities]
+                if self.nodes()[node_id].id() == extremity][0] for extremity in extremities]
             end_coord = [c + GraphCanvas.NODE_SIZE for c in self.nodes()[extremities_ids[1]].coord()[:2]]
             beg_coord = [c + GraphCanvas.NODE_SIZE for c in self.nodes()[extremities_ids[0]].coord()[:2]]
             edge_id = self.create_line(*beg_coord, *end_coord, width=GraphCanvas.EDGE_WIDTH)
@@ -281,7 +284,7 @@ class SelectableGraphCanvas(GraphCanvas):
             if float(time() - self.left_click_time) <= EditableGraphCanvas.CLICK_TIME_SENSIBILITY:
                 element_id = self.get_selected_el(ev.x, ev.y)
                 if element_id in self.nodes():
-                    self.selected = self.nodes()[element_id].name()
+                    self.selected = self.nodes()[element_id].id()
                     self.master.destroy()
 
     def selected_node_name(self):
@@ -300,6 +303,7 @@ class EditableGraphCanvas(GraphCanvas):
         self.bind_events()
 
     def init_variables(self):
+        super().init_variables()
         self.left_src = None
         self.tmp_line_id = None
 
@@ -320,6 +324,11 @@ class EditableGraphCanvas(GraphCanvas):
         # bind canvas events
         for event in canvas_callbacks:
             self.bind(event, canvas_callbacks[event])
+
+    def get_node_id(self):
+        _ = self.node_idx
+        self.node_idx += 1
+        return _
 
     # events handling code
 
@@ -386,8 +395,7 @@ class EditableGraphCanvas(GraphCanvas):
         if selected is None:
             return
         if selected in self.nodes():
-            name, access_points, aliases = self.configure_node(self.nodes()[selected].name(), self.nodes()[selected].aliases())
-            self.nodes()[selected].name(name)
+            access_points, aliases = self.configure_node(self.nodes()[selected].id(), self.nodes()[selected].aliases())
             self.nodes()[selected].aliases(aliases)
             if access_points is not None:
                 self.nodes()[selected].access_points(access_points)
@@ -424,7 +432,7 @@ class EditableGraphCanvas(GraphCanvas):
                     edge_id = self.create_line(*self.initial_click_coord,
                         self.nodes()[end].coord()[0]+GraphCanvas.NODE_SIZE, self.nodes()[end].coord()[1]+GraphCanvas.NODE_SIZE,
                         width=2.5)
-                    extremity_ids = (self.nodes()[self.get_selected_el(*self.initial_click_coord)].name(), self.nodes()[end].name())
+                    extremity_ids = (self.nodes()[self.get_selected_el(*self.initial_click_coord)].id(), self.nodes()[end].id())
                     self.add_edge(weight, edge_id, extremity_ids)
             else:
                 self.cv_image_coord = self.coords(self.cv_image_id)
@@ -476,13 +484,11 @@ class EditableGraphCanvas(GraphCanvas):
         return float(value.get())
 
     def create_node(self, x, y):
-        name, access_points, aliases = NodeConfigurationToplevel(self).configure()
-        if name == '' or name in [self.nodes()[n].name() for n in self.nodes()]:
-            return
+        access_points, aliases = NodeConfigurationToplevel(self).configure()
         node_coord = (x-GraphCanvas.NODE_SIZE, y-GraphCanvas.NODE_SIZE,
                       x+GraphCanvas.NODE_SIZE, y+GraphCanvas.NODE_SIZE)
         node_id = self.create_oval(*node_coord, fill='green' if access_points is not None else 'red')
-        self.add_node(name, node_id, access_points, aliases)
+        self.add_node(self.get_node_id(), node_id, access_points, aliases)
 
     def create_external_edge(self, internal_node, plan_name, external_node, weight=.0):
         self.plan_data.add_external_edge(internal_node, plan_name, external_node, weight)

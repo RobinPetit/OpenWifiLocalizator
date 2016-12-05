@@ -3,9 +3,9 @@ from app.general.tkinter_imports import *
 from app.data.NodeData import *
 
 class NodeConfigurationToplevel(t.Toplevel):
-    def __init__(self, master, node_name='', node_aliases=tuple(), handle_external=False):
+    def __init__(self, master, node_id='', node_aliases=tuple(), handle_external=False):
         super().__init__(master)
-        self.node_data = NodeData(node_name, node_aliases)
+        self.node_data = NodeData(node_id, node_aliases)
         self.handle_external_edges = handle_external
         self.init_variables()
         self.create_widgets()
@@ -24,12 +24,6 @@ class NodeConfigurationToplevel(t.Toplevel):
         self.create_widgets_validation()
 
     def create_widgets_aliases(self):
-        # Name
-        # TODO remove this widget and get id automaticaly
-        t.Label(self, text='(TO BE REMOVED) Node Name: ').grid(row=0, column=0)
-        self.name = t.StringVar()
-        self.name.set(self.node_data.name)
-        t.Entry(self, textvariable=self.name).grid(row=0, column=1)
         self.aliases = list(self.node_data.aliases)
         # Aliases
         self.aliases_group = t.LabelFrame(self, text='Aliases Management', padx=5, pady=5, relief=t.SUNKEN, borderwidth=3)
@@ -86,7 +80,7 @@ class NodeConfigurationToplevel(t.Toplevel):
         aliases = self.aliases
         if hasattr(self, 'ext_edges'):
             self.configure_external_edges()
-        return self.name.get(), ap, aliases
+        return ap, aliases
 
     def configure_external_edges(self):
         self.master.plan_data.remove_external_edges_from(self.node_data.name)
