@@ -13,7 +13,7 @@ When writing python code, please follow the given rules:
 
 To start the application run: 
 ```
-sudo python3 GraphMaker.p
+sudo python3 GraphMaker.py
 ```
 **in this folder** (`GraphMaker`)
 
