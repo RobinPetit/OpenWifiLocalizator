@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.xmlpull.v1.XmlPullParser;
@@ -76,6 +77,31 @@ public class Plan {
         }
     }
     
+
+    /**
+     * Create a plan <b>and</b> load XML file from this plan
+     *
+     * @param wifis list of capted wifis
+     * @param nodes list of potential nearest nodes
+     * @return The node with a minimal diffrence between its avg dbm and the avg
+     * dbm of the capted wifi
+     */
+    private Node collisionManager(ArrayList<Wifi> wifis, ArrayList<Node> nodes) {
+        Node res;
+        ArrayList<Float> scores = new ArrayList<Float>();
+        for (int i = 0; i < nodes.size(); i++) { // for each node
+            scores.add(0.0f);
+            ArrayList<Wifi> tmp = nodes.get(i).getWifi();
+            for (Wifi wifi: tmp) {
+                if (wifis.contains(wifi)) { // has a Wifi with the same BSS
+                    scores.set(i, scores.get(i)+Math.abs((wifis.get(wifis.indexOf(wifi))).getAvg()-wifi.getAvg()));
+                }
+            }
+        }
+        return nodes.get(nodes.indexOf(Collections.min(scores)));
+    }
+
+
     /**
      * Check if the current plan have this name
      * 
@@ -103,6 +129,39 @@ public class Plan {
         
         return null;
     }
+
+    
+    /**
+     * Get a node from this plan through wifi (NB: change name of the attribut)
+     *
+     * @param wifis of wifi
+     * @return The nearest Node based on the given array of Wifi
+     */
+    public Node getNode(ArrayList<Wifi> wifis) {
+        ArrayList<String> wifisStr = new ArrayList<String>();
+        for (Wifi wifi : wifis) {
+            wifisStr.add(wifi.getBSS());
+        }
+        ArrayList<Node> res = new ArrayList<Node>();
+        int biggestSetSize = 0;
+        for (Node node : _listNode) {
+            ArrayList<String> tmp = node.getListWifiBSS();
+            tmp.retainAll(wifisStr);
+            if (biggestSetSize == tmp.size()){
+                res.add(node);
+            }
+            else if (biggestSetSize < tmp.size()) {
+                res = new ArrayList<Node>();
+                res.add(node);
+                biggestSetSize = tmp.size();
+            }
+        }
+        if (res.size() < 1) {
+            return collisionManager(wifis, res);
+        }
+        return res.get(0);
+    }
+
     
     /**
      * Search all node with an specific alias (no search in node name)

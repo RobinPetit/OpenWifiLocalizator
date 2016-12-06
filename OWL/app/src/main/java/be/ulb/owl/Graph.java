@@ -41,14 +41,34 @@ public class Graph {
     }
     
     
-    public void whereAmI () {
-        // @TODO Ajouter dans le xml des wifi -> plan un ensemble contenant les 
-        // cas particulier ou un wifi ne serait présent que dans un seul plan.
+    
+    public Node whereAmI () {
+        ArrayList<Wifi> capted = _scanner.scan();
+        ArrayList<String> captedStr = new ArrayList<String>();
+        for (Wifi wifi : capted) {
+            captedStr.add(wifi.getBSS());
+        }
+        ArrayList<Plan> res = new ArrayList<Plan>();
+        int biggestSetSize = 0;
+        for (Plan plan : _allPlan) {
+            ArrayList<String> tmp = plan.getListWifiBSS();
+            tmp.retainAll(capted); // set-theoric and operation
+            if (biggestSetSize == tmp.size()) {
+                res.add(plan);
+            }
+            else if (biggestSetSize < tmp.size()) {
+                res = new ArrayList<Plan>();
+                res.add(plan);
+                biggestSetSize = tmp.size();
+            }
+        }
+        if (res.size() == 0) {
+            System.out.println("You are not at ULB.\nI should throw a propre exception but I'm too lazy...");
+        }
+        return res.get(0).getNode(capted);
     }
     
-    
-    
-    
+        
     
     
     /////////////////////////// STATIC ///////////////////////////

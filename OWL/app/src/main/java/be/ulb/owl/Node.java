@@ -141,5 +141,17 @@ public class Node {
     public ArrayList<String> getAlias() {
         return _listAlias;
     }
-    
+
+    public ArrayList<Wifi> getWifi() {
+        return _listWifi;
+    }
+
+    public ArrayList<String> getListWifiBSS() {
+        ArrayList<String> tmp = new ArrayList<String>();
+        for (Wifi wifi : _listWifi) {
+            tmp.add(wifi.getBSS());
+        }
+        return tmp;
+    }
+
 }

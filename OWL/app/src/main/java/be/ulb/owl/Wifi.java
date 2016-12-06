@@ -67,5 +67,14 @@ public class Wifi {
         return res;
     }
     
+
+    public boolean equals(Wifi wifi) {
+        return _BSS.equals(wifi.getBSS());
+    }
+
+    public float getAvg() {
+        return _avg;
+    }
+    
     
 }

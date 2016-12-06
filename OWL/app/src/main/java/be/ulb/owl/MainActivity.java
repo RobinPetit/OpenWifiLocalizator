@@ -21,6 +21,7 @@ import android.view.MotionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import be.ulb.owl.gui.Zoom;
@@ -120,8 +121,41 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
         // Create a plan for test
         Log.i(getClass().getName(), "Chargement du P.F");
         Graph.getPlan("P.F");
+
+
+        testWifi();
     }
 
+
+    private void testWifi() {
+        // ---- test ----
+
+        ArrayList<Wifi> tmp = new ArrayList<Wifi>();
+        tmp.add(new Wifi("00:26:cb:4e:0c:a0", 82.0f, 78.0f, 80.0f));
+        tmp.add(new Wifi("00:26:cb:4e:0c:a1", 81.0f, 79.0f, 80.4f));
+        tmp.add(new Wifi("a4:ee:57:f1:96:6b", 74.0f, 67.0f, 69.2f));
+        tmp.add(new Wifi("00:26:cb:4e:0e:70", 81.0f, 72.0f, 77.6f));
+        tmp.add(new Wifi("10:9a:dd:b5:2a:3f", 78.0f, 75.0f, 76.6f));
+        tmp.add(new Wifi("00:0c:e6:00:d1:0c", 91.0f, 81.0f, 88.6f));
+        tmp.add(new Wifi("00:26:cb:4e:0e:71", 79.0f, 72.0f, 77.2f));
+
+        Node position = _graph.whereAmI();
+        System.out.print("The result should be F19. res = ");
+        System.out.println(position.getName());
+
+        // ---- test ----
+
+        tmp = new ArrayList<Wifi>();
+        tmp.add(new Wifi("00:26:cb:4e:0e:71", 61.0f, 58.0f, 59.6f));
+        tmp.add(new Wifi("10:9a:dd:b5:2a:3f", 70.0f, 58.0f, 64.6f));
+        tmp.add(new Wifi("00:26:cb:4e:0e:70", 61.0f, 55.0f, 57.4f));
+        tmp.add(new Wifi("00:26:cb:4e:0c:a0", 82.0f, 72.0f, 74.2f));
+        tmp.add(new Wifi("00:26:cb:4e:0c:a1", 83.0f, 72.0f, 75.2f));
+
+        position = _graph.whereAmI();
+        System.out.print("The result should be F29. res = ");
+        System.out.println(position.getName());
+    }
 
 
     /**
