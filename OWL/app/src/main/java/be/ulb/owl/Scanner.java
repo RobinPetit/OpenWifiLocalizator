@@ -19,19 +19,17 @@ import java.util.*;
 public class Scanner {
 
     private static final MainActivity main = MainActivity.getInstance();
-    private WifiManager _wifiManager;
+
+    private boolean _defaultWifiEnable = true;
+    private WifiManager _wifiManager = null;
 
     private String _network;
     private HashMap<String, ArrayList<Float>> _accesPoints;
     private Runtime _r;
 
     public Scanner () {
-        Object service = main.getSystemService(Context.WIFI_SERVICE);
-        if(service instanceof WifiManager) {
-            _wifiManager = (WifiManager) service;
-        }
+        initWifiManager();
 
-        _wifiManager.setWifiEnabled(true);
         _wifiManager.startScan();
         List<ScanResult> result = _wifiManager.getScanResults();
         // TODO
@@ -100,6 +98,46 @@ public class Scanner {
                     Collections.min(values), avg(values)));
         }
         return temp;
+    }
+
+
+    /**
+     * Init the wifiManager
+     *
+     * @return True if all is ok (False if we can't init it)
+     */
+    public boolean initWifiManager() {
+        if(_wifiManager == null) {
+            Object service = main.getSystemService(Context.WIFI_SERVICE);
+            if(service instanceof WifiManager) {
+                _wifiManager = (WifiManager) service;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Force ON wifi and record the current statut of wifi
+     *
+     * @return True if operation success
+     */
+    public boolean forceEnableWifi() {
+        initWifiManager();
+        if(_wifiManager != null) {
+            _defaultWifiEnable = _wifiManager.isWifiEnabled();
+            return _wifiManager.setWifiEnabled(true);
+        }
+        return false;
+    }
+
+    /**
+     * Reset the status of the wifi (berfore he was forced to ON)
+     */
+    public void resetWifiStatus() {
+        if(_wifiManager != null) {
+            _wifiManager.setWifiEnabled(_defaultWifiEnable);
+        }
     }
 
 }
