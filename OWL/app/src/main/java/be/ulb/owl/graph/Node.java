@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package be.ulb.owl;
+package be.ulb.owl.graph;
 
 import java.util.ArrayList;
+
+import be.ulb.owl.Wifi;
 
 /**
  * Point on a specific plan

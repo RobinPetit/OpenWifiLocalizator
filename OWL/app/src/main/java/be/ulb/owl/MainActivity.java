@@ -3,7 +3,6 @@ package be.ulb.owl;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
-import android.os.Environment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,12 +17,12 @@ import android.view.View.OnTouchListener;
 import android.view.View.OnClickListener;
 import android.view.MotionEvent;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import be.ulb.owl.graph.Graph;
+import be.ulb.owl.graph.Node;
+import be.ulb.owl.graph.Plan;
 import be.ulb.owl.gui.Zoom;
 import be.ulb.owl.utils.LogUtils;
 

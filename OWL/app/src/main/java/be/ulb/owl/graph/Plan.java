@@ -3,11 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package be.ulb.owl;
+package be.ulb.owl.graph;
 
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
+import be.ulb.owl.MainActivity;
+import be.ulb.owl.Wifi;
 import be.ulb.owl.utils.XMLUtils;
 
 import java.io.File;

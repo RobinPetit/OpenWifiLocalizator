@@ -3,7 +3,7 @@
 * To change this template file, choose Tools | Templates
 * and open the template in the editor.
 */
-package be.ulb.owl;
+package be.ulb.owl.graph;
 
 import android.os.Environment;
 import android.util.Log;
@@ -11,6 +11,9 @@ import android.util.Log;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import be.ulb.owl.Scanner;
+import be.ulb.owl.Wifi;
 
 /**
  * Represent all Plan<br/>
