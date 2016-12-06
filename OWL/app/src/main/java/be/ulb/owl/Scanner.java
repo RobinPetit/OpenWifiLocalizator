@@ -1,5 +1,9 @@
 package be.ulb.owl;
 
+import android.content.Context;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,11 +18,24 @@ import java.util.*;
  */
 public class Scanner {
 
+    private static final MainActivity main = MainActivity.getInstance();
+    private WifiManager _wifiManager;
+
     private String _network;
     private HashMap<String, ArrayList<Float>> _accesPoints;
     private Runtime _r;
 
     public Scanner () {
+        Object service = main.getSystemService(Context.WIFI_SERVICE);
+        if(service instanceof WifiManager) {
+            _wifiManager = (WifiManager) service;
+        }
+
+        _wifiManager.setWifiEnabled(true);
+        _wifiManager.startScan();
+        List<ScanResult> result = _wifiManager.getScanResults();
+        // TODO
+
         _network = "wlp3s0";
         _accesPoints = new HashMap<String, ArrayList<Float>>();
         _r = Runtime.getRuntime();
