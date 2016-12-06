@@ -9,7 +9,9 @@ import java.io.IOException;
 import be.ulb.owl.MainActivity;
 
 /**
- * Created by Detobel36
+ * Function which help to use and manage log (and log file)
+ *
+ * @author Detobel36
  */
 public class LogUtils {
 

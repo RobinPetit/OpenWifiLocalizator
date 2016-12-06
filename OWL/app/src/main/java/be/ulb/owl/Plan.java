@@ -8,15 +8,14 @@ package be.ulb.owl;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
-import be.ulb.owl.xml.XMLUtils;
+import be.ulb.owl.utils.XMLUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
