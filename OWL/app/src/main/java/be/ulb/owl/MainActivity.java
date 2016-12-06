@@ -1,7 +1,5 @@
 package be.ulb.owl;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -12,18 +10,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.view.View;
-import android.view.View.OnTouchListener;
-import android.view.View.OnClickListener;
-import android.view.MotionEvent;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import be.ulb.owl.graph.Graph;
 import be.ulb.owl.graph.Node;
 import be.ulb.owl.graph.Plan;
-import be.ulb.owl.gui.Zoom;
+import be.ulb.owl.gui.listener.ClickListener;
+import be.ulb.owl.gui.listener.QueryTextListener;
+import be.ulb.owl.gui.listener.TouchListener;
 import be.ulb.owl.utils.LogUtils;
 
 /**
@@ -34,14 +29,12 @@ import be.ulb.owl.utils.LogUtils;
  *
  * @author Nathan, Detobel36
  */
-public class MainActivity extends AppCompatActivity implements OnTouchListener, OnClickListener,
-        SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity  {
 
     private static MainActivity instance;
     private static boolean DEBUG = false;
 
     private Graph _graph = null;
-    private Zoom _zoom = new Zoom();
     private ImageView _imageView;
     private Button _changePlan;
     private Button _local;
@@ -63,12 +56,18 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
         Log.i("Main", "Test");
         setContentView(R.layout.activity_main);
 
+
         _imageView = (ImageView)findViewById(R.id.plan);
-        _imageView.setOnTouchListener(this);
+        _imageView.setOnTouchListener(new TouchListener());
+
+        // Define clic listener
+        ClickListener clicListener = new ClickListener();
+
         _changePlan = (Button) findViewById(R.id.changePlan);
-        _changePlan.setOnClickListener(this);
+        _changePlan.setOnClickListener(clicListener);
+
         _local = (Button) findViewById(R.id.local);
-        _local.setOnClickListener(this);
+        _local.setOnClickListener(clicListener);
     }
 
 
@@ -85,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
         Graph.getPlan("P.F");
 
 
-        testWifi();
+//        testWifi();
     }
 
 
@@ -131,112 +130,11 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
         getMenuInflater().inflate(R.menu.menu, menu);
         MenuItem searchItem = menu.findItem(R.id.Search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnQueryTextListener(this);
+        searchView.setOnQueryTextListener(new QueryTextListener());
 
         return true;
     }
 
-    /**
-     * Event when we send a search request
-     *
-     * @param text string which is searched
-     * @return ?
-     */
-    public boolean onQueryTextSubmit(String text) {
-        Log.i(getClass().getName(), "text envoyé : "+text);
-        return false;
-    }
-
-    /**
-     * Event when text is change in search bar
-     *
-     * @param text string which is changed
-     * @return ?
-     */
-    public boolean onQueryTextChange(String text){
-        Log.d(getClass().getName(), "text modifié : "+text);
-        return false;
-    }
-
-    /**
-     * Event when we toutch the screen
-     *
-     * @param v ?
-     * @param event information about the event
-     * @return ?
-     */
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        _zoom.start(v,event);
-        return true;
-    }
-
-    /**
-     * Event when we clik on a view
-     *
-     * @param view the view
-     */
-    public void onClick(View view){
-        switch (view.getId()){
-
-            case R.id.changePlan:
-                switchPlan();
-                break;
-
-            case R.id.local:
-                searchLocal();
-                break;
-
-        }
-    }
-
-    /**
-     * Switch between the two different global plans
-     */
-    private void switchPlan(){
-        final String[] items = {"Plaine", "Solbosch", "P.F"}; // TODO Remove test (P.F)
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Make your selection");
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int item) {
-
-                String name = items[item];
-                Plan newPlan = Graph.getPlan(name);
-                if(newPlan != null) {
-                    Drawable image = newPlan.getDrawableImage();
-                    _imageView.setImageDrawable(image);
-                }
-                _currentPlan = newPlan;
-
-            }
-        });
-        AlertDialog alert = builder.create();
-        alert.show();
-    }
-
-    /**
-     * Search a local
-     */
-    private void searchLocal() {
-
-        final String[] items;
-        if(_currentPlan != null) {
-            items = (String[]) _currentPlan.getAllAlias().toArray();
-        } else {
-            items = (String[]) Arrays.asList("Exemple1", "Exemple2").toArray();
-        }
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Locaux");
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int item) {
-                Log.i(getClass().getName(), "Sélection du local : "+items[item]);
-            }
-        });
-        AlertDialog alert = builder.create();
-        alert.show();
-    }
 
 
     /**
@@ -247,6 +145,31 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
     public String getAppName() {
         return getResources().getString(R.string.app_name);
     }
+
+    /**
+     * Get the current plan which is show
+     *
+     * @return the curent plan
+     */
+    public Plan getCurrentPlan() {
+        return _currentPlan;
+    }
+
+    /**
+     * Change the current plan which is show on the user
+     *
+     * @param newCurrentPlan new Plan object
+     */
+    public void setCurrentPlan(Plan newCurrentPlan) {
+        if(newCurrentPlan != null) {
+            _currentPlan = newCurrentPlan;
+            _imageView.setImageDrawable(_currentPlan.getDrawableImage());
+        } else {
+            Log.w(this.getClass().getName(), "Le nouveau plan est null");
+        }
+    }
+
+
 
 
     //////////////////////// STATIC ////////////////////////

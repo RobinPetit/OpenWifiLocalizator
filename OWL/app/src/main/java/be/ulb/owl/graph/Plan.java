@@ -224,11 +224,15 @@ public class Plan {
     public ArrayList<String> getAllAlias() {
         if(_allAlias == null) {
             _allAlias = new ArrayList<String>();
+            Log.d(this.getClass().getName(), "Load alias !");
 
             for(Node node : _listNode) {
+                Log.d(this.getClass().getName(), "Alias: " + node.getName() + " (" + node.getAlias().toString() + ")");
                 _allAlias.addAll(node.getAlias());
             }
 
+        } else {
+            Log.i(this.getClass().getName(), "Alias null :/");
         }
 
         return _allAlias;
@@ -397,6 +401,7 @@ public class Plan {
             if(parser.getEventType() == XmlPullParser.START_TAG) {
                 switch(parser.getName()) {
 
+                    // TODO alias changes !!
                     case "alias":
                         parser.next(); // START_TAG
                         if(parser.getEventType() == XmlPullParser.TEXT) {
