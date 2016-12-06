@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
         super.onCreate(savedInstanceState);
         instance = this;
 
-        initLogSystem();
+        LogUtils.initLogSystem();
         Log.i("Main", "Test");
         setContentView(R.layout.activity_main);
 
@@ -73,43 +73,6 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
     }
 
 
-    private void initLogSystem() {
-        if (LogUtils.isExternalStorageWritable() ) {
-            File appDirectory = new File( Environment.getExternalStorageDirectory() + "/OWL" );
-            File logDirectory = new File( appDirectory + "/log" );
-            File logFile = new File( logDirectory, "logcat_" + System.currentTimeMillis() + ".txt" );
-
-            // create app folder
-            if ( !appDirectory.exists() ) {
-                appDirectory.mkdir();
-            }
-
-            // create log folder
-            if ( !logDirectory.exists() ) {
-                logDirectory.mkdir();
-            }
-
-            // clear the previous logcat and then write the new one to the file
-            try {
-                Process process = Runtime.getRuntime().exec( "logcat -c");
-                if(isDebug()) {
-                    process = Runtime.getRuntime().exec( "logcat -f " + logFile + " *:I");
-                } else {
-                    process = Runtime.getRuntime().exec( "logcat -f " + logFile + " *:W");
-                }
-
-            } catch ( IOException e ) {
-                e.printStackTrace();
-            }
-
-            LogUtils.clearLog();
-
-        } /*else if (LogUtils.isExternalStorageReadable() ) {
-            // only readable
-        } else {
-            // not accessible
-        }*/
-    }
 
     @Override
     protected void onStart() {
@@ -274,6 +237,16 @@ public class MainActivity extends AppCompatActivity implements OnTouchListener, 
         });
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+
+    /**
+     * Get the name of the application
+     *
+     * @return String with the app name
+     */
+    public String getAppName() {
+        return getResources().getString(R.string.app_name);
     }
 
 
