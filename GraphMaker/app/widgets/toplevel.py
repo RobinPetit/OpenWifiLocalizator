@@ -30,6 +30,9 @@ class NodeConfigurationToplevel(t.Toplevel):
         self.handle_external_edges = handle_external
         self.init_variables()
         self.create_widgets()
+        # Add first plan
+        self.wm_attributes("-topmost", 1)
+        self.focus_force()
 
     def init_variables(self):
         # start at -1 so that increment makes it start from 0
@@ -50,15 +53,25 @@ class NodeConfigurationToplevel(t.Toplevel):
         self.aliases_group.grid(row=1, column=0, columnspan=2)
         self.lb = t.Listbox(self.aliases_group, listvar=self.aliases)
         self.lb.grid(row=1, column=0, rowspan=3)
+        self.lb.delete(0, t.END)
         for alias in self.aliases:
             self.lb.insert(t.END, alias)
         self.alias = t.StringVar()
         t.Entry(self.aliases_group, textvariable=self.alias).grid(row=1, column=1)
-        t.Button(self.aliases_group, text='Add alias', command=lambda: (self.lb.insert(t.END, self.alias.get()), self.aliases.append(self.alias.get()))).grid(row=2, column=1)
-        t.Button(self.aliases_group, text='Remove alias', command=lambda: self.lb.delete(t.ANCHOR)).grid(row=3, column=1)
-        # Add first plan
-        self.wm_attributes("-topmost", 1)
-        self.focus_force()
+        t.Button(self.aliases_group, text='Add alias', command=self.add_alias).grid(row=2, column=1)
+        t.Button(self.aliases_group, text='Remove alias', command=self.delete_alias).grid(row=3, column=1)
+
+    def add_alias(self):
+        alias = self.alias.get()
+        if alias == '':
+            return
+        self.lb.insert(t.END, alias)
+        self.aliases.append(alias)
+
+    def delete_alias(self):
+        for sel in self.lb.curselection():
+            del self.aliases[sel]
+        self.lb.delete(t.ANCHOR)
 
     def create_widgets_external_edges(self):
         # External edges
@@ -100,9 +113,9 @@ class NodeConfigurationToplevel(t.Toplevel):
         self.wait_window()
         self.master.master.master.deiconify()
         ap = self.ap
-        aliases = self.aliases
         if hasattr(self, 'ext_edges'):
             self.configure_external_edges()
+        aliases = list(set(self.aliases))
         return ap, aliases
 
     def configure_external_edges(self):

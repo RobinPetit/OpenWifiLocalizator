@@ -326,6 +326,7 @@ class EditableGraphCanvas(GraphCanvas):
             return
         if selected in self.nodes():
             access_points, aliases = self.configure_node(self.nodes()[selected].id(), self.nodes()[selected].aliases())
+            aliases = list(set(aliases))
             self.nodes()[selected].aliases(aliases)
             if access_points is not None:
                 self.nodes()[selected].access_points(access_points)
