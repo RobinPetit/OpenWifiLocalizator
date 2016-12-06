@@ -43,10 +43,12 @@ public class Graph {
         return new ArrayList<Path>();
     }
     
-    
-    
     public Node whereAmI () {
         ArrayList<Wifi> capted = _scanner.scan();
+        return whereAmI(capted);
+    }
+    
+    public Node whereAmI (ArrayList<Wifi> capted) {
         ArrayList<String> captedStr = new ArrayList<String>();
         for (Wifi wifi : capted) {
             captedStr.add(wifi.getBSS());

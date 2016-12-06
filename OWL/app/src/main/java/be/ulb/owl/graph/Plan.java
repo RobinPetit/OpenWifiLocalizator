@@ -88,18 +88,27 @@ public class Plan {
      * dbm of the capted wifi
      */
     private Node collisionManager(ArrayList<Wifi> wifis, ArrayList<Node> nodes) {
+        ArrayList<String> wifisStr = new ArrayList<String>();
+        for (Wifi wifi : wifis) {
+            wifisStr.add(wifi.getBSS());
+        }
         Node res;
         ArrayList<Float> scores = new ArrayList<Float>();
         for (int i = 0; i < nodes.size(); i++) { // for each node
             scores.add(0.0f);
             ArrayList<Wifi> tmp = nodes.get(i).getWifi();
+            Float totaldbm = 0.0f;
+            Integer commonWifi = 0;
             for (Wifi wifi: tmp) {
-                if (wifis.contains(wifi)) { // has a Wifi with the same BSS
-                    scores.set(i, scores.get(i)+Math.abs((wifis.get(wifis.indexOf(wifi))).getAvg()-wifi.getAvg()));
+                if (wifisStr.contains(wifi.getBSS())) { // has a Wifi with the same BSS
+                    totaldbm += Math.abs((wifis.get(wifisStr.indexOf(wifi.getBSS()))).getAvg()-wifi.getAvg());
+                    commonWifi++;
                 }
             }
+            scores.set(i, totaldbm/commonWifi);
         }
-        return nodes.get(nodes.indexOf(Collections.min(scores)));
+        res = nodes.get(scores.indexOf(Collections.min(scores)));
+        return res;
     }
 
 
@@ -139,6 +148,7 @@ public class Plan {
      * @return The nearest Node based on the given array of Wifi
      */
     public Node getNode(ArrayList<Wifi> wifis) {
+        System.out.println("In get Node");
         ArrayList<String> wifisStr = new ArrayList<String>();
         for (Wifi wifi : wifis) {
             wifisStr.add(wifi.getBSS());
@@ -157,7 +167,7 @@ public class Plan {
                 biggestSetSize = tmp.size();
             }
         }
-        if (res.size() < 1) {
+        if (res.size() > 1) {
             return collisionManager(wifis, res);
         }
         return res.get(0);

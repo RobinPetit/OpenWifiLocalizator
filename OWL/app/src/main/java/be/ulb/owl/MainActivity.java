@@ -101,8 +101,8 @@ public class MainActivity extends AppCompatActivity  {
         tmp.add(new Wifi("00:0c:e6:00:d1:0c", 91.0f, 81.0f, 88.6f));
         tmp.add(new Wifi("00:26:cb:4e:0e:71", 79.0f, 72.0f, 77.2f));
 
-        Node position = _graph.whereAmI();
-        System.out.print("The result should be F19. res = ");
+        Node position = _graph.whereAmI(tmp);
+        System.out.print("Test without any changes.\nThe result should be F19. res = ");
         System.out.println(position.getName());
 
         // ---- test ----
@@ -114,8 +114,60 @@ public class MainActivity extends AppCompatActivity  {
         tmp.add(new Wifi("00:26:cb:4e:0c:a0", 82.0f, 72.0f, 74.2f));
         tmp.add(new Wifi("00:26:cb:4e:0c:a1", 83.0f, 72.0f, 75.2f));
 
-        position = _graph.whereAmI();
-        System.out.print("The result should be F29. res = ");
+        position = _graph.whereAmI(tmp);
+        System.out.print("Test without any changes.\nThe result should be F29. res = ");
+        System.out.println(position.getName());
+
+        // ---- test ----
+
+        tmp = new ArrayList<Wifi>();
+        tmp.add(new Wifi("00:26:cb:4e:0e:71", 61.0f, 58.0f, 54.3f));
+        tmp.add(new Wifi("10:9a:dd:b5:2a:3f", 70.0f, 58.0f, 70.9f));
+        tmp.add(new Wifi("00:26:cb:4e:0e:70", 61.0f, 55.0f, 80.0f));
+        tmp.add(new Wifi("00:26:cb:4e:0c:a0", 82.0f, 72.0f, 42.2f));
+        tmp.add(new Wifi("00:26:cb:4e:0c:a1", 83.0f, 72.0f, 21.7f));
+
+        position = _graph.whereAmI(tmp);
+        System.out.print("Test With changes in de avg values.\nThe result should be F29. res = ");
+        System.out.println(position.getName());
+
+        // ---- test ----
+
+        tmp = new ArrayList<Wifi>();
+        tmp.add(new Wifi("00:26:cb:4e:0e:71", 61.0f, 58.0f, 59.6f));
+        tmp.add(new Wifi("10:9a:dd:b5:2a:3f", 70.0f, 58.0f, 64.6f));
+        tmp.add(new Wifi("00:26:cb:4e:0e:70", 61.0f, 55.0f, 57.4f));
+        tmp.add(new Wifi("00:26:cb:4e:0c:a0", 82.0f, 72.0f, 74.2f));
+        tmp.add(new Wifi("00:26:cb:4e:0c:a1", 83.0f, 72.0f, 75.2f));
+        tmp.add(new Wifi("00:26:cb:4e:0e:71", 79.0f, 72.0f, 77.2f));
+
+        position = _graph.whereAmI(tmp);
+        System.out.print("Test with an additionnal wifi.\nThe result should be F29. res = ");
+        System.out.println(position.getName());
+
+        // ---- test ----
+
+        tmp = new ArrayList<Wifi>();
+        tmp.add(new Wifi("00:26:cb:4e:0e:71", 61.0f, 58.0f, 59.6f));
+        tmp.add(new Wifi("10:9a:dd:b5:2a:3f", 70.0f, 58.0f, 64.6f));
+        tmp.add(new Wifi("00:26:cb:4e:0e:70", 61.0f, 55.0f, 57.4f));
+        tmp.add(new Wifi("00:26:cb:4e:0c:a0", 82.0f, 72.0f, 74.2f));
+
+        position = _graph.whereAmI(tmp);
+        System.out.print("Test with a missing wifi.\nThe result should be F29. res = ");
+        System.out.println(position.getName());
+
+        // ---- test ----
+
+        tmp = new ArrayList<Wifi>();
+        tmp.add(new Wifi("00:26:cb:4e:0e:71", 61.0f, 58.0f, 58.6f));
+        tmp.add(new Wifi("10:9a:dd:b5:2a:3f", 70.0f, 58.0f, 64.6f));
+        tmp.add(new Wifi("00:26:cb:4e:0e:70", 61.0f, 55.0f, 56.4f));
+        tmp.add(new Wifi("00:26:cb:4e:0c:a0", 82.0f, 72.0f, 73.2f));
+        tmp.add(new Wifi("00:26:cb:4e:0c:a1", 83.0f, 72.0f, 74idea.2f));
+
+        position = _graph.whereAmI(tmp);
+        System.out.print("Test with slight changes in the avg values.\nThe result should be F29. res = ");
         System.out.println(position.getName());
     }
 
