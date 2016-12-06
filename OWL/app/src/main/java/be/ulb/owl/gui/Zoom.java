@@ -1,6 +1,8 @@
 package be.ulb.owl.gui;
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.graphics.Rect;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -132,9 +134,15 @@ public class Zoom {
 
                 if (mode == DRAG)
                 {
+                    Rect r = view.getDrawable().getBounds();
+
+                    float newX = event.getX() - start.x;
+                    float newY = event.getY() - start.y;
+
                     // create the transformation in the matrix  of points
+
                     matrix.set(savedMatrix);
-                    matrix.postTranslate(event.getX() - start.x, event.getY() - start.y);
+                    matrix.postTranslate(newX, newY);
                 }
                 else if (mode == ZOOM)
                 {
@@ -144,10 +152,7 @@ public class Zoom {
                     if (newDist > 5f)
                     {
                         matrix.set(savedMatrix);
-                        scale = newDist / oldDist; // setting the scaling of the
-                        // matrix...if scale > 1 means
-                        // zoom in...if scale < 1 means
-                        // zoom out
+                        scale = newDist / oldDist;
                         matrix.postScale(scale, scale, mid.x, mid.y);
                     }
                 }

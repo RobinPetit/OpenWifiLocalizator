@@ -2,7 +2,6 @@ package be.ulb.owl.gui.listener;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
 

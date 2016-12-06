@@ -5,6 +5,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -56,7 +57,6 @@ public class MainActivity extends AppCompatActivity  {
         Log.i("Main", "Test");
         setContentView(R.layout.activity_main);
 
-
         _imageView = (ImageView)findViewById(R.id.plan);
         _imageView.setOnTouchListener(new TouchListener());
 
@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity  {
         }
         // Create a plan for test
         Log.i(getClass().getName(), "Chargement du P.F");
+        setCurrentPlan(Graph.getPlan("P.F"));
         Graph.getPlan("P.F");
 
 
@@ -164,6 +165,7 @@ public class MainActivity extends AppCompatActivity  {
         if(newCurrentPlan != null) {
             _currentPlan = newCurrentPlan;
             _imageView.setImageDrawable(_currentPlan.getDrawableImage());
+            _imageView.setScaleType(ImageView.ScaleType.MATRIX);
         } else {
             Log.w(this.getClass().getName(), "Le nouveau plan est null");
         }
