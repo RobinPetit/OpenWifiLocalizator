@@ -77,7 +77,7 @@
                 <wifi BSS="ec:08:6b:5b:21:e0" max="82.0" min="82.0" avg="82.0" />
                 <wifi BSS="ae:5f:3e:2c:bf:78" max="85.0" min="85.0" avg="85.0" />
                 <wifi BSS="fc:3f:7c:22:c5:11" max="68.0" min="58.0" avg="63.8" />
-                <wifi BSS="92:68:c3:7:46:02" max="70.0" min="65.0" avg="68.0" />
+                <wifi BSS="92:68:c3:f7:46:02" max="70.0" min="65.0" avg="68.0" />
                 <wifi BSS="00:0c:e6:00:d2:a4" max="76.0" min="71.0" avg="73.0" />
                 <wifi BSS="00:16:b6:e7:0e:34" max="83.0" min="70.0" avg="75.4" />
                 <wifi BSS="00:0c:e6:00:d1:3c" max="83.0" min="83.0" avg="83.0" />
@@ -88,7 +88,7 @@
                 <wifi BSS="00:26:cb:a0:aa:c1" max="69.0" min="69.0" avg="69.0" />
                 <wifi BSS="00:0c:e6:00:d1:36" max="85.0" min="85.0" avg="85.0" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="38.0" min="32.0" avg="34.5" />
-                <wifi BSS="00:26:cb:4e:07:4" max="39.0" min="32.0" avg="35.0" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="39.0" min="32.0" avg="35.0" />
             </listWifi>
             <aliases>
                 <alias>F.2.080</alias>
@@ -105,13 +105,13 @@
                 <wifi BSS="00:26:cb:4e:04:51" max="84.0" min="80.0" avg="81.8" />
                 <wifi BSS="00:26:cb:a0:98:c1" max="46.0" min="35.0" avg="39.0" />
                 <wifi BSS="ae:5f:3e:2c:bf:78" max="85.0" min="74.0" avg="80.4" />
-                <wifi BSS="92:68:c3:7:46:02" max="93.0" min="84.0" avg="89.4" />
+                <wifi BSS="92:68:c3:f7:46:02" max="93.0" min="84.0" avg="89.4" />
                 <wifi BSS="00:26:cb:4d:d9:41" max="57.0" min="46.0" avg="50.0" />
                 <wifi BSS="00:0c:e6:00:d2:a4" max="71.0" min="65.0" avg="66.4" />
                 <wifi BSS="00:0c:e6:00:d1:36" max="77.0" min="77.0" avg="77.0" />
                 <wifi BSS="00:0c:e6:00:d1:3c" max="86.0" min="81.0" avg="83.6" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="65.0" min="60.0" avg="62.8" />
-                <wifi BSS="00:26:cb:4e:07:4" max="64.0" min="60.0" avg="62.0" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="64.0" min="60.0" avg="62.0" />
                 <wifi BSS="fc:3f:7c:22:c5:11" max="87.0" min="80.0" avg="83.5" />
                 <wifi BSS="00:26:cb:4d:d9:40" max="53.0" min="46.0" avg="48.5" />
                 <wifi BSS="00:16:b6:e7:0e:34" max="86.0" min="82.0" avg="84.3" />
@@ -130,13 +130,13 @@
                 <wifi BSS="00:26:cb:4e:04:51" max="84.0" min="81.0" avg="82.4" />
                 <wifi BSS="00:26:cb:a0:98:c1" max="42.0" min="39.0" avg="40.4" />
                 <wifi BSS="ae:5f:3e:2c:bf:78" max="85.0" min="81.0" avg="83.6" />
-                <wifi BSS="92:68:c3:7:46:02" max="93.0" min="86.0" avg="91.6" />
+                <wifi BSS="92:68:c3:f7:46:02" max="93.0" min="86.0" avg="91.6" />
                 <wifi BSS="00:26:cb:4d:d9:41" max="52.0" min="46.0" avg="49.6" />
                 <wifi BSS="00:0c:e6:00:d2:a4" max="75.0" min="66.0" avg="71.8" />
                 <wifi BSS="00:0c:e6:00:d1:36" max="82.0" min="74.0" avg="77.8" />
                 <wifi BSS="00:0c:e6:00:d1:3c" max="84.0" min="84.0" avg="84.0" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="64.0" min="60.0" avg="62.4" />
-                <wifi BSS="00:26:cb:4e:07:4" max="63.0" min="59.0" avg="61.2" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="63.0" min="59.0" avg="61.2" />
                 <wifi BSS="fc:3f:7c:22:c5:11" max="89.0" min="86.0" avg="88.0" />
                 <wifi BSS="00:26:cb:4d:d9:40" max="56.0" min="50.0" avg="52.0" />
                 <wifi BSS="00:16:b6:e7:0e:34" max="93.0" min="82.0" avg="87.0" />
@@ -165,12 +165,12 @@
                 <wifi BSS="00:26:cb:4e:04:51" max="78.0" min="77.0" avg="77.2" />
                 <wifi BSS="00:26:cb:a0:98:c1" max="51.0" min="45.0" avg="47.8" />
                 <wifi BSS="ae:5f:3e:2c:bf:78" max="85.0" min="79.0" avg="83.0" />
-                <wifi BSS="92:68:c3:7:46:02" max="93.0" min="87.0" avg="89.0" />
+                <wifi BSS="92:68:c3:f7:46:02" max="93.0" min="87.0" avg="89.0" />
                 <wifi BSS="00:26:cb:4d:d9:41" max="51.0" min="41.0" avg="45.0" />
                 <wifi BSS="00:0c:e6:00:d2:a4" max="70.0" min="65.0" avg="66.2" />
                 <wifi BSS="00:0c:e6:00:d1:36" max="75.0" min="74.0" avg="74.2" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="67.0" min="59.0" avg="61.8" />
-                <wifi BSS="00:26:cb:4e:07:4" max="63.0" min="61.0" avg="61.8" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="63.0" min="61.0" avg="61.8" />
                 <wifi BSS="fc:3f:7c:22:c5:11" max="88.0" min="82.0" avg="84.5" />
                 <wifi BSS="00:26:cb:4d:d9:40" max="45.0" min="41.0" avg="43.0" />
                 <wifi BSS="00:16:b6:e7:0e:34" max="84.0" min="77.0" avg="80.5" />
@@ -204,7 +204,7 @@
                 <wifi BSS="00:26:cb:a0:aa:c1" max="64.0" min="64.0" avg="64.0" />
                 <wifi BSS="00:26:cb:4d:d9:41" max="64.0" min="59.0" avg="60.8" />
                 <wifi BSS="00:16:b6:e7:0e:34" max="80.0" min="80.0" avg="80.0" />
-                <wifi BSS="00:26:cb:4e:07:4" max="53.0" min="46.0" avg="48.8" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="53.0" min="46.0" avg="48.8" />
                 <wifi BSS="00:26:cb:a0:aa:c0" max="54.0" min="54.0" avg="54.0" />
                 <wifi BSS="00:0c:e6:00:d1:0c" max="86.0" min="84.0" avg="84.5" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="53.0" min="46.0" avg="49.2" />
@@ -225,7 +225,7 @@
             <listWifi>
                 <wifi BSS="00:26:cb:a0:98:c1" max="50.0" min="46.0" avg="47.8" />
                 <wifi BSS="fc:3f:7c:22:c5:11" max="88.0" min="76.0" avg="84.4" />
-                <wifi BSS="92:68:c3:7:46:02" max="84.0" min="79.0" avg="82.4" />
+                <wifi BSS="92:68:c3:f7:46:02" max="84.0" min="79.0" avg="82.4" />
                 <wifi BSS="00:0c:e6:00:d2:a4" max="71.0" min="69.0" avg="70.2" />
                 <wifi BSS="00:16:b6:e7:0e:34" max="79.0" min="79.0" avg="79.0" />
                 <wifi BSS="00:26:cb:a0:98:c0" max="49.0" min="45.0" avg="46.8" />
@@ -233,7 +233,7 @@
                 <wifi BSS="00:26:cb:4d:d9:41" max="44.0" min="27.0" avg="34.4" />
                 <wifi BSS="00:0c:e6:00:d1:36" max="82.0" min="81.0" avg="81.8" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="64.0" min="55.0" avg="57.4" />
-                <wifi BSS="00:26:cb:4e:07:4" max="64.0" min="54.0" avg="57.2" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="64.0" min="54.0" avg="57.2" />
                 <wifi BSS="c0:ee:fb:20:30:40" max="89.0" min="84.0" avg="86.4" />
                 <wifi BSS="00:26:cb:a0:aa:c0" max="66.0" min="66.0" avg="66.0" />
                 <wifi BSS="00:0c:e6:00:d1:0c" max="80.0" min="77.0" avg="77.8" />
@@ -263,7 +263,7 @@
                 <wifi BSS="00:0c:e6:00:d1:0c" max="76.0" min="66.0" avg="70.2" />
                 <wifi BSS="d4:6d:50:f2:c7:72" max="87.0" min="87.0" avg="87.0" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="76.0" min="65.0" avg="69.6" />
-                <wifi BSS="00:26:cb:4e:07:4" max="70.0" min="67.0" avg="67.8" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="70.0" min="67.0" avg="67.8" />
                 <wifi BSS="00:26:cb:4d:d9:41" max="74.0" min="71.0" avg="72.0" />
                 <wifi BSS="00:26:cb:a0:aa:c1" max="57.0" min="53.0" avg="56.0" />
                 <wifi BSS="d4:6d:50:f2:c7:70" max="84.0" min="84.0" avg="84.0" />
@@ -287,7 +287,7 @@
                 <wifi BSS="00:26:cb:4e:0e:e0" max="83.0" min="59.0" avg="76.8" />
                 <wifi BSS="00:26:cb:a0:98:c0" max="87.0" min="82.0" avg="86.0" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="77.0" min="71.0" avg="73.2" />
-                <wifi BSS="00:26:cb:4e:07:4" max="77.0" min="70.0" avg="72.2" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="77.0" min="70.0" avg="72.2" />
                 <wifi BSS="00:26:cb:a0:aa:c1" max="31.0" min="29.0" avg="30.2" />
                 <wifi BSS="00:26:cb:a0:98:c1" max="84.0" min="82.0" avg="83.0" />
                 <wifi BSS="fc:3f:7c:22:c5:11" max="74.0" min="70.0" avg="71.6" />
@@ -311,7 +311,7 @@
             <listWifi>
                 <wifi BSS="00:26:cb:a0:98:c1" max="55.0" min="51.0" avg="52.6" />
                 <wifi BSS="fc:3f:7c:22:c5:11" max="82.0" min="76.0" avg="78.8" />
-                <wifi BSS="92:68:c3:7:46:02" max="81.0" min="78.0" avg="79.8" />
+                <wifi BSS="92:68:c3:f7:46:02" max="81.0" min="78.0" avg="79.8" />
                 <wifi BSS="00:0c:e6:00:d2:a4" max="69.0" min="63.0" avg="66.6" />
                 <wifi BSS="00:16:b6:e7:0e:34" max="82.0" min="72.0" avg="75.8" />
                 <wifi BSS="00:26:cb:4e:04:50" max="59.0" min="59.0" avg="59.0" />
@@ -321,7 +321,7 @@
                 <wifi BSS="00:26:cb:a0:aa:c1" max="69.0" min="69.0" avg="69.0" />
                 <wifi BSS="00:0c:e6:00:d1:36" max="81.0" min="81.0" avg="81.0" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="54.0" min="32.0" avg="44.0" />
-                <wifi BSS="00:26:cb:4e:07:4" max="54.0" min="32.0" avg="44.2" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="54.0" min="32.0" avg="44.2" />
                 <wifi BSS="c0:ee:fb:20:30:40" max="87.0" min="87.0" avg="87.0" />
                 <wifi BSS="00:26:cb:a0:aa:c0" max="66.0" min="66.0" avg="66.0" />
                 <wifi BSS="00:0c:e6:00:d1:0c" max="80.0" min="75.0" avg="79.0" />
@@ -389,7 +389,7 @@
                 <wifi BSS="00:26:cb:4e:0e:e0" max="64.0" min="58.0" avg="60.0" />
                 <wifi BSS="00:26:cb:a0:98:c0" max="83.0" min="80.0" avg="81.2" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="76.0" min="74.0" avg="75.0" />
-                <wifi BSS="00:26:cb:4e:07:4" max="75.0" min="72.0" avg="74.2" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="75.0" min="72.0" avg="74.2" />
                 <wifi BSS="00:26:cb:a0:aa:c1" max="66.0" min="39.0" avg="47.0" />
                 <wifi BSS="00:26:cb:a0:98:c1" max="83.0" min="80.0" avg="82.0" />
                 <wifi BSS="fc:3f:7c:22:c5:11" max="80.0" min="71.0" avg="75.8" />
@@ -421,7 +421,7 @@
                 <wifi BSS="00:26:cb:a0:98:c0" max="88.0" min="87.0" avg="87.4" />
                 <wifi BSS="00:26:cb:a0:98:c1" max="88.0" min="86.0" avg="86.4" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="87.0" min="85.0" avg="85.4" />
-                <wifi BSS="00:26:cb:4e:07:4" max="89.0" min="81.0" avg="84.6" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="89.0" min="81.0" avg="84.6" />
                 <wifi BSS="c8:b3:73:4b:01:ca" max="92.0" min="89.0" avg="90.8" />
                 <wifi BSS="00:26:cb:4d:d9:40" max="88.0" min="80.0" avg="86.0" />
                 <wifi BSS="00:26:cb:a0:aa:c1" max="66.0" min="59.0" avg="61.7" />
@@ -581,7 +581,7 @@
                 <wifi BSS="00:26:cb:a0:98:c1" max="83.0" min="79.0" avg="80.8" />
                 <wifi BSS="c0:ee:fb:20:30:40" max="88.0" min="85.0" avg="86.4" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="84.0" min="81.0" avg="82.0" />
-                <wifi BSS="00:26:cb:4e:07:4" max="88.0" min="82.0" avg="84.0" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="88.0" min="82.0" avg="84.0" />
                 <wifi BSS="fc:3f:7c:22:c5:11" max="89.0" min="83.0" avg="84.2" />
                 <wifi BSS="00:26:cb:4d:d9:40" max="82.0" min="79.0" avg="80.2" />
                 <wifi BSS="00:26:cb:4d:d9:41" max="82.0" min="79.0" avg="79.8" />
@@ -650,7 +650,7 @@
                 <wifi BSS="00:0c:e6:00:d1:0c" max="79.0" min="70.0" avg="75.4" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="86.0" min="80.0" avg="81.8" />
                 <wifi BSS="24:b6:57:8d:34:41" max="84.0" min="83.0" avg="83.6" />
-                <wifi BSS="00:26:cb:4e:07:4" max="82.0" min="80.0" avg="80.4" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="82.0" min="80.0" avg="80.4" />
                 <wifi BSS="d0:57:4c:cb:4a:70" max="89.0" min="87.0" avg="88.0" />
                 <wifi BSS="02:26:c6:3a:52:39" max="92.0" min="91.0" avg="91.5" />
                 <wifi BSS="00:26:cb:a0:aa:c1" max="83.0" min="73.0" avg="78.0" />
@@ -686,7 +686,7 @@
                 <wifi BSS="00:0c:e6:00:d1:0c" max="82.0" min="78.0" avg="80.7" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="84.0" min="82.0" avg="83.3" />
                 <wifi BSS="24:b6:57:8d:34:41" max="84.0" min="84.0" avg="84.0" />
-                <wifi BSS="00:26:cb:4e:07:4" max="89.0" min="89.0" avg="89.0" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="89.0" min="89.0" avg="89.0" />
                 <wifi BSS="d0:57:4c:cb:4a:70" max="88.0" min="88.0" avg="88.0" />
                 <wifi BSS="02:26:c6:3a:52:39" max="92.0" min="92.0" avg="92.0" />
                 <wifi BSS="00:26:cb:a0:aa:c1" max="79.0" min="79.0" avg="79.0" />
@@ -979,7 +979,7 @@
                 <wifi BSS="d4:6d:50:f2:c7:71" max="67.0" min="61.0" avg="63.4" />
                 <wifi BSS="00:0c:e6:00:d1:0c" max="77.0" min="72.0" avg="73.0" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="84.0" min="84.0" avg="84.0" />
-                <wifi BSS="00:26:cb:4e:07:4" max="84.0" min="84.0" avg="84.0" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="84.0" min="84.0" avg="84.0" />
                 <wifi BSS="24:b6:57:8d:34:40" max="88.0" min="88.0" avg="88.0" />
                 <wifi BSS="d4:6d:50:f2:c2:a3" max="94.0" min="94.0" avg="94.0" />
                 <wifi BSS="88:1d:fc:eb:9e:43" max="86.0" min="84.0" avg="85.2" />
@@ -1047,7 +1047,7 @@
                 <wifi BSS="00:26:cb:4e:04:51" max="75.0" min="72.0" avg="73.8" />
                 <wifi BSS="00:26:cb:4e:0e:e1" max="63.0" min="60.0" avg="61.8" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="86.0" min="81.0" avg="82.4" />
-                <wifi BSS="00:26:cb:4e:07:4" max="86.0" min="81.0" avg="83.2" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="86.0" min="81.0" avg="83.2" />
                 <wifi BSS="00:26:cb:4e:0e:e0" max="64.0" min="61.0" avg="62.4" />
                 <wifi BSS="00:0c:e6:00:d1:3c" max="93.0" min="84.0" avg="87.0" />
                 <wifi BSS="00:26:cb:4e:04:50" max="76.0" min="71.0" avg="73.4" />
@@ -1196,7 +1196,7 @@
                 <wifi BSS="00:26:cb:4e:04:51" max="86.0" min="80.0" avg="83.6" />
                 <wifi BSS="00:26:cb:4e:0e:e1" max="62.0" min="55.0" avg="59.0" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="93.0" min="91.0" avg="92.6" />
-                <wifi BSS="00:26:cb:4e:07:4" max="91.0" min="88.0" avg="88.6" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="91.0" min="88.0" avg="88.6" />
                 <wifi BSS="00:26:cb:4e:0e:e0" max="63.0" min="57.0" avg="59.8" />
                 <wifi BSS="00:0c:e6:00:d1:3c" max="87.0" min="84.0" avg="85.8" />
                 <wifi BSS="00:26:cb:4e:04:50" max="79.0" min="79.0" avg="79.0" />
@@ -1416,7 +1416,7 @@
                 <wifi BSS="fc:3f:7c:22:c5:11" max="79.0" min="72.0" avg="76.7" />
                 <wifi BSS="00:0c:e6:00:cf:b3" max="90.0" min="82.0" avg="87.3" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="68.0" min="60.0" avg="63.7" />
-                <wifi BSS="00:26:cb:4e:07:4" max="64.0" min="58.0" avg="61.3" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="64.0" min="58.0" avg="61.3" />
                 <wifi BSS="00:26:cb:4e:04:50" max="73.0" min="64.0" avg="68.5" />
                 <wifi BSS="00:0c:e6:00:d1:0c" max="93.0" min="84.0" avg="88.5" />
                 <wifi BSS="00:0c:e6:00:d2:a4" max="89.0" min="83.0" avg="86.0" />
@@ -1441,7 +1441,7 @@
                 <wifi BSS="00:16:b6:e7:0e:34" max="91.0" min="84.0" avg="89.0" />
                 <wifi BSS="00:0c:e6:00:d1:3c" max="91.0" min="83.0" avg="85.4" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="67.0" min="65.0" avg="66.2" />
-                <wifi BSS="00:26:cb:4e:07:4" max="74.0" min="65.0" avg="68.4" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="74.0" min="65.0" avg="68.4" />
                 <wifi BSS="00:26:cb:a0:98:c1" max="86.0" min="78.0" avg="82.8" />
                 <wifi BSS="00:26:cb:4e:04:51" max="65.0" min="61.0" avg="63.8" />
                 <wifi BSS="00:0c:e6:00:d1:0c" max="88.0" min="85.0" avg="86.4" />
@@ -1463,7 +1463,7 @@
                 <wifi BSS="fc:3f:7c:22:c5:11" max="92.0" min="80.0" avg="85.2" />
                 <wifi BSS="00:0c:e6:00:d1:3c" max="86.0" min="80.0" avg="84.2" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="76.0" min="70.0" avg="72.5" />
-                <wifi BSS="00:26:cb:4e:07:4" max="76.0" min="70.0" avg="72.5" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="76.0" min="70.0" avg="72.5" />
                 <wifi BSS="00:0c:e6:00:d1:0c" max="91.0" min="83.0" avg="87.5" />
                 <wifi BSS="00:26:cb:a0:98:c0" max="90.0" min="82.0" avg="84.0" />
                 <wifi BSS="00:26:cb:4e:0e:e0" max="89.0" min="86.0" avg="86.8" />
@@ -1493,7 +1493,7 @@
                 <wifi BSS="00:16:b6:e7:0e:34" max="91.0" min="84.0" avg="87.6" />
                 <wifi BSS="00:0c:e6:00:d1:3c" max="87.0" min="79.0" avg="83.8" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="78.0" min="73.0" avg="74.4" />
-                <wifi BSS="00:26:cb:4e:07:4" max="74.0" min="72.0" avg="73.2" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="74.0" min="72.0" avg="73.2" />
                 <wifi BSS="00:26:cb:a0:98:c1" max="90.0" min="81.0" avg="85.5" />
                 <wifi BSS="00:26:cb:4e:04:51" max="51.0" min="50.0" avg="50.8" />
                 <wifi BSS="00:0c:e6:00:d1:0c" max="93.0" min="84.0" avg="90.0" />
@@ -1515,7 +1515,7 @@
                 <wifi BSS="fc:3f:7c:22:c5:11" max="84.0" min="81.0" avg="82.8" />
                 <wifi BSS="00:0c:e6:00:d1:3c" max="88.0" min="79.0" avg="82.8" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="62.0" min="57.0" avg="59.4" />
-                <wifi BSS="00:26:cb:4e:07:4" max="63.0" min="57.0" avg="59.8" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="63.0" min="57.0" avg="59.8" />
                 <wifi BSS="00:0c:e6:00:d1:0c" max="87.0" min="87.0" avg="87.0" />
                 <wifi BSS="00:26:cb:a0:98:c0" max="75.0" min="67.0" avg="70.4" />
                 <wifi BSS="00:26:cb:4e:04:51" max="69.0" min="63.0" avg="66.0" />
@@ -1543,7 +1543,7 @@
                 <wifi BSS="00:26:cb:4d:d9:41" max="80.0" min="80.0" avg="80.0" />
                 <wifi BSS="00:0c:e6:00:cf:b3" max="85.0" min="85.0" avg="85.0" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="79.0" min="79.0" avg="79.0" />
-                <wifi BSS="00:26:cb:4e:07:4" max="78.0" min="78.0" avg="78.0" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="78.0" min="78.0" avg="78.0" />
             </listWifi>
             <aliases>
                 <alias>FORUM F</alias>
@@ -1557,7 +1557,7 @@
                 <wifi BSS="00:26:cb:a0:aa:c0" max="69.0" min="67.0" avg="68.0" />
                 <wifi BSS="00:26:cb:4d:d9:40" max="83.0" min="83.0" avg="83.0" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="78.0" min="77.0" avg="77.2" />
-                <wifi BSS="00:26:cb:4e:07:4" max="78.0" min="77.0" avg="77.6" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="78.0" min="77.0" avg="77.6" />
                 <wifi BSS="00:26:cb:4e:04:50" max="68.0" min="68.0" avg="68.0" />
                 <wifi BSS="00:0c:e6:00:d2:a4" max="89.0" min="82.0" avg="87.6" />
                 <wifi BSS="00:26:cb:4e:0e:e1" max="72.0" min="70.0" avg="71.4" />
@@ -1577,7 +1577,7 @@
                 <wifi BSS="00:26:cb:a0:aa:c0" max="74.0" min="66.0" avg="70.8" />
                 <wifi BSS="00:26:cb:4d:d9:40" max="88.0" min="86.0" avg="86.4" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="80.0" min="78.0" avg="79.0" />
-                <wifi BSS="00:26:cb:4e:07:4" max="80.0" min="79.0" avg="79.2" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="80.0" min="79.0" avg="79.2" />
                 <wifi BSS="00:26:cb:4e:04:50" max="62.0" min="62.0" avg="62.0" />
                 <wifi BSS="00:0c:e6:00:d2:a4" max="86.0" min="80.0" avg="83.6" />
                 <wifi BSS="00:26:cb:4e:0e:e1" max="76.0" min="71.0" avg="73.2" />
@@ -1598,7 +1598,7 @@
                 <wifi BSS="00:26:cb:4e:0e:e0" max="70.0" min="67.0" avg="69.0" />
                 <wifi BSS="00:26:cb:a0:aa:c0" max="58.0" min="52.0" avg="55.8" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="82.0" min="78.0" avg="80.4" />
-                <wifi BSS="00:26:cb:4e:07:4" max="80.0" min="79.0" avg="79.8" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="80.0" min="79.0" avg="79.8" />
                 <wifi BSS="00:26:cb:4e:04:50" max="66.0" min="56.0" avg="61.2" />
                 <wifi BSS="00:0c:e6:00:d2:a4" max="82.0" min="68.0" avg="75.6" />
                 <wifi BSS="00:26:cb:4e:0e:e1" max="72.0" min="67.0" avg="69.8" />
@@ -1621,7 +1621,7 @@
                 <wifi BSS="00:26:cb:4e:0e:e0" max="78.0" min="72.0" avg="75.0" />
                 <wifi BSS="00:26:cb:a0:aa:c0" max="67.0" min="60.0" avg="62.4" />
                 <wifi BSS="00:26:cb:4e:07:f0" max="78.0" min="75.0" avg="76.2" />
-                <wifi BSS="00:26:cb:4e:07:4" max="78.0" min="76.0" avg="76.8" />
+                <wifi BSS="00:26:cb:4e:07:f1" max="78.0" min="76.0" avg="76.8" />
                 <wifi BSS="00:26:cb:4e:04:50" max="59.0" min="59.0" avg="59.0" />
                 <wifi BSS="00:0c:e6:00:d2:a4" max="82.0" min="70.0" avg="74.8" />
                 <wifi BSS="00:26:cb:4e:0e:e1" max="81.0" min="72.0" avg="76.6" />
