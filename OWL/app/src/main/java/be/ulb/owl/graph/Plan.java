@@ -15,6 +15,7 @@ import be.ulb.owl.utils.XMLUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -23,27 +24,27 @@ import org.xmlpull.v1.XmlPullParserException;
 
 /**
  * A plan that contains Node, WifiList, ...
- * 
+ *
  * @author Detobel36
  */
 public class Plan {
 
     private static final MainActivity main = MainActivity.getInstance();
-    
-    
+
+
     private final String _name;
     private ArrayList<String> _allAlias; // Cache
     private ArrayList<Node> _listNode;
     private ArrayList<String> _allBssWifi;
     private InputStream _image;
-    
+
 
     /**
      * Create a plan <b>and</b> load XML file from this plan<br/>
      * <b>Only call by Graph object</b>
-     * 
+     *
      * @param name of the plan
-     * @see Graph#getPlan(java.lang.String) 
+     * @see Graph#getPlan(java.lang.String)
      */
     protected Plan(String name) throws IOException {
         this(name, true);
@@ -55,13 +56,13 @@ public class Plan {
      *
      * @param name name of the plan
      * @param loadPlan True if we must load XML file from this plan
-     * @see Graph#getPlan(java.lang.String, boolean) 
+     * @see Graph#getPlan(java.lang.String, boolean)
      */
     protected Plan(String name, boolean loadPlan) throws IOException {
         _listNode = new ArrayList<Node>();
         _allBssWifi = new ArrayList<String>();
         _allAlias = null;
-        
+
         _name = name;
         if(loadPlan) {
             boolean couldLoad = loadXMLPlan();
@@ -77,7 +78,28 @@ public class Plan {
             throw new IOException("Impossible de charger l'image de ce plan (" + _name + ")");
         }
     }
-    
+
+    private double getScore(Float level) {
+        /*
+        if (level > 0 && level < 40) {
+            return 1.4f;
+        }
+        else if (level > 40 && level <= 60) {
+            return 1.1f;
+        }
+        else if (level > 60 && level <= 80) {
+            return 0.7f;
+        }
+        else if (level > 80 && level <= 85) {
+            return 0.5f;
+        }
+        else if (level > 85 && level <= 100) {
+            return 0.3f;
+        }
+        return 1.0f;
+        */
+        return Math.pow((-level+100)/50, 0.6);//Math.sqrt((-level+100)/50);
+    }
 
     /**
      * Create a plan <b>and</b> load XML file from this plan
@@ -93,40 +115,89 @@ public class Plan {
             wifisStr.add(wifi.getBSS());
         }
         Node res;
-        ArrayList<Float> scores = new ArrayList<Float>();
+        ArrayList<Double> scores = new ArrayList<Double>();
+        System.out.println("Possible node :");
         for (int i = 0; i < nodes.size(); i++) { // for each node
+            System.out.print(nodes.get(i).getName()+" : ");
+            scores.add(0.0);
+            ArrayList<Wifi> tmp = nodes.get(i).getWifi();
+            double totaldbm = 0.0;
+            Integer commonWifi = 0;
+            for (Wifi wifi: tmp) {
+                if (wifisStr.contains(wifi.getBSS())) { // has a Wifi with the same BSS
+                    Integer offset = wifisStr.indexOf(wifi.getBSS());
+                    //System.out.print("+|"+(wifis.get(offset)).getAvg()+"-"+wifi.getAvg()+"|/"+getScore((wifis.get(offset).getAvg()+wifi.getAvg())/2));
+                    totaldbm += Math.abs((wifis.get(offset)).getAvg()-wifi.getAvg())/getScore((wifis.get(offset).getAvg()+wifi.getAvg())/2);
+                    commonWifi++;
+                }
+            }
+            scores.set(i, totaldbm/(commonWifi*commonWifi));
+            System.out.println(" = "+scores.get(i));
+        }
+        res = nodes.get(scores.indexOf(Collections.min(scores)));
+        return res;
+        /*
+        ArrayList<String> wifisStr = new ArrayList<String>();
+        for (Wifi wifi : wifis) {
+            wifisStr.add(wifi.getBSS());
+        }
+        Node res;
+        ArrayList<Float> scores = new ArrayList<Float>();
+        System.out.println("Possible node :");
+        for (int i = 0; i < nodes.size(); i++) { // for each node
+            System.out.print(nodes.get(i).getName()+" : ");
             scores.add(0.0f);
             ArrayList<Wifi> tmp = nodes.get(i).getWifi();
             Float totaldbm = 0.0f;
             Integer commonWifi = 0;
             for (Wifi wifi: tmp) {
                 if (wifisStr.contains(wifi.getBSS())) { // has a Wifi with the same BSS
-                    totaldbm += Math.abs((wifis.get(wifisStr.indexOf(wifi.getBSS()))).getAvg()-wifi.getAvg());
+                    Integer offset = wifisStr.indexOf(wifi.getBSS());
+                    totaldbm += Math.abs((wifis.get(offset)).getAvg()-wifi.getAvg());
                     commonWifi++;
                 }
             }
-            scores.set(i, totaldbm/commonWifi);
+            scores.set(i, totaldbm*commonWifi);
+            System.out.println(" = "+scores.get(i));
         }
         res = nodes.get(scores.indexOf(Collections.min(scores)));
         return res;
+        */
     }
 
+    private ArrayList<Wifi> and(ArrayList<Wifi> capted, ArrayList<Wifi> set) {
+        ArrayList<Wifi> res = new ArrayList<Wifi>();
+        ArrayList<String> tmp = new ArrayList<String>();
+        for (Wifi wifi:set) {
+            tmp.add(wifi.getBSS());
+        }
+        for (Wifi cap: capted) {
+            String key = cap.getBSS();
+            if (tmp.contains(key)) {
+                Wifi correspondent = set.get(tmp.indexOf(key));
+                if (cap.getAvg() < correspondent.getMax() && cap.getAvg() > correspondent.getMin() ) {
+                    res.add(cap);
+                }
+            }
+        }
+        return res;
+    }
 
     /**
      * Check if the current plan have this name
-     * 
+     *
      * @param name the specific name
      * @return True if this plan have this name
      */
     public boolean isName(String name) {
         return _name.equals(name);
     }
-    
-    
-    
+
+
+
     /**
      * Get a node from this plan
-     * 
+     *
      * @param name of the node
      * @return The node or null if not found
      */
@@ -136,11 +207,11 @@ public class Plan {
                 return node;
             }
         }
-        
+
         return null;
     }
 
-    
+
     /**
      * Get a node from this plan through wifi (NB: change name of the attribut)
      *
@@ -148,7 +219,7 @@ public class Plan {
      * @return The nearest Node based on the given array of Wifi
      */
     public Node getNode(ArrayList<Wifi> wifis) {
-        System.out.println("In get Node");
+        /*
         ArrayList<String> wifisStr = new ArrayList<String>();
         for (Wifi wifi : wifis) {
             wifisStr.add(wifi.getBSS());
@@ -171,46 +242,66 @@ public class Plan {
             return collisionManager(wifis, res);
         }
         return res.get(0);
+        */
+        ArrayList<String> wifisStr = new ArrayList<String>();
+        for (Wifi wifi : wifis) {
+            wifisStr.add(wifi.getBSS());
+        }
+        ArrayList<Node> res = new ArrayList<Node>();
+        for (Node node : _listNode) {
+            ArrayList<String> tmp = node.getListWifiBSS();
+            tmp.retainAll(wifisStr);
+            if (3 < tmp.size()){
+                res.add(node);
+            }
+        }
+        if (res.size() > 1) {
+            return collisionManager(wifis, res);
+        }
+        else if (res.size() == 1) {
+            return res.get(0);
+        }
+        return null;
     }
 
-    
+
     /**
      * Search all node with an specific alias (no search in node name)
-     * 
+     *
      * @param name the name (or alias) of this nodes
      * @return the list of all node (or empty list if not found)
      */
     public ArrayList<Node> searchNode(String name) {
         ArrayList<Node> res = new ArrayList<Node>();
-        
+
         for(Node node : _listNode) {
             if(node.haveAlias(name)) {
                 res.add(node);
             }
         }
-        
+
         return res;
     }
-    
-    
+
+
     /**
      * Check if a wifi signal (BSS) could be capted in this plan
-     * 
+     *
      * @param bss the plan which must be test
      * @return True if we can capt it
-     * @see #getListWifiBSS() 
+     * @see #getListWifiBSS()
      */
     public boolean containsWifiBSS(String bss) {
         return _allBssWifi.contains(bss);
     }
-    
-    
+
+
     /**
      * Get the list of the BSS which could be capted in this plan<br/>
      * <b>/!\</b> in Java list are reference (clone before modification)
-     * 
+     *
      * @return a list of String which contains all BSS
-     * @see #containsWifiBSS(java.lang.String) 
+     * @see #containsWifiBSS(java.lang.String)
      */
     public ArrayList<String> getListWifiBSS() {
         return _allBssWifi;
@@ -273,9 +364,9 @@ public class Plan {
     }
 
 
-    
+
     ///////////////////////////// XML /////////////////////////////
-    
+
     /**
      * Load XML from this plan
      *
@@ -292,34 +383,34 @@ public class Plan {
 
             // While the
             while(parser.next() != XmlPullParser.END_DOCUMENT) {
-                
+
                 XMLUtils.removeSpace(parser);
                 XMLDebugParser(parser);
-                
+
                 if(parser.getEventType() == XmlPullParser.START_TAG &&
                         parser.getName().equalsIgnoreCase("plan")) {
-                    
+
                     XMLUtils.nextAndRemoveSpace(parser);
-                    
+
                     while(parser.getEventType() != XmlPullParser.END_TAG ||
                             !parser.getName().equalsIgnoreCase("plan")) {
-                        
+
                         switch(parser.getName()) {
-                            
+
                             case "nodes":
                                 XMLLoadNodes(parser);
                                 break;
-                                
+
                             case "edges":
                                 XMLLoadEdges(parser);
                                 break;
-                                
+
                             case "background_image":
                             case "distance_unit":
                                 XMLUtils.nextAndRemoveSpace(parser); // Skip START
                                 XMLUtils.nextAndRemoveSpace(parser); // Skip END
                                 break;
-                                
+
                             default:
                                 Log.e(getClass().getName(), "Balise non prise en charge: "
                                         + parser.getName());
@@ -327,16 +418,16 @@ public class Plan {
                                 break;
 
                         }
-                        
+
                         XMLUtils.removeSpace(parser);
-                        
+
                     }
-                    
+
                 }
-                
-                
+
+
             }
-            
+
         } catch (IOException | XmlPullParserException ex) {
             Log.e(getClass().getName(), ex.getMessage());
             return false;
@@ -344,70 +435,70 @@ public class Plan {
 
         return true;
     }
-    
-    
+
+
     /**
      * Load all nodes of a XML File
-     * 
+     *
      * @param parser the XML File Iterator
      * @throws XmlPullParserException
      * @throws IOException
      */
-    private void XMLLoadNodes(XmlPullParser parser) 
+    private void XMLLoadNodes(XmlPullParser parser)
             throws XmlPullParserException, IOException {
-        
+
         // Next after "nodeS" balise
         XMLUtils.nextAndRemoveSpace(parser);
-        
-        while(parser.getEventType() != XmlPullParser.END_TAG || 
+
+        while(parser.getEventType() != XmlPullParser.END_TAG ||
                 !parser.getName().equalsIgnoreCase("nodes")) {
-            
-            if(parser.getEventType() == XmlPullParser.END_TAG && 
+
+            if(parser.getEventType() == XmlPullParser.END_TAG &&
                 parser.getName().equalsIgnoreCase("nodes")) {
                 break;
-                
+
             } else if(parser.getEventType() == XmlPullParser.START_TAG &&
                     parser.getName().equalsIgnoreCase("node")) {
-                
+
                 XMLLoadOneNode(parser);
-                
+
             } else {
                 Log.e(getClass().getName(), "Erreur dans le fichier (" + this._name + "). " +
                         "Problème de chargement de la node: " + parser.getName());
                 XMLDebugParser(parser);
                 XMLUtils.nextAndRemoveSpace(parser);
             }
-            
+
             XMLUtils.removeSpace(parser);
             XMLDebugParser(parser);
         }
         parser.next(); // Next after the End_tag
     }
-    
-    
+
+
     /**
      * Load One node from a XML File
-     * 
+     *
      * @param parser the XML File Iterator
      * @throws XmlPullParserException
-     * @throws IOException 
+     * @throws IOException
      */
-    private void XMLLoadOneNode(XmlPullParser parser) 
+    private void XMLLoadOneNode(XmlPullParser parser)
             throws XmlPullParserException, IOException {
-        
+
         // Init default values
         ArrayList<String> listAlias = new ArrayList<String>();
         ArrayList<Wifi> listWifi = null;
         float x = Integer.MIN_VALUE;
         float y = Integer.MIN_VALUE;
         String pointId = parser.getAttributeValue(null, "id");
-        
+
         // Next after "node" balise
         XMLUtils.nextAndRemoveSpace(parser);
-        
+
         while(parser.getEventType() != XmlPullParser.END_TAG ||
                 !parser.getName().equalsIgnoreCase("node")) {
-            
+
             if(parser.getEventType() == XmlPullParser.START_TAG) {
                 switch(parser.getName()) {
 
@@ -437,50 +528,50 @@ public class Plan {
 
                 }
             }
-            
+
             XMLUtils.nextAndRemoveSpace(parser);
         }
         parser.next(); // Remove End_tag
-        
+
         if(x != Integer.MIN_VALUE && y != Integer.MIN_VALUE && pointId != null) {
             // Create and add node
             _listNode.add(new Node(this, x, y, pointId, listWifi));
-            
+
         } else {
             Log.e(getClass().getName(), "Impossible de créer la node: " + pointId + " (il manque " +
                     "des informations)");
         }
-        
+
     }
-    
-    
+
+
     /**
      * Extract a list of Wifi from the XML File
-     * 
+     *
      * @param parser the XML File Iterator
      * @return an ArrayList of Wifi
      * @throws XmlPullParserException
-     * @throws IOException 
+     * @throws IOException
      */
-    private ArrayList<Wifi> XMLGetListWifi(XmlPullParser parser) 
+    private ArrayList<Wifi> XMLGetListWifi(XmlPullParser parser)
             throws XmlPullParserException, IOException {
-        
+
         ArrayList<Wifi> listWifi = new ArrayList<Wifi>();
-        
+
         // Next after "listwifi" balise
         XMLUtils.nextAndRemoveSpace(parser);
-        
-        while(parser.getEventType() != XmlPullParser.END_TAG || 
+
+        while(parser.getEventType() != XmlPullParser.END_TAG ||
                 !parser.getName().equalsIgnoreCase("listWifi")) {
-            
+
             if(parser.getEventType() == XmlPullParser.START_TAG &&
                     parser.getName().equalsIgnoreCase("wifi")) {
-                
+
                 String bss = parser.getAttributeValue(null, "BSS");
                 float max = Float.parseFloat(parser.getAttributeValue(null, "max"));
                 float min = Float.parseFloat(parser.getAttributeValue(null, "min"));
                 float avg = Float.parseFloat(parser.getAttributeValue(null, "avg"));
-                
+
                 if(!bss.equals("")) {
                     listWifi.add(new Wifi(bss, max, min, avg));
                     _allBssWifi.add(bss);
@@ -489,101 +580,101 @@ public class Plan {
                 Log.d(getClass().getName(), "Création d'un wifi: " + bss + " min: " + min +
                         " max: "+ max + " avg: " + avg);
             }
-            
+
             XMLUtils.nextAndRemoveSpace(parser);
         }
         parser.next(); // Next after the End_tag
-        
+
         return listWifi;
     }
-    
-    
+
+
     /**
      * Load all Edges
-     * 
+     *
      * @param parser the XML File Iterator
      * @throws XmlPullParserException
-     * @throws IOException 
+     * @throws IOException
      */
-    private void XMLLoadEdges(XmlPullParser parser) 
+    private void XMLLoadEdges(XmlPullParser parser)
             throws XmlPullParserException, IOException {
-        
+
         // Next after "edgesS" balise
         XMLUtils.nextAndRemoveSpace(parser);
-        
+
         while(parser.getEventType() != XmlPullParser.END_TAG ||
                 !parser.getName().equalsIgnoreCase("edges")) {
-            
-            
-            if(parser.getEventType() == XmlPullParser.END_TAG && 
+
+
+            if(parser.getEventType() == XmlPullParser.END_TAG &&
                 parser.getName().equalsIgnoreCase("edges")) {
                 break;
-                
+
             } else if(parser.getEventType() == XmlPullParser.START_TAG &&
                     parser.getName().equalsIgnoreCase("internal")) {
-                
+
                 XMLLoadSpecificEdges(parser, "internal");
-            
+
             } else if(parser.getEventType() == XmlPullParser.START_TAG &&
                     parser.getName().equalsIgnoreCase("external")) {
-                
+
                 XMLLoadSpecificEdges(parser, "external");
                 Log.d(getClass().getName(), "End External section");
-                
+
             } else {
                 Log.e(getClass().getName(), "Erreur dans le fichier. Problème de chargement de " +
                         "l'edge: " + parser.getName() + " (Plan: " + _name+ ")");
                 XMLDebugParser(parser);
                 XMLUtils.nextAndRemoveSpace(parser);
             }
-            
+
             XMLUtils.removeSpace(parser);
             XMLDebugParser(parser);
         }
         parser.next(); // Next after the End_tag
-        
+
     }
-    
-    
+
+
     /**
      * Load a specific Edge
-     * 
+     *
      * @param parser the XML File Iterator
      * @param typeEdge type of edge "internal" or "external"
      * @throws XmlPullParserException
-     * @throws IOException 
+     * @throws IOException
      */
-    private void XMLLoadSpecificEdges(XmlPullParser parser, String typeEdge) 
+    private void XMLLoadSpecificEdges(XmlPullParser parser, String typeEdge)
             throws XmlPullParserException, IOException {
-        
-        if(!typeEdge.equalsIgnoreCase("internal") && 
+
+        if(!typeEdge.equalsIgnoreCase("internal") &&
                 !typeEdge.equalsIgnoreCase("external")) {
-            throw new IllegalArgumentException("Les liens: " + typeEdge + 
+            throw new IllegalArgumentException("Les liens: " + typeEdge +
                     " ne sont pas encore pris en compte");
         }
-        
+
         // Next after "internal"/"external" balise
         XMLUtils.nextAndRemoveSpace(parser);
-        
+
         while(parser.getEventType() != XmlPullParser.END_TAG ||
                 !parser.getName().equalsIgnoreCase(typeEdge)) {
-            
-            
-            if(parser.getEventType() == XmlPullParser.END_TAG && 
+
+
+            if(parser.getEventType() == XmlPullParser.END_TAG &&
                 parser.getName().equalsIgnoreCase(typeEdge)) {
                 break;
-                
+
             } else if(parser.getEventType() == XmlPullParser.START_TAG &&
                     parser.getName().equalsIgnoreCase("edge")) {
-                
+
                 // Init default values
                 String begin = parser.getAttributeValue(null, "beg");
                 String end = parser.getAttributeValue(null, "end");
                 float weight = Float.parseFloat(parser.getAttributeValue(null, "weight"));
-                
+
                 Node nodeOne = getNode(begin);
                 Node nodeTwo = null;
-                
+
                 /// IF external node
                 if(typeEdge.equalsIgnoreCase("external")) {
                     String strPlan = parser.getAttributeValue(null, "plan");
@@ -591,51 +682,51 @@ public class Plan {
                     if(externalPlan != null) {
                         nodeTwo = externalPlan.getNode(end);
                     }
-                    
+
                 } else {
                     nodeTwo = getNode(end);
                 }
-                
+
                 if(nodeOne != null && nodeTwo != null) {
                     new Path(nodeOne, nodeTwo, weight, true);
                     Log.d(getClass().getName(), "Création d'un lien entre: " + nodeOne.getName() +
                             " et " + nodeTwo.getName() + " (distance: " + weight + ")");
-                    
+
                 } else {
                     Log.e(getClass().getName(), "Impossible de faire un lien entre les " +
                             "points: " + begin + " et " + end + " (au moins un des deux noeuds " +
                             "n'a pas été trouvé)");
                 }
-                parser.next(); // Next 
-                
+                parser.next(); // Next
+
             } else {
                 Log.e(getClass().getName(), "Erreur dans le fichier (" + _name + "). Problème de "
                         + "chargement d'une edge " + typeEdge + ": " + parser.getName());
                 XMLDebugParser(parser);
             }
-            
+
             XMLUtils.nextAndRemoveSpace(parser);
-            
+
         }
         parser.next(); // Next after the End_tag
-        
+
     }
-    
-    
+
+
     /**
      * Print Debug message
-     * 
+     *
      * @param parser the XML File Iterator
-     * @throws XmlPullParserException 
+     * @throws XmlPullParserException
      */
-    private static void XMLDebugParser(XmlPullParser parser) 
+    private static void XMLDebugParser(XmlPullParser parser)
             throws XmlPullParserException {
 
         String type = XmlPullParser.TYPES[parser.getEventType()];
         Log.d(Plan.class.getName(), parser.getName() + " (type:" + type + " text:" +
                 parser.getText() + ")");
     }
-    
-    
-    
+
+
+
 }
