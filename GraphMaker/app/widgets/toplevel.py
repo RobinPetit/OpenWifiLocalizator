@@ -48,7 +48,11 @@ class NodeConfigurationToplevel(t.Toplevel):
 
     def create_widgets_aliases(self):
         self.aliases = list(self.node_data.aliases)
+
+        # Information about node
         print("Information about node: " + str(self.node_data.name))
+        nodeInfo = t.Label(self, text="Node: " + str(self.node_data.name))
+        nodeInfo.grid(row=0, column=0, columnspan=2)
 
         # Aliases
         self.aliases_group = t.LabelFrame(self, text='Aliases Management', padx=5, pady=5, relief=t.SUNKEN, borderwidth=3)
@@ -59,7 +63,9 @@ class NodeConfigurationToplevel(t.Toplevel):
         for alias in self.aliases:
             self.lb.insert(t.END, alias)
         self.alias = t.StringVar()
-        t.Entry(self.aliases_group, textvariable=self.alias).grid(row=1, column=1)
+        entry = t.Entry(self.aliases_group, textvariable=self.alias)
+        entry.grid(row=1, column=1)
+        entry.focus_set()
         t.Button(self.aliases_group, text='Add alias', command=self.add_alias).grid(row=2, column=1)
         t.Button(self.aliases_group, text='Remove alias', command=self.delete_alias).grid(row=3, column=1)
 
