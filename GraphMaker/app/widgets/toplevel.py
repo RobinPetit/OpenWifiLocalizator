@@ -48,6 +48,8 @@ class NodeConfigurationToplevel(t.Toplevel):
 
     def create_widgets_aliases(self):
         self.aliases = list(self.node_data.aliases)
+        print("Information about node: " + str(self.node_data.name))
+
         # Aliases
         self.aliases_group = t.LabelFrame(self, text='Aliases Management', padx=5, pady=5, relief=t.SUNKEN, borderwidth=3)
         self.aliases_group.grid(row=1, column=0, columnspan=2)
