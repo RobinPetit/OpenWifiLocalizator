@@ -18,7 +18,7 @@ import be.ulb.owl.Wifi;
 /**
  * Represent all Plan<br/>
  * Must be initialised only <b>once</b>
- * 
+ *
  * @author Detobel36
  */
 public class Graph {
@@ -27,37 +27,37 @@ public class Graph {
     private static ArrayList<Plan> _allPlan;
 
     private Scanner _scanner;
-    
-    
+
+
     public Graph () {
         _allPlan = new ArrayList<Plan>();
         loadAllPlan();
-        
+
         _scanner = new Scanner();
     }
-    
-    
-    
+
+
+
     public ArrayList<Path> bestPath(Node nodeFrom, Node nodeTo) {
         // TODO
         return new ArrayList<Path>();
     }
-    
+
     public Node whereAmI () {
-        ArrayList<Wifi> capted = _scanner.scan();
-        return whereAmI(capted);
+        ArrayList<Wifi> sensed = _scanner.scan();
+        return whereAmI(sensed);
     }
-    
-    public Node whereAmI (ArrayList<Wifi> capted) {
-        ArrayList<String> captedStr = new ArrayList<String>();
-        for (Wifi wifi : capted) {
-            captedStr.add(wifi.getBSS());
+
+    public Node whereAmI (ArrayList<Wifi> sensed) {
+        ArrayList<String> sensedStr = new ArrayList<String>();
+        for (Wifi wifi : sensed) {
+            sensedStr.add(wifi.getBSS());
         }
         ArrayList<Plan> res = new ArrayList<Plan>();
         int biggestSetSize = 0;
         for (Plan plan : _allPlan) {
             ArrayList<String> tmp = plan.getListWifiBSS();
-            tmp.retainAll(capted); // set-theoric and operation
+            tmp.retainAll(sensedStr); // set-theoric and operation
             if (biggestSetSize == tmp.size()) {
                 res.add(plan);
             }
@@ -70,14 +70,14 @@ public class Graph {
         if (res.size() == 0) {
             System.out.println("You are not at ULB.\nI should throw a propre exception but I'm too lazy...");
         }
-        return res.get(0).getNode(capted);
+        return res.get(0).getNode(sensed);
     }
-    
-        
-    
-    
+
+
+
+
     /////////////////////////// STATIC ///////////////////////////
-    
+
     /**
      * Load all plan in the default folder
      */
@@ -97,11 +97,11 @@ public class Graph {
         }
 
     }
-    
-    
+
+
     /**
      * Search all node which contain a specific alias (no search in name)
-     * 
+     *
      * @param name the name (alias) of this nodes
      * @return an ArrayList of Node
      */
@@ -112,22 +112,22 @@ public class Graph {
         }
         return listeNode;
     }
-    
-    
+
+
     /**
      * Get a specific plan or <b>create</b> if not exist
-     * 
+     *
      * @param name the name of the specific plan
      * @return The plan (or null if not found)
      */
     public static Plan getPlan(String name) {
         return getPlan(name, true);
     }
-    
-    
+
+
     /**
      * Get a specific plan or <b>create</b> if not exist
-     * 
+     *
      * @param name the name of the specific plan
      * @param loadIfNotExist try to load if the plan is not found
      * @return The plan (or null if not found)
@@ -139,7 +139,7 @@ public class Graph {
                 return plan;
             }
         }
-        
+
         if(resPlan == null && loadIfNotExist) {
             try {
                 resPlan = new Plan(name);
@@ -149,10 +149,10 @@ public class Graph {
                         " (e: " + exception.getMessage()+")");
             }
         }
-        
+
         return resPlan;
     }
 
-    
-    
+
+
 }
