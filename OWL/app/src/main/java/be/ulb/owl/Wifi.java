@@ -75,6 +75,10 @@ public class Wifi {
     public float getAvg() {
         return _avg;
     }
+
+    public float getMax() { return _max; }
+
+    public float getMin() { return _min; }
     
     
 }

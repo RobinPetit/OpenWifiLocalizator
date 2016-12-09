@@ -4,12 +4,8 @@ import android.content.Context;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.*;
+import java.lang.Object;
 
 /**
  * Scan all wifi
@@ -22,45 +18,38 @@ public class Scanner {
 
     private boolean _defaultWifiEnable = true;
     private WifiManager _wifiManager = null;
-
-    private String _network;
-    private HashMap<String, ArrayList<Float>> _accesPoints;
-    private Runtime _r;
+    private HashMap<String, ArrayList<Integer>> _accesPoints;
 
     public Scanner () {
         initWifiManager();
-
         _wifiManager.startScan();
-        List<ScanResult> result = _wifiManager.getScanResults();
-        // TODO
-
-        _network = "wlp3s0";
-        _accesPoints = new HashMap<String, ArrayList<Float>>();
-        _r = Runtime.getRuntime();
+        _accesPoints = new HashMap<String, ArrayList<Integer>>();
     }
 
-    private Float avg (ArrayList<Float> tmp) {
-        Float sum = 0.0f;
-        for (Float elem : tmp) {
+    private Integer avg (ArrayList<Integer> tmp) {
+        Integer sum = 0;
+        for (Integer elem : tmp) {
             sum += elem;
         }
         return sum/tmp.size();
     }
 
-    private BufferedReader getData () {
-        BufferedReader bufferedreader = null;
-        try {
-            Process p = _r.exec("iw dev "+_network+" scan");
-            InputStream in = p.getInputStream();
-            BufferedInputStream buf = new BufferedInputStream(in);
-            InputStreamReader inread = new InputStreamReader(buf);
-            bufferedreader = new BufferedReader(inread);
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
+    private void getData () {
+        List<ScanResult> results = _wifiManager.getScanResults();
+        for (ScanResult res :results) {
+            String key = res.BSSID;
+            Integer value = res.level;
+            if (!_accesPoints.containsKey(key)) {
+                _accesPoints.put(key, new ArrayList<Integer>());
+                _accesPoints.get(key).add(value);
+            }
+            else {
+                _accesPoints.get(key).add(value);
+            }
         }
-        return bufferedreader;
     }
 
+    /*
     private void parse (BufferedReader data) {
         try {
             String key = "";
@@ -85,15 +74,16 @@ public class Scanner {
             System.err.println(e.getMessage());
         }
     }
+    */
 
     public ArrayList<Wifi> scan () {
         ArrayList<Wifi> temp = new ArrayList<Wifi>();
         for (int i = 0; i < 5; i++) {
-            parse(getData());
+            getData();
         }
         
         for(String key : _accesPoints.keySet()) {
-            ArrayList<Float> values = _accesPoints.get(key);
+            ArrayList<Integer> values = _accesPoints.get(key);
             temp.add(new Wifi(key, Collections.max(values), 
                     Collections.min(values), avg(values)));
         }
