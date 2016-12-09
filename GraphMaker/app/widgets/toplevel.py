@@ -50,9 +50,10 @@ class NodeConfigurationToplevel(t.Toplevel):
         self.aliases = list(self.node_data.aliases)
 
         # Information about node
-        print("Information about node: " + str(self.node_data.name))
-        nodeInfo = t.Label(self, text="Node: " + str(self.node_data.name))
-        nodeInfo.grid(row=0, column=0, columnspan=2)
+        if(self.node_data.name != ""):
+            print("Information about node: " + str(self.node_data.name))
+            nodeInfo = t.Label(self, text="Node: " + str(self.node_data.name))
+            nodeInfo.grid(row=0, column=0, columnspan=2)
 
         # Aliases
         self.aliases_group = t.LabelFrame(self, text='Aliases Management', padx=5, pady=5, relief=t.SUNKEN, borderwidth=3)

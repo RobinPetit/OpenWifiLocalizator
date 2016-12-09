@@ -17,6 +17,9 @@ class App(t.Frame):
 
     def __init__(self, master, **options):
         super().__init__(master)
+        self.options = options
+
+        self.master = master
         self.bind('<Control-s>', self.save_to_xml)
         self.create_widgets(**options)
 
@@ -32,6 +35,7 @@ class App(t.Frame):
             command=lambda v: self.canvas.set_bg_image(v), orient=t.HORIZONTAL)
         self.alpha_scale.set(App.ALPHA_INITIAL_VALUE)
         self.alpha_scale.pack()
+        self.createMenu()
 
     def open_file(self):
         self.file_name = t.filedialog.askopenfilename(initialdir=Config.MAPS_PATH,
@@ -50,6 +54,14 @@ class App(t.Frame):
             else:
                 self.destroy()
 
+    def open_new_file(self):
+        self.canvas.destroy()
+        self.canvas = None
+        self.alpha_scale.destroy()
+        self.alpha_scale = None
+        self.create_widgets(**self.options)
+
+
     def ask_metre_length(self):
         toplevel = t.Toplevel(self)
         nb_pixels = t.StringVar()
@@ -67,6 +79,18 @@ class App(t.Frame):
         self.ap = AccessPointList(iterations=5)
         self.ap.scan()
         self.toplevel.wm_title('access points scanned')
+
+    def createMenu(self):
+        menubar=t.Menu(self.master)
+        filemenu=t.Menu(menubar,tearoff=0)
+        filemenu.add_command(label="Open a new", command=self.open_new_file)
+        filemenu.add_command(label="Save", command=self.save_to_xml)
+        filemenu.add_separator()
+        filemenu.add_command(label="Quit", command=self.master.destroy)
+        menubar.add_cascade(label="File", menu=filemenu)
+
+        self.master.config(menu=menubar)
+
 
     # Save functions
 
@@ -98,4 +122,5 @@ class App(t.Frame):
         content = self.text()
         with open(path, 'w') as save_file:
             save_file.write(content)
+        print("File saved !")
 
