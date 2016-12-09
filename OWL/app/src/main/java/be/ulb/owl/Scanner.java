@@ -3,6 +3,8 @@ package be.ulb.owl;
 import android.content.Context;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.Build;
+import android.util.Log;
 
 import java.util.*;
 import java.lang.Object;
@@ -21,7 +23,10 @@ public class Scanner {
     private HashMap<String, ArrayList<Integer>> _accesPoints;
 
     public Scanner () {
-        initWifiManager();
+        forceEnableWifi();
+        if(!_wifiManager.isWifiEnabled()) {
+            Log.d(getClass().getName(), "Wifi disable");
+        }
         _wifiManager.startScan();
         _accesPoints = new HashMap<String, ArrayList<Integer>>();
     }
@@ -34,7 +39,7 @@ public class Scanner {
         return sum/tmp.size();
     }
 
-    private void getData () {
+    private void getData() {
         List<ScanResult> results = _wifiManager.getScanResults();
         for (ScanResult res :results) {
             String key = res.BSSID;
@@ -76,7 +81,7 @@ public class Scanner {
     }
     */
 
-    public ArrayList<Wifi> scan () {
+    public ArrayList<Wifi> scan() {
         ArrayList<Wifi> temp = new ArrayList<Wifi>();
         for (int i = 0; i < 5; i++) {
             getData();
@@ -87,6 +92,11 @@ public class Scanner {
             temp.add(new Wifi(key, Collections.max(values), 
                     Collections.min(values), avg(values)));
         }
+
+        if(temp.isEmpty()) {
+            Log.i(getClass().getName(), "Aucun wifi dans cette zone");
+        }
+
         return temp;
     }
 
@@ -114,6 +124,13 @@ public class Scanner {
      */
     public boolean forceEnableWifi() {
         initWifiManager();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 &&
+                _wifiManager.isScanAlwaysAvailable()) {
+            Log.i(getClass().getName(), "ScanAlwaysAvailable Enjoy !");
+            return true;
+        }
+
         if(_wifiManager != null) {
             _defaultWifiEnable = _wifiManager.isWifiEnabled();
             return _wifiManager.setWifiEnabled(true);

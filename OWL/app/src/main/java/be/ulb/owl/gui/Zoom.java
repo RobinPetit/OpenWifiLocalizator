@@ -11,7 +11,6 @@ import android.widget.ImageView;
 public class Zoom {
 
     private static final String TAG = "Touch";
-    @SuppressWarnings("unused")
     private static final float MIN_ZOOM = 1f,MAX_ZOOM = 1f;
 
     // These matrices will be used to scale points of the image
@@ -39,8 +38,7 @@ public class Zoom {
      * ----------------------------------------------------
      */
 
-    private float spacing(MotionEvent event)
-    {
+    private float spacing(MotionEvent event) {
         float x = event.getX(0) - event.getX(1);
         float y = event.getY(0) - event.getY(1);
         return (float) Math.sqrt(x * x + y * y);
@@ -53,31 +51,27 @@ public class Zoom {
      * ------------------------------------------------------------
      */
 
-    private void midPoint(PointF point, MotionEvent event)
-    {
+    private void midPoint(PointF point, MotionEvent event) {
         float x = event.getX(0) + event.getX(1);
         float y = event.getY(0) + event.getY(1);
         point.set(x / 2, y / 2);
     }
 
     /** Show an event in the LogCat view, for debugging */
-    private void dumpEvent(MotionEvent event)
-    {
+    private void dumpEvent(MotionEvent event) {
         String names[] = { "DOWN", "UP", "MOVE", "CANCEL", "OUTSIDE","POINTER_DOWN", "POINTER_UP", "7?", "8?", "9?" };
         StringBuilder sb = new StringBuilder();
         int action = event.getAction();
         int actionCode = action & MotionEvent.ACTION_MASK;
         sb.append("event ACTION_").append(names[actionCode]);
 
-        if (actionCode == MotionEvent.ACTION_POINTER_DOWN || actionCode == MotionEvent.ACTION_POINTER_UP)
-        {
-            sb.append("(pid ").append(action >> MotionEvent.ACTION_POINTER_ID_SHIFT);
+        if (actionCode == MotionEvent.ACTION_POINTER_DOWN || actionCode == MotionEvent.ACTION_POINTER_UP) {
+            sb.append("(pid ").append(action >> MotionEvent.ACTION_POINTER_INDEX_SHIFT);
             sb.append(")");
         }
 
         sb.append("[");
-        for (int i = 0; i < event.getPointerCount(); i++)
-        {
+        for (int i = 0; i < event.getPointerCount(); i++) {
             sb.append("#").append(i);
             sb.append("(pid ").append(event.getPointerId(i));
             sb.append(")=").append((int) event.getX(i));
@@ -90,7 +84,11 @@ public class Zoom {
         Log.d("Touch Events ---------", sb.toString());
     }
 
-    public void start(View v, MotionEvent e){
+    public void start(View v, MotionEvent e) {
+        if(v == null) {
+            return;
+        }
+
         view = (ImageView) v;
         view.setScaleType(ImageView.ScaleType.MATRIX);
         event = e;
@@ -100,6 +98,7 @@ public class Zoom {
         // Handle touch events here...
 
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
+
             // first finger down only
             case MotionEvent.ACTION_DOWN:
                 Log.d(TAG, "mode=DRAG"); // write to LogCat
@@ -132,25 +131,24 @@ public class Zoom {
 
             case MotionEvent.ACTION_MOVE:
 
-                if (mode == DRAG)
-                {
-                    Rect r = view.getDrawable().getBounds();
+                if (mode == DRAG) {
+                    if(view.getDrawable() != null) {
+                        Rect r = view.getDrawable().getBounds();
 
-                    float newX = event.getX() - start.x;
-                    float newY = event.getY() - start.y;
+                        float newX = event.getX() - start.x;
+                        float newY = event.getY() - start.y;
 
-                    // create the transformation in the matrix  of points
+                        // create the transformation in the matrix  of points
 
-                    matrix.set(savedMatrix);
-                    matrix.postTranslate(newX, newY);
-                }
-                else if (mode == ZOOM)
-                {
+                        matrix.set(savedMatrix);
+                        matrix.postTranslate(newX, newY);
+                    }
+
+                } else if (mode == ZOOM) {
                     // pinch zooming
                     float newDist = spacing(event);
                     Log.d(TAG, "newDist=" + newDist);
-                    if (newDist > 5f)
-                    {
+                    if (newDist > 5f) {
                         matrix.set(savedMatrix);
                         scale = newDist / oldDist;
                         matrix.postScale(scale, scale, mid.x, mid.y);

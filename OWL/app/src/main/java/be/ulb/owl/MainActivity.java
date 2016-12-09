@@ -1,11 +1,11 @@
 package be.ulb.owl;
 
-import android.graphics.drawable.Drawable;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AppCompatActivity;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -84,8 +84,37 @@ public class MainActivity extends AppCompatActivity  {
         setCurrentPlan(Graph.getPlan("P.F"));
         Graph.getPlan("P.F");
 
+        Log.i(getClass().getName(), "Scanner.scan");
+        Node current = _graph.whereAmI();
+        if(current != null) {
+            Log.d(getClass().getName(), "Noeud trouvé: " + current.getName());
+            setCurrentPlan(current.getParentPlan());
 
-        testWifi();
+        } else {
+            Log.d(getClass().getName(), "Position introuvable");
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Not found");
+            builder.setMessage("You are not at ULB");
+            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.dismiss();
+                }
+            });
+            builder.create().show();
+
+        }
+
+//        testWifi();
+    }
+
+    /**
+     * When we hidde the application
+     * @see #onDestroy() when application is destroy
+     */
+    @Override
+    protected void onStop() {
+        super.onStop();
+        _graph.hidden();
     }
 
 

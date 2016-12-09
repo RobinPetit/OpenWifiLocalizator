@@ -36,12 +36,12 @@ public class XMLUtils {
     /**
      * Read XML File and return a XMLPullParser
      * 
-     * @param name of the file who must be read
+     * @param name of the file who must be read (with extention !)
      * @return XmlPullParser
      */
     public static XmlPullParser readXMLFile(String name) throws IOException, XmlPullParserException {
         XmlPullParser parser = null;
-        InputStream url = MainActivity.getInstance().getAssets().open("XMLMap"+ File.separator+name + ".xml");
+        InputStream url = MainActivity.getInstance().getAssets().open("XMLMap"+ File.separator + name + ".xml");
         // InputStream url = XMLUtils.class.getResourceAsStream("/"+name+".xml");
         Reader XMLFile = new BufferedReader(new InputStreamReader(url));
         //Reader XMLFile = new FileReader(name);

@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import be.ulb.owl.MainActivity;
 import be.ulb.owl.Scanner;
 import be.ulb.owl.Wifi;
 
@@ -32,6 +33,11 @@ public class Graph {
     public Graph () {
         _allPlan = new ArrayList<Plan>();
         loadAllPlan();
+
+
+        if(_allPlan.isEmpty()) {
+            Log.w(getClass().getName(), "Aucun plan n'a été chargé");
+        }
 
         _scanner = new Scanner();
     }
@@ -67,6 +73,7 @@ public class Graph {
                 biggestSetSize = tmp.size();
             }
         }
+
         if (res.size() == 0) {
             System.out.println("You are not at ULB.\nI should throw a propre exception but I'm too lazy...");
         }
@@ -74,7 +81,16 @@ public class Graph {
     }
 
 
-
+    /**
+     * Call when application is hide
+     *
+     * @see MainActivity#onStop()
+     */
+    public void hidden() {
+       _scanner.resetWifiStatus();
+    }
+        
+    
 
     /////////////////////////// STATIC ///////////////////////////
 
@@ -82,18 +98,28 @@ public class Graph {
      * Load all plan in the default folder
      */
     private static void loadAllPlan() {
-        File mapFolder = new File(Environment.getExternalStorageDirectory() + "/OWL/XMLMap");
+        String[] strFile = null;
+        try {
+            strFile = MainActivity.getInstance().getAssets().list("XMLMap");
+        } catch(IOException exception) {
 
-        if(mapFolder != null && mapFolder.exists() && mapFolder.isDirectory()) {
+        }
 
-            for (File plan : mapFolder.listFiles()) {
-                // Check that the plan exist, is a file, have a name AND is not a test plan
-                if(plan != null && plan.exists() && plan.isFile() && !plan.getName().equalsIgnoreCase("") &&
-                        !plan.getName().contains(IGNOREPLAN)) {
-                    getPlan(plan.getName());
+        if(strFile != null && strFile.length > 0) {
+
+            for (String filePlan : strFile) {
+
+                if(filePlan == null || filePlan.equalsIgnoreCase("")) {
+                    continue;
+                }
+
+                String namePlan = filePlan.replaceFirst("[.][^.]+$", "");
+
+                // Check if plan is not empty and not an ignored file
+                if(namePlan != null && !namePlan.equalsIgnoreCase("") && !namePlan.contains(IGNOREPLAN)) {
+                    getPlan(namePlan);
                 }
             }
-
         }
 
     }
