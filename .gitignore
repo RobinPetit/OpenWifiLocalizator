@@ -13,7 +13,7 @@ plans/
 plan_de_travail/
 
 *.xml
-!./XML maps/*.xml
+!XML maps/*.xml
 
 # Hide config file
 GraphMaker/app/Config.py

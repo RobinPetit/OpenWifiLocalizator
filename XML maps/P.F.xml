@@ -1,9 +1,9 @@
-<plan name="P_F/P_F_2 S�minaires_FOND DE PLAN">
-	<background_image coord="(-219.0, -500.0)" />
+<plan name="P.F">
+	<background_image coord="(-631.0, -247.0)" />
 	<distance_unit value="11" />
 	<nodes>
-		<node id="F16">
-			<coord x="1378.0" y="626.0" />
+		<node id="0">
+			<coord x="966.0" y="879.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:98:c0" max="79.0" min="77.0" avg="78.2" />
 				<wifi BSS="00:26:cb:4e:04:50" max="86.0" min="83.0" avg="84.4" />
@@ -38,8 +38,8 @@
 				<alias>FORUM B</alias>
 			</aliases>
 		</node>
-		<node id="Outdoor11">
-			<coord x="1377.0" y="778.0" />
+		<node id="1">
+			<coord x="965.0" y="1031.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:04:50" max="85.0" min="82.0" avg="84.0" />
 				<wifi BSS="00:26:cb:a0:98:c1" max="80.0" min="74.0" avg="77.0" />
@@ -70,14 +70,14 @@
 				<wifi BSS="d0:57:4c:cb:4a:71" max="85.0" min="85.0" avg="85.0" />
 			</listWifi>
 		</node>
-		<node id="F6">
-			<coord x="223.0" y="439.0" />
+		<node id="2">
+			<coord x="-189.0" y="692.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:98:c1" max="61.0" min="59.0" avg="59.6" />
 				<wifi BSS="ec:08:6b:5b:21:e0" max="82.0" min="82.0" avg="82.0" />
 				<wifi BSS="ae:5f:3e:2c:bf:78" max="85.0" min="85.0" avg="85.0" />
 				<wifi BSS="fc:3f:7c:22:c5:11" max="68.0" min="58.0" avg="63.8" />
-				<wifi BSS="92:68:c3:f7:46:02" max="70.0" min="65.0" avg="68.0" />
+				<wifi BSS="92:68:c3:7:46:02" max="70.0" min="65.0" avg="68.0" />
 				<wifi BSS="00:0c:e6:00:d2:a4" max="76.0" min="71.0" avg="73.0" />
 				<wifi BSS="00:16:b6:e7:0e:34" max="83.0" min="70.0" avg="75.4" />
 				<wifi BSS="00:0c:e6:00:d1:3c" max="83.0" min="83.0" avg="83.0" />
@@ -88,7 +88,7 @@
 				<wifi BSS="00:26:cb:a0:aa:c1" max="69.0" min="69.0" avg="69.0" />
 				<wifi BSS="00:0c:e6:00:d1:36" max="85.0" min="85.0" avg="85.0" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="38.0" min="32.0" avg="34.5" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="39.0" min="32.0" avg="35.0" />
+				<wifi BSS="00:26:cb:4e:07:4" max="39.0" min="32.0" avg="35.0" />
 			</listWifi>
 			<aliases>
 				<alias>F.2.080</alias>
@@ -96,8 +96,8 @@
 				<alias>FORUM H</alias>
 			</aliases>
 		</node>
-		<node id="F1">
-			<coord x="226.0" y="1005.0" />
+		<node id="3">
+			<coord x="-186.0" y="1258.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:98:c0" max="44.0" min="36.0" avg="38.6" />
 				<wifi BSS="c0:ee:fb:20:30:40" max="88.0" min="80.0" avg="83.4" />
@@ -105,13 +105,13 @@
 				<wifi BSS="00:26:cb:4e:04:51" max="84.0" min="80.0" avg="81.8" />
 				<wifi BSS="00:26:cb:a0:98:c1" max="46.0" min="35.0" avg="39.0" />
 				<wifi BSS="ae:5f:3e:2c:bf:78" max="85.0" min="74.0" avg="80.4" />
-				<wifi BSS="92:68:c3:f7:46:02" max="93.0" min="84.0" avg="89.4" />
+				<wifi BSS="92:68:c3:7:46:02" max="93.0" min="84.0" avg="89.4" />
 				<wifi BSS="00:26:cb:4d:d9:41" max="57.0" min="46.0" avg="50.0" />
 				<wifi BSS="00:0c:e6:00:d2:a4" max="71.0" min="65.0" avg="66.4" />
 				<wifi BSS="00:0c:e6:00:d1:36" max="77.0" min="77.0" avg="77.0" />
 				<wifi BSS="00:0c:e6:00:d1:3c" max="86.0" min="81.0" avg="83.6" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="65.0" min="60.0" avg="62.8" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="64.0" min="60.0" avg="62.0" />
+				<wifi BSS="00:26:cb:4e:07:4" max="64.0" min="60.0" avg="62.0" />
 				<wifi BSS="fc:3f:7c:22:c5:11" max="87.0" min="80.0" avg="83.5" />
 				<wifi BSS="00:26:cb:4d:d9:40" max="53.0" min="46.0" avg="48.5" />
 				<wifi BSS="00:16:b6:e7:0e:34" max="86.0" min="82.0" avg="84.3" />
@@ -121,8 +121,8 @@
 				<alias>F.2.070</alias>
 			</aliases>
 		</node>
-		<node id="F2">
-			<coord x="226.0" y="912.0" />
+		<node id="4">
+			<coord x="-186.0" y="1165.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:98:c0" max="41.0" min="38.0" avg="40.0" />
 				<wifi BSS="c0:ee:fb:20:30:40" max="89.0" min="89.0" avg="89.0" />
@@ -130,13 +130,13 @@
 				<wifi BSS="00:26:cb:4e:04:51" max="84.0" min="81.0" avg="82.4" />
 				<wifi BSS="00:26:cb:a0:98:c1" max="42.0" min="39.0" avg="40.4" />
 				<wifi BSS="ae:5f:3e:2c:bf:78" max="85.0" min="81.0" avg="83.6" />
-				<wifi BSS="92:68:c3:f7:46:02" max="93.0" min="86.0" avg="91.6" />
+				<wifi BSS="92:68:c3:7:46:02" max="93.0" min="86.0" avg="91.6" />
 				<wifi BSS="00:26:cb:4d:d9:41" max="52.0" min="46.0" avg="49.6" />
 				<wifi BSS="00:0c:e6:00:d2:a4" max="75.0" min="66.0" avg="71.8" />
 				<wifi BSS="00:0c:e6:00:d1:36" max="82.0" min="74.0" avg="77.8" />
 				<wifi BSS="00:0c:e6:00:d1:3c" max="84.0" min="84.0" avg="84.0" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="64.0" min="60.0" avg="62.4" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="63.0" min="59.0" avg="61.2" />
+				<wifi BSS="00:26:cb:4e:07:4" max="63.0" min="59.0" avg="61.2" />
 				<wifi BSS="fc:3f:7c:22:c5:11" max="89.0" min="86.0" avg="88.0" />
 				<wifi BSS="00:26:cb:4d:d9:40" max="56.0" min="50.0" avg="52.0" />
 				<wifi BSS="00:16:b6:e7:0e:34" max="93.0" min="82.0" avg="87.0" />
@@ -156,8 +156,8 @@
 				<alias>F.2.068</alias>
 			</aliases>
 		</node>
-		<node id="F3">
-			<coord x="226.0" y="797.0" />
+		<node id="5">
+			<coord x="-186.0" y="1050.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:98:c0" max="50.0" min="44.0" avg="46.8" />
 				<wifi BSS="c0:ee:fb:20:30:40" max="88.0" min="88.0" avg="88.0" />
@@ -165,12 +165,12 @@
 				<wifi BSS="00:26:cb:4e:04:51" max="78.0" min="77.0" avg="77.2" />
 				<wifi BSS="00:26:cb:a0:98:c1" max="51.0" min="45.0" avg="47.8" />
 				<wifi BSS="ae:5f:3e:2c:bf:78" max="85.0" min="79.0" avg="83.0" />
-				<wifi BSS="92:68:c3:f7:46:02" max="93.0" min="87.0" avg="89.0" />
+				<wifi BSS="92:68:c3:7:46:02" max="93.0" min="87.0" avg="89.0" />
 				<wifi BSS="00:26:cb:4d:d9:41" max="51.0" min="41.0" avg="45.0" />
 				<wifi BSS="00:0c:e6:00:d2:a4" max="70.0" min="65.0" avg="66.2" />
 				<wifi BSS="00:0c:e6:00:d1:36" max="75.0" min="74.0" avg="74.2" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="67.0" min="59.0" avg="61.8" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="63.0" min="61.0" avg="61.8" />
+				<wifi BSS="00:26:cb:4e:07:4" max="63.0" min="61.0" avg="61.8" />
 				<wifi BSS="fc:3f:7c:22:c5:11" max="88.0" min="82.0" avg="84.5" />
 				<wifi BSS="00:26:cb:4d:d9:40" max="45.0" min="41.0" avg="43.0" />
 				<wifi BSS="00:16:b6:e7:0e:34" max="84.0" min="77.0" avg="80.5" />
@@ -196,15 +196,15 @@
 				<alias>F.2.066</alias>
 			</aliases>
 		</node>
-		<node id="F7">
-			<coord x="221.0" y="352.0" />
+		<node id="6">
+			<coord x="-191.0" y="605.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:04:51" max="52.0" min="44.0" avg="48.6" />
 				<wifi BSS="fc:3f:7c:22:c5:11" max="70.0" min="66.0" avg="68.6" />
 				<wifi BSS="00:26:cb:a0:aa:c1" max="64.0" min="64.0" avg="64.0" />
 				<wifi BSS="00:26:cb:4d:d9:41" max="64.0" min="59.0" avg="60.8" />
 				<wifi BSS="00:16:b6:e7:0e:34" max="80.0" min="80.0" avg="80.0" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="53.0" min="46.0" avg="48.8" />
+				<wifi BSS="00:26:cb:4e:07:4" max="53.0" min="46.0" avg="48.8" />
 				<wifi BSS="00:26:cb:a0:aa:c0" max="54.0" min="54.0" avg="54.0" />
 				<wifi BSS="00:0c:e6:00:d1:0c" max="86.0" min="84.0" avg="84.5" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="53.0" min="46.0" avg="49.2" />
@@ -220,12 +220,12 @@
 				<alias>FORUM G</alias>
 			</aliases>
 		</node>
-		<node id="F4">
-			<coord x="227.0" y="678.0" />
+		<node id="7">
+			<coord x="-185.0" y="931.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:98:c1" max="50.0" min="46.0" avg="47.8" />
 				<wifi BSS="fc:3f:7c:22:c5:11" max="88.0" min="76.0" avg="84.4" />
-				<wifi BSS="92:68:c3:f7:46:02" max="84.0" min="79.0" avg="82.4" />
+				<wifi BSS="92:68:c3:7:46:02" max="84.0" min="79.0" avg="82.4" />
 				<wifi BSS="00:0c:e6:00:d2:a4" max="71.0" min="69.0" avg="70.2" />
 				<wifi BSS="00:16:b6:e7:0e:34" max="79.0" min="79.0" avg="79.0" />
 				<wifi BSS="00:26:cb:a0:98:c0" max="49.0" min="45.0" avg="46.8" />
@@ -233,7 +233,7 @@
 				<wifi BSS="00:26:cb:4d:d9:41" max="44.0" min="27.0" avg="34.4" />
 				<wifi BSS="00:0c:e6:00:d1:36" max="82.0" min="81.0" avg="81.8" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="64.0" min="55.0" avg="57.4" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="64.0" min="54.0" avg="57.2" />
+				<wifi BSS="00:26:cb:4e:07:4" max="64.0" min="54.0" avg="57.2" />
 				<wifi BSS="c0:ee:fb:20:30:40" max="89.0" min="84.0" avg="86.4" />
 				<wifi BSS="00:26:cb:a0:aa:c0" max="66.0" min="66.0" avg="66.0" />
 				<wifi BSS="00:0c:e6:00:d1:0c" max="80.0" min="77.0" avg="77.8" />
@@ -246,8 +246,8 @@
 				<alias>F.2.064</alias>
 			</aliases>
 		</node>
-		<node id="F9">
-			<coord x="432.0" y="354.0" />
+		<node id="8">
+			<coord x="20.0" y="607.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:04:50" max="37.0" min="31.0" avg="34.2" />
 				<wifi BSS="00:26:cb:4e:0e:e0" max="79.0" min="77.0" avg="78.2" />
@@ -263,7 +263,7 @@
 				<wifi BSS="00:0c:e6:00:d1:0c" max="76.0" min="66.0" avg="70.2" />
 				<wifi BSS="d4:6d:50:f2:c7:72" max="87.0" min="87.0" avg="87.0" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="76.0" min="65.0" avg="69.6" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="70.0" min="67.0" avg="67.8" />
+				<wifi BSS="00:26:cb:4e:07:4" max="70.0" min="67.0" avg="67.8" />
 				<wifi BSS="00:26:cb:4d:d9:41" max="74.0" min="71.0" avg="72.0" />
 				<wifi BSS="00:26:cb:a0:aa:c1" max="57.0" min="53.0" avg="56.0" />
 				<wifi BSS="d4:6d:50:f2:c7:70" max="84.0" min="84.0" avg="84.0" />
@@ -276,8 +276,8 @@
 				<alias>FORUM E</alias>
 			</aliases>
 		</node>
-		<node id="F10">
-			<coord x="652.0" y="357.0" />
+		<node id="9">
+			<coord x="240.0" y="610.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:aa:c0" max="30.0" min="29.0" avg="29.6" />
 				<wifi BSS="00:26:cb:4e:0e:e1" max="84.0" min="57.0" avg="71.8" />
@@ -287,7 +287,7 @@
 				<wifi BSS="00:26:cb:4e:0e:e0" max="83.0" min="59.0" avg="76.8" />
 				<wifi BSS="00:26:cb:a0:98:c0" max="87.0" min="82.0" avg="86.0" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="77.0" min="71.0" avg="73.2" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="77.0" min="70.0" avg="72.2" />
+				<wifi BSS="00:26:cb:4e:07:4" max="77.0" min="70.0" avg="72.2" />
 				<wifi BSS="00:26:cb:a0:aa:c1" max="31.0" min="29.0" avg="30.2" />
 				<wifi BSS="00:26:cb:a0:98:c1" max="84.0" min="82.0" avg="83.0" />
 				<wifi BSS="fc:3f:7c:22:c5:11" max="74.0" min="70.0" avg="71.6" />
@@ -306,12 +306,12 @@
 				<alias>FORUM E</alias>
 			</aliases>
 		</node>
-		<node id="F5">
-			<coord x="227.0" y="563.0" />
+		<node id="10">
+			<coord x="-185.0" y="816.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:98:c1" max="55.0" min="51.0" avg="52.6" />
 				<wifi BSS="fc:3f:7c:22:c5:11" max="82.0" min="76.0" avg="78.8" />
-				<wifi BSS="92:68:c3:f7:46:02" max="81.0" min="78.0" avg="79.8" />
+				<wifi BSS="92:68:c3:7:46:02" max="81.0" min="78.0" avg="79.8" />
 				<wifi BSS="00:0c:e6:00:d2:a4" max="69.0" min="63.0" avg="66.6" />
 				<wifi BSS="00:16:b6:e7:0e:34" max="82.0" min="72.0" avg="75.8" />
 				<wifi BSS="00:26:cb:4e:04:50" max="59.0" min="59.0" avg="59.0" />
@@ -321,7 +321,7 @@
 				<wifi BSS="00:26:cb:a0:aa:c1" max="69.0" min="69.0" avg="69.0" />
 				<wifi BSS="00:0c:e6:00:d1:36" max="81.0" min="81.0" avg="81.0" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="54.0" min="32.0" avg="44.0" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="54.0" min="32.0" avg="44.2" />
+				<wifi BSS="00:26:cb:4e:07:4" max="54.0" min="32.0" avg="44.2" />
 				<wifi BSS="c0:ee:fb:20:30:40" max="87.0" min="87.0" avg="87.0" />
 				<wifi BSS="00:26:cb:a0:aa:c0" max="66.0" min="66.0" avg="66.0" />
 				<wifi BSS="00:0c:e6:00:d1:0c" max="80.0" min="75.0" avg="79.0" />
@@ -333,8 +333,8 @@
 				<alias>F.2.058</alias>
 			</aliases>
 		</node>
-		<node id="F19">
-			<coord x="1673.0" y="-350.0" />
+		<node id="11">
+			<coord x="1261.0" y="-97.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:0c:a0" max="82.0" min="78.0" avg="80.0" />
 				<wifi BSS="00:26:cb:4e:0c:a1" max="81.0" min="79.0" avg="80.4" />
@@ -349,8 +349,8 @@
 				<alias>FORUM C</alias>
 			</aliases>
 		</node>
-		<node id="F18">
-			<coord x="1671.0" y="619.0" />
+		<node id="12">
+			<coord x="1259.0" y="872.0" />
 			<listWifi>
 				<wifi BSS="d4:6d:50:f2:c7:74" max="86.0" min="77.0" avg="81.0" />
 				<wifi BSS="00:26:cb:4e:0e:70" max="73.0" min="64.0" avg="69.4" />
@@ -378,8 +378,8 @@
 				<alias>FORUM B</alias>
 			</aliases>
 		</node>
-		<node id="F11">
-			<coord x="704.0" y="376.0" />
+		<node id="13">
+			<coord x="292.0" y="629.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:aa:c0" max="38.0" min="37.0" avg="37.8" />
 				<wifi BSS="00:26:cb:4e:0e:e1" max="62.0" min="57.0" avg="59.2" />
@@ -389,7 +389,7 @@
 				<wifi BSS="00:26:cb:4e:0e:e0" max="64.0" min="58.0" avg="60.0" />
 				<wifi BSS="00:26:cb:a0:98:c0" max="83.0" min="80.0" avg="81.2" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="76.0" min="74.0" avg="75.0" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="75.0" min="72.0" avg="74.2" />
+				<wifi BSS="00:26:cb:4e:07:4" max="75.0" min="72.0" avg="74.2" />
 				<wifi BSS="00:26:cb:a0:aa:c1" max="66.0" min="39.0" avg="47.0" />
 				<wifi BSS="00:26:cb:a0:98:c1" max="83.0" min="80.0" avg="82.0" />
 				<wifi BSS="fc:3f:7c:22:c5:11" max="80.0" min="71.0" avg="75.8" />
@@ -407,8 +407,8 @@
 				<alias>F.2.052</alias>
 			</aliases>
 		</node>
-		<node id="F12">
-			<coord x="702.0" y="206.0" />
+		<node id="14">
+			<coord x="290.0" y="459.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:aa:c0" max="67.0" min="58.0" avg="61.8" />
 				<wifi BSS="00:26:cb:4e:0e:e1" max="62.0" min="58.0" avg="59.8" />
@@ -421,7 +421,7 @@
 				<wifi BSS="00:26:cb:a0:98:c0" max="88.0" min="87.0" avg="87.4" />
 				<wifi BSS="00:26:cb:a0:98:c1" max="88.0" min="86.0" avg="86.4" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="87.0" min="85.0" avg="85.4" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="89.0" min="81.0" avg="84.6" />
+				<wifi BSS="00:26:cb:4e:07:4" max="89.0" min="81.0" avg="84.6" />
 				<wifi BSS="c8:b3:73:4b:01:ca" max="92.0" min="89.0" avg="90.8" />
 				<wifi BSS="00:26:cb:4d:d9:40" max="88.0" min="80.0" avg="86.0" />
 				<wifi BSS="00:26:cb:a0:aa:c1" max="66.0" min="59.0" avg="61.7" />
@@ -430,8 +430,8 @@
 				<alias>toilettes</alias>
 			</aliases>
 		</node>
-		<node id="F29">
-			<coord x="1542.0" y="-79.0" />
+		<node id="15">
+			<coord x="1130.0" y="174.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:0e:71" max="61.0" min="58.0" avg="59.6" />
 				<wifi BSS="10:9a:dd:b5:2a:3f" max="70.0" min="58.0" avg="64.6" />
@@ -443,8 +443,8 @@
 				<alias>FORUM D</alias>
 			</aliases>
 		</node>
-		<node id="F22">
-			<coord x="1086.0" y="39.0" />
+		<node id="16">
+			<coord x="674.0" y="292.0" />
 			<listWifi>
 				<wifi BSS="10:9a:dd:b5:2a:3f" max="85.0" min="79.0" avg="81.6" />
 				<wifi BSS="00:26:cb:4e:0c:a0" max="66.0" min="59.0" avg="61.4" />
@@ -460,8 +460,8 @@
 				<alias>FORUM C</alias>
 			</aliases>
 		</node>
-		<node id="F13">
-			<coord x="702.0" y="50.0" />
+		<node id="17">
+			<coord x="290.0" y="303.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:aa:c0" max="73.0" min="69.0" avg="71.6" />
 				<wifi BSS="00:26:cb:4e:0e:e1" max="48.0" min="43.0" avg="45.0" />
@@ -481,8 +481,8 @@
 				<alias>FORUM E</alias>
 			</aliases>
 		</node>
-		<node id="F17">
-			<coord x="1083.0" y="622.0" />
+		<node id="18">
+			<coord x="671.0" y="875.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:98:c0" max="79.0" min="79.0" avg="79.0" />
 				<wifi BSS="00:14:6c:cf:72:e0" max="93.0" min="93.0" avg="93.0" />
@@ -509,8 +509,8 @@
 				<alias>FORUM A</alias>
 			</aliases>
 		</node>
-		<node id="F23">
-			<coord x="1348.0" y="44.0" />
+		<node id="19">
+			<coord x="936.0" y="297.0" />
 			<listWifi>
 				<wifi BSS="10:9a:dd:b5:2a:3f" max="73.0" min="69.0" avg="70.6" />
 				<wifi BSS="00:26:cb:4e:0c:a0" max="64.0" min="57.0" avg="60.2" />
@@ -527,8 +527,8 @@
 				<alias>FORUM C</alias>
 			</aliases>
 		</node>
-		<node id="Outdoor1">
-			<coord x="856.0" y="377.0" />
+		<node id="20">
+			<coord x="444.0" y="630.0" />
 			<listWifi>
 				<wifi BSS="d4:6d:50:f2:c7:70" max="77.0" min="68.0" avg="72.4" />
 				<wifi BSS="d4:6d:50:f2:c7:72" max="77.0" min="67.0" avg="73.2" />
@@ -554,8 +554,8 @@
 				<wifi BSS="00:26:cb:4d:d9:40" max="89.0" min="89.0" avg="89.0" />
 			</listWifi>
 		</node>
-		<node id="Outdoor2">
-			<coord x="993.0" y="378.0" />
+		<node id="21">
+			<coord x="581.0" y="631.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:0e:e1" max="86.0" min="86.0" avg="86.0" />
 				<wifi BSS="00:26:cb:4e:0e:e0" max="84.0" min="84.0" avg="84.0" />
@@ -581,7 +581,7 @@
 				<wifi BSS="00:26:cb:a0:98:c1" max="83.0" min="79.0" avg="80.8" />
 				<wifi BSS="c0:ee:fb:20:30:40" max="88.0" min="85.0" avg="86.4" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="84.0" min="81.0" avg="82.0" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="88.0" min="82.0" avg="84.0" />
+				<wifi BSS="00:26:cb:4e:07:4" max="88.0" min="82.0" avg="84.0" />
 				<wifi BSS="fc:3f:7c:22:c5:11" max="89.0" min="83.0" avg="84.2" />
 				<wifi BSS="00:26:cb:4d:d9:40" max="82.0" min="79.0" avg="80.2" />
 				<wifi BSS="00:26:cb:4d:d9:41" max="82.0" min="79.0" avg="79.8" />
@@ -591,8 +591,8 @@
 				<wifi BSS="c8:b3:73:4b:01:c9" max="88.0" min="88.0" avg="88.0" />
 			</listWifi>
 		</node>
-		<node id="F24">
-			<coord x="1221.0" y="-82.0" />
+		<node id="22">
+			<coord x="809.0" y="171.0" />
 			<listWifi>
 				<wifi BSS="10:9a:dd:b5:2a:3f" max="73.0" min="69.0" avg="71.6" />
 				<wifi BSS="00:26:cb:4e:0c:a0" max="65.0" min="60.0" avg="62.4" />
@@ -608,8 +608,8 @@
 				<alias>FORUM C</alias>
 			</aliases>
 		</node>
-		<node id="F20">
-			<coord x="1089.0" y="-203.0" />
+		<node id="23">
+			<coord x="677.0" y="50.0" />
 			<listWifi>
 				<wifi BSS="10:9a:dd:b5:2a:3f" max="78.0" min="70.0" avg="73.5" />
 				<wifi BSS="00:26:cb:4e:0c:a0" max="67.0" min="64.0" avg="65.2" />
@@ -626,8 +626,8 @@
 				<alias>FORUM C</alias>
 			</aliases>
 		</node>
-		<node id="Outdoor3">
-			<coord x="992.0" y="562.0" />
+		<node id="24">
+			<coord x="580.0" y="815.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:04:50" max="78.0" min="75.0" avg="77.0" />
 				<wifi BSS="c0:56:27:81:07:2e" max="87.0" min="86.0" avg="86.4" />
@@ -650,7 +650,7 @@
 				<wifi BSS="00:0c:e6:00:d1:0c" max="79.0" min="70.0" avg="75.4" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="86.0" min="80.0" avg="81.8" />
 				<wifi BSS="24:b6:57:8d:34:41" max="84.0" min="83.0" avg="83.6" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="82.0" min="80.0" avg="80.4" />
+				<wifi BSS="00:26:cb:4e:07:4" max="82.0" min="80.0" avg="80.4" />
 				<wifi BSS="d0:57:4c:cb:4a:70" max="89.0" min="87.0" avg="88.0" />
 				<wifi BSS="02:26:c6:3a:52:39" max="92.0" min="91.0" avg="91.5" />
 				<wifi BSS="00:26:cb:a0:aa:c1" max="83.0" min="73.0" avg="78.0" />
@@ -663,8 +663,8 @@
 				<wifi BSS="fe:52:8d:c6:63:5a" max="92.0" min="92.0" avg="92.0" />
 			</listWifi>
 		</node>
-		<node id="Outdoor4">
-			<coord x="996.0" y="765.0" />
+		<node id="25">
+			<coord x="584.0" y="1018.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:04:50" max="83.0" min="80.0" avg="81.3" />
 				<wifi BSS="c0:56:27:81:07:2e" max="86.0" min="86.0" avg="86.0" />
@@ -686,7 +686,7 @@
 				<wifi BSS="00:0c:e6:00:d1:0c" max="82.0" min="78.0" avg="80.7" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="84.0" min="82.0" avg="83.3" />
 				<wifi BSS="24:b6:57:8d:34:41" max="84.0" min="84.0" avg="84.0" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="89.0" min="89.0" avg="89.0" />
+				<wifi BSS="00:26:cb:4e:07:4" max="89.0" min="89.0" avg="89.0" />
 				<wifi BSS="d0:57:4c:cb:4a:70" max="88.0" min="88.0" avg="88.0" />
 				<wifi BSS="02:26:c6:3a:52:39" max="92.0" min="92.0" avg="92.0" />
 				<wifi BSS="00:26:cb:a0:aa:c1" max="79.0" min="79.0" avg="79.0" />
@@ -710,8 +710,8 @@
 				<wifi BSS="00:1d:7e:fb:a6:51" max="91.0" min="91.0" avg="91.0" />
 			</listWifi>
 		</node>
-		<node id="F27">
-			<coord x="1413.0" y="49.0" />
+		<node id="26">
+			<coord x="1001.0" y="302.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:0e:71" max="49.0" min="45.0" avg="47.4" />
 				<wifi BSS="10:9a:dd:b5:2a:3f" max="82.0" min="62.0" avg="70.2" />
@@ -726,8 +726,8 @@
 				<alias>FORUM D</alias>
 			</aliases>
 		</node>
-		<node id="Outdoor5">
-			<coord x="995.0" y="209.0" />
+		<node id="27">
+			<coord x="583.0" y="462.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:0e:e1" max="87.0" min="85.0" avg="85.8" />
 				<wifi BSS="00:0c:e6:00:d2:a4" max="64.0" min="64.0" avg="64.0" />
@@ -758,8 +758,8 @@
 				<alias>Toilettes</alias>
 			</aliases>
 		</node>
-		<node id="F25">
-			<coord x="1416.0" y="-204.0" />
+		<node id="28">
+			<coord x="1004.0" y="49.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:0e:71" max="63.0" min="56.0" avg="58.5" />
 				<wifi BSS="10:9a:dd:b5:2a:3f" max="80.0" min="67.0" avg="73.2" />
@@ -772,8 +772,8 @@
 				<alias>FORUM D</alias>
 			</aliases>
 		</node>
-		<node id="Outdoor6">
-			<coord x="991.0" y="65.0" />
+		<node id="29">
+			<coord x="579.0" y="318.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:0e:e1" max="65.0" min="56.0" avg="59.2" />
 				<wifi BSS="00:0c:e6:00:d2:a4" max="64.0" min="62.0" avg="63.4" />
@@ -800,8 +800,8 @@
 				<wifi BSS="00:14:d1:9e:02:38" max="94.0" min="94.0" avg="94.0" />
 			</listWifi>
 		</node>
-		<node id="F26">
-			<coord x="1670.0" y="-202.0" />
+		<node id="30">
+			<coord x="1258.0" y="51.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:0e:71" max="63.0" min="62.0" avg="62.6" />
 				<wifi BSS="10:9a:dd:b5:2a:3f" max="77.0" min="71.0" avg="74.8" />
@@ -814,8 +814,8 @@
 				<alias>FORUM D</alias>
 			</aliases>
 		</node>
-		<node id="Outdoor7">
-			<coord x="991.0" y="-88.0" />
+		<node id="31">
+			<coord x="579.0" y="165.0" />
 			<listWifi>
 				<wifi BSS="f8:e9:03:cb:00:bc" max="91.0" min="91.0" avg="91.0" />
 				<wifi BSS="00:26:cb:4e:0e:e1" max="67.0" min="62.0" avg="64.4" />
@@ -840,8 +840,8 @@
 				<wifi BSS="00:26:cb:4e:0e:70" max="88.0" min="88.0" avg="88.0" />
 			</listWifi>
 		</node>
-		<node id="Outdoor8">
-			<coord x="994.0" y="-211.0" />
+		<node id="32">
+			<coord x="582.0" y="42.0" />
 			<listWifi>
 				<wifi BSS="f8:e9:03:cb:00:bc" max="91.0" min="90.0" avg="90.2" />
 				<wifi BSS="00:26:cb:4e:0e:e1" max="62.0" min="59.0" avg="60.2" />
@@ -867,8 +867,8 @@
 				<wifi BSS="d4:6d:50:f2:c7:72" max="83.0" min="83.0" avg="83.0" />
 			</listWifi>
 		</node>
-		<node id="F21">
-			<coord x="1344.0" y="-204.0" />
+		<node id="33">
+			<coord x="932.0" y="49.0" />
 			<listWifi>
 				<wifi BSS="10:9a:dd:b5:2a:3f" max="86.0" min="80.0" avg="83.4" />
 				<wifi BSS="00:26:cb:4e:0c:a0" max="69.0" min="65.0" avg="67.6" />
@@ -884,8 +884,8 @@
 				<alias>FORUM C</alias>
 			</aliases>
 		</node>
-		<node id="Outdoor9">
-			<coord x="997.0" y="-352.0" />
+		<node id="34">
+			<coord x="585.0" y="-99.0" />
 			<listWifi>
 				<wifi BSS="f8:e9:03:cb:00:bc" max="89.0" min="79.0" avg="84.8" />
 				<wifi BSS="00:26:cb:4e:0e:e1" max="58.0" min="58.0" avg="58.0" />
@@ -913,8 +913,8 @@
 				<alias>F.2.144</alias>
 			</aliases>
 		</node>
-		<node id="F14">
-			<coord x="1115.0" y="-350.0" />
+		<node id="35">
+			<coord x="703.0" y="-97.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:0c:a0" max="76.0" min="74.0" avg="75.2" />
 				<wifi BSS="00:26:cb:4e:0e:e1" max="74.0" min="65.0" avg="70.4" />
@@ -928,8 +928,8 @@
 				<alias>F.2.0144</alias>
 			</aliases>
 		</node>
-		<node id="F28">
-			<coord x="1676.0" y="50.0" />
+		<node id="36">
+			<coord x="1264.0" y="303.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:0e:71" max="57.0" min="52.0" avg="54.2" />
 				<wifi BSS="10:9a:dd:b5:2a:3f" max="74.0" min="70.0" avg="71.8" />
@@ -943,8 +943,8 @@
 				<alias>FORUM D</alias>
 			</aliases>
 		</node>
-		<node id="F15">
-			<coord x="1375.0" y="-346.0" />
+		<node id="37">
+			<coord x="963.0" y="-93.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:0c:a0" max="68.0" min="66.0" avg="67.2" />
 				<wifi BSS="00:26:cb:4e:0e:e1" max="85.0" min="65.0" avg="71.7" />
@@ -963,8 +963,8 @@
 				<alias>FORUM C</alias>
 			</aliases>
 		</node>
-		<node id="Outdoor10">
-			<coord x="1203.0" y="777.0" />
+		<node id="38">
+			<coord x="791.0" y="1030.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:04:50" max="88.0" min="83.0" avg="85.4" />
 				<wifi BSS="00:26:cb:a0:98:c1" max="78.0" min="76.0" avg="77.2" />
@@ -979,7 +979,7 @@
 				<wifi BSS="d4:6d:50:f2:c7:71" max="67.0" min="61.0" avg="63.4" />
 				<wifi BSS="00:0c:e6:00:d1:0c" max="77.0" min="72.0" avg="73.0" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="84.0" min="84.0" avg="84.0" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="84.0" min="84.0" avg="84.0" />
+				<wifi BSS="00:26:cb:4e:07:4" max="84.0" min="84.0" avg="84.0" />
 				<wifi BSS="24:b6:57:8d:34:40" max="88.0" min="88.0" avg="88.0" />
 				<wifi BSS="d4:6d:50:f2:c2:a3" max="94.0" min="94.0" avg="94.0" />
 				<wifi BSS="88:1d:fc:eb:9e:43" max="86.0" min="84.0" avg="85.2" />
@@ -1005,8 +1005,8 @@
 				<wifi BSS="00:0c:e6:00:cf:b3" max="73.0" min="73.0" avg="73.0" />
 			</listWifi>
 		</node>
-		<node id="F41">
-			<coord x="592.0" y="-206.0" />
+		<node id="39">
+			<coord x="180.0" y="47.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:04:51" max="85.0" min="80.0" avg="82.0" />
 				<wifi BSS="00:26:cb:a0:aa:c1" max="85.0" min="85.0" avg="85.0" />
@@ -1021,8 +1021,8 @@
 				<alias>FORUM E</alias>
 			</aliases>
 		</node>
-		<node id="F45">
-			<coord x="344.0" y="-201.0" />
+		<node id="40">
+			<coord x="-68.0" y="52.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:04:51" max="78.0" min="77.0" avg="77.5" />
 				<wifi BSS="00:26:cb:a0:aa:c1" max="85.0" min="79.0" avg="81.5" />
@@ -1038,8 +1038,8 @@
 				<alias>FORUM E</alias>
 			</aliases>
 		</node>
-		<node id="F43">
-			<coord x="341.0" y="47.0" />
+		<node id="41">
+			<coord x="-71.0" y="300.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:aa:c0" max="90.0" min="81.0" avg="84.6" />
 				<wifi BSS="00:26:cb:a0:aa:c1" max="81.0" min="80.0" avg="80.2" />
@@ -1047,7 +1047,7 @@
 				<wifi BSS="00:26:cb:4e:04:51" max="75.0" min="72.0" avg="73.8" />
 				<wifi BSS="00:26:cb:4e:0e:e1" max="63.0" min="60.0" avg="61.8" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="86.0" min="81.0" avg="82.4" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="86.0" min="81.0" avg="83.2" />
+				<wifi BSS="00:26:cb:4e:07:4" max="86.0" min="81.0" avg="83.2" />
 				<wifi BSS="00:26:cb:4e:0e:e0" max="64.0" min="61.0" avg="62.4" />
 				<wifi BSS="00:0c:e6:00:d1:3c" max="93.0" min="84.0" avg="87.0" />
 				<wifi BSS="00:26:cb:4e:04:50" max="76.0" min="71.0" avg="73.4" />
@@ -1059,8 +1059,8 @@
 				<alias>FORUM E</alias>
 			</aliases>
 		</node>
-		<node id="F30">
-			<coord x="1084.0" y="248.0" />
+		<node id="42">
+			<coord x="672.0" y="501.0" />
 			<listWifi>
 				<wifi BSS="00:0c:e6:00:d2:a4" max="81.0" min="78.0" avg="79.0" />
 				<wifi BSS="10:9a:dd:b5:2a:3f" max="77.0" min="73.0" avg="74.6" />
@@ -1081,8 +1081,8 @@
 				<alias>FORUM A</alias>
 			</aliases>
 		</node>
-		<node id="F31">
-			<coord x="1349.0" y="250.0" />
+		<node id="43">
+			<coord x="937.0" y="503.0" />
 			<listWifi>
 				<wifi BSS="00:0c:e6:00:d2:a4" max="80.0" min="80.0" avg="80.0" />
 				<wifi BSS="10:9a:dd:b5:2a:3f" max="67.0" min="63.0" avg="65.2" />
@@ -1103,8 +1103,8 @@
 				<alias>FORUM A</alias>
 			</aliases>
 		</node>
-		<node id="F44">
-			<coord x="464.0" y="-82.0" />
+		<node id="44">
+			<coord x="52.0" y="171.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:04:51" max="77.0" min="70.0" avg="72.8" />
 				<wifi BSS="00:26:cb:a0:aa:c1" max="84.0" min="79.0" avg="81.5" />
@@ -1117,8 +1117,8 @@
 				<alias>FORUM E</alias>
 			</aliases>
 		</node>
-		<node id="F32">
-			<coord x="1089.0" y="493.0" />
+		<node id="45">
+			<coord x="677.0" y="746.0" />
 			<listWifi>
 				<wifi BSS="00:0c:e6:00:d2:a4" max="82.0" min="78.0" avg="81.0" />
 				<wifi BSS="10:9a:dd:b5:2a:3f" max="79.0" min="69.0" avg="72.6" />
@@ -1141,8 +1141,8 @@
 				<alias>FORUM A</alias>
 			</aliases>
 		</node>
-		<node id="F33">
-			<coord x="1346.0" y="496.0" />
+		<node id="46">
+			<coord x="934.0" y="749.0" />
 			<listWifi>
 				<wifi BSS="00:0c:e6:00:d2:a4" max="78.0" min="71.0" avg="73.0" />
 				<wifi BSS="10:9a:dd:b5:2a:3f" max="79.0" min="76.0" avg="78.2" />
@@ -1166,8 +1166,8 @@
 				<alias>FORUM A</alias>
 			</aliases>
 		</node>
-		<node id="F34">
-			<coord x="1223.0" y="383.0" />
+		<node id="47">
+			<coord x="811.0" y="636.0" />
 			<listWifi>
 				<wifi BSS="00:0c:e6:00:d2:a4" max="78.0" min="70.0" avg="71.6" />
 				<wifi BSS="10:9a:dd:b5:2a:3f" max="70.0" min="67.0" avg="68.2" />
@@ -1187,8 +1187,8 @@
 				<alias>FORUM A</alias>
 			</aliases>
 		</node>
-		<node id="F42">
-			<coord x="593.0" y="50.0" />
+		<node id="48">
+			<coord x="181.0" y="303.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:aa:c0" max="80.0" min="77.0" avg="78.2" />
 				<wifi BSS="00:26:cb:a0:aa:c1" max="81.0" min="77.0" avg="79.2" />
@@ -1196,7 +1196,7 @@
 				<wifi BSS="00:26:cb:4e:04:51" max="86.0" min="80.0" avg="83.6" />
 				<wifi BSS="00:26:cb:4e:0e:e1" max="62.0" min="55.0" avg="59.0" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="93.0" min="91.0" avg="92.6" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="91.0" min="88.0" avg="88.6" />
+				<wifi BSS="00:26:cb:4e:07:4" max="91.0" min="88.0" avg="88.6" />
 				<wifi BSS="00:26:cb:4e:0e:e0" max="63.0" min="57.0" avg="59.8" />
 				<wifi BSS="00:0c:e6:00:d1:3c" max="87.0" min="84.0" avg="85.8" />
 				<wifi BSS="00:26:cb:4e:04:50" max="79.0" min="79.0" avg="79.0" />
@@ -1206,8 +1206,8 @@
 				<alias>FORUM E</alias>
 			</aliases>
 		</node>
-		<node id="Outdoor12">
-			<coord x="1556.0" y="783.0" />
+		<node id="49">
+			<coord x="1144.0" y="1036.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:04:50" max="83.0" min="83.0" avg="83.0" />
 				<wifi BSS="00:26:cb:a0:98:c1" max="87.0" min="81.0" avg="83.6" />
@@ -1243,8 +1243,8 @@
 				<wifi BSS="02:26:c6:3a:52:39" max="92.0" min="92.0" avg="92.0" />
 			</listWifi>
 		</node>
-		<node id="F40">
-			<coord x="703.0" y="-202.0" />
+		<node id="50">
+			<coord x="291.0" y="51.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:aa:c0" max="79.0" min="78.0" avg="78.5" />
 				<wifi BSS="00:26:cb:4e:0e:e1" max="47.0" min="42.0" avg="43.8" />
@@ -1262,8 +1262,8 @@
 				<alias>FORUM E</alias>
 			</aliases>
 		</node>
-		<node id="F35">
-			<coord x="1414.0" y="494.0" />
+		<node id="51">
+			<coord x="1002.0" y="747.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:0e:70" max="63.0" min="60.0" avg="61.8" />
 				<wifi BSS="10:9a:dd:b5:2a:3f" max="70.0" min="66.0" avg="67.8" />
@@ -1281,8 +1281,8 @@
 				<alias>FORUM B</alias>
 			</aliases>
 		</node>
-		<node id="F36">
-			<coord x="1671.0" y="498.0" />
+		<node id="52">
+			<coord x="1259.0" y="751.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:0e:70" max="75.0" min="69.0" avg="70.8" />
 				<wifi BSS="10:9a:dd:b5:2a:3f" max="76.0" min="70.0" avg="72.6" />
@@ -1302,8 +1302,8 @@
 				<alias>FORUM B</alias>
 			</aliases>
 		</node>
-		<node id="F37">
-			<coord x="1410.0" y="248.0" />
+		<node id="53">
+			<coord x="998.0" y="501.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:0e:70" max="56.0" min="45.0" avg="48.8" />
 				<wifi BSS="10:9a:dd:b5:2a:3f" max="62.0" min="46.0" avg="53.4" />
@@ -1320,8 +1320,8 @@
 				<alias>FORUM B</alias>
 			</aliases>
 		</node>
-		<node id="F38">
-			<coord x="1675.0" y="247.0" />
+		<node id="54">
+			<coord x="1263.0" y="500.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:0e:70" max="58.0" min="49.0" avg="52.6" />
 				<wifi BSS="10:9a:dd:b5:2a:3f" max="64.0" min="56.0" avg="59.8" />
@@ -1337,8 +1337,8 @@
 				<alias>FORUM B</alias>
 			</aliases>
 		</node>
-		<node id="F39">
-			<coord x="1544.0" y="382.0" />
+		<node id="55">
+			<coord x="1132.0" y="635.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:0e:70" max="60.0" min="52.0" avg="54.6" />
 				<wifi BSS="10:9a:dd:b5:2a:3f" max="61.0" min="56.0" avg="58.4" />
@@ -1355,8 +1355,8 @@
 				<alias>FORUM B</alias>
 			</aliases>
 		</node>
-		<node id="Outdoor13">
-			<coord x="991.0" y="1017.0" />
+		<node id="56">
+			<coord x="579.0" y="1270.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:04:51" max="79.0" min="79.0" avg="79.0" />
 				<wifi BSS="c0:ee:fb:20:30:40" max="90.0" min="78.0" avg="81.6" />
@@ -1382,8 +1382,8 @@
 				<wifi BSS="88:1d:fc:eb:9e:41" max="89.0" min="89.0" avg="89.0" />
 			</listWifi>
 		</node>
-		<node id="Outdoor14">
-			<coord x="731.0" y="1018.0" />
+		<node id="57">
+			<coord x="319.0" y="1271.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:4e:04:51" max="75.0" min="73.0" avg="73.8" />
 				<wifi BSS="c0:ee:fb:20:30:40" max="82.0" min="77.0" avg="79.8" />
@@ -1403,8 +1403,8 @@
 				<wifi BSS="00:26:cb:a0:98:c1" max="65.0" min="65.0" avg="65.0" />
 			</listWifi>
 		</node>
-		<node id="F47">
-			<coord x="215.0" y="258.0" />
+		<node id="58">
+			<coord x="-197.0" y="511.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:aa:c0" max="73.0" min="72.0" avg="72.7" />
 				<wifi BSS="00:26:cb:4e:04:51" max="72.0" min="68.0" avg="69.3" />
@@ -1416,7 +1416,7 @@
 				<wifi BSS="fc:3f:7c:22:c5:11" max="79.0" min="72.0" avg="76.7" />
 				<wifi BSS="00:0c:e6:00:cf:b3" max="90.0" min="82.0" avg="87.3" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="68.0" min="60.0" avg="63.7" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="64.0" min="58.0" avg="61.3" />
+				<wifi BSS="00:26:cb:4e:07:4" max="64.0" min="58.0" avg="61.3" />
 				<wifi BSS="00:26:cb:4e:04:50" max="73.0" min="64.0" avg="68.5" />
 				<wifi BSS="00:0c:e6:00:d1:0c" max="93.0" min="84.0" avg="88.5" />
 				<wifi BSS="00:0c:e6:00:d2:a4" max="89.0" min="83.0" avg="86.0" />
@@ -1427,8 +1427,8 @@
 				<alias>FORUM G</alias>
 			</aliases>
 		</node>
-		<node id="F50">
-			<coord x="310.0" y="197.0" />
+		<node id="59">
+			<coord x="-102.0" y="450.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:aa:c0" max="66.0" min="64.0" avg="65.2" />
 				<wifi BSS="00:26:cb:4e:0e:e0" max="89.0" min="81.0" avg="84.2" />
@@ -1441,7 +1441,7 @@
 				<wifi BSS="00:16:b6:e7:0e:34" max="91.0" min="84.0" avg="89.0" />
 				<wifi BSS="00:0c:e6:00:d1:3c" max="91.0" min="83.0" avg="85.4" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="67.0" min="65.0" avg="66.2" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="74.0" min="65.0" avg="68.4" />
+				<wifi BSS="00:26:cb:4e:07:4" max="74.0" min="65.0" avg="68.4" />
 				<wifi BSS="00:26:cb:a0:98:c1" max="86.0" min="78.0" avg="82.8" />
 				<wifi BSS="00:26:cb:4e:04:51" max="65.0" min="61.0" avg="63.8" />
 				<wifi BSS="00:0c:e6:00:d1:0c" max="88.0" min="85.0" avg="86.4" />
@@ -1451,8 +1451,8 @@
 				<alias>FORUM G</alias>
 			</aliases>
 		</node>
-		<node id="F48">
-			<coord x="400.0" y="139.0" />
+		<node id="60">
+			<coord x="-12.0" y="392.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:aa:c0" max="74.0" min="71.0" avg="72.2" />
 				<wifi BSS="00:26:cb:4e:04:50" max="74.0" min="56.0" avg="67.5" />
@@ -1463,7 +1463,7 @@
 				<wifi BSS="fc:3f:7c:22:c5:11" max="92.0" min="80.0" avg="85.2" />
 				<wifi BSS="00:0c:e6:00:d1:3c" max="86.0" min="80.0" avg="84.2" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="76.0" min="70.0" avg="72.5" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="76.0" min="70.0" avg="72.5" />
+				<wifi BSS="00:26:cb:4e:07:4" max="76.0" min="70.0" avg="72.5" />
 				<wifi BSS="00:0c:e6:00:d1:0c" max="91.0" min="83.0" avg="87.5" />
 				<wifi BSS="00:26:cb:a0:98:c0" max="90.0" min="82.0" avg="84.0" />
 				<wifi BSS="00:26:cb:4e:0e:e0" max="89.0" min="86.0" avg="86.8" />
@@ -1477,8 +1477,8 @@
 				<alias>FORUM G</alias>
 			</aliases>
 		</node>
-		<node id="F46">
-			<coord x="404.0" y="259.0" />
+		<node id="61">
+			<coord x="-8.0" y="512.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:aa:c0" max="63.0" min="60.0" avg="61.2" />
 				<wifi BSS="00:26:cb:4e:0e:e0" max="86.0" min="80.0" avg="84.4" />
@@ -1493,7 +1493,7 @@
 				<wifi BSS="00:16:b6:e7:0e:34" max="91.0" min="84.0" avg="87.6" />
 				<wifi BSS="00:0c:e6:00:d1:3c" max="87.0" min="79.0" avg="83.8" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="78.0" min="73.0" avg="74.4" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="74.0" min="72.0" avg="73.2" />
+				<wifi BSS="00:26:cb:4e:07:4" max="74.0" min="72.0" avg="73.2" />
 				<wifi BSS="00:26:cb:a0:98:c1" max="90.0" min="81.0" avg="85.5" />
 				<wifi BSS="00:26:cb:4e:04:51" max="51.0" min="50.0" avg="50.8" />
 				<wifi BSS="00:0c:e6:00:d1:0c" max="93.0" min="84.0" avg="90.0" />
@@ -1503,8 +1503,8 @@
 				<alias>F.2.088</alias>
 			</aliases>
 		</node>
-		<node id="F49">
-			<coord x="214.0" y="141.0" />
+		<node id="62">
+			<coord x="-198.0" y="394.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:aa:c0" max="75.0" min="72.0" avg="72.8" />
 				<wifi BSS="00:26:cb:4e:04:50" max="73.0" min="67.0" avg="71.2" />
@@ -1515,7 +1515,7 @@
 				<wifi BSS="fc:3f:7c:22:c5:11" max="84.0" min="81.0" avg="82.8" />
 				<wifi BSS="00:0c:e6:00:d1:3c" max="88.0" min="79.0" avg="82.8" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="62.0" min="57.0" avg="59.4" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="63.0" min="57.0" avg="59.8" />
+				<wifi BSS="00:26:cb:4e:07:4" max="63.0" min="57.0" avg="59.8" />
 				<wifi BSS="00:0c:e6:00:d1:0c" max="87.0" min="87.0" avg="87.0" />
 				<wifi BSS="00:26:cb:a0:98:c0" max="75.0" min="67.0" avg="70.4" />
 				<wifi BSS="00:26:cb:4e:04:51" max="69.0" min="63.0" avg="66.0" />
@@ -1528,8 +1528,8 @@
 				<alias>FORUM G</alias>
 			</aliases>
 		</node>
-		<node id="F51">
-			<coord x="649.0" y="269.0" />
+		<node id="63">
+			<coord x="237.0" y="522.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:aa:c1" max="53.0" min="48.0" avg="50.2" />
 				<wifi BSS="00:26:cb:4e:0e:e0" max="74.0" min="70.0" avg="72.0" />
@@ -1543,21 +1543,21 @@
 				<wifi BSS="00:26:cb:4d:d9:41" max="80.0" min="80.0" avg="80.0" />
 				<wifi BSS="00:0c:e6:00:cf:b3" max="85.0" min="85.0" avg="85.0" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="79.0" min="79.0" avg="79.0" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="78.0" min="78.0" avg="78.0" />
+				<wifi BSS="00:26:cb:4e:07:4" max="78.0" min="78.0" avg="78.0" />
 			</listWifi>
 			<aliases>
 				<alias>FORUM F</alias>
 			</aliases>
 		</node>
-		<node id="F52">
-			<coord x="649.0" y="112.0" />
+		<node id="64">
+			<coord x="237.0" y="365.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:aa:c1" max="70.0" min="66.0" avg="67.6" />
 				<wifi BSS="00:26:cb:4e:0e:e0" max="72.0" min="69.0" avg="70.8" />
 				<wifi BSS="00:26:cb:a0:aa:c0" max="69.0" min="67.0" avg="68.0" />
 				<wifi BSS="00:26:cb:4d:d9:40" max="83.0" min="83.0" avg="83.0" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="78.0" min="77.0" avg="77.2" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="78.0" min="77.0" avg="77.6" />
+				<wifi BSS="00:26:cb:4e:07:4" max="78.0" min="77.0" avg="77.6" />
 				<wifi BSS="00:26:cb:4e:04:50" max="68.0" min="68.0" avg="68.0" />
 				<wifi BSS="00:0c:e6:00:d2:a4" max="89.0" min="82.0" avg="87.6" />
 				<wifi BSS="00:26:cb:4e:0e:e1" max="72.0" min="70.0" avg="71.4" />
@@ -1569,15 +1569,15 @@
 				<alias>FORUM F</alias>
 			</aliases>
 		</node>
-		<node id="F53">
-			<coord x="466.0" y="115.0" />
+		<node id="65">
+			<coord x="54.0" y="368.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:aa:c1" max="73.0" min="67.0" avg="70.6" />
 				<wifi BSS="00:26:cb:4e:0e:e0" max="77.0" min="73.0" avg="75.4" />
 				<wifi BSS="00:26:cb:a0:aa:c0" max="74.0" min="66.0" avg="70.8" />
 				<wifi BSS="00:26:cb:4d:d9:40" max="88.0" min="86.0" avg="86.4" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="80.0" min="78.0" avg="79.0" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="80.0" min="79.0" avg="79.2" />
+				<wifi BSS="00:26:cb:4e:07:4" max="80.0" min="79.0" avg="79.2" />
 				<wifi BSS="00:26:cb:4e:04:50" max="62.0" min="62.0" avg="62.0" />
 				<wifi BSS="00:0c:e6:00:d2:a4" max="86.0" min="80.0" avg="83.6" />
 				<wifi BSS="00:26:cb:4e:0e:e1" max="76.0" min="71.0" avg="73.2" />
@@ -1591,14 +1591,14 @@
 				<alias>FORUM F</alias>
 			</aliases>
 		</node>
-		<node id="F54">
-			<coord x="556.0" y="198.0" />
+		<node id="66">
+			<coord x="144.0" y="451.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:aa:c1" max="64.0" min="57.0" avg="61.4" />
 				<wifi BSS="00:26:cb:4e:0e:e0" max="70.0" min="67.0" avg="69.0" />
 				<wifi BSS="00:26:cb:a0:aa:c0" max="58.0" min="52.0" avg="55.8" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="82.0" min="78.0" avg="80.4" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="80.0" min="79.0" avg="79.8" />
+				<wifi BSS="00:26:cb:4e:07:4" max="80.0" min="79.0" avg="79.8" />
 				<wifi BSS="00:26:cb:4e:04:50" max="66.0" min="56.0" avg="61.2" />
 				<wifi BSS="00:0c:e6:00:d2:a4" max="82.0" min="68.0" avg="75.6" />
 				<wifi BSS="00:26:cb:4e:0e:e1" max="72.0" min="67.0" avg="69.8" />
@@ -1614,14 +1614,14 @@
 				<alias>FORUM F</alias>
 			</aliases>
 		</node>
-		<node id="F55">
-			<coord x="463.0" y="273.0" />
+		<node id="67">
+			<coord x="51.0" y="526.0" />
 			<listWifi>
 				<wifi BSS="00:26:cb:a0:aa:c1" max="66.0" min="61.0" avg="64.8" />
 				<wifi BSS="00:26:cb:4e:0e:e0" max="78.0" min="72.0" avg="75.0" />
 				<wifi BSS="00:26:cb:a0:aa:c0" max="67.0" min="60.0" avg="62.4" />
 				<wifi BSS="00:26:cb:4e:07:f0" max="78.0" min="75.0" avg="76.2" />
-				<wifi BSS="00:26:cb:4e:07:f1" max="78.0" min="76.0" avg="76.8" />
+				<wifi BSS="00:26:cb:4e:07:4" max="78.0" min="76.0" avg="76.8" />
 				<wifi BSS="00:26:cb:4e:04:50" max="59.0" min="59.0" avg="59.0" />
 				<wifi BSS="00:0c:e6:00:d2:a4" max="82.0" min="70.0" avg="74.8" />
 				<wifi BSS="00:26:cb:4e:0e:e1" max="81.0" min="72.0" avg="76.6" />
@@ -1640,112 +1640,109 @@
 	</nodes>
 	<edges>
 		<internal>
-			<edge beg="F22" end="F23" weight="23.82" />
-			<edge beg="F20" end="F24" weight="16.28" />
-			<edge beg="F24" end="F23" weight="16.26" />
-			<edge beg="F24" end="F21" weight="15.75" />
-			<edge beg="F24" end="F22" weight="16.48" />
-			<edge beg="F15" end="F25" weight="13.44" />
-			<edge beg="F19" end="F26" weight="13.46" />
-			<edge beg="F25" end="F26" weight="23.09" />
-			<edge beg="F25" end="F27" weight="23.0" />
-			<edge beg="F26" end="F28" weight="22.92" />
-			<edge beg="F27" end="F28" weight="23.91" />
-			<edge beg="F26" end="F29" weight="16.14" />
-			<edge beg="F25" end="F29" weight="16.14" />
-			<edge beg="F29" end="F27" weight="16.52" />
-			<edge beg="F22" end="F30" weight="19.0" />
-			<edge beg="F23" end="F31" weight="18.73" />
-			<edge beg="F30" end="F31" weight="24.09" />
-			<edge beg="F30" end="F32" weight="22.28" />
-			<edge beg="F32" end="F33" weight="23.37" />
-			<edge beg="F31" end="F33" weight="22.37" />
-			<edge beg="F34" end="F32" weight="15.76" />
-			<edge beg="F30" end="F34" weight="17.62" />
-			<edge beg="F45" end="F41" weight="22.55" />
-			<edge beg="F31" end="F34" weight="16.66" />
-			<edge beg="F34" end="F33" weight="15.18" />
-			<edge beg="F32" end="F17" weight="11.74" />
-			<edge beg="F33" end="F16" weight="12.17" />
-			<edge beg="F45" end="F44" weight="15.36" />
-			<edge beg="F35" end="F16" weight="12.44" />
-			<edge beg="F36" end="F18" weight="11.0" />
-			<edge beg="Outdoor4" end="Outdoor13" weight="22.91" />
-			<edge beg="F35" end="F36" weight="23.37" />
-			<edge beg="F37" end="F35" weight="22.37" />
-			<edge beg="F44" end="F43" weight="16.2" />
-			<edge beg="F37" end="F39" weight="17.23" />
-			<edge beg="F39" end="F35" weight="15.6" />
-			<edge beg="F39" end="F36" weight="15.64" />
-			<edge beg="F37" end="F38" weight="24.09" />
-			<edge beg="F38" end="F36" weight="22.82" />
-			<edge beg="F38" end="F39" weight="17.1" />
-			<edge beg="F44" end="F42" weight="16.78" />
-			<edge beg="F27" end="F37" weight="18.09" />
-			<edge beg="F28" end="F38" weight="17.91" />
-			<edge beg="Outdoor11" end="Outdoor12" weight="16.28" />
-			<edge beg="F40" end="F13" weight="22.91" />
-			<edge beg="F44" end="F41" weight="16.2" />
-			<edge beg="F41" end="F40" weight="10.1" />
-			<edge beg="F41" end="F42" weight="23.27" />
-			<edge beg="F42" end="F13" weight="9.91" />
-			<edge beg="F43" end="F42" weight="22.91" />
-			<edge beg="F45" end="F43" weight="22.55" />
-			<edge beg="F29" end="F28" weight="16.91" />
-			<edge beg="F5" end="F4" weight="10.45" />
-			<edge beg="F6" end="F5" weight="11.28" />
-			<edge beg="F7" end="F6" weight="7.91" />
-			<edge beg="F1" end="F2" weight="8.45" />
-			<edge beg="F7" end="F9" weight="19.18" />
-			<edge beg="F3" end="F2" weight="10.45" />
-			<edge beg="F4" end="F3" weight="10.82" />
-			<edge beg="F10" end="F9" weight="20.0" />
-			<edge beg="F11" end="F10" weight="5.03" />
-			<edge beg="F12" end="F11" weight="15.46" />
-			<edge beg="F13" end="F12" weight="14.18" />
-			<edge beg="F11" end="Outdoor1" weight="13.82" />
-			<edge beg="Outdoor1" end="Outdoor2" weight="12.45" />
-			<edge beg="Outdoor2" end="Outdoor3" weight="16.73" />
-			<edge beg="Outdoor3" end="Outdoor4" weight="18.46" />
-			<edge beg="Outdoor5" end="Outdoor2" weight="15.36" />
-			<edge beg="Outdoor6" end="Outdoor5" weight="13.1" />
-			<edge beg="Outdoor7" end="Outdoor6" weight="13.91" />
-			<edge beg="Outdoor8" end="Outdoor7" weight="11.19" />
-			<edge beg="Outdoor9" end="Outdoor8" weight="12.82" />
-			<edge beg="Outdoor9" end="F14" weight="10.73" />
-			<edge beg="F15" end="F14" weight="23.64" />
-			<edge beg="Outdoor10" end="Outdoor4" weight="18.85" />
-			<edge beg="Outdoor11" end="Outdoor10" weight="15.82" />
-			<edge beg="F16" end="Outdoor11" weight="13.82" />
-			<edge beg="F17" end="F16" weight="26.82" />
-			<edge beg="F18" end="F16" weight="26.64" />
-			<edge beg="F15" end="F19" weight="27.09" />
-			<edge beg="F14" end="F20" weight="13.57" />
-			<edge beg="F21" end="F15" weight="13.21" />
-			<edge beg="F21" end="F20" weight="23.18" />
-			<edge beg="F20" end="F22" weight="22.0" />
-			<edge beg="F21" end="F23" weight="22.55" />
-			<edge beg="Outdoor13" end="Outdoor14" weight="23.64" />
-			<edge beg="F50" end="F46" weight="10.24" />
-			<edge beg="F46" end="F9" weight="9.0" />
-			<edge beg="F47" end="F7" weight="8.56" />
-			<edge beg="F47" end="F50" weight="10.26" />
-			<edge beg="F47" end="F46" weight="17.18" />
-			<edge beg="F50" end="F48" weight="9.73" />
-			<edge beg="F48" end="F46" weight="10.92" />
-			<edge beg="F49" end="F47" weight="10.64" />
-			<edge beg="F49" end="F50" weight="10.1" />
-			<edge beg="F49" end="F48" weight="16.91" />
-			<edge beg="F53" end="F55" weight="14.37" />
-			<edge beg="F55" end="F54" weight="10.86" />
-			<edge beg="F53" end="F54" weight="11.13" />
-			<edge beg="F54" end="F52" weight="11.52" />
-			<edge beg="F52" end="F51" weight="14.27" />
-			<edge beg="F54" end="F51" weight="10.64" />
-			<edge beg="F53" end="F52" weight="16.64" />
-			<edge beg="F55" end="F51" weight="16.91" />
-			<edge beg="F55" end="F9" weight="7.88" />
-			<edge beg="F51" end="F10" weight="8.0" />
+			<edge beg="64" end="66" weight="11.52" />
+			<edge beg="66" end="67" weight="10.86" />
+			<edge beg="17" end="14" weight="14.18" />
+			<edge beg="14" end="13" weight="15.46" />
+			<edge beg="50" end="17" weight="22.91" />
+			<edge beg="39" end="40" weight="22.55" />
+			<edge beg="40" end="44" weight="15.36" />
+			<edge beg="44" end="41" weight="16.2" />
+			<edge beg="40" end="41" weight="22.55" />
+			<edge beg="41" end="48" weight="22.91" />
+			<edge beg="44" end="48" weight="16.78" />
+			<edge beg="39" end="44" weight="16.2" />
+			<edge beg="39" end="50" weight="10.1" />
+			<edge beg="48" end="17" weight="9.91" />
+			<edge beg="34" end="35" weight="10.73" />
+			<edge beg="34" end="32" weight="12.82" />
+			<edge beg="32" end="31" weight="11.19" />
+			<edge beg="31" end="29" weight="13.91" />
+			<edge beg="27" end="21" weight="15.36" />
+			<edge beg="20" end="13" weight="13.82" />
+			<edge beg="20" end="21" weight="12.45" />
+			<edge beg="29" end="27" weight="13.1" />
+			<edge beg="16" end="42" weight="19.0" />
+			<edge beg="42" end="47" weight="17.62" />
+			<edge beg="47" end="45" weight="15.76" />
+			<edge beg="43" end="47" weight="16.66" />
+			<edge beg="21" end="24" weight="16.73" />
+			<edge beg="24" end="25" weight="18.46" />
+			<edge beg="25" end="38" weight="18.85" />
+			<edge beg="25" end="56" weight="22.91" />
+			<edge beg="56" end="57" weight="23.64" />
+			<edge beg="38" end="1" weight="15.82" />
+			<edge beg="0" end="1" weight="13.82" />
+			<edge beg="1" end="49" weight="16.28" />
+			<edge beg="0" end="18" weight="26.82" />
+			<edge beg="0" end="12" weight="26.64" />
+			<edge beg="47" end="46" weight="15.18" />
+			<edge beg="4" end="5" weight="10.45" />
+			<edge beg="4" end="4" weight="8.45" />
+			<edge beg="42" end="45" weight="22.28" />
+			<edge beg="3" end="4" weight="8.45" />
+			<edge beg="45" end="46" weight="23.37" />
+			<edge beg="5" end="7" weight="10.82" />
+			<edge beg="43" end="46" weight="22.37" />
+			<edge beg="7" end="10" weight="10.45" />
+			<edge beg="42" end="43" weight="24.09" />
+			<edge beg="10" end="2" weight="11.28" />
+			<edge beg="53" end="54" weight="24.09" />
+			<edge beg="2" end="6" weight="7.91" />
+			<edge beg="53" end="51" weight="22.37" />
+			<edge beg="58" end="62" weight="10.64" />
+			<edge beg="51" end="0" weight="12.44" />
+			<edge beg="6" end="58" weight="8.56" />
+			<edge beg="46" end="0" weight="12.17" />
+			<edge beg="62" end="59" weight="10.1" />
+			<edge beg="45" end="18" weight="11.74" />
+			<edge beg="58" end="59" weight="10.26" />
+			<edge beg="59" end="60" weight="9.73" />
+			<edge beg="59" end="61" weight="10.24" />
+			<edge beg="60" end="61" weight="10.92" />
+			<edge beg="60" end="62" weight="16.91" />
+			<edge beg="58" end="61" weight="17.18" />
+			<edge beg="61" end="8" weight="9.0" />
+			<edge beg="67" end="8" weight="7.88" />
+			<edge beg="6" end="8" weight="19.18" />
+			<edge beg="8" end="9" weight="20.0" />
+			<edge beg="9" end="13" weight="5.03" />
+			<edge beg="9" end="63" weight="8.0" />
+			<edge beg="63" end="67" weight="16.91" />
+			<edge beg="67" end="65" weight="14.37" />
+			<edge beg="65" end="64" weight="16.64" />
+			<edge beg="64" end="63" weight="14.27" />
+			<edge beg="66" end="63" weight="10.64" />
+			<edge beg="65" end="66" weight="11.13" />
+			<edge beg="51" end="52" weight="23.37" />
+			<edge beg="55" end="51" weight="15.6" />
+			<edge beg="53" end="55" weight="17.23" />
+			<edge beg="19" end="16" weight="23.82" />
+			<edge beg="26" end="36" weight="23.91" />
+			<edge beg="54" end="55" weight="17.1" />
+			<edge beg="55" end="52" weight="15.64" />
+			<edge beg="54" end="52" weight="22.82" />
+			<edge beg="52" end="12" weight="11.0" />
+			<edge beg="28" end="30" weight="23.09" />
+			<edge beg="35" end="37" weight="23.64" />
+			<edge beg="37" end="11" weight="27.09" />
+			<edge beg="37" end="28" weight="13.44" />
+			<edge beg="37" end="33" weight="13.21" />
+			<edge beg="35" end="23" weight="13.57" />
+			<edge beg="23" end="22" weight="16.28" />
+			<edge beg="22" end="16" weight="16.48" />
+			<edge beg="23" end="16" weight="22.0" />
+			<edge beg="33" end="22" weight="15.75" />
+			<edge beg="22" end="19" weight="16.26" />
+			<edge beg="23" end="33" weight="23.18" />
+			<edge beg="33" end="19" weight="22.55" />
+			<edge beg="28" end="26" weight="23.0" />
+			<edge beg="30" end="36" weight="22.92" />
+			<edge beg="11" end="30" weight="13.46" />
+			<edge beg="15" end="28" weight="16.14" />
+			<edge beg="15" end="26" weight="16.52" />
+			<edge beg="15" end="36" weight="16.91" />
+			<edge beg="30" end="15" weight="16.14" />
 		</internal>
 		<external>
 		</external>
