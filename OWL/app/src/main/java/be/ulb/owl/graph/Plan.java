@@ -80,25 +80,7 @@ public class Plan {
     }
 
     private double getScore(Float level) {
-        /*
-        if (level > 0 && level < 40) {
-            return 1.4f;
-        }
-        else if (level > 40 && level <= 60) {
-            return 1.1f;
-        }
-        else if (level > 60 && level <= 80) {
-            return 0.7f;
-        }
-        else if (level > 80 && level <= 85) {
-            return 0.5f;
-        }
-        else if (level > 85 && level <= 100) {
-            return 0.3f;
-        }
-        return 1.0f;
-        */
-        return Math.pow((-level+100)/50, 0.6);//Math.sqrt((-level+100)/50);
+        return Math.pow((-level+100)/50, 0.6);
     }
 
     /**
@@ -116,9 +98,7 @@ public class Plan {
         }
         Node res;
         ArrayList<Double> scores = new ArrayList<Double>();
-        System.out.println("Possible node :");
         for (int i = 0; i < nodes.size(); i++) { // for each node
-            System.out.print(nodes.get(i).getName()+" : ");
             scores.add(0.0);
             ArrayList<Wifi> tmp = nodes.get(i).getWifi();
             double totaldbm = 0.0;
@@ -126,43 +106,14 @@ public class Plan {
             for (Wifi wifi: tmp) {
                 if (wifisStr.contains(wifi.getBSS())) { // has a Wifi with the same BSS
                     Integer offset = wifisStr.indexOf(wifi.getBSS());
-                    //System.out.print("+|"+(wifis.get(offset)).getAvg()+"-"+wifi.getAvg()+"|/"+getScore((wifis.get(offset).getAvg()+wifi.getAvg())/2));
                     totaldbm += Math.abs((wifis.get(offset)).getAvg()-wifi.getAvg())/getScore((wifis.get(offset).getAvg()+wifi.getAvg())/2);
                     commonWifi++;
                 }
             }
             scores.set(i, totaldbm/(commonWifi*commonWifi));
-            System.out.println(" = "+scores.get(i));
         }
         res = nodes.get(scores.indexOf(Collections.min(scores)));
         return res;
-        /*
-        ArrayList<String> wifisStr = new ArrayList<String>();
-        for (Wifi wifi : wifis) {
-            wifisStr.add(wifi.getBSS());
-        }
-        Node res;
-        ArrayList<Float> scores = new ArrayList<Float>();
-        System.out.println("Possible node :");
-        for (int i = 0; i < nodes.size(); i++) { // for each node
-            System.out.print(nodes.get(i).getName()+" : ");
-            scores.add(0.0f);
-            ArrayList<Wifi> tmp = nodes.get(i).getWifi();
-            Float totaldbm = 0.0f;
-            Integer commonWifi = 0;
-            for (Wifi wifi: tmp) {
-                if (wifisStr.contains(wifi.getBSS())) { // has a Wifi with the same BSS
-                    Integer offset = wifisStr.indexOf(wifi.getBSS());
-                    totaldbm += Math.abs((wifis.get(offset)).getAvg()-wifi.getAvg());
-                    commonWifi++;
-                }
-            }
-            scores.set(i, totaldbm*commonWifi);
-            System.out.println(" = "+scores.get(i));
-        }
-        res = nodes.get(scores.indexOf(Collections.min(scores)));
-        return res;
-        */
     }
 
     private ArrayList<Wifi> and(ArrayList<Wifi> capted, ArrayList<Wifi> set) {
@@ -219,30 +170,6 @@ public class Plan {
      * @return The nearest Node based on the given array of Wifi
      */
     public Node getNode(ArrayList<Wifi> wifis) {
-        /*
-        ArrayList<String> wifisStr = new ArrayList<String>();
-        for (Wifi wifi : wifis) {
-            wifisStr.add(wifi.getBSS());
-        }
-        ArrayList<Node> res = new ArrayList<Node>();
-        int biggestSetSize = 0;
-        for (Node node : _listNode) {
-            ArrayList<String> tmp = node.getListWifiBSS();
-            tmp.retainAll(wifisStr);
-            if (biggestSetSize == tmp.size()){
-                res.add(node);
-            }
-            else if (biggestSetSize < tmp.size()) {
-                res = new ArrayList<Node>();
-                res.add(node);
-                biggestSetSize = tmp.size();
-            }
-        }
-        if (res.size() > 1) {
-            return collisionManager(wifis, res);
-        }
-        return res.get(0);
-        */
         ArrayList<String> wifisStr = new ArrayList<String>();
         for (Wifi wifi : wifis) {
             wifisStr.add(wifi.getBSS());
