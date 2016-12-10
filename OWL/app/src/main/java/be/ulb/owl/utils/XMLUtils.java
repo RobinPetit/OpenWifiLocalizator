@@ -36,7 +36,7 @@ public class XMLUtils {
     /**
      * Read XML File and return a XMLPullParser
      * 
-     * @param name of the file who must be read (with extention !)
+     * @param name of the file who must be read (without extention !)
      * @return XmlPullParser
      */
     public static XmlPullParser readXMLFile(String name) throws IOException, XmlPullParserException {
