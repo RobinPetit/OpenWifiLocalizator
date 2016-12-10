@@ -72,12 +72,18 @@ public class Path {
     
     /**
      * Get distance
-     * 
+     *
      * @return the distance between two point
      */
     public float getDistance() {
         return _distance;
     }
     
-    
+    public Node getComplementOf(Node extremity) {
+        assert(containsNode(extremity));
+        if(_nodeOne.isNode(extremity.getName()))
+            return _nodeTwo;
+        else
+            return _nodeOne;
+    }
 }

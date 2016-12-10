@@ -37,7 +37,7 @@ public class Node {
      */
     public Node(Plan parentPlan, float x, float y, String name, 
             ArrayList<Wifi> listWifi) {
-        
+
         this._listPath = new ArrayList<Path>();
         this._listAlias = new ArrayList<String>();
         this._listWifi = listWifi;
@@ -156,4 +156,11 @@ public class Node {
         return tmp;
     }
 
+    public ArrayList<Node> getNeighbours() {
+        ArrayList<Node> neighbours = new ArrayList<>();
+        for(Path path: _listPath) {
+            neighbours.add(path.getComplementOf(this));
+        }
+        return neighbours;
+    }
 }
