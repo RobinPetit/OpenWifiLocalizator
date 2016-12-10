@@ -82,7 +82,7 @@ public class Plan {
     private double getScore(Float level) {
         return Math.pow((-level+100)/50, 0.6);
     }
-    
+
     /**
      * Create a plan <b>and</b> load XML file from this plan
      *
