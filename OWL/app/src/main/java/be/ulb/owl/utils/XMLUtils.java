@@ -62,7 +62,7 @@ public class XMLUtils {
      * @throws XmlPullParserException
      */
     public static boolean isSpace(XmlPullParser parser) throws XmlPullParserException {
-        return parser.getEventType() == XmlPullParser.TEXT && 
+        return parser.getEventType() == XmlPullParser.TEXT &&
                 (parser.getName() == null || parser.getName().equalsIgnoreCase(""));
     }
 

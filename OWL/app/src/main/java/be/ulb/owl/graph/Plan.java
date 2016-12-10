@@ -144,6 +144,14 @@ public class Plan {
         return _name.equals(name);
     }
 
+    /**
+     * Get the name of the plan
+     *
+     * @return the name of this plan
+     */
+    public String getName() {
+        return _name;
+    }
 
 
     /**
@@ -254,13 +262,13 @@ public class Plan {
             _allAlias = new ArrayList<String>();
             Log.d(this.getClass().getName(), "Load alias !");
 
-            for(Node node : _listNode) {
-                Log.d(this.getClass().getName(), "Alias: " + node.getName() + " (" + node.getAlias().toString() + ")");
-                _allAlias.addAll(node.getAlias());
+            for (Node node : _listNode) {
+                for(String alias : node.getAlias()) {
+                    if(!_allAlias.contains(alias)) {
+                        _allAlias.add(alias);
+                    }
+                }
             }
-
-        } else {
-            Log.i(this.getClass().getName(), "Alias null :/");
         }
 
         return _allAlias;
@@ -430,15 +438,19 @@ public class Plan {
                 switch(parser.getName()) {
 
                     // TODO alias changes !!
-                    case "alias":
-                        parser.next(); // START_TAG
-                        if(parser.getEventType() == XmlPullParser.TEXT) {
-                            listAlias.add(parser.getText());
-                        } else {
-                            Log.e(this.getClass().getName(), "Erreur avec le fichier à paser ! " +
-                                    "Pour le plan: " + _name);
-                        }
+                    case "aliases":
+                        listAlias = XMLGetListAlias(parser);
                         break;
+
+//                    case "alias":
+//                        parser.next(); // START_TAG
+//                        if(parser.getEventType() == XmlPullParser.TEXT) {
+//                            listAlias.add(parser.getText());
+//                        } else {
+//                            Log.e(this.getClass().getName(), "Erreur avec le fichier à paser ! " +
+//                                    "Pour le plan: " + _name);
+//                        }
+//                        break;
 
                     case "coord":
                         x = Float.parseFloat(parser.getAttributeValue(null, "x"));
@@ -462,7 +474,7 @@ public class Plan {
 
         if(x != Integer.MIN_VALUE && y != Integer.MIN_VALUE && pointId != null) {
             // Create and add node
-            _listNode.add(new Node(this, x, y, pointId, listWifi));
+            _listNode.add(new Node(this, x, y, pointId, listWifi, listAlias));
 
         } else {
             Log.e(getClass().getName(), "Impossible de créer la node: " + pointId + " (il manque " +
@@ -513,6 +525,42 @@ public class Plan {
         parser.next(); // Next after the End_tag
 
         return listWifi;
+    }
+
+    /**
+     * Extract a list of Alias from the XML File
+     *
+     * @param parser the XML File Iterator
+     * @return an ArrayList of String that contains alias
+     */
+    private ArrayList<String> XMLGetListAlias(XmlPullParser parser)
+            throws XmlPullParserException, IOException {
+        ArrayList<String> listAlias = new ArrayList<String>();
+
+        // Next after "listwifi" balise
+        XMLUtils.nextAndRemoveSpace(parser);
+
+        while(parser.getEventType() != XmlPullParser.END_TAG ||
+                !parser.getName().equalsIgnoreCase("aliases")) {
+
+            if(parser.getEventType() == XmlPullParser.START_TAG &&
+                    parser.getName().equalsIgnoreCase("alias")) {
+
+                XMLDebugParser(parser);
+                parser.next();
+                if(parser.getEventType() == XmlPullParser.TEXT && parser.getText() != "") {
+                    listAlias.add(parser.getText());
+                }
+                parser.next();
+
+
+            }
+
+            XMLUtils.nextAndRemoveSpace(parser);
+        }
+        parser.next(); // Next after the End_tag
+
+        return listAlias;
     }
 
 

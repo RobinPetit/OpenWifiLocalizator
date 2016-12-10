@@ -79,10 +79,9 @@ public class MainActivity extends AppCompatActivity  {
         if(_graph == null) {
             _graph = new Graph();
         }
-        // Create a plan for test
-        Log.i(getClass().getName(), "Chargement du P.F");
-        setCurrentPlan(Graph.getPlan("P.F"));
-        Graph.getPlan("P.F");
+
+        // Set default plan
+        setCurrentPlan(Graph.getPlan("Solbosch"));
 
         Log.i(getClass().getName(), "Scanner.scan");
         Node current = _graph.whereAmI();
@@ -374,11 +373,14 @@ public class MainActivity extends AppCompatActivity  {
      * @param newCurrentPlan new Plan object
      */
     public void setCurrentPlan(Plan newCurrentPlan) {
-        if(newCurrentPlan != null) {
+        if(newCurrentPlan != null && (_currentPlan == null ||
+                !newCurrentPlan.getName().equalsIgnoreCase(_currentPlan.getName())) ) {
+
             _currentPlan = newCurrentPlan;
             _imageView.setImageDrawable(_currentPlan.getDrawableImage());
             _imageView.setScaleType(ImageView.ScaleType.MATRIX);
-        } else {
+
+        } else if(newCurrentPlan == null) {
             Log.w(this.getClass().getName(), "Le nouveau plan est null");
         }
     }

@@ -37,10 +37,24 @@ public class Node {
      */
     public Node(Plan parentPlan, float x, float y, String name, 
             ArrayList<Wifi> listWifi) {
-        
+        this(parentPlan, x, y, name, listWifi, new ArrayList<String>());
+    }
+
+    /**
+     * Init a node
+     *
+     * @param parentPlan plan where is this node
+     * @param x x position of th node
+     * @param y y position of the node
+     * @param name of the node
+     * @param listWifi list of all wifi capted on this point
+     * @param listAlias list of all alias
+     */
+    public Node(Plan parentPlan, float x, float y, String name,
+                ArrayList<Wifi> listWifi, ArrayList<String> listAlias) {
         this._listPath = new ArrayList<Path>();
-        this._listAlias = new ArrayList<String>();
         this._listWifi = listWifi;
+        this._listAlias = listAlias;
         
         this._x = x;
         this._y = y;
