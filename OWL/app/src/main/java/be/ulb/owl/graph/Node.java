@@ -163,4 +163,24 @@ public class Node {
         }
         return neighbours;
     }
+
+    public double getDistanceFrom(Node neighbour) {
+        assert(getNeighbours().contains(neighbour));
+        double ret = 0.;
+        for(Path path: _listPath) {
+            if(path.containsNode(neighbour)) {
+                ret = path.getDistance();
+                break;
+            }
+        }
+        return ret;
+    }
+
+    public Path pathTo(Node dest) throws NoPathException {
+        for(Path path : _listPath) {
+            if(path.getComplementOf(this).equals(dest))
+                return path;
+        }
+        throw new NoPathException("No path between " + getName() + " and " + dest.getName());
+    }
 }

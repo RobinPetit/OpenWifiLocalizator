@@ -47,7 +47,7 @@ public class Graph {
      *
      * @return A list containing every node of the graph
      */
-    private ArrayList<Node> getAllNodes() {
+    public ArrayList<Node> getAllNodes() {
         ArrayList<Node> allNodes = new ArrayList<>();
         for(Plan plan : _allPlan)
             allNodes.addAll(plan.getAllNodes());
@@ -60,7 +60,7 @@ public class Graph {
      * @param nodeTo The node the user wants to reach
      * @return An ordered list of nodes the user has to cross to reach the destination
      */
-    public ArrayList<Path> bestPath(Node nodeFrom, Node nodeTo) {
+    public ArrayList<Path> bestPath(Node nodeFrom, Node nodeTo) throws NoPathException {
         ShortestPathEvaluator evaluator = new ShortestPathEvaluator(getAllNodes(), nodeFrom, nodeTo);
         return evaluator.find();
     }
