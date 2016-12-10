@@ -62,7 +62,7 @@ public class Path {
      * @param node the start node
      * @return the oposit node
      */
-    public Node getOpositNode(Node node) {
+    public Node getOppositNodeOf(Node node) {
         // return _nodeOne.equals(node) ? _nodeTwo : _nodeOne;
         if(_nodeOne.equals(node)) {
             return _nodeTwo;
@@ -77,14 +77,6 @@ public class Path {
      */
     public float getDistance() {
         return _distance;
-    }
-    
-    public Node getComplementOf(Node extremity) {
-        assert(containsNode(extremity));
-        if(_nodeOne.isNode(extremity.getName()))
-            return _nodeTwo;
-        else
-            return _nodeOne;
     }
 
     @Override

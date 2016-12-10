@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity  {
                 Node current = src;
                 int k = 0;
                 while(!current.equals(dest)) {
-                    current = overallPath.get(k++).getComplementOf(current);
+                    current = overallPath.get(k++).getOppositNodeOf(current);
                     pathString += " --> " + current.getName();
                 }
                 Log.i(getClass().getName(), "Found path is given by: " + pathString);
