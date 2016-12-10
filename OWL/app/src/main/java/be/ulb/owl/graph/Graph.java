@@ -11,6 +11,7 @@ import android.util.Log;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import be.ulb.owl.MainActivity;
 import be.ulb.owl.Scanner;
@@ -42,11 +43,26 @@ public class Graph {
         _scanner = new Scanner();
     }
 
+    /**
+     *
+     * @return A list containing every node of the graph
+     */
+    private ArrayList<Node> getAllNodes() {
+        ArrayList<Node> allNodes = new ArrayList<>();
+        for(Plan plan : _allPlan)
+            allNodes.addAll(plan.getAllNodes());
+        return allNodes;
+    }
 
-
+    /**
+     * Implements a shortest path algorithm (A*) between two nodes
+     * @param nodeFrom The node the user is located at
+     * @param nodeTo The node the user wants to reach
+     * @return An ordered list of nodes the user has to cross to reach the destination
+     */
     public ArrayList<Path> bestPath(Node nodeFrom, Node nodeTo) {
-        // TODO
-        return new ArrayList<Path>();
+        ShortestPathEvaluator evaluator = new ShortestPathEvaluator(getAllNodes(), nodeFrom, nodeTo);
+        return evaluator.find();
     }
 
     public Node whereAmI () {
