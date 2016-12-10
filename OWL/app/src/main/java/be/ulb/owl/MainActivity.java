@@ -11,7 +11,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Color;
+import android.graphics.BitmapFactory;
+import android.widget.LinearLayout;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import be.ulb.owl.graph.Graph;
@@ -21,6 +29,22 @@ import be.ulb.owl.gui.listener.ClickListener;
 import be.ulb.owl.gui.listener.QueryTextListener;
 import be.ulb.owl.gui.listener.TouchListener;
 import be.ulb.owl.utils.LogUtils;
+
+/*
+//Create a new image bitmap and attach a brand new canvas to it
+Bitmap tempBitmap = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.RGB_565);
+Canvas tempCanvas = new Canvas(tempBitmap);
+
+//Draw the image bitmap into the cavas
+tempCanvas.drawBitmap(myBitmap, 0, 0, null);
+
+//Draw everything else you want into the canvas, in this example a rectangle with rounded edges
+tempCanvas.drawRoundRect(new RectF(x1,y1,x2,y2), 2, 2, myPaint);
+
+//Attach the canvas to the ImageView
+myImageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
+ */
+
 
 /**
  * Main file for Androit application<br/>
@@ -37,11 +61,32 @@ public class MainActivity extends AppCompatActivity  {
 
     private Graph _graph = null;
     private ImageView _imageView;
+    private ImageView _imageDraw;
+    private Bitmap _bitmap = null;
+    private Paint _paint = null;
     private Button _changePlan;
     private Button _local;
 
     private Plan _currentPlan = null;
 
+
+    private void setUpDrawArea () {
+        int width = _imageView.getDrawable().getIntrinsicWidth();
+        int height = _imageView.getDrawable().getIntrinsicHeight();
+        System.out.println(width+"\t"+height);
+        Bitmap bitMap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        bitMap = bitMap.copy(bitMap.getConfig(), true);
+        Canvas canvas = new Canvas(bitMap);
+
+        Paint paint = new Paint();
+        paint.setColor(Color.RED);
+        paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        paint.setAntiAlias(true);
+
+        _imageDraw.setImageBitmap(bitMap);
+        canvas.drawCircle(50, 50, 50, paint);
+        _imageDraw.invalidate();
+    }
 
     /**
      * Call when the application is created the first time
@@ -59,6 +104,9 @@ public class MainActivity extends AppCompatActivity  {
 
         _imageView = (ImageView)findViewById(R.id.plan);
         _imageView.setOnTouchListener(new TouchListener());
+
+        _imageDraw = (ImageView)findViewById(R.id.draw);
+        _imageDraw.setOnTouchListener(new TouchListener());
 
         // Define clic listener
         ClickListener clicListener = new ClickListener();
@@ -102,8 +150,8 @@ public class MainActivity extends AppCompatActivity  {
             builder.create().show();
 
         }
-
-//        testWifi();
+        setUpDrawArea();
+    //testWifi();
     }
 
     /**
@@ -118,87 +166,6 @@ public class MainActivity extends AppCompatActivity  {
 
 
     private void testWifi() {
-        /*
-        // ---- test ----
-
-        ArrayList<Wifi> tmp = new ArrayList<Wifi>();
-        tmp.add(new Wifi("00:26:cb:4e:0c:a0", 82.0f, 78.0f, 80.0f));
-        tmp.add(new Wifi("00:26:cb:4e:0c:a1", 81.0f, 79.0f, 80.4f));
-        tmp.add(new Wifi("a4:ee:57:f1:96:6b", 74.0f, 67.0f, 69.2f));
-        tmp.add(new Wifi("00:26:cb:4e:0e:70", 81.0f, 72.0f, 77.6f));
-        tmp.add(new Wifi("10:9a:dd:b5:2a:3f", 78.0f, 75.0f, 76.6f));
-        tmp.add(new Wifi("00:0c:e6:00:d1:0c", 91.0f, 81.0f, 88.6f));
-        tmp.add(new Wifi("00:26:cb:4e:0e:71", 79.0f, 72.0f, 77.2f));
-
-        Node position = _graph.whereAmI(tmp);
-        System.out.print("Test without any changes.\nThe result should be F19. res = ");
-        System.out.println(position.getName());
-
-        // ---- test ----
-
-        tmp = new ArrayList<Wifi>();
-        tmp.add(new Wifi("00:26:cb:4e:0e:71", 61.0f, 58.0f, 59.6f));
-        tmp.add(new Wifi("10:9a:dd:b5:2a:3f", 70.0f, 58.0f, 64.6f));
-        tmp.add(new Wifi("00:26:cb:4e:0e:70", 61.0f, 55.0f, 57.4f));
-        tmp.add(new Wifi("00:26:cb:4e:0c:a0", 82.0f, 72.0f, 74.2f));
-        tmp.add(new Wifi("00:26:cb:4e:0c:a1", 83.0f, 72.0f, 75.2f));
-
-        position = _graph.whereAmI(tmp);
-        System.out.print("Test without any changes.\nThe result should be F29. res = ");
-        System.out.println(position.getName());
-
-        // ---- test ----
-
-        tmp = new ArrayList<Wifi>();
-        tmp.add(new Wifi("00:26:cb:4e:0e:71", 61.0f, 58.0f, 54.3f));
-        tmp.add(new Wifi("10:9a:dd:b5:2a:3f", 70.0f, 58.0f, 70.9f));
-        tmp.add(new Wifi("00:26:cb:4e:0e:70", 61.0f, 55.0f, 80.0f));
-        tmp.add(new Wifi("00:26:cb:4e:0c:a0", 82.0f, 72.0f, 42.2f));
-        tmp.add(new Wifi("00:26:cb:4e:0c:a1", 83.0f, 72.0f, 21.7f));
-
-        position = _graph.whereAmI(tmp);
-        System.out.print("Test With changes in de avg values.\nThe result should be F29. res = ");
-        System.out.println(position.getName());
-
-        // ---- test ----
-
-        tmp = new ArrayList<Wifi>();
-        tmp.add(new Wifi("00:26:cb:4e:0e:71", 61.0f, 58.0f, 59.6f));
-        tmp.add(new Wifi("10:9a:dd:b5:2a:3f", 70.0f, 58.0f, 64.6f));
-        tmp.add(new Wifi("00:26:cb:4e:0e:70", 61.0f, 55.0f, 57.4f));
-        tmp.add(new Wifi("00:26:cb:4e:0c:a0", 82.0f, 72.0f, 74.2f));
-        tmp.add(new Wifi("00:26:cb:4e:0c:a1", 83.0f, 72.0f, 75.2f));
-        tmp.add(new Wifi("00:26:cb:4e:0e:71", 79.0f, 72.0f, 77.2f));
-
-        position = _graph.whereAmI(tmp);
-        System.out.print("Test with an additionnal wifi.\nThe result should be F29. res = ");
-        System.out.println(position.getName());
-
-        // ---- test ----
-
-        tmp = new ArrayList<Wifi>();
-        tmp.add(new Wifi("00:26:cb:4e:0e:71", 61.0f, 58.0f, 59.6f));
-        tmp.add(new Wifi("10:9a:dd:b5:2a:3f", 70.0f, 58.0f, 64.6f));
-        tmp.add(new Wifi("00:26:cb:4e:0e:70", 61.0f, 55.0f, 57.4f));
-        tmp.add(new Wifi("00:26:cb:4e:0c:a0", 82.0f, 72.0f, 74.2f));
-
-        position = _graph.whereAmI(tmp);
-        System.out.print("Test with a missing wifi.\nThe result should be F29. res = ");
-        System.out.println(position.getName());
-
-        // ---- test ----
-
-        tmp = new ArrayList<Wifi>();
-        tmp.add(new Wifi("00:26:cb:4e:0e:71", 61.0f, 58.0f, 58.6f));
-        tmp.add(new Wifi("10:9a:dd:b5:2a:3f", 70.0f, 58.0f, 64.6f));
-        tmp.add(new Wifi("00:26:cb:4e:0e:70", 61.0f, 55.0f, 56.4f));
-        tmp.add(new Wifi("00:26:cb:4e:0c:a0", 82.0f, 72.0f, 73.2f));
-        tmp.add(new Wifi("00:26:cb:4e:0c:a1", 83.0f, 72.0f, 74.2f));
-
-        position = _graph.whereAmI(tmp);
-        System.out.print("Test with slight changes in the avg values.\nThe result should be F29. res = ");
-        System.out.println(position.getName());
-        */
         // ---- test ----
 
         ArrayList<Wifi> tmp = new ArrayList<Wifi>();
@@ -329,7 +296,6 @@ public class MainActivity extends AppCompatActivity  {
         System.out.print("Test 6.\n res = ");
         System.out.println(position.getName());
     }
-
 
     /**
      *

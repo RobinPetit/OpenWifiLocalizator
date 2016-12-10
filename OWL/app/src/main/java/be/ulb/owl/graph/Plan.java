@@ -82,7 +82,7 @@ public class Plan {
     private double getScore(Float level) {
         return Math.pow((-level+100)/50, 0.6);
     }
-
+    
     /**
      * Create a plan <b>and</b> load XML file from this plan
      *
@@ -116,23 +116,6 @@ public class Plan {
         return res;
     }
 
-    private ArrayList<Wifi> and(ArrayList<Wifi> capted, ArrayList<Wifi> set) {
-        ArrayList<Wifi> res = new ArrayList<Wifi>();
-        ArrayList<String> tmp = new ArrayList<String>();
-        for (Wifi wifi:set) {
-            tmp.add(wifi.getBSS());
-        }
-        for (Wifi cap: capted) {
-            String key = cap.getBSS();
-            if (tmp.contains(key)) {
-                Wifi correspondent = set.get(tmp.indexOf(key));
-                if (cap.getAvg() < correspondent.getMax() && cap.getAvg() > correspondent.getMin() ) {
-                    res.add(cap);
-                }
-            }
-        }
-        return res;
-    }
 
     /**
      * Check if the current plan have this name
