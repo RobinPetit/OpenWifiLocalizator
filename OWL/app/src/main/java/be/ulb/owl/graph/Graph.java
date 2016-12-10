@@ -5,13 +5,10 @@
 */
 package be.ulb.owl.graph;
 
-import android.os.Environment;
 import android.util.Log;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import be.ulb.owl.MainActivity;
 import be.ulb.owl.Scanner;

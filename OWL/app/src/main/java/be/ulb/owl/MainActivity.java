@@ -24,8 +24,6 @@ import be.ulb.owl.gui.listener.QueryTextListener;
 import be.ulb.owl.gui.listener.TouchListener;
 import be.ulb.owl.utils.LogUtils;
 
-import static android.R.attr.start;
-
 /**
  * Main file for Androit application<br/>
  * See this file before: https://developer.android.com/images/training/basics/basic-lifecycle-create.png<br/>
