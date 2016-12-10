@@ -103,7 +103,6 @@ public class MainActivity extends AppCompatActivity  {
         setContentView(R.layout.activity_main);
 
         _imageView = (ImageView)findViewById(R.id.plan);
-        _imageView.setOnTouchListener(new TouchListener());
 
         _imageDraw = (ImageView)findViewById(R.id.draw);
         _imageDraw.setOnTouchListener(new TouchListener());
@@ -352,6 +351,9 @@ public class MainActivity extends AppCompatActivity  {
     }
 
 
+    public ImageView getImageView() {
+        return _imageView;
+    }
 
 
     //////////////////////// STATIC ////////////////////////
