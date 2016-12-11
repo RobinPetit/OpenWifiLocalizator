@@ -47,12 +47,12 @@ public class ClickListener implements View.OnClickListener {
         final String[] items = {"Plaine", "Solbosch", "P.F"}; // TODO Remove test (P.F)
 
         AlertDialog.Builder builder = new AlertDialog.Builder(main);
-        builder.setTitle("Make your selection");
+        builder.setTitle(R.string.select_map);
         builder.setItems(items, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
 
                 String name = items[item];
-                Log.d(getClass().getName(), "Nom de la map: " + name);
+                Log.d(getClass().getName(), "Name of the map: " + name);
                 main.setCurrentPlan(Graph.getPlan(name));
 
             }
@@ -80,11 +80,11 @@ public class ClickListener implements View.OnClickListener {
 
         final String[] listFinal = items;
         AlertDialog.Builder builder = new AlertDialog.Builder(main);
-        builder.setTitle("Locaux");
+        builder.setTitle(R.string.select_local);
         builder.setItems(items, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
                 // TODO place point on map ?
-                Log.i(getClass().getName(), "Sélection du local : "+listFinal[item]);
+                Log.i(getClass().getName(), "Local selected: "+listFinal[item]);
             }
         });
         AlertDialog alert = builder.create();

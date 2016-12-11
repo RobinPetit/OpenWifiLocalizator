@@ -36,7 +36,7 @@ public class Graph {
 
 
         if(_allPlan.isEmpty()) {
-            Log.w(getClass().getName(), "Aucun plan n'a été chargé");
+            Log.w(getClass().getName(), "None plan has been loaded");
         }
 
         _scanner = new Scanner();
@@ -75,7 +75,8 @@ public class Graph {
         }
 
         if (res.size() == 0) {
-            System.out.println("You are not at ULB.\nI should throw a propre exception but I'm too lazy...");
+            Log.i(getClass().getName(), "You are not at ULB.\nI should throw a propre exception " +
+                    "but I'm too lazy...");
         }
         return res.get(0).getNode(sensed);
     }
@@ -171,8 +172,8 @@ public class Graph {
                 resPlan = new Plan(name);
                 _allPlan.add(resPlan);
             } catch (IOException exception) {
-                Log.e(Graph.class.getName(), "Impossible de charger le plan: " + name +
-                        " (e: " + exception.getMessage()+")");
+                Log.e(Graph.class.getName(), "Can not load the plan: " + name +
+                        " (err: " + exception.getMessage()+")");
             }
         }
 

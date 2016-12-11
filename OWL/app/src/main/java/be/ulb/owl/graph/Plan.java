@@ -67,7 +67,7 @@ public class Plan {
         if(loadPlan) {
             boolean couldLoad = loadXMLPlan();
             if(!couldLoad) {
-                throw new IOException("Impossible de charger ce plan " + _name + " (XML introuvable)");
+                throw new IOException("Impossible to load this plan " + _name + " (XML not found)");
             }
         }
 
@@ -75,7 +75,7 @@ public class Plan {
             // TODO optimisation ? :/
             _image = main.getAssets().open("IMGMap" + File.separator + _name +".png");
         } catch (IOException e) {
-            throw new IOException("Impossible de charger l'image de ce plan (" + _name + ")");
+            throw new IOException("Impossible to load the image of this plan (" + _name + ")");
         }
     }
 
@@ -330,8 +330,7 @@ public class Plan {
                                 break;
 
                             default:
-                                Log.e(getClass().getName(), "Balise non prise en charge: "
-                                        + parser.getName());
+                                Log.e(getClass().getName(), "XML Unknown tag: " + parser.getName());
                                 parser.next();
                                 break;
 
@@ -381,8 +380,8 @@ public class Plan {
                 XMLLoadOneNode(parser);
 
             } else {
-                Log.e(getClass().getName(), "Erreur dans le fichier (" + this._name + "). " +
-                        "Problème de chargement de la node: " + parser.getName());
+                Log.e(getClass().getName(), "Error in the file (" + this._name + "). " +
+                        "Problem when node: " + parser.getName() + " is loaded");
                 XMLDebugParser(parser);
                 XMLUtils.nextAndRemoveSpace(parser);
             }
@@ -460,8 +459,8 @@ public class Plan {
             _listNode.add(new Node(this, x, y, pointId, listWifi, listAlias));
 
         } else {
-            Log.e(getClass().getName(), "Impossible de créer la node: " + pointId + " (il manque " +
-                    "des informations)");
+            Log.e(getClass().getName(), "Impossible to create the node: " + pointId + " (missing " +
+                    "informations)");
         }
 
     }
@@ -499,7 +498,7 @@ public class Plan {
                     _allBssWifi.add(bss);
                 }
 
-                Log.d(getClass().getName(), "Création d'un wifi: " + bss + " min: " + min +
+                Log.d(getClass().getName(), "Creating a wifi: " + bss + " min: " + min +
                         " max: "+ max + " avg: " + avg);
             }
 
@@ -580,8 +579,8 @@ public class Plan {
                 Log.d(getClass().getName(), "End External section");
 
             } else {
-                Log.e(getClass().getName(), "Erreur dans le fichier. Problème de chargement de " +
-                        "l'edge: " + parser.getName() + " (Plan: " + _name+ ")");
+                Log.e(getClass().getName(), "Error in the file. Problem when the edge: " +
+                        parser.getName() + " is load (Plan: " + _name+ ")");
                 XMLDebugParser(parser);
                 XMLUtils.nextAndRemoveSpace(parser);
             }
@@ -607,8 +606,8 @@ public class Plan {
 
         if(!typeEdge.equalsIgnoreCase("internal") &&
                 !typeEdge.equalsIgnoreCase("external")) {
-            throw new IllegalArgumentException("Les liens: " + typeEdge +
-                    " ne sont pas encore pris en compte");
+            throw new IllegalArgumentException("Link : " + typeEdge +
+                    " are currently not supported");
         }
 
         // Next after "internal"/"external" balise
@@ -647,19 +646,18 @@ public class Plan {
 
                 if(nodeOne != null && nodeTwo != null) {
                     new Path(nodeOne, nodeTwo, weight, true);
-                    Log.d(getClass().getName(), "Création d'un lien entre: " + nodeOne.getName() +
-                            " et " + nodeTwo.getName() + " (distance: " + weight + ")");
+                    Log.d(getClass().getName(), "Creating link between: " + nodeOne.getName() +
+                            " and " + nodeTwo.getName() + " (distance: " + weight + ")");
 
                 } else {
-                    Log.e(getClass().getName(), "Impossible de faire un lien entre les " +
-                            "points: " + begin + " et " + end + " (au moins un des deux noeuds " +
-                            "n'a pas été trouvé)");
+                    Log.e(getClass().getName(), "Impossible to make link between: " + begin +
+                            " and " + end + " (at least one of the two was not found)");
                 }
                 parser.next(); // Next
 
             } else {
-                Log.e(getClass().getName(), "Erreur dans le fichier (" + _name + "). Problème de "
-                        + "chargement d'une edge " + typeEdge + ": " + parser.getName());
+                Log.e(getClass().getName(), "Error in the file (" + _name + "). Problem with the " +
+                        "loading of an edge " + typeEdge + ": " + parser.getName());
                 XMLDebugParser(parser);
             }
 

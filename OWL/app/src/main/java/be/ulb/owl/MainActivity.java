@@ -30,7 +30,7 @@ import be.ulb.owl.gui.listener.QueryTextListener;
 import be.ulb.owl.gui.listener.TouchListener;
 import be.ulb.owl.utils.LogUtils;
 
-/*
+/* TODO faire du netoyage ici :P  @denishoornaert
 //Create a new image bitmap and attach a brand new canvas to it
 Bitmap tempBitmap = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.RGB_565);
 Canvas tempCanvas = new Canvas(tempBitmap);
@@ -133,15 +133,15 @@ public class MainActivity extends AppCompatActivity  {
         Log.i(getClass().getName(), "Scanner.scan");
         Node current = _graph.whereAmI();
         if(current != null) {
-            Log.d(getClass().getName(), "Noeud trouvé: " + current.getName());
+            Log.d(getClass().getName(), "Node found: " + current.getName());
             setCurrentPlan(current.getParentPlan());
 
         } else {
-            Log.d(getClass().getName(), "Position introuvable");
+            Log.d(getClass().getName(), "Position not found");
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Not found");
-            builder.setMessage("You are not at ULB");
-            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            builder.setTitle(R.string.not_found);
+            builder.setMessage(R.string.not_in_ULB);
+            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     dialog.dismiss();
                 }
@@ -149,6 +149,7 @@ public class MainActivity extends AppCompatActivity  {
             builder.create().show();
 
         }
+
         setUpDrawArea();
     //testWifi();
     }
@@ -297,7 +298,7 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     /**
-     *
+     * TODO @NathanLiccardo quand est appellé cet event précisément ? :/
      *
      * @param menu
      * @return
@@ -346,7 +347,7 @@ public class MainActivity extends AppCompatActivity  {
             _imageView.setScaleType(ImageView.ScaleType.MATRIX);
 
         } else if(newCurrentPlan == null) {
-            Log.w(this.getClass().getName(), "Le nouveau plan est null");
+            Log.w(this.getClass().getName(), "New plan is null");
         }
     }
 
