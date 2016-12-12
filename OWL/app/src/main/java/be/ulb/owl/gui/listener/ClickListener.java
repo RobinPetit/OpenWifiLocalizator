@@ -47,11 +47,12 @@ public class ClickListener implements View.OnClickListener {
         final String[] items = {"Plaine", "Solbosch", "P.F"}; // TODO Remove test (P.F)
 
         AlertDialog.Builder builder = new AlertDialog.Builder(main);
-        builder.setTitle("Make your selection");
+        builder.setTitle(R.string.select_map);
         builder.setItems(items, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
 
                 String name = items[item];
+                Log.d(getClass().getName(), "Name of the map: " + name);
                 main.setCurrentPlan(Graph.getPlan(name));
 
             }
@@ -65,27 +66,25 @@ public class ClickListener implements View.OnClickListener {
      */
     private void searchLocal() {
 
-        final String[] items;
+        String[] items = new String[]{};
         Plan currentPlan = main.getCurrentPlan();
         if(currentPlan != null) {
             ArrayList<String> allAlias = currentPlan.getAllAlias();
             Log.d(this.getClass().getName(), allAlias.toString());
 
-            if(!allAlias.isEmpty() && allAlias.toArray() instanceof String[]) {
-                items = (String[]) allAlias.toArray();
-            } else {
-                items = new String[]{};
+            if(allAlias.size() > 0) {
+                items = new String[allAlias.size()];
+                items = allAlias.toArray(items);
             }
-
-        } else {
-            items = (String[]) Arrays.asList("Exemple1", "Exemple2").toArray();
         }
 
+        final String[] listFinal = items;
         AlertDialog.Builder builder = new AlertDialog.Builder(main);
-        builder.setTitle("Locaux");
+        builder.setTitle(R.string.select_local);
         builder.setItems(items, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-                Log.i(getClass().getName(), "Sélection du local : "+items[item]);
+                // TODO place point on map ?
+                Log.i(getClass().getName(), "Local selected: "+listFinal[item]);
             }
         });
         AlertDialog alert = builder.create();

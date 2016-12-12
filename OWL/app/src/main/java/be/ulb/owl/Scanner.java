@@ -94,7 +94,7 @@ public class Scanner {
         }
 
         if(temp.isEmpty()) {
-            Log.i(getClass().getName(), "Aucun wifi dans cette zone");
+            Log.i(getClass().getName(), "No wifi in this area");
         }
 
         return temp;

@@ -161,7 +161,7 @@ public class Zoom {
     }
 
     public Zoom(){
-        System.out.println("Instantiate");
+        Log.i(getClass().getName(), "Instantiate");
     }
 
 }

@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">OWL</string>
+    <string name="not_found">Not found</string>
+    <string name="not_in_ULB">You are not at ULB</string>
+    <string name="ok">Ok</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="select_local">Choose a local</string>
+    <string name="select_map">Choose your campus</string>
 </resources>

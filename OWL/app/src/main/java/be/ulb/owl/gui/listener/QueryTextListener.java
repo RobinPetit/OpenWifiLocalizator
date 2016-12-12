@@ -12,13 +12,13 @@ public class QueryTextListener implements SearchView.OnQueryTextListener {
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        Log.i(getClass().getName(), "text envoyé : "+query);
+        Log.i(getClass().getName(), "text sended: "+query);
         return false;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        Log.d(getClass().getName(), "text modifié : "+newText);
+        Log.d(getClass().getName(), "text modified: "+newText);
         return false;
     }
 }

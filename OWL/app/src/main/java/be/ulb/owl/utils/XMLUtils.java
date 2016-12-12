@@ -36,7 +36,7 @@ public class XMLUtils {
     /**
      * Read XML File and return a XMLPullParser
      * 
-     * @param name of the file who must be read (with extention !)
+     * @param name of the file who must be read (without extention !)
      * @return XmlPullParser
      */
     public static XmlPullParser readXMLFile(String name) throws IOException, XmlPullParserException {
@@ -62,7 +62,7 @@ public class XMLUtils {
      * @throws XmlPullParserException
      */
     public static boolean isSpace(XmlPullParser parser) throws XmlPullParserException {
-        return parser.getEventType() == XmlPullParser.TEXT && 
+        return parser.getEventType() == XmlPullParser.TEXT &&
                 (parser.getName() == null || parser.getName().equalsIgnoreCase(""));
     }
 

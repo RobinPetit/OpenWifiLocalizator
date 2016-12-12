@@ -66,7 +66,7 @@ public class Plan {
         if(loadPlan) {
             boolean couldLoad = loadXMLPlan();
             if(!couldLoad) {
-                throw new IOException("Impossible de charger ce plan " + _name + " (XML introuvable)");
+                throw new IOException("Impossible to load this plan " + _name + " (XML not found)");
             }
         }
 
@@ -74,7 +74,7 @@ public class Plan {
             // TODO optimisation ? :/
             _image = main.getAssets().open("IMGMap" + File.separator + _name +".png");
         } catch (IOException e) {
-            throw new IOException("Impossible de charger l'image de ce plan (" + _name + ")");
+            throw new IOException("Impossible to load the image of this plan (" + _name + ")");
         }
     }
 
@@ -115,23 +115,6 @@ public class Plan {
         return res;
     }
 
-    private ArrayList<Wifi> and(ArrayList<Wifi> capted, ArrayList<Wifi> set) {
-        ArrayList<Wifi> res = new ArrayList<Wifi>();
-        ArrayList<String> tmp = new ArrayList<String>();
-        for (Wifi wifi:set) {
-            tmp.add(wifi.getBSS());
-        }
-        for (Wifi cap: capted) {
-            String key = cap.getBSS();
-            if (tmp.contains(key)) {
-                Wifi correspondent = set.get(tmp.indexOf(key));
-                if (cap.getAvg() < correspondent.getMax() && cap.getAvg() > correspondent.getMin() ) {
-                    res.add(cap);
-                }
-            }
-        }
-        return res;
-    }
 
     /**
      * Check if the current plan have this name
@@ -143,6 +126,14 @@ public class Plan {
         return _name.equals(name);
     }
 
+    /**
+     * Get the name of the plan
+     *
+     * @return the name of this plan
+     */
+    public String getName() {
+        return _name;
+    }
 
 
     /**
@@ -253,13 +244,13 @@ public class Plan {
             _allAlias = new ArrayList<String>();
             Log.d(this.getClass().getName(), "Load alias !");
 
-            for(Node node : _listNode) {
-                Log.d(this.getClass().getName(), "Alias: " + node.getName() + " (" + node.getAlias().toString() + ")");
-                _allAlias.addAll(node.getAlias());
+            for (Node node : _listNode) {
+                for(String alias : node.getAlias()) {
+                    if(!_allAlias.contains(alias)) {
+                        _allAlias.add(alias);
+                    }
+                }
             }
-
-        } else {
-            Log.i(this.getClass().getName(), "Alias null :/");
         }
 
         return _allAlias;
@@ -338,8 +329,7 @@ public class Plan {
                                 break;
 
                             default:
-                                Log.e(getClass().getName(), "Balise non prise en charge: "
-                                        + parser.getName());
+                                Log.e(getClass().getName(), "XML Unknown tag: " + parser.getName());
                                 parser.next();
                                 break;
 
@@ -389,8 +379,8 @@ public class Plan {
                 XMLLoadOneNode(parser);
 
             } else {
-                Log.e(getClass().getName(), "Erreur dans le fichier (" + this._name + "). " +
-                        "Problème de chargement de la node: " + parser.getName());
+                Log.e(getClass().getName(), "Error in the file (" + this._name + "). " +
+                        "Problem when node: " + parser.getName() + " is loaded");
                 XMLDebugParser(parser);
                 XMLUtils.nextAndRemoveSpace(parser);
             }
@@ -429,15 +419,19 @@ public class Plan {
                 switch(parser.getName()) {
 
                     // TODO alias changes !!
-                    case "alias":
-                        parser.next(); // START_TAG
-                        if(parser.getEventType() == XmlPullParser.TEXT) {
-                            listAlias.add(parser.getText());
-                        } else {
-                            Log.e(this.getClass().getName(), "Erreur avec le fichier à paser ! " +
-                                    "Pour le plan: " + _name);
-                        }
+                    case "aliases":
+                        listAlias = XMLGetListAlias(parser);
                         break;
+
+//                    case "alias":
+//                        parser.next(); // START_TAG
+//                        if(parser.getEventType() == XmlPullParser.TEXT) {
+//                            listAlias.add(parser.getText());
+//                        } else {
+//                            Log.e(this.getClass().getName(), "Erreur avec le fichier à paser ! " +
+//                                    "Pour le plan: " + _name);
+//                        }
+//                        break;
 
                     case "coord":
                         x = Float.parseFloat(parser.getAttributeValue(null, "x"));
@@ -461,11 +455,11 @@ public class Plan {
 
         if(x != Integer.MIN_VALUE && y != Integer.MIN_VALUE && pointId != null) {
             // Create and add node
-            _listNode.add(new Node(this, x, y, pointId, listWifi));
+            _listNode.add(new Node(this, x, y, pointId, listWifi, listAlias));
 
         } else {
-            Log.e(getClass().getName(), "Impossible de créer la node: " + pointId + " (il manque " +
-                    "des informations)");
+            Log.e(getClass().getName(), "Impossible to create the node: " + pointId + " (missing " +
+                    "informations)");
         }
 
     }
@@ -503,7 +497,7 @@ public class Plan {
                     _allBssWifi.add(bss);
                 }
 
-                Log.d(getClass().getName(), "Création d'un wifi: " + bss + " min: " + min +
+                Log.d(getClass().getName(), "Creating a wifi: " + bss + " min: " + min +
                         " max: "+ max + " avg: " + avg);
             }
 
@@ -512,6 +506,42 @@ public class Plan {
         parser.next(); // Next after the End_tag
 
         return listWifi;
+    }
+
+    /**
+     * Extract a list of Alias from the XML File
+     *
+     * @param parser the XML File Iterator
+     * @return an ArrayList of String that contains alias
+     */
+    private ArrayList<String> XMLGetListAlias(XmlPullParser parser)
+            throws XmlPullParserException, IOException {
+        ArrayList<String> listAlias = new ArrayList<String>();
+
+        // Next after "listwifi" balise
+        XMLUtils.nextAndRemoveSpace(parser);
+
+        while(parser.getEventType() != XmlPullParser.END_TAG ||
+                !parser.getName().equalsIgnoreCase("aliases")) {
+
+            if(parser.getEventType() == XmlPullParser.START_TAG &&
+                    parser.getName().equalsIgnoreCase("alias")) {
+
+                XMLDebugParser(parser);
+                parser.next();
+                if(parser.getEventType() == XmlPullParser.TEXT && parser.getText() != "") {
+                    listAlias.add(parser.getText());
+                }
+                parser.next();
+
+
+            }
+
+            XMLUtils.nextAndRemoveSpace(parser);
+        }
+        parser.next(); // Next after the End_tag
+
+        return listAlias;
     }
 
 
@@ -548,8 +578,8 @@ public class Plan {
                 Log.d(getClass().getName(), "End External section");
 
             } else {
-                Log.e(getClass().getName(), "Erreur dans le fichier. Problème de chargement de " +
-                        "l'edge: " + parser.getName() + " (Plan: " + _name+ ")");
+                Log.e(getClass().getName(), "Error in the file. Problem when the edge: " +
+                        parser.getName() + " is load (Plan: " + _name+ ")");
                 XMLDebugParser(parser);
                 XMLUtils.nextAndRemoveSpace(parser);
             }
@@ -575,8 +605,8 @@ public class Plan {
 
         if(!typeEdge.equalsIgnoreCase("internal") &&
                 !typeEdge.equalsIgnoreCase("external")) {
-            throw new IllegalArgumentException("Les liens: " + typeEdge +
-                    " ne sont pas encore pris en compte");
+            throw new IllegalArgumentException("Link : " + typeEdge +
+                    " are currently not supported");
         }
 
         // Next after "internal"/"external" balise
@@ -604,7 +634,7 @@ public class Plan {
                 /// IF external node
                 if(typeEdge.equalsIgnoreCase("external")) {
                     String strPlan = parser.getAttributeValue(null, "plan");
-                    Plan externalPlan = Graph.getPlan(strPlan);
+                    Plan externalPlan = Graph.getPlan(strPlan, false);
                     if(externalPlan != null) {
                         nodeTwo = externalPlan.getNode(end);
                     }
@@ -615,19 +645,18 @@ public class Plan {
 
                 if(nodeOne != null && nodeTwo != null) {
                     new Path(nodeOne, nodeTwo, weight, true);
-                    Log.d(getClass().getName(), "Création d'un lien entre: " + nodeOne.getName() +
-                            " et " + nodeTwo.getName() + " (distance: " + weight + ")");
+                    Log.d(getClass().getName(), "Creating link between: " + nodeOne.getName() +
+                            " and " + nodeTwo.getName() + " (distance: " + weight + ")");
 
                 } else {
-                    Log.e(getClass().getName(), "Impossible de faire un lien entre les " +
-                            "points: " + begin + " et " + end + " (au moins un des deux noeuds " +
-                            "n'a pas été trouvé)");
+                    Log.e(getClass().getName(), "Impossible to make link between: " + begin +
+                            " and " + end + " (at least one of the two was not found)");
                 }
                 parser.next(); // Next
 
             } else {
-                Log.e(getClass().getName(), "Erreur dans le fichier (" + _name + "). Problème de "
-                        + "chargement d'une edge " + typeEdge + ": " + parser.getName());
+                Log.e(getClass().getName(), "Error in the file (" + _name + "). Problem with the " +
+                        "loading of an edge " + typeEdge + ": " + parser.getName());
                 XMLDebugParser(parser);
             }
 
