@@ -635,7 +635,7 @@ public class Plan {
                 /// IF external node
                 if(typeEdge.equalsIgnoreCase("external")) {
                     String strPlan = parser.getAttributeValue(null, "plan");
-                    Plan externalPlan = Graph.getPlan(strPlan);
+                    Plan externalPlan = Graph.getPlan(strPlan, false);
                     if(externalPlan != null) {
                         nodeTwo = externalPlan.getNode(end);
                     }
