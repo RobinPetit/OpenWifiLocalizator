@@ -51,7 +51,7 @@ public class ShortestPathEvaluator {
      * @param b
      * @return The euclidian distance between two nodes
      */
-    private double heuristic(Node a, Node b) {
+    static public double heuristic(Node a, Node b) {
         double deltaX = a.getX() - b.getX();
         double deltaY = a.getY() - b.getY();
         return Math.sqrt(deltaX*deltaX + deltaY*deltaY);

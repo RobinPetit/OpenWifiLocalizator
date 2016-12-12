@@ -51,6 +51,17 @@ public class Graph {
         return allNodes;
     }
 
+    public ArrayList<Path> findPath(String destination) throws NoPathException {
+        Node src = whereAmI();
+        ArrayList<Node> destinations = searchNode(destination);
+        double minHeuristic = Double.POSITIVE_INFINITY;
+        Node closestDestination = null;
+        for(Node node: destinations)
+            if(ShortestPathEvaluator.heuristic(src, node) < minHeuristic)
+                closestDestination = node;
+        return bestPath(src, closestDestination);
+    }
+
     /**
      * Implements a shortest path algorithm (A*) between two nodes
      * @param nodeFrom The node the user is located at
@@ -191,7 +202,4 @@ public class Graph {
 
         return resPlan;
     }
-
-
-
 }
