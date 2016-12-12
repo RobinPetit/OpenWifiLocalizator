@@ -24,15 +24,13 @@ public class ShortestPathEvaluator {
     private boolean _executed;
 
     public ShortestPathEvaluator(ArrayList<Node> nodes, Node from, Node to) {
-        _allNodes = nodes;
         _evaluatedNodes = new ArrayList<>();
-
         _toBeEvaluated = new ArrayList<>();
         _toBeEvaluated.add(from);
         _mostEfficientOrigin = new HashMap<>();
         _reachingScore = new HashMap<>();
         _intermediateScore = new HashMap<>();
-        for(Node node: _allNodes) {
+        for(Node node: nodes) {
             if (!node.isNode(from.getName())) {
                 _reachingScore.put(node, Double.POSITIVE_INFINITY);
                 _intermediateScore.put(node, Double.POSITIVE_INFINITY);
