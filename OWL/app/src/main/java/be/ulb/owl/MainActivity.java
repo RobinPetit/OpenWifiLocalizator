@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import be.ulb.owl.graph.Graph;
+import be.ulb.owl.graph.NoPathException;
 import be.ulb.owl.graph.Node;
 import be.ulb.owl.graph.Path;
 import be.ulb.owl.graph.Plan;
@@ -156,11 +157,14 @@ public class MainActivity extends AppCompatActivity  {
             builder.create().show();
 
         }
-        //testWifi();
+        if(DEBUG) {
+            testWifi();
+            testBestPath();
+        }
     }
 
     /**
-     * When we hidde the application
+     * When we hide the application
      * @see #onDestroy() when application is destroy
      */
     @Override
@@ -169,6 +173,32 @@ public class MainActivity extends AppCompatActivity  {
         _graph.hidden();
     }
 
+    private void testBestPath() {
+        // 57 & 3
+        int[] startingEnd = {21, 57};
+        int[] arrivalEnd = {14, 3};
+        assert(startingEnd.length == arrivalEnd.length);
+        ArrayList<Node> allNodes = _graph.getAllNodes();
+        for(int i = 0; i < startingEnd.length; ++i) {
+            Node src = allNodes.get(startingEnd[i]);
+            Node dest = allNodes.get(arrivalEnd[i]);
+            Log.i(getClass().getName(), "Testing best path between nodes " + src.getName() + " and " + dest.getName());
+            try {
+                ArrayList<Path> overallPath = _graph.bestPath(src, dest);
+                String pathString = src.getName();
+                Node current = src;
+                int k = 0;
+                while(!current.equals(dest)) {
+                    current = overallPath.get(k++).getOppositNodeOf(current);
+                    pathString += " --> " + current.getName();
+                }
+                Log.i(getClass().getName(), "Found path is given by: " + pathString);
+            } catch (NoPathException e) {
+                Log.e(getClass().getName(), "No path has been found between nodes " + startingEnd[i]
+                        + " and " + arrivalEnd[i] + " even though it was supposed to!");
+            }
+        }
+    }
 
     private void testWifi() {
         // ---- test ----

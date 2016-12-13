@@ -5,10 +5,8 @@
 */
 package be.ulb.owl.graph;
 
-import android.os.Environment;
 import android.util.Log;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -42,11 +40,37 @@ public class Graph {
         _scanner = new Scanner();
     }
 
+    /**
+     *
+     * @return A list containing every node of the graph
+     */
+    public ArrayList<Node> getAllNodes() {
+        ArrayList<Node> allNodes = new ArrayList<>();
+        for(Plan plan : _allPlan)
+            allNodes.addAll(plan.getAllNodes());
+        return allNodes;
+    }
 
+    public ArrayList<Path> findPath(String destination) throws NoPathException {
+        Node src = whereAmI();
+        ArrayList<Node> destinations = searchNode(destination);
+        double minHeuristic = Double.POSITIVE_INFINITY;
+        Node closestDestination = null;
+        for(Node node: destinations)
+            if(ShortestPathEvaluator.heuristic(src, node) < minHeuristic)
+                closestDestination = node;
+        return bestPath(src, closestDestination);
+    }
 
-    public ArrayList<Path> bestPath(Node nodeFrom, Node nodeTo) {
-        // TODO
-        return new ArrayList<Path>();
+    /**
+     * Implements a shortest path algorithm (A*) between two nodes
+     * @param nodeFrom The node the user is located at
+     * @param nodeTo The node the user wants to reach
+     * @return An ordered list of nodes the user has to cross to reach the destination
+     */
+    public ArrayList<Path> bestPath(Node nodeFrom, Node nodeTo) throws NoPathException {
+        ShortestPathEvaluator evaluator = new ShortestPathEvaluator(getAllNodes(), nodeFrom, nodeTo);
+        return evaluator.find();
     }
 
     public Node whereAmI () {
@@ -179,7 +203,4 @@ public class Graph {
 
         return resPlan;
     }
-
-
-
 }

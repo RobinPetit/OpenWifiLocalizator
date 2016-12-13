@@ -66,7 +66,7 @@ public class Path {
      * @param node the start node
      * @return the oposit node
      */
-    public Node getOpositNode(Node node) {
+    public Node getOppositNodeOf(Node node) {
         // return _nodeOne.equals(node) ? _nodeTwo : _nodeOne;
         if(_nodeOne.equals(node)) {
             return _nodeTwo;
@@ -76,12 +76,15 @@ public class Path {
     
     /**
      * Get distance
-     * 
+     *
      * @return the distance between two point
      */
     public float getDistance() {
         return _distance;
     }
-    
-    
+
+    @Override
+    public String toString() {
+        return "Path of length " + _distance + " between " + _nodeOne.getName() + " and " + _nodeTwo.getName();
+    }
 }

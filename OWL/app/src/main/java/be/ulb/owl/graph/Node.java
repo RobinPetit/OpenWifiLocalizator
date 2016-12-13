@@ -170,4 +170,31 @@ public class Node {
         return tmp;
     }
 
+    public ArrayList<Node> getNeighbours() {
+        ArrayList<Node> neighbours = new ArrayList<>();
+        for(Path path: _listPath) {
+            neighbours.add(path.getOppositNodeOf(this));
+        }
+        return neighbours;
+    }
+
+    public double getDistanceFrom(Node neighbour) {
+        assert(getNeighbours().contains(neighbour));
+        double ret = 0.;
+        for(Path path: _listPath) {
+            if(path.containsNode(neighbour)) {
+                ret = path.getDistance();
+                break;
+            }
+        }
+        return ret;
+    }
+
+    public Path pathTo(Node dest) throws NoPathException {
+        for(Path path : _listPath) {
+            if(path.getOppositNodeOf(this).equals(dest))
+                return path;
+        }
+        throw new NoPathException("No path between " + getName() + " and " + dest.getName());
+    }
 }
