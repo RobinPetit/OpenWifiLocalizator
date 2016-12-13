@@ -51,7 +51,7 @@ public class DrawView extends ImageView {
         Node node = path.getNode();
         Float x1 = this.getX(node.getX());
         Float y1 = this.getY(node.getY());
-        node = path.getOpositNode(node);
+        node = path.getOppositNodeOf(node);
         Float x2 = this.getX(node.getX());
         Float y2 = this.getY(node.getY());
         _canvas.drawLine(x1, y1, x2, y2, _paint);
