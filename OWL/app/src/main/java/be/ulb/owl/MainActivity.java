@@ -27,6 +27,7 @@ import be.ulb.owl.graph.NoPathException;
 import be.ulb.owl.graph.Node;
 import be.ulb.owl.graph.Path;
 import be.ulb.owl.graph.Plan;
+import be.ulb.owl.gui.DrawView;
 import be.ulb.owl.gui.listener.ClickListener;
 import be.ulb.owl.gui.listener.QueryTextListener;
 import be.ulb.owl.gui.listener.TouchListener;
@@ -64,30 +65,34 @@ public class MainActivity extends AppCompatActivity  {
     private Graph _graph = null;
     private ImageView _imageView;
     private ImageView _imageDraw;
-    private Bitmap _bitmap = null;
-    private Paint _paint = null;
+    private Bitmap _bitmap = null; // temp
+    private Paint _paint = null; //temp
+    private Canvas _canvas = null; // temp
     private Button _changePlan;
     private Button _local;
 
     private Plan _currentPlan = null;
 
 
-    private void setUpDrawArea () {
-        int width = _imageView.getDrawable().getIntrinsicWidth();
-        int height = _imageView.getDrawable().getIntrinsicHeight();
-        System.out.println(width+"\t"+height);
-        Bitmap bitMap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        bitMap = bitMap.copy(bitMap.getConfig(), true);
-        Canvas canvas = new Canvas(bitMap);
-
-        Paint paint = new Paint();
-        paint.setColor(Color.RED);
-        paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        paint.setAntiAlias(true);
-
-        _imageDraw.setImageBitmap(bitMap);
-        canvas.drawCircle(50, 50, 50, paint);
+    public void draw (Node node) {
+        Float x = node.getX();//*(_imageView.getDrawable().getIntrinsicWidth()/2481);
+        Float y = node.getY();//*(_imageView.getDrawable().getIntrinsicHeight()/1754);
+        System.out.println("Draw x:"+x+" y:"+y+"");
+        _canvas.drawCircle(x, y, 20, _paint);
         _imageDraw.invalidate();
+    }
+
+    private void setUpCanvas () {
+        Integer width = _imageView.getDrawable().getIntrinsicWidth();
+        Integer height = _imageView.getDrawable().getIntrinsicHeight();
+        _bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        _bitmap = _bitmap.copy(_bitmap.getConfig(), true);
+        _canvas = new Canvas(_bitmap);
+        _paint = new Paint();
+        _paint.setColor(Color.RED);
+        _paint.setStyle(Paint.Style.FILL_AND_STROKE);
+        _paint.setAntiAlias(true);
+        _imageDraw.setImageBitmap(_bitmap);
     }
 
     /**
@@ -131,13 +136,14 @@ public class MainActivity extends AppCompatActivity  {
 
         // Set default plan
         setCurrentPlan(Graph.getPlan("Solbosch"));
-
+        this.setUpCanvas();
         Log.i(getClass().getName(), "Scanner.scan");
         Node current = _graph.whereAmI();
         if(current != null) {
             Log.d(getClass().getName(), "Node found: " + current.getName());
             setCurrentPlan(current.getParentPlan());
-
+            this.setUpCanvas();
+            this.draw(current);
         } else {
             Log.d(getClass().getName(), "Position not found");
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -151,8 +157,6 @@ public class MainActivity extends AppCompatActivity  {
             builder.create().show();
 
         }
-
-        setUpDrawArea();
         if(DEBUG) {
             testWifi();
             testBestPath();
@@ -223,6 +227,7 @@ public class MainActivity extends AppCompatActivity  {
         tmp.add(new Wifi("00:37:b7:64:c3:66", 90.0f, 90.0f, 90.0f));
 
         Node position = _graph.whereAmI(tmp);
+        draw(position);
         System.out.print("Test 1.\n res = ");
         System.out.println(position.getName());
 
@@ -250,6 +255,7 @@ public class MainActivity extends AppCompatActivity  {
         tmp.add(new Wifi("00:26:cb:a0:aa:c0", 77.0f, 67.0f, 70.3f));
 
         position = _graph.whereAmI(tmp);
+        draw(position);
         System.out.print("Test 2.\n res = ");
         System.out.println(position.getName());
 
@@ -263,6 +269,7 @@ public class MainActivity extends AppCompatActivity  {
         tmp.add(new Wifi("00:0c:e6:00:d1:0c", 88.0f, 88.0f, 88.0f));
 
         position = _graph.whereAmI(tmp);
+        draw(position);
         System.out.print("Test 3.\n res = ");
         System.out.println(position.getName());
 
@@ -283,6 +290,7 @@ public class MainActivity extends AppCompatActivity  {
         tmp.add(new Wifi("00:26:cb:a0:aa:c0", 75.0f, 62.0f, 71.2f));
 
         position = _graph.whereAmI(tmp);
+        draw(position);
         System.out.print("Test 4.\n res = ");
         System.out.println(position.getName());
 
@@ -306,6 +314,7 @@ public class MainActivity extends AppCompatActivity  {
         tmp.add(new Wifi("d4:6d:50:f2:c7:73", 86.0f, 86.0f, 86.0f));
 
         position = _graph.whereAmI(tmp);
+        draw(position);
         System.out.print("Test 5.\n res = ");
         System.out.println(position.getName());
 
@@ -324,6 +333,7 @@ public class MainActivity extends AppCompatActivity  {
         tmp.add(new Wifi("d4:6d:50:f2:c7:73", 90.0f, 85.0f, 87.5f));
 
         position = _graph.whereAmI(tmp);
+        draw(position);
         System.out.print("Test 6.\n res = ");
         System.out.println(position.getName());
     }

@@ -55,7 +55,11 @@ public class Path {
     public boolean containsNode(Node node) {
         return _nodeOne.equals(node) || _nodeTwo.equals(node);
     }
-    
+
+    public Node getNode () {
+        return _nodeOne;
+    }
+
     /**
      * Get the node on the opostif of the current node
      * 
