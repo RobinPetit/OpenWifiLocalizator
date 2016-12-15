@@ -1,6 +1,7 @@
 package be.ulb.owl;
 
 import android.content.DialogInterface;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity  {
 
     private static MainActivity instance;
     private static final boolean DEBUG = false;
-    private static final boolean TEST = false;
+    private static final boolean TEST = true;
 
     private Graph _graph = null;
     private ImageView _imageView;
@@ -137,10 +138,12 @@ public class MainActivity extends AppCompatActivity  {
 
         // Set default plan
         setCurrentPlan(Graph.getPlan("Solbosch"));
+        this.setUpCanvas();
         Log.i(getClass().getName(), "Scanner.scan");
         localize();
 
         if(TEST) {
+            setCurrentPlan(_graph.getPlanByName("P.F"));
             testWifi();
             testBestPath();
         }
@@ -176,10 +179,8 @@ public class MainActivity extends AppCompatActivity  {
                     pathString += " --> " + current.getName();
                 }
                 Log.i(getClass().getName(), "Found path is given by: " + pathString);
-                if(i == 1) {
-                    setCurrentPlan(_graph.getPlanByName("P.F"));
+                if(i == 1)
                     drawPath(overallPath);
-                }
             } catch (NoPathException e) {
                 Log.e(getClass().getName(), "No path has been found between nodes " + startingEnd[i]
                         + " and " + arrivalEnd[i] + " even though it was supposed to!");
@@ -381,6 +382,8 @@ public class MainActivity extends AppCompatActivity  {
                 !newCurrentPlan.getName().equalsIgnoreCase(_currentPlan.getName())) ) {
 
             _currentPlan = newCurrentPlan;
+            if(_canvas != null)
+                _canvas.drawColor(0, PorterDuff.Mode.CLEAR);
             _imageView.setImageDrawable(_currentPlan.getDrawableImage());
             _imageView.setScaleType(ImageView.ScaleType.MATRIX);
 
