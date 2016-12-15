@@ -15,7 +15,7 @@ import be.ulb.owl.MainActivity;
  */
 public class LogUtils {
 
-    private static final long MAXTIMELOG = 259200000; // 3 days (i hope)
+    private static final long MAXTIMELOG = 3600 * 24 * 3 * 1000;  // 3 Dyas in milliseconds
     private static final MainActivity main = MainActivity.getInstance();
 
 
