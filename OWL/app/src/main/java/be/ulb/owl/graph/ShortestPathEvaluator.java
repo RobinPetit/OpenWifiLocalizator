@@ -8,7 +8,6 @@ import java.util.HashMap;
  */
 
 public class ShortestPathEvaluator {
-    private ArrayList<Node> _allNodes;
     private ArrayList<Node> _evaluatedNodes;           // contains all the nodes which have already been treated
     private ArrayList<Node> _toBeEvaluated;            // contains all the nodes that have already been discovered
                                                        // by the algorithm but which haven't been treated yet
@@ -55,10 +54,6 @@ public class ShortestPathEvaluator {
         return Math.sqrt(deltaX*deltaX + deltaY*deltaY);
     }
 
-    /**
-     *
-     * @return The list of nodes to cross to reach the `dest` node starting at the `src` node
-     */
     public void lookup() {
         while(!_toBeEvaluated.isEmpty()) {
             Node current = getLowestIntermediateScore();
@@ -79,7 +74,7 @@ public class ShortestPathEvaluator {
 
     /**
      *
-     * @return A list of path representing where the user needs to o to reach the given points
+     * @return A list of path representing where the user needs to reach the given points
      * @throws NoPathException
      */
     public ArrayList<Path> find() throws NoPathException {

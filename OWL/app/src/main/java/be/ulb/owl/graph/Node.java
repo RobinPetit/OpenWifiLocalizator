@@ -29,11 +29,11 @@ public class Node {
     /**
      * Init a node
      * 
-     * @param parentPlan plan where is this node
-     * @param x x position of th node
+     * @param parentPlan plan containing the ndoe
+     * @param x x position of the node
      * @param y y position of the node
      * @param name of the node
-     * @param listWifi list of all wifi capted on this point
+     * @param listWifi list of all wifi signals received at this point
      */
     public Node(Plan parentPlan, float x, float y, String name, 
             ArrayList<Wifi> listWifi) {
@@ -43,12 +43,12 @@ public class Node {
     /**
      * Init a node
      *
-     * @param parentPlan plan where is this node
-     * @param x x position of th node
+     * @param parentPlan plan containing
+     * @param x x position of the node
      * @param y y position of the node
      * @param name of the node
-     * @param listWifi list of all wifi capted on this point
-     * @param listAlias list of all alias
+     * @param listWifi list of all wifi signals received on this point
+     * @param listAlias list of all aliases of the node
      */
     public Node(Plan parentPlan, float x, float y, String name,
                 ArrayList<Wifi> listWifi, ArrayList<String> listAlias) {
@@ -76,7 +76,7 @@ public class Node {
     /**
      * Add a path to an other Node
      * 
-     * @param newPath the Path betwee the two node
+     * @param newPath the Path between the two node
      */
     protected void addPath(Path newPath) {
         if(!newPath.containsNode(this)) {
@@ -149,7 +149,7 @@ public class Node {
     
     /**
      * Get the list of the alias<br/>
-     * <b>/!\</b> Java use reference... Clone befor modification
+     * <b>/!\</b> Java use reference... Clone before modification
      * 
      * @return An ArrayList of string that contains all alias
      * @see #isNode(java.lang.String) 

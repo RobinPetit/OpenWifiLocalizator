@@ -8,7 +8,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.util.Log;
 import android.widget.ImageView;
 
 import java.util.List;
@@ -38,13 +37,6 @@ public class DrawView extends ImageView {
 
     private Float getX (Float x) {
         return x/_wFactor;
-    }
-
-    public void draw (Node node) {
-        Float x = 50.0f; //this.getX(node.getX());
-        Float y = 50.0f; //this.getY(node.getY());
-        _canvas.drawCircle(x, y, 50, _paint);
-        this.invalidate();
     }
 
     public void draw (Path path) {

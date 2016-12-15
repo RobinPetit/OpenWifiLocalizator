@@ -29,14 +29,10 @@ import be.ulb.owl.MainActivity;
  * @author Detobel36
  */
 public class XMLUtils {
-    
-    private static final String ns = null;
-    
-    
     /**
      * Read XML File and return a XMLPullParser
      * 
-     * @param name of the file who must be read (without extention !)
+     * @param name of the file who must be read (without extension !)
      * @return XmlPullParser
      */
     public static XmlPullParser readXMLFile(String name) throws IOException, XmlPullParserException {
@@ -67,7 +63,7 @@ public class XMLUtils {
     }
 
     /**
-     * Remove all space from the current iterator to the next data
+     * Remove all spaces from the current iterator to the next data
      *
      * @param parser the parser which must be tested
      * @throws XmlPullParserException

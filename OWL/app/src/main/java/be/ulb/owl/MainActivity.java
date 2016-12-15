@@ -2,7 +2,6 @@ package be.ulb.owl;
 
 import android.content.DialogInterface;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
@@ -17,11 +16,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Color;
-import android.graphics.BitmapFactory;
-import android.widget.LinearLayout;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +47,7 @@ myImageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
 
 
 /**
- * Main file for Androit application<br/>
+ * Main file for Android application<br/>
  * See this file before: https://developer.android.com/images/training/basics/basic-lifecycle-create.png<br/>
  * Doc: https://developer.android.com/training/basics/activity-lifecycle/starting.html
  *
@@ -119,14 +113,14 @@ public class MainActivity extends AppCompatActivity  {
         _imageDraw = (ImageView)findViewById(R.id.draw);
         _imageDraw.setOnTouchListener(new TouchListener());
 
-        // Define clic listener
-        ClickListener clicListener = new ClickListener();
+        // Define click listener
+        ClickListener clickListener = new ClickListener();
 
         _changePlan = (Button) findViewById(R.id.changePlan);
-        _changePlan.setOnClickListener(clicListener);
+        _changePlan.setOnClickListener(clickListener);
 
         _local = (Button) findViewById(R.id.local);
-        _local.setOnClickListener(clicListener);
+        _local.setOnClickListener(clickListener);
     }
 
     @Override
@@ -385,7 +379,7 @@ public class MainActivity extends AppCompatActivity  {
     /**
      * Get the current plan which is show
      *
-     * @return the curent plan
+     * @return the current plan
      */
     public Plan getCurrentPlan() {
         return _currentPlan;

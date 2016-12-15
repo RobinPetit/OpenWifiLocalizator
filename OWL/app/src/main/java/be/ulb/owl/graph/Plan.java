@@ -467,9 +467,8 @@ public class Plan {
 
     }
 
-
     /**
-     * Extract a list of Wifi from the XML File
+     * Extract a list of Wifi from the XML file
      *
      * @param parser the XML File Iterator
      * @return an ArrayList of Wifi
@@ -481,7 +480,7 @@ public class Plan {
 
         ArrayList<Wifi> listWifi = new ArrayList<Wifi>();
 
-        // Next after "listwifi" balise
+        // Next after the <listwifi> tag
         XMLUtils.nextAndRemoveSpace(parser);
 
         while(parser.getEventType() != XmlPullParser.END_TAG ||
@@ -512,7 +511,7 @@ public class Plan {
     }
 
     /**
-     * Extract a list of Alias from the XML File
+     * Extract a list of aliases from the XML File
      *
      * @param parser the XML File Iterator
      * @return an ArrayList of String that contains alias
@@ -521,7 +520,7 @@ public class Plan {
             throws XmlPullParserException, IOException {
         ArrayList<String> listAlias = new ArrayList<String>();
 
-        // Next after "listwifi" balise
+        // Next after <listwifi> tag
         XMLUtils.nextAndRemoveSpace(parser);
 
         while(parser.getEventType() != XmlPullParser.END_TAG ||
@@ -558,7 +557,7 @@ public class Plan {
     private void XMLLoadEdges(XmlPullParser parser)
             throws XmlPullParserException, IOException {
 
-        // Next after "edgesS" balise
+        // Next after <edges> tag
         XMLUtils.nextAndRemoveSpace(parser);
 
         while(parser.getEventType() != XmlPullParser.END_TAG ||
@@ -612,7 +611,7 @@ public class Plan {
                     " are currently not supported");
         }
 
-        // Next after "internal"/"external" balise
+        // Next after "internal"/"external" tag
         XMLUtils.nextAndRemoveSpace(parser);
 
         while(parser.getEventType() != XmlPullParser.END_TAG ||
@@ -684,7 +683,4 @@ public class Plan {
         Log.d(Plan.class.getName(), parser.getName() + " (type:" + type + " text:" +
                 parser.getText() + ")");
     }
-
-
-
 }
