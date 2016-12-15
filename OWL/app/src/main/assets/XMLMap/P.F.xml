@@ -1,5 +1,5 @@
 <plan name="P.F">
-    <background_image coord="(-631.0, -247.0)" />
+    <background_image x="-631" y="-247" />
     <distance_unit value="11" />
     <nodes>
         <node id="0">

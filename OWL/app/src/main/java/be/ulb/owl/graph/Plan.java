@@ -29,7 +29,8 @@ import org.xmlpull.v1.XmlPullParserException;
 public class Plan {
 
     private static final MainActivity main = MainActivity.getInstance();
-
+    private float _bgCoordX;
+    private float _bgCoordY;
 
     private final String _name;
     private ArrayList<String> _allAlias; // Cache
@@ -323,6 +324,8 @@ public class Plan {
                                 break;
 
                             case "background_image":
+                                _bgCoordX = Float.parseFloat(parser.getAttributeValue(null, "x"));
+                                _bgCoordY = Float.parseFloat(parser.getAttributeValue(null, "y"));
                             case "distance_unit":
                                 XMLUtils.nextAndRemoveSpace(parser); // Skip START
                                 XMLUtils.nextAndRemoveSpace(parser); // Skip END
@@ -455,7 +458,7 @@ public class Plan {
 
         if(x != Integer.MIN_VALUE && y != Integer.MIN_VALUE && pointId != null) {
             // Create and add node
-            _listNode.add(new Node(this, x, y, pointId, listWifi, listAlias));
+            _listNode.add(new Node(this, (x-_bgCoordX)/2, (y-_bgCoordY)/2, pointId, listWifi, listAlias));
 
         } else {
             Log.e(getClass().getName(), "Impossible to create the node: " + pointId + " (missing " +

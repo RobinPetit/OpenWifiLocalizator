@@ -1,6 +1,7 @@
 package be.ulb.owl;
 
 import android.content.DialogInterface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
@@ -21,6 +22,7 @@ import android.widget.LinearLayout;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import be.ulb.owl.graph.Graph;
 import be.ulb.owl.graph.NoPathException;
@@ -60,7 +62,8 @@ myImageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
 public class MainActivity extends AppCompatActivity  {
 
     private static MainActivity instance;
-    private static boolean DEBUG = false;
+    private static final boolean DEBUG = false;
+    private static final boolean TEST = false;
 
     private Graph _graph = null;
     private ImageView _imageView;
@@ -78,7 +81,7 @@ public class MainActivity extends AppCompatActivity  {
         Float x = node.getX();//*(_imageView.getDrawable().getIntrinsicWidth()/2481);
         Float y = node.getY();//*(_imageView.getDrawable().getIntrinsicHeight()/1754);
         System.out.println("Draw x:"+x+" y:"+y+"");
-        _canvas.drawCircle(x, y, 20, _paint);
+        _canvas.drawCircle(x, y, 10, _paint);
         _imageDraw.invalidate();
     }
 
@@ -124,8 +127,6 @@ public class MainActivity extends AppCompatActivity  {
         _local.setOnClickListener(clicListener);
     }
 
-
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -157,7 +158,7 @@ public class MainActivity extends AppCompatActivity  {
             builder.create().show();
 
         }
-        if(DEBUG) {
+        if(TEST) {
             testWifi();
             testBestPath();
         }
@@ -193,6 +194,10 @@ public class MainActivity extends AppCompatActivity  {
                     pathString += " --> " + current.getName();
                 }
                 Log.i(getClass().getName(), "Found path is given by: " + pathString);
+                if(i == 1) {
+                    setCurrentPlan(_graph.getPlanByName("P.F"));
+                    drawPath(overallPath);
+                }
             } catch (NoPathException e) {
                 Log.e(getClass().getName(), "No path has been found between nodes " + startingEnd[i]
                         + " and " + arrivalEnd[i] + " even though it was supposed to!");
@@ -354,7 +359,9 @@ public class MainActivity extends AppCompatActivity  {
         return true;
     }
 
-
+    private void drawPath(List<Path> pathList) {
+        new DrawView(this, _canvas).draw(pathList);
+    }
 
     /**
      * Get the name of the application

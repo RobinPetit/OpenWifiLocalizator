@@ -99,7 +99,7 @@ public class Graph {
         }
 
         if (res.size() == 0) {
-            Log.i(getClass().getName(), "You are not at ULB.\nI should throw a propre exception " +
+            Log.i(getClass().getName(), "You are not at ULB.\nI should throw a proper exception " +
                     "but I'm too lazy...");
         }
         return res.get(0).getNode(sensed);
@@ -115,7 +115,12 @@ public class Graph {
        _scanner.resetWifiStatus();
     }
         
-    
+    public Plan getPlanByName(String name) {
+        for(Plan plan: _allPlan)
+            if(plan.getName().equals(name))
+                return plan;
+        return null;
+    }
 
     /////////////////////////// STATIC ///////////////////////////
 

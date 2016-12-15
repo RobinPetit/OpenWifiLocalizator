@@ -5,31 +5,27 @@ package be.ulb.owl.gui;
  */
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 import android.widget.ImageView;
+
+import java.util.List;
 
 import be.ulb.owl.graph.Node;
 import be.ulb.owl.graph.Path;
 
 public class DrawView extends ImageView {
-
-    private Bitmap _bitMap;
     private Canvas _canvas;
-    private Paint _paint;
+    private Paint _paint = new Paint();
 
-    public DrawView (Context context, Integer width, Integer height) {
+    public DrawView (Context context, Canvas canvas) {
         super(context);
-        _bitMap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        _bitMap = _bitMap.copy(_bitMap.getConfig(), true);
-        _canvas = new Canvas(_bitMap);
-        _paint = new Paint();
+        _canvas = canvas;
         _paint.setColor(Color.RED);
         _paint.setStyle(Paint.Style.FILL_AND_STROKE);
         _paint.setAntiAlias(true);
-        this.setImageBitmap(_bitMap);
     }
 
     private Float getY (Float y) {
@@ -47,7 +43,7 @@ public class DrawView extends ImageView {
         this.invalidate();
     }
 
-    public void Draw (Path path) {
+    public void draw (Path path) {
         Node node = path.getNode();
         Float x1 = this.getX(node.getX());
         Float y1 = this.getY(node.getY());
@@ -56,5 +52,10 @@ public class DrawView extends ImageView {
         Float y2 = this.getY(node.getY());
         _canvas.drawLine(x1, y1, x2, y2, _paint);
         this.invalidate();
+    }
+
+    public void draw(List<Path> pathList) {
+        for(Path path: pathList)
+            draw(path);
     }
 }
