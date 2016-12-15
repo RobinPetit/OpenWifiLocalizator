@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity  {
     private static MainActivity instance;
     private static final boolean DEBUG = true; // view info message in log (maybe more after)
     private static final boolean TEST = true;   // active to call test
+    private static final int SCAN_TIME_INTERVAL = 30;  // in seconds
 
     private Graph _graph = null;
     private ImageView _imageView;
@@ -123,6 +124,7 @@ public class MainActivity extends AppCompatActivity  {
         // Define click listener
         ClickListener clickListener = new ClickListener();
 
+        // init buttons
         _changePlan = (Button) findViewById(R.id.changePlan);
         _changePlan.setOnClickListener(clickListener);
 
@@ -131,6 +133,27 @@ public class MainActivity extends AppCompatActivity  {
 
         _localizeButton = (Button)findViewById(R.id.localizeButton);
         _localizeButton.setOnClickListener(clickListener);
+
+        // schedule scan event
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                while(!isInterrupted()) {
+                    try {
+                        Thread.sleep(1000 * SCAN_TIME_INTERVAL);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                localize(false);
+                            }
+                        });
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        t.start();
     }
 
     @Override
@@ -407,13 +430,17 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     public void localize() {
+        localize(true);
+    }
+
+    public void localize(boolean displayNotFound) {
         Node current = _graph.whereAmI();
         if(current != null) {
             Log.i(getClass().getName(), "Node found: " + current.getName());
 
             setCurrentPlan(current.getParentPlan());
             this.draw(current);
-        } else {
+        } else if (displayNotFound){
             Log.i(getClass().getName(), "Position not found");
 
             DialogUtils.infoBox(this, R.string.not_found, R.string.not_in_ULB);
