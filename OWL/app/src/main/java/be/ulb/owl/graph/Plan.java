@@ -71,12 +71,7 @@ public class Plan {
             }
         }
 
-        try {
-            // TODO optimisation ? :/
-            _image = main.getAssets().open("IMGMap" + File.separator + _name +".png");
-        } catch (IOException e) {
-            throw new IOException("Impossible to load the image of this plan (" + _name + ")");
-        }
+        loadImage();
     }
 
     private double getScore(Float level) {
@@ -114,6 +109,20 @@ public class Plan {
         }
         res = nodes.get(scores.indexOf(Collections.min(scores)));
         return res;
+    }
+
+    /**
+     * Load the image from the IMGMap folder
+     *
+     * @throws IOException error with file
+     */
+    private void loadImage() throws IOException {
+        try {
+            // TODO optimisation ? :/
+            _image = main.getAssets().open("IMGMap" + File.separator + _name +".png");
+        } catch (IOException e) {
+            throw new IOException("Impossible to load the image of this plan (" + _name + ")");
+        }
     }
 
 
@@ -275,9 +284,19 @@ public class Plan {
      */
     public Drawable getDrawableImage() {
         Drawable res = null;
+
+        try {
+            if(_image == null || _image.available() == 0) {
+                loadImage();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         if(_image != null) {
             res = Drawable.createFromStream(_image, null);
         }
+
         return res;
     }
 

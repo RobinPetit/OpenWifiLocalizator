@@ -11,6 +11,7 @@ import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.graphics.Bitmap;
@@ -29,6 +30,7 @@ import be.ulb.owl.gui.DrawView;
 import be.ulb.owl.gui.listener.ClickListener;
 import be.ulb.owl.gui.listener.QueryTextListener;
 import be.ulb.owl.gui.listener.TouchListener;
+import be.ulb.owl.utils.DialogUtils;
 import be.ulb.owl.utils.LogUtils;
 
 /* TODO faire du netoyage ici :P  @denishoornaert
@@ -58,8 +60,8 @@ myImageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
 public class MainActivity extends AppCompatActivity  {
 
     private static MainActivity instance;
-    private static final boolean DEBUG = false;
-    private static final boolean TEST = true;
+    private static final boolean DEBUG = true; // view info message in log (maybe more after)
+    private static final boolean TEST = true;   // active to call test
 
     private Graph _graph = null;
     private ImageView _imageView;
@@ -73,7 +75,7 @@ public class MainActivity extends AppCompatActivity  {
 
     private Plan _currentPlan = null;
 
-    public void draw (Node node) {
+    public void draw(Node node) {
         Float x = node.getX();
         Float y = node.getY();
         x /= getWidthShrinkageFactor();
@@ -83,17 +85,21 @@ public class MainActivity extends AppCompatActivity  {
         _imageDraw.invalidate();
     }
 
-    private void setUpCanvas () {
-        Integer width = _imageView.getDrawable().getIntrinsicWidth();
-        Integer height = _imageView.getDrawable().getIntrinsicHeight();
-        _bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        _bitmap = _bitmap.copy(_bitmap.getConfig(), true);
-        _canvas = new Canvas(_bitmap);
-        _paint = new Paint();
-        _paint.setColor(Color.RED);
-        _paint.setStyle(Paint.Style.FILL_AND_STROKE);
-        _paint.setAntiAlias(true);
-        _imageDraw.setImageBitmap(_bitmap);
+    private void setUpCanvas() {
+        if(_imageView.getDrawable() != null) {
+            Integer width = _imageView.getDrawable().getIntrinsicWidth();
+            Integer height = _imageView.getDrawable().getIntrinsicHeight();
+            _bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            _bitmap = _bitmap.copy(_bitmap.getConfig(), true);
+            _canvas = new Canvas(_bitmap);
+            _paint = new Paint();
+            _paint.setColor(Color.RED);
+            _paint.setStyle(Paint.Style.FILL_AND_STROKE);
+            _paint.setAntiAlias(true);
+            _imageDraw.setImageBitmap(_bitmap);
+        } else {
+            Log.w(getClass().getName(), "_imageView have no drawable");
+        }
     }
 
     /**
@@ -111,7 +117,6 @@ public class MainActivity extends AppCompatActivity  {
         setContentView(R.layout.activity_main);
 
         _imageView = (ImageView)findViewById(R.id.plan);
-
         _imageDraw = (ImageView)findViewById(R.id.draw);
         _imageDraw.setOnTouchListener(new TouchListener());
 
@@ -139,9 +144,9 @@ public class MainActivity extends AppCompatActivity  {
         // Set default plan
         setCurrentPlan(Graph.getPlan("Solbosch"));
         this.setUpCanvas();
+
         Log.i(getClass().getName(), "Scanner.scan");
         localize();
-
         if(TEST) {
             setCurrentPlan(_graph.getPlanByName("P.F"));
             testWifi();
@@ -156,7 +161,7 @@ public class MainActivity extends AppCompatActivity  {
     @Override
     protected void onStop() {
         super.onStop();
-        _graph.hidden();
+        _graph.hidden(); // (also) Reset wifi settings
     }
 
     private void testBestPath() {
@@ -392,6 +397,11 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
 
+    /**
+     * Get the image which is currently show
+     *
+     * @return the ImageView
+     */
     public ImageView getImageView() {
         return _imageView;
     }
@@ -399,20 +409,14 @@ public class MainActivity extends AppCompatActivity  {
     public void localize() {
         Node current = _graph.whereAmI();
         if(current != null) {
-            Log.d(getClass().getName(), "Node found: " + current.getName());
+            Log.i(getClass().getName(), "Node found: " + current.getName());
+
             setCurrentPlan(current.getParentPlan());
             this.draw(current);
         } else {
-            Log.d(getClass().getName(), "Position not found");
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(R.string.not_found);
-            builder.setMessage(R.string.not_in_ULB);
-            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    dialog.dismiss();
-                }
-            });
-            builder.create().show();
+            Log.i(getClass().getName(), "Position not found");
+
+            DialogUtils.infoBox(this, R.string.not_found, R.string.not_in_ULB);
         }
     }
 
