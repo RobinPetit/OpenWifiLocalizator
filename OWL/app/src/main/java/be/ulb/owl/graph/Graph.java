@@ -9,6 +9,7 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import be.ulb.owl.MainActivity;
 import be.ulb.owl.Scanner;
@@ -87,7 +88,7 @@ public class Graph {
         int biggestSetSize = 0;
         for (Plan plan : _allPlan) {
             ArrayList<String> tmp = plan.getListWifiBSS();
-            tmp.retainAll(sensedStr); // set-theoric and operation
+            tmp.retainAll(sensedStr); // set-theoretical and operation
             if (biggestSetSize == tmp.size()) {
                 res.add(plan);
             }

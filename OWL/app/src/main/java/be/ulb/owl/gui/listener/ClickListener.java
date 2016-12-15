@@ -35,6 +35,9 @@ public class ClickListener implements View.OnClickListener {
             case R.id.local:
                 searchLocal();
                 break;
+            case R.id.localizeButton:
+                localize();
+                break;
 
         }
     }
@@ -43,7 +46,7 @@ public class ClickListener implements View.OnClickListener {
     /**
      * Switch between the two different global plans
      */
-    private void switchPlan(){
+    private void switchPlan() {
         final String[] items = {"Plaine", "Solbosch", "P.F"}; // TODO Remove test (P.F)
 
         AlertDialog.Builder builder = new AlertDialog.Builder(main);
@@ -91,5 +94,7 @@ public class ClickListener implements View.OnClickListener {
         alert.show();
     }
 
-
+    private void localize() {
+        main.localize();
+    }
 }

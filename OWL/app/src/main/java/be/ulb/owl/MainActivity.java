@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity  {
 
     private static MainActivity instance;
     private static final boolean DEBUG = false;
-    private static final boolean TEST = true;
+    private static final boolean TEST = false;
 
     private Graph _graph = null;
     private ImageView _imageView;
@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity  {
     private Canvas _canvas = null; // temp
     private Button _changePlan;
     private Button _local;
+    private Button _localizeButton;
 
     private Plan _currentPlan = null;
 
@@ -121,6 +122,9 @@ public class MainActivity extends AppCompatActivity  {
 
         _local = (Button) findViewById(R.id.local);
         _local.setOnClickListener(clickListener);
+
+        _localizeButton = (Button)findViewById(R.id.localizeButton);
+        _localizeButton.setOnClickListener(clickListener);
     }
 
     @Override
@@ -133,27 +137,9 @@ public class MainActivity extends AppCompatActivity  {
 
         // Set default plan
         setCurrentPlan(Graph.getPlan("Solbosch"));
-        this.setUpCanvas();
         Log.i(getClass().getName(), "Scanner.scan");
-        Node current = _graph.whereAmI();
-        if(current != null) {
-            Log.d(getClass().getName(), "Node found: " + current.getName());
-            setCurrentPlan(current.getParentPlan());
-            this.setUpCanvas();
-            this.draw(current);
-        } else {
-            Log.d(getClass().getName(), "Position not found");
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(R.string.not_found);
-            builder.setMessage(R.string.not_in_ULB);
-            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    dialog.dismiss();
-                }
-            });
-            builder.create().show();
+        localize();
 
-        }
         if(TEST) {
             testWifi();
             testBestPath();
@@ -403,14 +389,31 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
 
-
     public ImageView getImageView() {
         return _imageView;
     }
 
+    public void localize() {
+        Node current = _graph.whereAmI();
+        if(current != null) {
+            Log.d(getClass().getName(), "Node found: " + current.getName());
+            setCurrentPlan(current.getParentPlan());
+            this.draw(current);
+        } else {
+            Log.d(getClass().getName(), "Position not found");
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.not_found);
+            builder.setMessage(R.string.not_in_ULB);
+            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.dismiss();
+                }
+            });
+            builder.create().show();
+        }
+    }
 
     //////////////////////// STATIC ////////////////////////
-
     /**
      * Get the main instance
      *
