@@ -95,7 +95,7 @@ class App(t.Frame):
     # Save functions
 
     def text(self, nb_tab=0):
-        text = (TAB * (nb_tab+1)) + '<background_image coord="{}" />\n'.format(tuple(self.canvas.image_coord()))
+        text = (TAB * (nb_tab+1)) + '<background_image x="{}" y="{}" />\n'.format(*self.canvas.image_coord())
         text += (TAB * (nb_tab+1)) + '<distance_unit value="{}" />\n'.format(self.canvas.get_pixels_per_metre())
         plan_name = purge_plan_name(self.canvas.background_file_name, Config.MAPS_PATH)
         text += (TAB * (nb_tab+1)) + '<nodes>\n'

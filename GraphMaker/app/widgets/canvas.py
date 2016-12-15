@@ -162,7 +162,9 @@ class GraphCanvas(t.Canvas):
         bg_image = root.find('background_image')
         self.background_file_name = Config.MAPS_PATH + str(root.get('name')) + '.png'
         self.set_bg_image(App.App.ALPHA_INITIAL_VALUE, self.background_file_name)
-        self.set_bg_coord([float(value.strip()) for value in bg_image.get('coord')[1:-1].split(',')])
+        x = float(bg_image.get('x'))
+        y = float(bg_image.get('y'))
+        self.set_bg_coord([x, y])
         self.load_nodes(root.find('nodes'))
         self.load_edges(root.find('edges'))
 
