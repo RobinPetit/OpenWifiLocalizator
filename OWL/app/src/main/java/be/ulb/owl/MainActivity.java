@@ -1,6 +1,7 @@
 package be.ulb.owl;
 
 import android.content.DialogInterface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity  {
 
     private static MainActivity instance;
     private static final boolean DEBUG = false;
-    private static final boolean TEST = false;
+    private static final boolean TEST = true;
 
     private Graph _graph = null;
     private ImageView _imageView;
@@ -76,10 +77,11 @@ public class MainActivity extends AppCompatActivity  {
 
     private Plan _currentPlan = null;
 
-
     public void draw (Node node) {
-        Float x = node.getX();//*(_imageView.getDrawable().getIntrinsicWidth()/2481);
-        Float y = node.getY();//*(_imageView.getDrawable().getIntrinsicHeight()/1754);
+        Float x = node.getX();
+        Float y = node.getY();
+        x /= getWidthShrinkageFactor();
+        y /= getHeightShrinkageFactor();
         System.out.println("Draw x:"+x+" y:"+y+"");
         _canvas.drawCircle(x, y, 10, _paint);
         _imageDraw.invalidate();
@@ -359,8 +361,16 @@ public class MainActivity extends AppCompatActivity  {
         return true;
     }
 
+    private float getWidthShrinkageFactor() {
+        return (float)((BitmapDrawable)_imageView.getDrawable()).getBitmap().getWidth()/_imageView.getDrawable().getIntrinsicWidth();
+    }
+
+    private float getHeightShrinkageFactor() {
+        return (float)((BitmapDrawable)_imageView.getDrawable()).getBitmap().getHeight()/_imageView.getDrawable().getIntrinsicHeight();
+    }
+
     private void drawPath(List<Path> pathList) {
-        new DrawView(this, _canvas).draw(pathList);
+        new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor()).draw(pathList);
     }
 
     /**

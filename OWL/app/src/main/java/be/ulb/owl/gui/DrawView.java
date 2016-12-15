@@ -19,9 +19,13 @@ import be.ulb.owl.graph.Path;
 public class DrawView extends ImageView {
     private Canvas _canvas;
     private Paint _paint = new Paint();
+    private final float _wFactor;
+    private final float _hFactor;
 
-    public DrawView (Context context, Canvas canvas) {
+    public DrawView (Context context, Canvas canvas, float widthFactor, float heightFactor) {
         super(context);
+        _wFactor = widthFactor;
+        _hFactor = heightFactor;
         _canvas = canvas;
         _paint.setColor(Color.RED);
         _paint.setStyle(Paint.Style.FILL_AND_STROKE);
@@ -29,11 +33,11 @@ public class DrawView extends ImageView {
     }
 
     private Float getY (Float y) {
-        return y;
+        return y/_hFactor;
     }
 
     private Float getX (Float x) {
-        return x;
+        return x/_wFactor;
     }
 
     public void draw (Node node) {

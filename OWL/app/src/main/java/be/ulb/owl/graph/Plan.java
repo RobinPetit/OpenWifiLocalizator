@@ -458,7 +458,7 @@ public class Plan {
 
         if(x != Integer.MIN_VALUE && y != Integer.MIN_VALUE && pointId != null) {
             // Create and add node
-            _listNode.add(new Node(this, (x-_bgCoordX)/2, (y-_bgCoordY)/2, pointId, listWifi, listAlias));
+            _listNode.add(new Node(this, (x-_bgCoordX), (y-_bgCoordY), pointId, listWifi, listAlias));
 
         } else {
             Log.e(getClass().getName(), "Impossible to create the node: " + pointId + " (missing " +
