@@ -21,8 +21,7 @@ import be.ulb.owl.graph.Plan;
 
 public class ClickListener implements View.OnClickListener {
 
-    private static final MainActivity main = MainActivity.getInstance();
-
+    private final MainActivity main = MainActivity.getInstance();
 
     @Override
     public void onClick(View view) {

@@ -47,30 +47,30 @@ public class LogUtils {
     }
 
     /**
-     * Clear to old log
+     * Clear too old log
      */
     public static void clearLog() {
         clearLog(MAXTIMELOG);
     }
 
     /**
-     * Clear to old log until a date
+     * Clear too old log until a date
      *
      * @param maxTimeLog maximum time (in mili second) life of a file
      */
     public static void clearLog(float maxTimeLog) {
         File logFolder = new File(Environment.getExternalStorageDirectory() + File.separator +
                 main.getAppName() + File.separator + "log");
-        if(logFolder != null && logFolder.exists()) {
+        if(logFolder.exists()) {
             for (File file : logFolder.listFiles()) {
                 if (file != null && file.exists() && file.isFile() && file.getName().contains("logcat_")) {
                     String fileName = file.getName();
 
                     int pos = fileName.lastIndexOf(".");
                     if(pos != -1 && fileName.substring(pos).equalsIgnoreCase(".txt")) {
-                        String nameWitoutExt = fileName.substring(0, pos);
+                        String nameWithoutExt = fileName.substring(0, pos);
 
-                        String[] split = nameWitoutExt.split("_");
+                        String[] split = nameWithoutExt.split("_");
 
                         if (split.length == 2) {
                             long fileTime = Long.parseLong(split[1]);
@@ -78,8 +78,8 @@ public class LogUtils {
 
                             if (actualTime - fileTime > maxTimeLog) {
                                 file.delete();
-                                Log.i(LogUtils.class.getName(), "Suppression du fichier: " +
-                                        file.getName() + " (trop vieux)");
+                                Log.i(LogUtils.class.getName(), "Deletion of file: " +
+                                        file.getName() + " (too old)");
                             }
                         }
                     }
@@ -114,7 +114,7 @@ public class LogUtils {
             try {
                 // clear the previous logcat and then write the new one to the file
                 Runtime.getRuntime().exec( "logcat -c");
-                if(main.isDebug()) {
+                if(MainActivity.isDebug()) {
                     Runtime.getRuntime().exec( "logcat -f " + logFile + " *:I");
                 } else {
                     Runtime.getRuntime().exec( "logcat -f " + logFile + " *:W");

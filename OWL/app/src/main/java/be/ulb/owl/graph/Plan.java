@@ -27,8 +27,7 @@ import org.xmlpull.v1.XmlPullParserException;
  * @author Detobel36
  */
 public class Plan {
-
-    private static final MainActivity main = MainActivity.getInstance();
+    private final MainActivity main = MainActivity.getInstance();
     private float _bgCoordX;
     private float _bgCoordY;
 
