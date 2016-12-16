@@ -77,13 +77,7 @@ public class MainActivity extends AppCompatActivity  {
     private Plan _currentPlan = null;
 
     public void draw(Node node) {
-        Float x = node.getX();
-        Float y = node.getY();
-        x /= getWidthShrinkageFactor();
-        y /= getHeightShrinkageFactor();
-        System.out.println("Draw x:"+x+" y:"+y+"");
-        _canvas.drawCircle(x, y, 10, _paint);
-        _imageDraw.invalidate();
+        new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor()).draw(node);
     }
 
     private void setUpCanvas() {

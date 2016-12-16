@@ -155,7 +155,7 @@ public class Plan {
     public double getAbsoluteX(float x) {
         Plan root = MainActivity.getRootParentOfPlan(this);
         double originX = getXOnParent() / root.getPpm();
-        return originX + Math.cos(Math.PI/180 * _relativeAngle)*x;
+        return originX + Math.cos(Math.PI/180 * _relativeAngle)*x/getPpm();
     }
 
     /**
@@ -165,7 +165,7 @@ public class Plan {
     public double getAbsoluteY(float y) {
         Plan root = MainActivity.getRootParentOfPlan(this);
         double originY = getYOnParent() / root.getPpm();
-        return originY - Math.sin(Math.PI/180 * _relativeAngle)*y;
+        return originY - Math.sin(Math.PI/180 * _relativeAngle)*y/getPpm();
     }
 
     private double getXOnParent() {

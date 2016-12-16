@@ -136,6 +136,14 @@ public class Node {
     public float getY() {
         return (float)getParentPlan().getAbsoluteY(_y/getParentPlan().getPpm());
     }
+
+    public float getXOnPlan() {
+        return _x;
+    }
+
+    public float getYOnPlan() {
+        return _y;
+    }
     
     /**
      * Get the name of the node

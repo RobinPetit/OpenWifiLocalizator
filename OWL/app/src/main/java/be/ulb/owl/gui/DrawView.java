@@ -16,6 +16,8 @@ import be.ulb.owl.graph.Node;
 import be.ulb.owl.graph.Path;
 
 public class DrawView extends ImageView {
+    private static final Integer NODE_RADIUS = 10;  // in pixels
+
     private Canvas _canvas;
     private Paint _paint = new Paint();
     private final float _wFactor;
@@ -39,14 +41,21 @@ public class DrawView extends ImageView {
         return x/_wFactor;
     }
 
-    public void draw (Path path) {
+    public void draw(Path path) {
         Node node = path.getNode();
-        Float x1 = this.getX(node.getX());
-        Float y1 = this.getY(node.getY());
+        Float x1 = this.getX(node.getXOnPlan());
+        Float y1 = this.getY(node.getYOnPlan());
         node = path.getOppositNodeOf(node);
-        Float x2 = this.getX(node.getX());
-        Float y2 = this.getY(node.getY());
+        Float x2 = this.getX(node.getXOnPlan());
+        Float y2 = this.getY(node.getYOnPlan());
         _canvas.drawLine(x1, y1, x2, y2, _paint);
+        this.invalidate();
+    }
+
+    public void draw(Node node) {
+        Float x = getX(node.getXOnPlan());
+        Float y = getY(node.getYOnPlan());
+        _canvas.drawCircle(x, y, NODE_RADIUS, _paint);
         this.invalidate();
     }
 
