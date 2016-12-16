@@ -101,7 +101,7 @@ public class ShortestPathEvaluator {
         // do not re-treat nodes
         if(_evaluatedNodes.contains(neighbour))
             return;
-        double newScore = _reachingScore.get(current) + current.getDistanceFrom(neighbour);
+        double newScore = _reachingScore.get(current) + neighbour.getParentPlan().getDistanceBetweenNodes(neighbour, current);
         if(!_toBeEvaluated.contains(neighbour))
             _toBeEvaluated.add(neighbour);
         else if(newScore >= _reachingScore.get(neighbour))  // if there exists a better path, forget it

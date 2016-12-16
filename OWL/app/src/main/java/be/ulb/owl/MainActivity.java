@@ -177,6 +177,10 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
 
+    public static Plan getRootParentOfPlan(Plan plan) {
+        return plan.getName().charAt(0) == 'S' ? Graph.getPlan("Solbosch", false) : Graph.getPlan("Plaine", false);
+    }
+
     /**
      * When we hide the application
      * @see #onDestroy() when application is destroy

@@ -181,7 +181,6 @@ public class Graph {
         return getPlan(name, true);
     }
 
-
     /**
      * Get a specific plan or <b>create</b> if not exist
      *

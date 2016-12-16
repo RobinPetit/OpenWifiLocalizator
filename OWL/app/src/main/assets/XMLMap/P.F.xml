@@ -1,6 +1,8 @@
 <plan name="P.F">
     <background_image x="-631" y="-247" />
     <distance_unit value="11" />
+    <angle_with_parent value="-75.40" />
+    <position_on_parent x="1362" y="768" />
     <nodes>
         <node id="0">
             <coord x="966.0" y="879.0" />

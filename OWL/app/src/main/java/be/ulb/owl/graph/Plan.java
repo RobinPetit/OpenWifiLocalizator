@@ -36,6 +36,10 @@ public class Plan {
     private ArrayList<Node> _listNode;
     private ArrayList<String> _allBssWifi;
     private InputStream _image;
+    private float _ppm;  // pixels per metre
+    private float _relativeAngle;
+    private float _xOnParent;
+    private float _yOnParent;
 
 
     /**
@@ -144,6 +148,33 @@ public class Plan {
         return _name;
     }
 
+    /**
+     *
+     * @return The pseudo-absolute y coordinate of the origin of the plan
+     */
+    public double getAbsoluteX(float x) {
+        Plan root = MainActivity.getRootParentOfPlan(this);
+        double originX = getXOnParent() / root.getPpm();
+        return originX + Math.cos(Math.PI/180 * _relativeAngle)*x;
+    }
+
+    /**
+     *
+     * @return The pseudo-absolute y coordinate of the origin of the plan
+     */
+    public double getAbsoluteY(float y) {
+        Plan root = MainActivity.getRootParentOfPlan(this);
+        double originY = getYOnParent() / root.getPpm();
+        return originY - Math.sin(Math.PI/180 * _relativeAngle)*y;
+    }
+
+    private double getXOnParent() {
+        return _xOnParent;
+    }
+
+    private double getYOnParent() {
+        return _yOnParent;
+    }
 
     /**
      * Get a node from this plan
@@ -163,7 +194,7 @@ public class Plan {
 
 
     /**
-     * Get a node from this plan through wifi (NB: change name of the attribut)
+     * Get a node from this plan through wifi (NB: change name of the attribute)
      *
      * @param wifis of wifi
      * @return The nearest Node based on the given array of Wifi
@@ -344,9 +375,25 @@ public class Plan {
                             case "background_image":
                                 _bgCoordX = Float.parseFloat(parser.getAttributeValue(null, "x"));
                                 _bgCoordY = Float.parseFloat(parser.getAttributeValue(null, "y"));
+                                parser.next();
+                                break;
+
                             case "distance_unit":
-                                XMLUtils.nextAndRemoveSpace(parser); // Skip START
-                                XMLUtils.nextAndRemoveSpace(parser); // Skip END
+                                _ppm = Float.parseFloat(parser.getAttributeValue(null, "value"));
+                                Log.i(getClass().getName(), "PPM is " + _ppm);
+                                parser.next();
+                                break;
+
+                            case "angle_with_parent":
+                                _relativeAngle = Float.parseFloat(parser.getAttributeValue(null, "value"));
+                                Log.i(getClass().getName(), "Relative angle is: " + _relativeAngle);
+                                parser.next();
+                                break;
+
+                            case "position_on_parent":
+                                _xOnParent = Float.parseFloat(parser.getAttributeValue(null, "x"));
+                                _yOnParent = Float.parseFloat(parser.getAttributeValue(null, "y"));
+                                parser.next();
                                 break;
 
                             default:
@@ -373,6 +420,20 @@ public class Plan {
         return true;
     }
 
+    public float getPpm() {
+        return _ppm;
+    }
+
+    public double getDistanceBetweenNodes(Node a, Node b) {
+        double distance = -1;
+        for(Node node : getAllNodes()) {
+            if(node.isNode(a.getName())) {
+                distance = node.getDistanceFrom(b);
+            }
+        }
+        assert(distance > 0);
+        return distance / _ppm;
+    }
 
     /**
      * Load all nodes of a XML File

@@ -125,7 +125,7 @@ public class Node {
      * @return the X coordinate
      */
     public float getX() {
-        return _x;
+        return (float)getParentPlan().getAbsoluteX(_x/getParentPlan().getPpm());
     }
     
     /**
@@ -134,7 +134,7 @@ public class Node {
      * @return the Y coordinate
      */
     public float getY() {
-        return _y;
+        return (float)getParentPlan().getAbsoluteY(_y/getParentPlan().getPpm());
     }
     
     /**
