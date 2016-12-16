@@ -106,7 +106,11 @@ public class Node {
      * @see #getAlias() 
      */
     public boolean haveAlias(String alias) {
-        return this._listAlias.contains(alias);
+        for(String a : _listAlias) {
+            if(a.equalsIgnoreCase(alias))
+                return true;
+        }
+        return false;
     }
     
     

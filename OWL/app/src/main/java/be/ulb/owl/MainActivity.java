@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity  {
 
     private static MainActivity instance;
     private static final boolean DEBUG = true; // view info message in log (maybe more after)
-    private static final boolean TEST = true;   // active to call test
+    private static final boolean TEST = false;   // active to call test
     private static final int SCAN_TIME_INTERVAL = 30;  // in seconds
 
     private Graph _graph = null;
@@ -173,6 +173,10 @@ public class MainActivity extends AppCompatActivity  {
 
     public static Plan getRootParentOfPlan(Plan plan) {
         return plan.getName().charAt(0) == 'S' ? Graph.getPlan("Solbosch", false) : Graph.getPlan("Plaine", false);
+    }
+
+    public final Graph getGraph() {
+        return _graph;
     }
 
     /**
@@ -376,7 +380,9 @@ public class MainActivity extends AppCompatActivity  {
         return (float)((BitmapDrawable)_imageView.getDrawable()).getBitmap().getHeight()/_imageView.getDrawable().getIntrinsicHeight();
     }
 
-    private void drawPath(List<Path> pathList) {
+    public void drawPath(List<Path> pathList) {
+        cleanCanvas();
+        draw(_graph.whereAmI());
         new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor()).draw(pathList);
     }
 
@@ -408,14 +414,18 @@ public class MainActivity extends AppCompatActivity  {
                 !newCurrentPlan.getName().equalsIgnoreCase(_currentPlan.getName())) ) {
 
             _currentPlan = newCurrentPlan;
-            if(_canvas != null)
-                _canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+            cleanCanvas();
             _imageView.setImageDrawable(_currentPlan.getDrawableImage());
             _imageView.setScaleType(ImageView.ScaleType.MATRIX);
 
         } else if(newCurrentPlan == null) {
             Log.w(this.getClass().getName(), "New plan is null");
         }
+    }
+
+    private void cleanCanvas() {
+        if(_canvas != null)
+            _canvas.drawColor(0, PorterDuff.Mode.CLEAR);
     }
 
     /**

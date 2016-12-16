@@ -22,7 +22,7 @@ import be.ulb.owl.Wifi;
  * @author Detobel36
  */
 public class Graph {
-
+    MainActivity main = MainActivity.getInstance();
     private static final String IGNOREPLAN = "Example";
     private static ArrayList<Plan> _allPlan;
 
@@ -52,15 +52,18 @@ public class Graph {
         return allNodes;
     }
 
-    public ArrayList<Path> findPath(String destination) throws NoPathException {
+    public void findPath(String destination) throws NoPathException {
         Node src = whereAmI();
         ArrayList<Node> destinations = searchNode(destination);
+        Log.i(getClass().getName(), "Nodes found:");
+        for(Node d : destinations)
+            Log.i(getClass().getName(), d.getName());
         double minHeuristic = Double.POSITIVE_INFINITY;
         Node closestDestination = null;
         for(Node node: destinations)
             if(ShortestPathEvaluator.heuristic(src, node) < minHeuristic)
                 closestDestination = node;
-        return bestPath(src, closestDestination);
+        main.drawPath(bestPath(src, closestDestination));
     }
 
     /**
@@ -70,6 +73,7 @@ public class Graph {
      * @return An ordered list of nodes the user has to cross to reach the destination
      */
     public ArrayList<Path> bestPath(Node nodeFrom, Node nodeTo) throws NoPathException {
+        Log.d(getClass().getName(), "Searching path between: " + nodeFrom + " and " + nodeTo);
         ShortestPathEvaluator evaluator = new ShortestPathEvaluator(getAllNodes(), nodeFrom, nodeTo);
         return evaluator.find();
     }
