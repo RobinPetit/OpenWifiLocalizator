@@ -20,88 +20,214 @@ skinparam stereotypeCBackgroundColor OldLace
  
 ' Définition des class
 
-class Graph {
-  - _allPlan : ArrayList<Plan>
-  + bestPath(NodeFrom, NodeTo) : ArrayList<Path>
-  + whereAmI() : void
-}
 
-class Node {
-  - _listPath : ArrayList<Path>
-  - _listAlias : ArrayList<String>
-  - _listWifi : ArrayList<Wifi>
-  - _parentPlan : Plan
-  - _x : float
-  - _y : float
-  - _name : String
-  + Node(planParent, x, y, name, listWifi)
-  + addAlias(alias) : void
-  # addPath(newPath) : void
-  + isNode(name) : boolean
-  + haveAlias(alias) : boolean
-  + getParentPlan() : Plan
-  + getX() : float
-  + getY() : float
-  + getName() : String
-  + getAlias() : ArrayList<String>
-}
- 
-class Path {
-  - _nodeOne : Node
-  - _nodeTwo : Node
-  - _distance : float
-  + Path(nodeOne, nodeTwo, distance)
-  + containsNode(node) boolean
-  + getOppositeNode(node) : Node
-  + getDistance() : float
-}
- 
-class Plan {
-  - _name : String
-  - _listNode : ArrayList<Node>
-  - _allBssWifi : ArrayList<String>
-  + Plan(name, loadPlan)
-  + Plan(name)
-  + isName(name) : boolean
-  + getNode(name) : Node
-  + searchNode(name) : ArrayList<Node>
-  + containsWifiBss(bss) : boolean
-  + getListWifiBss() : ArrayList<String>
-  - loadXMLPlan() : void
-  - XMLLoadNodes(parser) : void
-  - XMLLoadOneNode(parser) : void
-  - XMLGetListWifi(parser) : ArrayList<Wifi>
-  - XMLLoadEdges(parser) : void
-  - XMLLoadSpecificEdges(parser, typeEdge) : void
-  - XMLDebugParser(parser) : void
-}
 
 class Wifi {
   - _BSS : String
   - _min : float
   - _max : float
   - _avg : float
-  + Wifi(Bss, value)
-  + Wifi(Bss, max, min ,avg)
+  + Wifi(Bss : String, value : float)
+  + Wifi(Bss : String, max : float, min : float, avg : float)
   + getBSS() : String
-  
+  + getLikelyhood(wifi : Wifi) : int
+  + equals(wifi : Wifi) : boolean
+  + getAvg() : float
+  + getMax() : float
+  + getMin() : float
 }
 
 class Scanner {
-  - _network : String
+  - _defaultWifiEnable : boolean
+  - _wifiManager : WifiManager
   - _accesPoints : HashMap
-  - _r : Runtime
-  - avg(ArrayList) : float
-  - getData() : BufferedReader
-  - parse(BufferedReader) : void
+  + Scanner()
+  - avg(tmp : ArrayList<Integer>) : Integer
+  - getData() : void
   + scan() : ArrayList<Wifi>
+  + initWifiManager() : boolean
+  + forceEnableWifi() : boolean
+  + resetWifiStatus() : void
 }
 
+class MainActivity {
+  - {static}instance : MainActivity
+  - {static}DEBUG : boolean
+  - {static}TEST : boolean
+  - {static}SCAN_TIME_INTERVAL : int
+  - _graph : Graph
+  - _imageView : ImageView
+  - _imageDraw : ImageView
+  - _bitmap : Bitmap
+  - _paint : Paint
+  - _canvas : Canvas
+  - _changePlan : Button
+  - _local : Button
+  - _localizeButton : Button
+  - _currentPlan : Plan
+  # onCreate(savedInstanceState : Bundle) : void
+  # onStart() : void
+  # onStop() : void
+  - testBestPath() : void
+  - testWifi() : void
+  + onCreateOptionsMenu(menu : Menu) : boolean
+  - getWidthShrinkageFactor() : float
+  - getHeightShrinkageFactor() : float
+  - drawPath(pathList : List<Path>) : void
+  + getAppName() : String
+  + setCurrentPlan(newCurrentPlan : Plan) : void
+  + getImageView() : ImageView
+  + localize(displayNotFound : boolean) : void
+  + {static}getInstance() : MainActivity
+  + {static}isDebug() : boolean
+}
+
+package graph {
+
+  class Graph {
+    - {static} _allPlan : ArrayList<Plan>
+    - _scanner : Scanner
+    + Graph()
+    + getAllNodes() : ArrayList<Node>
+    + findPath(destination : String) : ArrayList<Path>
+    + bestPath(nodeFrom : Node, nodeTo : Node) : ArrayList<Path>
+    + whereAmI() : Node
+    + whereAmI(sensed : ArrayList<Wifi>) : Node
+    + hidden() : void
+    + getPlanByName(name : String) : Plan
+    - {static} loadAllPlan() : void
+  }
+
+  class Node {
+    - _listPath : ArrayList<Path>
+    - _listAlias : ArrayList<String>
+    - _listWifi : ArrayList<Wifi>
+    - _parentPlan : Plan
+    - _x : float
+    - _y : float
+    - _name : String
+    + Node(parentPlan : Plan, x : float, y : float, name : String, listWifi : ArrayList<Wifi>)
+    + Node(parentPlan : Plan, x : float, y : float, name : String, listWifi : ArrayList<Wifi>, listAlias : ArrayList<String>)
+    + addAlias(alias : String) : void
+    # addPath(newPath : Path) : void
+    + isNode(name : String) : boolean
+    + haveAlias(alias : String) : boolean
+    + getParentPlan() : Plan
+    + getX() : float
+    + getY() : float
+    + getName() : String
+    + getAlias() : ArrayList<String>
+    + getWifi() : ArrayList<Wifi>
+    + getListWifiBSS() : ArrayList<String>
+    + getNeighbours() : ArrayList<Node>
+    + getDistanceFrom(neighbour : Node) : double
+    + pathTo(dest : Node) : Path
+  }
+ 
+  class Path {
+    - _nodeOne : Node
+    - _nodeTwo : Node
+    - _distance : float
+    + Path(nodeOne : Node, nodeTwo : Node, distance : float)
+    + Path(nodeOne : Node, nodeTwo : Node, distance : float, addPathToNode: Boolean)
+    + containsNode(node : Node) boolean
+    + getNode() : Node
+    + getOppositNodeOf(node : Node) : Node
+    + getDistance() : float
+    + toString() : String
+  }
+ 
+  class Plan {
+    - _bgCoordX : float
+    - _bgCoordY : float
+    - _name : String
+    - _allAlias : ArrayList<String>
+    - _listNode : ArrayList<Node>
+    - _allBssWifi : ArrayList<String>
+    - _image : InputStream
+    + Plan(name : String)
+    + Plan(name : String, loadPlan : Boolean)
+    - getScore(level : float) : double
+    - collisionManager(wifis : ArrayList<Wifi>, nodes : ArrayList<Node>) : Node
+    - loadImage() : void
+    + isName(name : String) : boolean
+    + getName() : String
+    + getNode(name : String) : Node
+    + getNode(wifis : ArrayList<Wifi>) : Node
+    + searchNode(name : String) : ArrayList<Node>
+    + containsWifiBss(bss : String) : boolean
+    + getListWifiBss() : ArrayList<String>
+    + getAllNodes() : ArrayList<Node>
+    + getAllAlias() : ArrayList<String>
+    + getImage() : InputStream
+    + getDrawableImage() : Drawable
+    - loadXMLPlan() : boolean
+    - XMLLoadNodes(parser : XmlPullParser) : void
+    - XMLLoadOneNode(parser : XmlPullParser) : void
+    - XMLGetListWifi(parser : XmlPullParser) : ArrayList<Wifi>
+    - XMLGetListAlias(parser : XmlPullParser) : ArrayList<String>
+    - XMLLoadEdges(parser : XmlPullParser) : void
+    - XMLLoadSpecificEdges(parser : XmlPullParser, typeEdge : String) : void
+    - XMLDebugParser(parser : XmlPullParser) : void
+  }
+
+  class ShortestPathEvaluator{
+    - _evaluatedNodes : ArrayList<Node>
+    - _toBeEvaluated : ArrayList<Node>
+    - _mostEfficientOrigin : HashMap<Node, Node>
+    - _reachingScore : HashMap<Node, Double>
+    - _intermediateScore : HashMap<Node, Double>
+    - _src : Node
+    - _dest : Node
+    - _found : boolean
+    - _executed : boolean
+    + ShortestPathEvaluator(nodes : ArrayList<Node>, from : Node, to : Node)
+    + {static}heuristic(a : Node, b : Node) : double
+    + lookup() : void
+    + find() : ArrayList<Path>
+    - evaluateNeighbour(current : Node, neighbour : Node) : void
+    - getLowestIntermediateScore() : Node
+  }
+
+}
+
+package utils {
+  
+  class DialogUtils {
+    + {static}infoBox(parent : Context, title : int, message : int) : void
+    + {static}infoBox(parent : Context, title : String, message : String) : void
+  }
+  
+  class LogUtils {
+    - {static}MAXTIMELOG : long
+    + {static}isExternalStorageWritable() : boolean
+    + {static}isExternalStorageReadable() : boolean
+    + {static}clearLog() : void
+    + {static}clearLog(maxTimeLog : float) : void
+    + {static}initLogSystem() : void
+  }
+
+  class XMLUtils {
+    + {static}readXMLFile(name : String) : XmlPullParser
+    + {static}isSpace(parser : XmlPullParser) : boolean
+    + {static}removeSpace(parser : XmlPullParser) : void
+    + {static}nextAndRemoveSpace(parser : XmlPullParser) : void
+  }
+
+}
+
+
 ' Définition des liens
-Node  *-  Path
-Node  *-  Wifi
-Node  -*  Path
+Node  "2" *--o "*"  Path
+Node  *--  Wifi
+
 Graph *- Plan
+Graph -- Scanner
+
 Plan  *-  Node
 Wifi -- Scanner
+
+MainActivity -- Graph
+MainActivity -- Plan
+
 @enduml

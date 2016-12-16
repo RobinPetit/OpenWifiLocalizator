@@ -54,32 +54,6 @@ public class Scanner {
         }
     }
 
-    /*
-    private void parse (BufferedReader data) {
-        try {
-            String key = "";
-            String line = "";
-            while ((line = data.readLine()) != null) {
-                if ((line.substring(0, 3)).equals("BSS")) {
-                    key = line.substring(4, 21);
-                }
-                else if (line.substring(0, 7).equals("\tsignal")) {
-                    if (!_accesPoints.containsKey(key)) {
-                        System.out.println("put");
-                        _accesPoints.put(key, new ArrayList<Float>());
-                        _accesPoints.get(key).add(Float.valueOf(line.substring(8, line.length()-4)));
-                    }
-                    else {
-                        System.out.println("add");
-                        _accesPoints.get(key).add(Float.valueOf(line.substring(8, line.length()-4)));
-                    }
-                }
-            }
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
-    }
-    */
 
     public ArrayList<Wifi> scan() {
         ArrayList<Wifi> temp = new ArrayList<Wifi>();
