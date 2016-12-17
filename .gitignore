@@ -4,23 +4,22 @@
 *.log
 *.out
 
-### PROTOTYPE ###
-
-# Netbeans Project
-/prototype/nbproject/*
-/prototype/OWL/nbproject/private/
-/prototype/build.xml
-/prototype/manifest.mf
-/prototype/build/
-/prototype/dist/
-
 # Vim files
 *.swp
 *.swo
 
 # Hidden directories
 plans/
+plan_de_travail/
+*.xml
+!XML maps/*.xml
+
+# Hide config file
+GraphMaker/app/Config.py
+
+# Python cache
+**/__pycache__/*
 
 ### OWL ###
-
 OWL/app/src/main/assets/IMGMap/
+
