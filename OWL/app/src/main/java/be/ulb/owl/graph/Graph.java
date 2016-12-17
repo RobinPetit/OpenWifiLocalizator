@@ -63,6 +63,7 @@ public class Graph {
         for(Node node: destinations)
             if(ShortestPathEvaluator.heuristic(src, node) < minHeuristic)
                 closestDestination = node;
+        main.setDestination(closestDestination);
         main.drawPath(bestPath(src, closestDestination));
     }
 

@@ -58,26 +58,29 @@ myImageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
  */
 public class MainActivity extends AppCompatActivity  {
 
+    // static attributes
     private static MainActivity instance;
     private static final boolean DEBUG = true; // view info message in log (maybe more after)
     private static final boolean TEST = false;   // active to call test
-    private static final int SCAN_TIME_INTERVAL = 30;  // in seconds
+    private static final int SCAN_TIME_INTERVAL = 2;  // in seconds
 
-    private Graph _graph = null;
+    // android widgets
     private ImageView _imageView;
     private ImageView _imageDraw;
     private Bitmap _bitmap = null; // temp
     private Paint _paint = null; //temp
     private Canvas _canvas = null; // temp
-    private Button _changePlan;
-    private Button _local;
-    private Button _localizeButton;
-
-    private Plan _currentPlan = null;
     private MaterialSearchView _searchView = null;  // the widget with the searchbar and autocompletion
+
+    // private attributes
+    private Graph _graph = null;
+    private Plan _currentPlan = null;
+    private Node _currentPosition;
+    private Node _destination;  // null if none
 
     public void draw(Node node) {
         new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor()).draw(node);
+        _imageDraw.invalidate();
     }
 
     private void setUpCanvas() {
@@ -100,7 +103,7 @@ public class MainActivity extends AppCompatActivity  {
     /**
      * Call when the application is created the first time
      *
-     * @param savedInstanceState
+     * @param savedInstanceState ignored
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,18 +119,22 @@ public class MainActivity extends AppCompatActivity  {
         _imageDraw = (ImageView)findViewById(R.id.draw);
         _imageDraw.setOnTouchListener(new TouchListener());
 
+        Button changePlan;
+        Button local;
+        Button localizeButton;
+
         // Define click listener
         ClickListener clickListener = new ClickListener();
 
         // init buttons
-        _changePlan = (Button) findViewById(R.id.changePlan);
-        _changePlan.setOnClickListener(clickListener);
+        changePlan = (Button)findViewById(R.id.changePlan);
+        changePlan.setOnClickListener(clickListener);
 
-        _local = (Button) findViewById(R.id.local);
-        _local.setOnClickListener(clickListener);
+        local = (Button)findViewById(R.id.local);
+        local.setOnClickListener(clickListener);
 
-        _localizeButton = (Button)findViewById(R.id.localizeButton);
-        _localizeButton.setOnClickListener(clickListener);
+        localizeButton = (Button)findViewById(R.id.localizeButton);
+        localizeButton.setOnClickListener(clickListener);
 
         // schedule scan event
         Thread t = new Thread() {
@@ -185,6 +192,13 @@ public class MainActivity extends AppCompatActivity  {
 
     public final Graph getGraph() {
         return _graph;
+    }
+
+    /**
+     * tell the application what node has ben chosen to be reached
+     */
+    public void setDestination(Node dest) {
+        _destination = dest;
     }
 
     /**
@@ -443,7 +457,7 @@ public class MainActivity extends AppCompatActivity  {
      */
     public void drawPath(List<Path> pathList) {
         cleanCanvas();
-        draw(_graph.whereAmI());
+        draw(_currentPosition);
         new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor()).draw(pathList);
     }
 
@@ -516,8 +530,21 @@ public class MainActivity extends AppCompatActivity  {
         Node current = _graph.whereAmI();
         if(current != null) {
             setCurrentPlan(current.getParentPlan());
-            this.draw(current);
+            if(_currentPosition != current) {
+                _currentPosition = current;
+                cleanCanvas();
+                this.draw(current);
+                if(_destination != null) {
+                    try {
+                        drawPath(_graph.bestPath(_currentPosition, _destination));
+                    } catch (NoPathException e) {
+                        Log.e(getClass().getName(), "Error: should have found an alternative for a path between "
+                                + _currentPosition.getName() + " and " + _destination.getName());
+                    }
+                }
+            }
         } else if (displayNotFound){
+            _currentPosition = null;
             DialogUtils.infoBox(this, R.string.not_found, R.string.not_in_ULB);
         }
     }
