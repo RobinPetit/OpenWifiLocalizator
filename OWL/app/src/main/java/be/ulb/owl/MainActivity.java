@@ -74,8 +74,7 @@ public class MainActivity extends AppCompatActivity  {
     private Button _localizeButton;
 
     private Plan _currentPlan = null;
-    private MaterialSearchView _searchView = null;
-    private Toolbar _toolbar;
+    private MaterialSearchView _searchView = null;  // the widget with the searchbar and autocompletion
 
     public void draw(Node node) {
         new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor()).draw(node);
@@ -111,8 +110,7 @@ public class MainActivity extends AppCompatActivity  {
         LogUtils.initLogSystem();
         setContentView(R.layout.activity_main);
 
-        _toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(_toolbar);
+        setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
 
         _imageView = (ImageView)findViewById(R.id.plan);
         _imageDraw = (ImageView)findViewById(R.id.draw);
@@ -137,7 +135,9 @@ public class MainActivity extends AppCompatActivity  {
             public void run() {
                 while(!isInterrupted()) {
                     try {
+                        // sleep a given amount of time
                         Thread.sleep(1000 * SCAN_TIME_INTERVAL);
+                        // and then try to localize user
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -174,6 +174,11 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
 
+    /**
+     * Returns the campus plan of a given plan
+     * @param plan The plan to determine the campus of
+     * @return The campus plan containing plan
+     */
     public static Plan getRootParentOfPlan(Plan plan) {
         return plan.getName().charAt(0) == 'S' ? Graph.getPlan("Solbosch", false) : Graph.getPlan("Plaine", false);
     }
@@ -369,30 +374,50 @@ public class MainActivity extends AppCompatActivity  {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
         _searchView = (MaterialSearchView)findViewById(R.id.search_view);
+        // QueryListener is used to detect when the user starts a query for a local
         _searchView.setOnQueryTextListener(new QueryTextListener());
+        // OnItemClickListener is used to detect when the user selects a suggestion from the list
         _searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            /**
+             * method called when the user selects a suggested local
+             *
+             * @param parent ignored
+             * @param view ignored
+             * @param position index of the selected item of the list
+             * @param id ignored
+             */
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 _searchView.setQuery(_searchView.getSuggestionAtPosition(position), true);
             }
         });
+        // give all of the nodes from the graph as available suggestions  (may bbe refined)
         for(Node node: _graph.getAllNodes())
             _searchView.addSuggestions(node.getAlias());
 
         return true;
     }
 
+    /**
+     * method called when the `back` button is pressed
+     */
     @Override
     public void onBackPressed() {
-        Log.d(getClass().getName(), "Back pressed");
+        // if back is pressed while the searchbar is being used, then close it and kep going
         if(_searchView != null && _searchView.isOpen())
             _searchView.closeSearch();
         else
             super.onBackPressed();
     }
 
+    /**
+     * method called when any element of the application is selected
+     * @param item The selected item
+     * @return True
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // if the searchbar is clicked on, then open it (and allow suggestions)
         if(item.getItemId() == R.id.search_item) {
             _searchView.openSearch();
             return true;
@@ -401,13 +426,21 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     private float getWidthShrinkageFactor() {
-        return (float)((BitmapDrawable)_imageView.getDrawable()).getBitmap().getWidth()/_imageView.getDrawable().getIntrinsicWidth();
+        float trueWidth = (float)((BitmapDrawable)_imageView.getDrawable()).getBitmap().getWidth();
+        float effectiveWidth = _imageView.getDrawable().getIntrinsicWidth();
+        return trueWidth / effectiveWidth;
     }
 
     private float getHeightShrinkageFactor() {
-        return (float)((BitmapDrawable)_imageView.getDrawable()).getBitmap().getHeight()/_imageView.getDrawable().getIntrinsicHeight();
+        float trueHeight = (float)((BitmapDrawable)_imageView.getDrawable()).getBitmap().getHeight();
+        float effectiveHeight = _imageView.getDrawable().getIntrinsicHeight();
+        return trueHeight / effectiveHeight;
     }
 
+    /**
+     * Draws the given path on the plan on the screen
+     * @param pathList An ArrayList of Path representing the nodes to pass by
+     */
     public void drawPath(List<Path> pathList) {
         cleanCanvas();
         draw(_graph.whereAmI());
@@ -451,6 +484,9 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
 
+    /**
+     * Removes anything being on the canvas
+     */
     private void cleanCanvas() {
         if(_canvas != null)
             _canvas.drawColor(0, PorterDuff.Mode.CLEAR);
@@ -465,20 +501,23 @@ public class MainActivity extends AppCompatActivity  {
         return _imageView;
     }
 
+    /**
+     * localizes the user
+     */
     public void localize() {
         localize(true);
     }
 
+    /**
+     * localizes the user
+     * @param displayNotFound Boolean telling whether or not to signal if user is unable to localize
+     */
     public void localize(boolean displayNotFound) {
         Node current = _graph.whereAmI();
         if(current != null) {
-            Log.i(getClass().getName(), "Node found: " + current.getName());
-
             setCurrentPlan(current.getParentPlan());
             this.draw(current);
         } else if (displayNotFound){
-            Log.i(getClass().getName(), "Position not found");
-
             DialogUtils.infoBox(this, R.string.not_found, R.string.not_in_ULB);
         }
     }
