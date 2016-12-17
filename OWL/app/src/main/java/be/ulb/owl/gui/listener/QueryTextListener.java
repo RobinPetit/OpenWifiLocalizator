@@ -1,24 +1,23 @@
 package be.ulb.owl.gui.listener;
 
-import android.support.v7.widget.SearchView;
 import android.util.Log;
 
 import be.ulb.owl.MainActivity;
 import be.ulb.owl.graph.NoPathException;
+import br.com.mauker.materialsearchview.MaterialSearchView;
 
 /**
  * All event
  *
  * @author Detobel36
  */
-public class QueryTextListener implements SearchView.OnQueryTextListener {
-    MainActivity main = MainActivity.getInstance();
+public class QueryTextListener implements MaterialSearchView.OnQueryTextListener {
 
     @Override
     public boolean onQueryTextSubmit(String query) {
         Log.i(getClass().getName(), "text sent: "+query);
         try {
-            main.getGraph().findPath(query);
+            MainActivity.getInstance().getGraph().findPath(query);
         } catch (NoPathException e) {
             Log.e(getClass().getName(), "No path was found: " + e.toString());
         }
@@ -27,7 +26,7 @@ public class QueryTextListener implements SearchView.OnQueryTextListener {
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        Log.d(getClass().getName(), "text modified: "+newText);
         return false;
     }
+
 }

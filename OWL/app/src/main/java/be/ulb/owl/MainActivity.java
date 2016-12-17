@@ -1,17 +1,15 @@
 package be.ulb.owl;
 
-import android.content.DialogInterface;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.graphics.Bitmap;
@@ -32,6 +30,7 @@ import be.ulb.owl.gui.listener.QueryTextListener;
 import be.ulb.owl.gui.listener.TouchListener;
 import be.ulb.owl.utils.DialogUtils;
 import be.ulb.owl.utils.LogUtils;
+import br.com.mauker.materialsearchview.MaterialSearchView;
 
 /* TODO faire du netoyage ici :P  @denishoornaert
 //Create a new image bitmap and attach a brand new canvas to it
@@ -75,6 +74,8 @@ public class MainActivity extends AppCompatActivity  {
     private Button _localizeButton;
 
     private Plan _currentPlan = null;
+    private MaterialSearchView _searchView = null;
+    private Toolbar _toolbar;
 
     public void draw(Node node) {
         new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor()).draw(node);
@@ -108,8 +109,10 @@ public class MainActivity extends AppCompatActivity  {
         instance = this;
 
         LogUtils.initLogSystem();
-        Log.i("Main", "Test");
         setContentView(R.layout.activity_main);
+
+        _toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(_toolbar);
 
         _imageView = (ImageView)findViewById(R.id.plan);
         _imageDraw = (ImageView)findViewById(R.id.draw);
@@ -365,11 +368,36 @@ public class MainActivity extends AppCompatActivity  {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
-        MenuItem searchItem = menu.findItem(R.id.Search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnQueryTextListener(new QueryTextListener());
+        _searchView = (MaterialSearchView)findViewById(R.id.search_view);
+        _searchView.setOnQueryTextListener(new QueryTextListener());
+        _searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                _searchView.setQuery(_searchView.getSuggestionAtPosition(position), true);
+            }
+        });
+        for(Node node: _graph.getAllNodes())
+            _searchView.addSuggestions(node.getAlias());
 
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.d(getClass().getName(), "Back pressed");
+        if(_searchView != null && _searchView.isOpen())
+            _searchView.closeSearch();
+        else
+            super.onBackPressed();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.search_item) {
+            _searchView.openSearch();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private float getWidthShrinkageFactor() {
