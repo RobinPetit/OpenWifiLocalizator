@@ -43,7 +43,7 @@
     </RelativeLayout>
 
     <Button
-        android:text="Maps"
+        android:text="@string/maps_btn_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -52,7 +52,7 @@
         android:id="@+id/changePlan" />
 
     <Button
-        android:text="Locaux"
+        android:text="@string/rooms_btn_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -61,7 +61,7 @@
         android:id="@+id/local" />
 
     <Button
-        android:text="Me localiser"
+        android:text="@string/localize_btn_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
