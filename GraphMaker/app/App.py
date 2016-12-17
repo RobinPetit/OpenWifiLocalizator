@@ -46,13 +46,25 @@ class App(t.Frame):
             self.canvas.load_xml(self.file_name)
 
         elif ext:
-            px_p_m = self.ask_metre_length()
-            if px_p_m != None:
-                self.canvas.set_pixels_per_metre(px_p_m)
+            new_plan_data = self.ask_new_plan_data()
+            if None not in new_plan_data:
+                self.canvas.set_pixels_per_metre(new_plan_data.ppm)
+                self.canvas.set_angle_with_parent(new_plan_data.angle)
+                self.canvas.set_position_on_parent([new_plan_data.x, new_plan_data.y])
                 self.background_file_name = self.file_name
                 self.canvas.set_bg_image(App.ALPHA_INITIAL_VALUE, self.background_file_name)
             else:
                 self.destroy()
+
+    class NewPlanData:
+        def __init__(self, ppm, angle, pos):
+            self.ppm = ppm
+            self.angle = angle
+            self.x = pos[0]
+            self.y = pos[1]
+
+        def __iter__(self):
+            return [self.ppm, self.angle, self.x, self.y].__iter__()
 
     def open_new_file(self):
         self.canvas.destroy()
@@ -62,17 +74,39 @@ class App(t.Frame):
         self.create_widgets(**self.options)
 
 
-    def ask_metre_length(self):
+    def ask_new_plan_data(self):
         toplevel = t.Toplevel(self)
+        # Pixels per metre
         nb_pixels = t.StringVar()
         t.Label(toplevel, text='Enter length (in pixels) of a meter on the given plan: ').grid(row=0, column=0)
-        entry = t.Entry(toplevel, textvariable=nb_pixels)
-        entry.grid(row=1, column=0)
-        entry.focus_set()
-        t.Button(toplevel, text='Ok', command=toplevel.destroy).grid(row=2)
+        ppm_entry = t.Entry(toplevel, textvariable=nb_pixels)
+        ppm_entry.grid(row=0, column=1, columnspan=2)
+        # Angle with parent
+        angle = t.StringVar()
+        t.Label(toplevel, text='Enter the angle (trigonometric direction but in degrees) of\n'
+                               'this building relative to its parent plan (Solbosch or Plaine): ') \
+                .grid(row=1, column=0)
+        angle_entry = t.Entry(toplevel, textvariable=angle)
+        angle_entry.grid(row=1, column=1, columnspan=2)
+        # Position on parent plan
+        x_on_parent = t.StringVar()
+        y_on_parent = t.StringVar()
+        t.Label(toplevel, text='Enter the building position on parent plan: ').grid(row=2, column=0)
+        x_entry = t.Entry(toplevel, textvariable=x_on_parent)
+        y_entry = t.Entry(toplevel, textvariable=y_on_parent)
+        x_entry.grid(row=2, column=1)
+        y_entry.grid(row=2, column=2)
+        t.Button(toplevel, text='Ok', command=toplevel.destroy).grid(row=3, column=0, columnspan=3)
         toplevel.bind('<Return>', lambda _: toplevel.destroy())
         toplevel.wait_window()
-        return int(nb_pixels.get()) if (nb_pixels.get().isnumeric() and nb_pixels.get() != "") else None
+        try:
+            ppm = int(nb_pixels.get())
+            angle = float(angle.get())
+            x = int(x_on_parent.get())
+            y = int(y_on_parent.get())
+        except:
+            ppm = angle = x = y = None
+        return self.NewPlanData(ppm, angle, [x, y])
 
     def scan(self):
         self.toplevel.wm_title('Scanning access points...')
@@ -95,8 +129,11 @@ class App(t.Frame):
     # Save functions
 
     def text(self, nb_tab=0):
-        text = (TAB * (nb_tab+1)) + '<background_image x="{}" y="{}" />\n'.format(*self.canvas.image_coord())
+        text  = (TAB * (nb_tab+1)) + '<background_image x="{}" y="{}" />\n'.format(*self.canvas.image_coord())
         text += (TAB * (nb_tab+1)) + '<distance_unit value="{}" />\n'.format(self.canvas.get_pixels_per_metre())
+        text += (TAB * (nb_tab+1)) + '<angle_with_parent value="{}" />\n'.format(self.canvas.get_angle_with_parent())
+        text += (TAB * (nb_tab+1)) + '<position_on_parent x="{}" y="{}" />\n'.format(*self.canvas.get_position_on_parent())
+
         plan_name = purge_plan_name(self.canvas.background_file_name, Config.MAPS_PATH)
         text += (TAB * (nb_tab+1)) + '<nodes>\n'
         for node_id in self.canvas.nodes():

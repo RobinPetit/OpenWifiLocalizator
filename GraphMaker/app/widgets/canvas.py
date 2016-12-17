@@ -99,6 +99,14 @@ class GraphCanvas(t.Canvas):
         assert isinstance(px_p_m, int)
         self.px_p_m = px_p_m
 
+    def set_angle_with_parent(self, angle):
+        assert isinstance(angle, float)
+        self.parent_angle = angle
+
+    def set_position_on_parent(self, c):
+        assert isinstance(c, list) and len(list(filter(lambda e: isinstance(e, int), c))) == len(c)
+        self.pos_on_parent = c
+
     # data getters
 
     def image_coord(self):
@@ -121,6 +129,12 @@ class GraphCanvas(t.Canvas):
 
     def get_pixels_per_metre(self):
         return self.px_p_m
+
+    def get_angle_with_parent(self):
+        return self.parent_angle
+
+    def get_position_on_parent(self):
+        return self.pos_on_parent
 
     # events
 
