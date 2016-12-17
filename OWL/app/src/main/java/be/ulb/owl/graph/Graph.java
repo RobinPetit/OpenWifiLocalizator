@@ -53,18 +53,24 @@ public class Graph {
     }
 
     public void findPath(String destination) throws NoPathException {
-        Node src = whereAmI();
+        Node src = main.location();
         ArrayList<Node> destinations = searchNode(destination);
-        Log.i(getClass().getName(), "Nodes found:");
-        for(Node d : destinations)
-            Log.i(getClass().getName(), d.getName());
         double minHeuristic = Double.POSITIVE_INFINITY;
         Node closestDestination = null;
-        for(Node node: destinations)
-            if(ShortestPathEvaluator.heuristic(src, node) < minHeuristic)
+        for(Node node: destinations) {
+            double currentHeuristic = ShortestPathEvaluator.heuristic(src, node);
+            if(currentHeuristic < minHeuristic){
                 closestDestination = node;
-        main.setDestination(closestDestination);
-        main.drawPath(bestPath(src, closestDestination));
+                minHeuristic = currentHeuristic;
+            }
+        }
+        main.setDestination(destination);
+        main.draw(src);
+        ArrayList<Path> p = bestPath(src, closestDestination);
+        Log.d(getClass().getName(), "Path between " + src.getName() + " and " + closestDestination.getName());
+        for(Path path: p)
+            Log.i(getClass().getName(), path.getNode().getName() + " - " + path.getOppositNodeOf(path.getNode()).getName());
+        main.drawPath(p);
     }
 
     /**
@@ -74,7 +80,7 @@ public class Graph {
      * @return An ordered list of nodes the user has to cross to reach the destination
      */
     public ArrayList<Path> bestPath(Node nodeFrom, Node nodeTo) throws NoPathException {
-        Log.d(getClass().getName(), "Searching path between: " + nodeFrom + " and " + nodeTo);
+        Log.d(getClass().getName(), "Searching path between: " + nodeFrom.getName() + " and " + nodeTo.getName());
         ShortestPathEvaluator evaluator = new ShortestPathEvaluator(getAllNodes(), nodeFrom, nodeTo);
         return evaluator.find();
     }

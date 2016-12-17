@@ -76,11 +76,12 @@ public class MainActivity extends AppCompatActivity  {
     private Graph _graph = null;
     private Plan _currentPlan = null;
     private Node _currentPosition;
-    private Node _destination;  // null if none
+    private String _destinationName;  // null if none
 
     public void draw(Node node) {
         new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor()).draw(node);
         _imageDraw.invalidate();
+        _imageView.invalidate();
     }
 
     private void setUpCanvas() {
@@ -197,8 +198,8 @@ public class MainActivity extends AppCompatActivity  {
     /**
      * tell the application what node has ben chosen to be reached
      */
-    public void setDestination(Node dest) {
-        _destination = dest;
+    public void setDestination(String dest) {
+        _destinationName = dest;
     }
 
     /**
@@ -533,20 +534,25 @@ public class MainActivity extends AppCompatActivity  {
             if(_currentPosition != current) {
                 _currentPosition = current;
                 cleanCanvas();
-                this.draw(current);
-                if(_destination != null) {
+                //this.draw(current);
+                if(_destinationName != null) {
                     try {
-                        drawPath(_graph.bestPath(_currentPosition, _destination));
+                        _graph.findPath(_destinationName);
                     } catch (NoPathException e) {
                         Log.e(getClass().getName(), "Error: should have found an alternative for a path between "
-                                + _currentPosition.getName() + " and " + _destination.getName());
+                                + _currentPosition.getName() + " and " + _destinationName);
                     }
-                }
+                } else
+                    this.draw(current);
             }
         } else if (displayNotFound){
             _currentPosition = null;
             DialogUtils.infoBox(this, R.string.not_found, R.string.not_in_ULB);
         }
+    }
+
+    public final Node location() {
+        return _currentPosition;
     }
 
     //////////////////////// STATIC ////////////////////////

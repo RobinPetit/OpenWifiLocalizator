@@ -17,6 +17,8 @@ import be.ulb.owl.graph.Path;
 
 public class DrawView extends ImageView {
     private static final Integer NODE_RADIUS = 10;  // in pixels
+    private static final Integer NODE_COLOR = Color.rgb(0xeb, 0x9c, 0x31);
+    private static final Integer EDGE_COLOR = Color.BLUE;
 
     private Canvas _canvas;
     private Paint _paint = new Paint();
@@ -28,7 +30,6 @@ public class DrawView extends ImageView {
         _wFactor = widthFactor;
         _hFactor = heightFactor;
         _canvas = canvas;
-        _paint.setColor(Color.RED);
         _paint.setStyle(Paint.Style.FILL_AND_STROKE);
         _paint.setAntiAlias(true);
     }
@@ -42,6 +43,7 @@ public class DrawView extends ImageView {
     }
 
     public void draw(Path path) {
+        _paint.setColor(EDGE_COLOR);
         Node node = path.getNode();
         Float x1 = this.getX(node.getXOnPlan());
         Float y1 = this.getY(node.getYOnPlan());
@@ -53,6 +55,7 @@ public class DrawView extends ImageView {
     }
 
     public void draw(Node node) {
+        _paint.setColor(NODE_COLOR);
         Float x = getX(node.getXOnPlan());
         Float y = getY(node.getYOnPlan());
         _canvas.drawCircle(x, y, NODE_RADIUS, _paint);
