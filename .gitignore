@@ -19,6 +19,7 @@ GraphMaker/app/Config.py
 
 # Python cache
 **/__pycache__/*
+**/__init__.pyc
 
 ### OWL ###
 OWL/app/src/main/assets/IMGMap/
