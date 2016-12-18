@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity  {
     private static MainActivity instance;
     private static final boolean DEBUG = true; // view info message in log (maybe more after)
     private static final boolean TEST = false;   // active to call test
+    private static final boolean DEMO = true; // active to active
 
     // android widgets
     private ImageView _imageView;
@@ -118,6 +119,10 @@ public class MainActivity extends AppCompatActivity  {
             setCurrentPlan(_graph.getPlanByName("P.F"));
             testWifi();
             testBestPath();
+        }
+
+        if (DEMO) {
+            setCurrentPlan(_graph.getPlanByName("P.F"));
         }
     }
 
@@ -562,5 +567,7 @@ public class MainActivity extends AppCompatActivity  {
     public static boolean isTest() {
         return TEST;
     }
+
+    public static boolean isDemo() { return DEMO; }
 
 }

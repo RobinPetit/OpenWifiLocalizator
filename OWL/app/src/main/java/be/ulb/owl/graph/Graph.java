@@ -28,11 +28,16 @@ public class Graph {
 
     private Scanner _scanner;
 
+    // dedicated to the démonstration
+    private int _offset;
+    private ArrayList<Node> _demoMotions = new ArrayList<Node>();
 
     public Graph () {
         _allPlan = new ArrayList<Plan>();
         loadAllPlan();
-
+        if (MainActivity.isDemo()) {
+            _offset = 0;
+        }
 
         if(_allPlan.isEmpty()) {
             Log.w(getClass().getName(), "None plan has been loaded");
@@ -93,11 +98,38 @@ public class Graph {
         return evaluator.find();
     }
 
+    public void setPlan () {
+        if (0 == _offset) {
+            Plan currentPlan = main.getCurrentPlan();
+            _demoMotions.add(currentPlan.getNode("64"));
+            _demoMotions.add(currentPlan.getNode("63"));
+            _demoMotions.add(currentPlan.getNode("9"));
+            _demoMotions.add(currentPlan.getNode("13"));
+            _demoMotions.add(currentPlan.getNode("20"));
+            _demoMotions.add(currentPlan.getNode("21"));
+            _demoMotions.add(currentPlan.getNode("27"));
+            _demoMotions.add(currentPlan.getNode("29"));
+            _demoMotions.add(currentPlan.getNode("31"));
+            _demoMotions.add(currentPlan.getNode("32"));
+            _demoMotions.add(currentPlan.getNode("34"));
+            _demoMotions.add(currentPlan.getNode("35"));
+            _demoMotions.add(currentPlan.getNode("23"));
+            _demoMotions.add(currentPlan.getNode("16"));
+            _demoMotions.add(currentPlan.getNode("42"));
+        }
+    }
+
     public Node whereAmI () {
         Node res = null;
-        if(MainActivity.isDebug() && MainActivity.isTest()) {
+        if (MainActivity.isDemo()) {
+            setPlan();
+            res = _demoMotions.get(_offset);
+            _offset = (_offset+1)%_demoMotions.size();
+        }
+        else if(MainActivity.isDebug() && MainActivity.isTest()) {
             res = getAllNodes().get(new Random().nextInt(getAllNodes().size()));
-        } else {
+        }
+        else {
             ArrayList<Wifi> sensed = _scanner.scan();
             res = whereAmI(sensed);
         }
