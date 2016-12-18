@@ -32,22 +32,6 @@ import be.ulb.owl.utils.DialogUtils;
 import be.ulb.owl.utils.LogUtils;
 import br.com.mauker.materialsearchview.MaterialSearchView;
 
-/* TODO faire du netoyage ici :P  @denishoornaert
-//Create a new image bitmap and attach a brand new canvas to it
-Bitmap tempBitmap = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.RGB_565);
-Canvas tempCanvas = new Canvas(tempBitmap);
-
-//Draw the image bitmap into the cavas
-tempCanvas.drawBitmap(myBitmap, 0, 0, null);
-
-//Draw everything else you want into the canvas, in this example a rectangle with rounded edges
-tempCanvas.drawRoundRect(new RectF(x1,y1,x2,y2), 2, 2, myPaint);
-
-//Attach the canvas to the ImageView
-myImageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
- */
-
-
 /**
  * Main file for Android application<br/>
  * See this file before: https://developer.android.com/images/training/basics/basic-lifecycle-create.png<br/>
@@ -62,7 +46,6 @@ public class MainActivity extends AppCompatActivity  {
     private static MainActivity instance;
     private static final boolean DEBUG = true; // view info message in log (maybe more after)
     private static final boolean TEST = false;   // active to call test
-    private static final int SCAN_TIME_INTERVAL = 2;  // in seconds
 
     // android widgets
     private ImageView _imageView;
@@ -78,28 +61,6 @@ public class MainActivity extends AppCompatActivity  {
     private Node _currentPosition;
     private String _destinationName;  // null if none
 
-    public void draw(Node node) {
-        new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor()).draw(node);
-        _imageDraw.invalidate();
-        _imageView.invalidate();
-    }
-
-    private void setUpCanvas() {
-        if(_imageView.getDrawable() != null) {
-            Integer width = _imageView.getDrawable().getIntrinsicWidth();
-            Integer height = _imageView.getDrawable().getIntrinsicHeight();
-            _bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            _bitmap = _bitmap.copy(_bitmap.getConfig(), true);
-            _canvas = new Canvas(_bitmap);
-            _paint = new Paint();
-            _paint.setColor(Color.RED);
-            _paint.setStyle(Paint.Style.FILL_AND_STROKE);
-            _paint.setAntiAlias(true);
-            _imageDraw.setImageBitmap(_bitmap);
-        } else {
-            Log.w(getClass().getName(), "_imageView have no drawable");
-        }
-    }
 
     /**
      * Call when the application is created the first time
@@ -136,29 +97,6 @@ public class MainActivity extends AppCompatActivity  {
 
         localizeButton = (Button)findViewById(R.id.localizeButton);
         localizeButton.setOnClickListener(clickListener);
-
-        // schedule scan event
-        Thread t = new Thread() {
-            @Override
-            public void run() {
-                while(!isInterrupted()) {
-                    try {
-                        // sleep a given amount of time
-                        Thread.sleep(1000 * SCAN_TIME_INTERVAL);
-                        // and then try to localize user
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                localize(false);
-                            }
-                        });
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        };
-        t.start();
     }
 
     @Override
@@ -168,6 +106,7 @@ public class MainActivity extends AppCompatActivity  {
         if(_graph == null) {
             _graph = new Graph();
         }
+        _graph.startScanTask();
 
         // Set default plan
         setCurrentPlan(Graph.getPlan("Solbosch"));
@@ -182,8 +121,27 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
 
+
+    private void setUpCanvas() {
+        if(_imageView.getDrawable() != null) {
+            Integer width = _imageView.getDrawable().getIntrinsicWidth();
+            Integer height = _imageView.getDrawable().getIntrinsicHeight();
+            _bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            _bitmap = _bitmap.copy(_bitmap.getConfig(), true);
+            _canvas = new Canvas(_bitmap);
+            _paint = new Paint();
+            _paint.setColor(Color.RED);
+            _paint.setStyle(Paint.Style.FILL_AND_STROKE);
+            _paint.setAntiAlias(true);
+            _imageDraw.setImageBitmap(_bitmap);
+        } else {
+            Log.w(getClass().getName(), "_imageView have no drawable");
+        }
+    }
+
     /**
      * Returns the campus plan of a given plan
+     *
      * @param plan The plan to determine the campus of
      * @return The campus plan containing plan
      */
@@ -196,7 +154,9 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     /**
-     * tell the application what node has ben chosen to be reached
+     * Tell the application what node has ben chosen to be reached
+     *
+     * @param dest Name of the destination
      */
     public void setDestination(String dest) {
         _destinationName = dest;
@@ -440,6 +400,27 @@ public class MainActivity extends AppCompatActivity  {
         return super.onOptionsItemSelected(item);
     }
 
+
+    /**
+     * Get the name of the application
+     *
+     * @return String with the app name
+     */
+    public String getAppName() {
+        return getResources().getString(R.string.app_name);
+    }
+
+    /**
+     * Get the current plan which is show
+     *
+     * @return the current plan
+     */
+    public Plan getCurrentPlan() {
+        return _currentPlan;
+    }
+
+
+
     private float getWidthShrinkageFactor() {
         float trueWidth = (float)((BitmapDrawable)_imageView.getDrawable()).getBitmap().getWidth();
         float effectiveWidth = _imageView.getDrawable().getIntrinsicWidth();
@@ -460,24 +441,6 @@ public class MainActivity extends AppCompatActivity  {
         cleanCanvas();
         draw(_currentPosition);
         new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor()).draw(pathList);
-    }
-
-    /**
-     * Get the name of the application
-     *
-     * @return String with the app name
-     */
-    public String getAppName() {
-        return getResources().getString(R.string.app_name);
-    }
-
-    /**
-     * Get the current plan which is show
-     *
-     * @return the current plan
-     */
-    public Plan getCurrentPlan() {
-        return _currentPlan;
     }
 
     /**
@@ -506,6 +469,33 @@ public class MainActivity extends AppCompatActivity  {
         if(_canvas != null)
             _canvas.drawColor(0, PorterDuff.Mode.CLEAR);
     }
+
+
+    /**
+     * Draw a node on the current plan
+     *
+     * @param node the position of the point
+     */
+    public void draw(Node node) {
+        draw(node, false);
+    }
+
+    /**
+     * Draw a node on the current plan
+     *
+     * @param node the node which must be draw
+     * @param cleanBefore True if the plan must be clean before
+     */
+    public void draw(Node node, boolean cleanBefore) {
+        if(cleanBefore) {
+            cleanCanvas();
+        }
+        new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor()).draw(node);
+        _imageDraw.invalidate();
+        _imageView.invalidate();
+    }
+
+
 
     /**
      * Get the image which is currently show
@@ -567,6 +557,10 @@ public class MainActivity extends AppCompatActivity  {
 
     public static boolean isDebug() {
         return DEBUG;
+    }
+
+    public static boolean isTest() {
+        return TEST;
     }
 
 }

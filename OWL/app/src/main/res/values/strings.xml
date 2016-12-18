@@ -11,4 +11,5 @@
     <string name="localize_btn_text">Localize me</string>
     <string name="rooms_btn_text">Rooms</string>
     <string name="search_item_title">Search</string>
+    <string name="search_hint">Search...</string>
 </resources>

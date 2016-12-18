@@ -53,24 +53,32 @@ public class Graph {
     }
 
     public void findPath(String destination) throws NoPathException {
-        Node src = main.location();
         ArrayList<Node> destinations = searchNode(destination);
-        double minHeuristic = Double.POSITIVE_INFINITY;
-        Node closestDestination = null;
-        for(Node node: destinations) {
-            double currentHeuristic = ShortestPathEvaluator.heuristic(src, node);
-            if(currentHeuristic < minHeuristic){
-                closestDestination = node;
-                minHeuristic = currentHeuristic;
+        Node src = main.location();
+
+        if(src != null) {
+            double minHeuristic = Double.POSITIVE_INFINITY;
+            Node closestDestination = null;
+            for (Node node : destinations) {
+                double currentHeuristic = ShortestPathEvaluator.heuristic(src, node);
+                if (currentHeuristic < minHeuristic) {
+                    closestDestination = node;
+                    minHeuristic = currentHeuristic;
+                }
             }
+            main.setDestination(destination);
+            main.draw(src);
+            ArrayList<Path> p = bestPath(src, closestDestination);
+            Log.d(getClass().getName(), "Path between " + src.getName() + " and " + closestDestination.getName());
+            for (Path path : p)
+                Log.i(getClass().getName(), path.getNode().getName() + " - " + path.getOppositNodeOf(path.getNode()).getName());
+            main.drawPath(p);
+        } else {
+            Node dest = destinations.get(0);
+            main.setCurrentPlan(dest.getParentPlan());
+            Log.d(getClass().getName(), "Set current and draw");
+            main.draw(dest);
         }
-        main.setDestination(destination);
-        main.draw(src);
-        ArrayList<Path> p = bestPath(src, closestDestination);
-        Log.d(getClass().getName(), "Path between " + src.getName() + " and " + closestDestination.getName());
-        for(Path path: p)
-            Log.i(getClass().getName(), path.getNode().getName() + " - " + path.getOppositNodeOf(path.getNode()).getName());
-        main.drawPath(p);
     }
 
     /**
@@ -86,8 +94,14 @@ public class Graph {
     }
 
     public Node whereAmI () {
-        ArrayList<Wifi> sensed = _scanner.scan();
-        return whereAmI(sensed);
+        Node res = null;
+        if(MainActivity.isDebug() && MainActivity.isTest()) {
+            res = getAllNodes().get(new Random().nextInt(getAllNodes().size()));
+        } else {
+            ArrayList<Wifi> sensed = _scanner.scan();
+            res = whereAmI(sensed);
+        }
+        return res;
     }
 
     public Node whereAmI (ArrayList<Wifi> sensed) {
@@ -113,6 +127,7 @@ public class Graph {
         if (res.size() == 0) {
             Log.i(getClass().getName(), "You are not at ULB.\nI should throw a proper exception " +
                     "but I'm too lazy...");
+            return null;
         }
         return res.get(0).getNode(sensed);
     }
@@ -124,15 +139,31 @@ public class Graph {
      * @see MainActivity#onStop()
      */
     public void hidden() {
-       _scanner.resetWifiStatus();
+        _scanner.resetWifiStatus();
+        _scanner.stopScanTask();
     }
-        
+
+    /**
+     * Start the scan scheduller
+     */
+    public void startScanTask() {
+        _scanner.startScanTask();
+    }
+
+
+    /**
+     * Get a plan
+     *
+     * @param name of the plan
+     * @return the Plan object
+     */
     public Plan getPlanByName(String name) {
         for(Plan plan: _allPlan)
             if(plan.getName().equals(name))
                 return plan;
         return null;
     }
+
 
     /////////////////////////// STATIC ///////////////////////////
 
