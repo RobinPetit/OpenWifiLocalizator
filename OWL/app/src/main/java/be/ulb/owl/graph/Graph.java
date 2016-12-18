@@ -100,7 +100,7 @@ public class Graph {
 
     public void setPlan () {
         if (0 == _offset) {
-            Plan currentPlan = main.getCurrentPlan();
+            Plan currentPlan = getPlan("P.F");
             _demoMotions.add(currentPlan.getNode("64"));
             _demoMotions.add(currentPlan.getNode("63"));
             _demoMotions.add(currentPlan.getNode("9"));
