@@ -11,7 +11,6 @@
 # Hidden directories
 plans/
 plan_de_travail/
-
 *.xml
 !XML maps/*.xml
 
@@ -20,3 +19,7 @@ GraphMaker/app/Config.py
 
 # Python cache
 **/__pycache__/*
+
+### OWL ###
+OWL/app/src/main/assets/IMGMap/
+

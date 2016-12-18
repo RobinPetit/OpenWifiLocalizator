@@ -1,0 +1,2 @@
+# Stock Image from Map
+Plan are private so you must add it manually here.  All `XML` which are contain in `assets/XMLMap` **must** have a `PNG` image here with **the same name** (:warning: case sensitive)
