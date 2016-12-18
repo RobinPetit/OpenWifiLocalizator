@@ -85,8 +85,7 @@ public class ClickListener implements View.OnClickListener {
         builder.setTitle(R.string.select_local);
         builder.setItems(items, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-                // TODO place point on map ?
-                Log.i(getClass().getName(), "Local selected: "+listFinal[item]);
+                main.setDestination(listFinal[item]);
             }
         });
         AlertDialog alert = builder.create();

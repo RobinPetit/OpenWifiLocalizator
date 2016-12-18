@@ -25,8 +25,6 @@ public class QueryTextListener implements MaterialSearchView.OnQueryTextListener
     }
 
     @Override
-    public boolean onQueryTextChange(String newText) {
-        return false;
-    }
+    public boolean onQueryTextChange(String newText) { return false; }
 
 }

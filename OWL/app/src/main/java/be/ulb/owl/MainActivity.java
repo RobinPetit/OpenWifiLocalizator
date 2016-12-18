@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity  {
     // static attributes
     private static MainActivity instance;
     private static final boolean DEBUG = true; // view info message in log (maybe more after)
-    private static final boolean TEST = true;   // active to call test
+    private static final boolean TEST = false;   // active to call test
 
     // android widgets
     private ImageView _imageView;
@@ -557,6 +557,10 @@ public class MainActivity extends AppCompatActivity  {
 
     public static boolean isDebug() {
         return DEBUG;
+    }
+
+    public static boolean isTest() {
+        return TEST;
     }
 
 }

@@ -94,10 +94,14 @@ public class Graph {
     }
 
     public Node whereAmI () {
-        return getAllNodes().get(new Random().nextInt(getAllNodes().size()));
-//
-//        ArrayList<Wifi> sensed = _scanner.scan();
-//        return whereAmI(sensed);
+        Node res = null;
+        if(MainActivity.isDebug() && MainActivity.isTest()) {
+            res = getAllNodes().get(new Random().nextInt(getAllNodes().size()));
+        } else {
+            ArrayList<Wifi> sensed = _scanner.scan();
+            res = whereAmI(sensed);
+        }
+        return res;
     }
 
     public Node whereAmI (ArrayList<Wifi> sensed) {

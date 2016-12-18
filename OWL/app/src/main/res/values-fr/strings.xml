@@ -11,4 +11,5 @@
     <string name="maps_btn_text">Cartes</string>
     <string name="rooms_btn_text">Locaux</string>
     <string name="search_item_title">Rechercher</string>
+    <string name="search_hint">Recherche...</string>
 </resources>
