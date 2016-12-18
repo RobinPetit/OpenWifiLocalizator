@@ -27,6 +27,7 @@ public class DrawView extends ImageView {
 
     public DrawView (Context context, Canvas canvas, float widthFactor, float heightFactor) {
         super(context);
+
         _wFactor = widthFactor;
         _hFactor = heightFactor;
         _canvas = canvas;

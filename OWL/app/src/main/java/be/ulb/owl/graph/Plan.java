@@ -500,20 +500,9 @@ public class Plan {
             if(parser.getEventType() == XmlPullParser.START_TAG) {
                 switch(parser.getName()) {
 
-                    // TODO alias changes !!
                     case "aliases":
                         listAlias = XMLGetListAlias(parser);
                         break;
-
-//                    case "alias":
-//                        parser.next(); // START_TAG
-//                        if(parser.getEventType() == XmlPullParser.TEXT) {
-//                            listAlias.add(parser.getText());
-//                        } else {
-//                            Log.e(this.getClass().getName(), "Erreur avec le fichier à paser ! " +
-//                                    "Pour le plan: " + _name);
-//                        }
-//                        break;
 
                     case "coord":
                         x = Float.parseFloat(parser.getAttributeValue(null, "x"));

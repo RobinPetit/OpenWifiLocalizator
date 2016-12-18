@@ -8,6 +8,10 @@ import android.util.Log;
 
 import java.util.*;
 import java.lang.Object;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Scan all wifi
@@ -17,6 +21,10 @@ import java.lang.Object;
 public class Scanner {
 
     private static final MainActivity main = MainActivity.getInstance();
+    private static final int SCAN_TIME_INTERVAL = 2;  // in seconds
+
+    private Thread _scanTask = null;
+    private boolean _taskInProgress = false;
 
     private boolean _defaultWifiEnable = true;
     private WifiManager _wifiManager = null;
@@ -31,6 +39,12 @@ public class Scanner {
         _accesPoints = new HashMap<String, ArrayList<Integer>>();
     }
 
+    /**
+     * Calcul the average of a test
+     *
+     * @param tmp list of the frequence
+     * @return the average
+     */
     private Integer avg (ArrayList<Integer> tmp) {
         Integer sum = 0;
         for (Integer elem : tmp) {
@@ -39,6 +53,9 @@ public class Scanner {
         return sum/tmp.size();
     }
 
+    /**
+     * Save all wifi in the _accessPoints attribute
+     */
     private void getData() {
         List<ScanResult> results = _wifiManager.getScanResults();
         for (ScanResult res :results) {
@@ -54,7 +71,11 @@ public class Scanner {
         }
     }
 
-
+    /**
+     * Scan all around wifi
+     *
+     * @return the list of all wifi
+     */
     public ArrayList<Wifi> scan() {
         ArrayList<Wifi> temp = new ArrayList<Wifi>();
         for (int i = 0; i < 5; i++) {
@@ -119,6 +140,44 @@ public class Scanner {
         if(_wifiManager != null) {
             _wifiManager.setWifiEnabled(_defaultWifiEnable);
         }
+    }
+
+    /**
+     * Start the scan task
+     */
+    public void startScanTask() {
+        if(!_taskInProgress) {
+            _scanTask = new Thread() {
+                @Override
+                public void run() {
+                    while(!isInterrupted() && _taskInProgress) {
+                        try {
+                            // sleep a given amount of time
+                            Thread.sleep(1000 * SCAN_TIME_INTERVAL);
+                            // and then try to localize user
+                            main.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    main.localize(false);
+                                }
+                            });
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            };
+            _taskInProgress = true;
+            _scanTask.start();
+
+        }
+    }
+
+    /**
+     * Stop temporary the scan thread
+     */
+    public void stopScanTask() {
+        _taskInProgress = false;
     }
 
 }
