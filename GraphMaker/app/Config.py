@@ -5,6 +5,6 @@ class Config:
     # Debug Mode
     DEBUG = True
     # MAPS location
-    MAPS_PATH = '../plans/'
+    MAPS_PATH = '../OWL/app/src/main/assets/IMGMap/'
     # XMLs location
     XMLS_PATH = '../OWL/app/src/main/assets/XMLMap/'
