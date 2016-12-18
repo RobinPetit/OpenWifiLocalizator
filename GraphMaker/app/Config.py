@@ -7,4 +7,4 @@ class Config:
     # MAPS location
     MAPS_PATH = '../plans/'
     # XMLs location
-    XMLS_PATH = '../XML maps/'
+    XMLS_PATH = '../OWL/app/src/main/assets/XMLMap/'

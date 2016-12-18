@@ -12,7 +12,7 @@ When writing python code, please follow the given rules:
 
 ## Configuration
 
-To configure GraphMaker you must copy `app/Config.py.init` to `app/Config.py`.              
+To configure GraphMaker you must copy `app/Config.py.init` to `app/Config.py`.
 `cp app/Config.py.init app/Config.py`
 Here you have an example of config:
 ```
@@ -26,15 +26,15 @@ class Config:
     # MAPS location
     MAPS_PATH = '../plans/'
     # XMLs location
-    XMLS_PATH = '../XML maps/'
+    XMLS_PATH = '../OWL/app/src/main/assets/XMLMap/'
 
 ```
 
 
 
-## Start 
+## Start
 
-To start the application run: 
+To start the application run:
 ```
 sudo python3 GraphMaker.py
 ```
