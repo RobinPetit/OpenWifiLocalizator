@@ -45,11 +45,14 @@ public class MainActivity extends AppCompatActivity  {
     private static final boolean DEBUG = true; // view info message in log (maybe more after)
     private static final boolean TEST = true;   // active to call test
     private static final boolean DEMO = false; // active to active
+    private static final String[] NOT_SUGGESTED = {"Mystery"};
+    private static final String PLAINE_PLAN = "Plaine";
+    private static final String SOLBOSCH_PLAN = "Solbosch";
 
     // android widgets
     private ImageView _imageView;
     private ImageView _imageDraw;
-    private Canvas _canvas = null; // temp
+    private Canvas _canvas = null;
     private MaterialSearchView _searchView = null;  // the widget with the searchbar and autocompletion
 
     // private attributes
@@ -57,6 +60,7 @@ public class MainActivity extends AppCompatActivity  {
     private Plan _currentPlan = null;
     private Node _currentPosition;
     private String _destinationName;  // null if none
+    private DrawView _drawer;
 
 
     /**
@@ -106,8 +110,9 @@ public class MainActivity extends AppCompatActivity  {
         _graph.startScanTask();
 
         // Set default plan
-        setCurrentPlan(Graph.getPlan("Solbosch"));
+        setCurrentPlan(Graph.getPlan(SOLBOSCH_PLAN));
         this.setUpCanvas();
+        _drawer = new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor());
 
         Log.i(getClass().getName(), "Scanner.scan");
         localize();
@@ -144,7 +149,7 @@ public class MainActivity extends AppCompatActivity  {
      * @return The campus plan containing plan
      */
     public static Plan getRootParentOfPlan(Plan plan) {
-        return plan.getName().charAt(0) == 'S' ? Graph.getPlan("Solbosch", false) : Graph.getPlan("Plaine", false);
+        return plan.getName().charAt(0) == 'S' ? Graph.getPlan(SOLBOSCH_PLAN, false) : Graph.getPlan(PLAINE_PLAN, false);
     }
 
     public final Graph getGraph() {
@@ -367,6 +372,8 @@ public class MainActivity extends AppCompatActivity  {
         // give all of the nodes from the graph as available suggestions  (may bbe refined)
         for(Node node: _graph.getAllNodes())
             _searchView.addSuggestions(node.getAlias());
+        for(String suggestion : NOT_SUGGESTED)
+            _searchView.removeSuggestion(suggestion);
 
         return true;
     }
@@ -438,7 +445,7 @@ public class MainActivity extends AppCompatActivity  {
     public void drawPath(List<Path> pathList) {
         cleanCanvas();
         draw(_currentPosition);
-        new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor()).draw(pathList);
+        _drawer.draw(pathList);
     }
 
     /**
@@ -485,10 +492,9 @@ public class MainActivity extends AppCompatActivity  {
      * @param cleanBefore True if the plan must be clean before
      */
     public void draw(Node node, boolean cleanBefore) {
-        if(cleanBefore) {
+        if(cleanBefore)
             cleanCanvas();
-        }
-        new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor()).draw(node);
+        _drawer.draw(node);
         _imageDraw.invalidate();
         _imageView.invalidate();
     }
