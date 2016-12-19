@@ -66,7 +66,7 @@ public class Path {
      * @param node the start node
      * @return the oposit node
      */
-    public Node getOppositNodeOf(Node node) {
+    public Node getOppositeNodeOf(Node node) {
         // return _nodeOne.equals(node) ? _nodeTwo : _nodeOne;
         if(_nodeOne.equals(node)) {
             return _nodeTwo;
@@ -86,5 +86,20 @@ public class Path {
     @Override
     public String toString() {
         return "Path of length " + _distance + " between " + _nodeOne.getName() + " and " + _nodeTwo.getName();
+    }
+
+    /**
+     *
+     * @param p
+     * @return The intersection node between this path if one exists
+     * @throws IllegalArgumentException
+     */
+    public Node getIntersectionWith(Path p) throws IllegalArgumentException {
+        if(this.containsNode(p.getNode()))
+            return p.getNode();
+        else if(this.containsNode(p.getOppositeNodeOf(p.getNode())))
+            return p.getOppositeNodeOf(p.getNode());
+        else
+            throw new IllegalArgumentException("Path.getIntersectionWith needs a path having a non-nul intersection");
     }
 }

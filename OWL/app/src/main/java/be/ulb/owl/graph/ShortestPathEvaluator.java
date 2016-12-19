@@ -54,7 +54,7 @@ public class ShortestPathEvaluator {
         return Math.sqrt(deltaX*deltaX + deltaY*deltaY);
     }
 
-    public void lookup() {
+    private void lookup() {
         while(!_toBeEvaluated.isEmpty()) {
             Node current = getLowestIntermediateScore();
             assert(_toBeEvaluated.contains(current));
