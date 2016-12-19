@@ -14,8 +14,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,8 +49,6 @@ public class MainActivity extends AppCompatActivity  {
     // android widgets
     private ImageView _imageView;
     private ImageView _imageDraw;
-    private Bitmap _bitmap = null; // temp
-    private Paint _paint = null; //temp
     private Canvas _canvas = null; // temp
     private MaterialSearchView _searchView = null;  // the widget with the searchbar and autocompletion
 
@@ -129,16 +125,13 @@ public class MainActivity extends AppCompatActivity  {
 
     private void setUpCanvas() {
         if(_imageView.getDrawable() != null) {
-            Integer width = _imageView.getDrawable().getIntrinsicWidth();
-            Integer height = _imageView.getDrawable().getIntrinsicHeight();
-            _bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            _bitmap = _bitmap.copy(_bitmap.getConfig(), true);
-            _canvas = new Canvas(_bitmap);
-            _paint = new Paint();
-            _paint.setColor(Color.RED);
-            _paint.setStyle(Paint.Style.FILL_AND_STROKE);
-            _paint.setAntiAlias(true);
-            _imageDraw.setImageBitmap(_bitmap);
+            Integer height = _imageView.getDrawable().getIntrinsicWidth();
+            Integer width = _imageView.getDrawable().getIntrinsicHeight();
+            Bitmap bitmap;
+            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            bitmap = bitmap.copy(bitmap.getConfig(), true);
+            _canvas = new Canvas(bitmap);
+            _imageDraw.setImageBitmap(bitmap);
         } else {
             Log.w(getClass().getName(), "_imageView have no drawable");
         }
@@ -529,7 +522,7 @@ public class MainActivity extends AppCompatActivity  {
             if(_currentPosition != current) {
                 _currentPosition = current;
                 cleanCanvas();
-                //this.draw(current);
+
                 if(_destinationName != null) {
                     try {
                         _graph.findPath(_destinationName);
