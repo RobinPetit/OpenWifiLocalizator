@@ -74,9 +74,11 @@ public class Graph {
             main.setDestination(destination);
             main.draw(src);
             ArrayList<Path> p = bestPath(src, closestDestination);
+            if(p.size() >= 2)
+                refinePath(p, destination);
             Log.d(getClass().getName(), "Path between " + src.getName() + " and " + closestDestination.getName());
             for (Path path : p)
-                Log.i(getClass().getName(), path.getNode().getName() + " - " + path.getOppositNodeOf(path.getNode()).getName());
+                Log.i(getClass().getName(), path.getNode().getName() + " - " + path.getOppositeNodeOf(path.getNode()).getName());
             main.drawPath(p);
         } else {
             Node dest = destinations.get(0);
@@ -84,6 +86,18 @@ public class Graph {
             Log.d(getClass().getName(), "Set current and draw");
             main.draw(dest);
         }
+    }
+
+    private void refinePath(ArrayList<Path> overallPath, String alias) {
+        int firstOccurrenceOfDestination = overallPath.size() - 1;
+        Node commonNode = overallPath.get(firstOccurrenceOfDestination).getIntersectionWith(overallPath.get(firstOccurrenceOfDestination-1));
+        Log.d(getClass().getName(), overallPath.size() + " nodes were found, and after refinment:");
+        while (overallPath.size() > 0 && commonNode.haveAlias(alias)) {
+            firstOccurrenceOfDestination--;
+            commonNode = overallPath.get(firstOccurrenceOfDestination).getOppositeNodeOf(commonNode);
+            overallPath.remove(firstOccurrenceOfDestination+1);
+        }
+        Log.d(getClass().getName(), "only " + overallPath.size() + " are left");
     }
 
     /**
