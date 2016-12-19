@@ -40,7 +40,7 @@ public class Graph {
         }
 
         if(_allPlan.isEmpty()) {
-            Log.w(getClass().getName(), "None plan has been loaded");
+            Log.w(getClass().getName(), "No plan has been loaded");
         }
 
         _scanner = new Scanner();
@@ -157,8 +157,7 @@ public class Graph {
         }
 
         if (res.size() == 0) {
-            Log.i(getClass().getName(), "You are not at ULB.\nI should throw a proper exception " +
-                    "but I'm too lazy...");
+            Log.i(getClass().getName(), "You are not at ULB.");
             return null;
         }
         return res.get(0).getNode(sensed);

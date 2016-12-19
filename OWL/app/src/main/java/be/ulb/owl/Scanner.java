@@ -177,6 +177,7 @@ public class Scanner {
      * Stop temporary the scan thread
      */
     public void stopScanTask() {
+        _scanTask.interrupt();
         _taskInProgress = false;
     }
 
