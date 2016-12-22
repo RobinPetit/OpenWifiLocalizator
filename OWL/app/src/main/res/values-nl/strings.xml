@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">OWL</string>
+    <string name="localize_btn_text">Me localiseren</string>
+    <string name="ok">Ok</string>
+    <string name="maps_btn_text">Kaarten</string>
+    <string name="no">Nee</string>
+    <string name="not_found">Onvindbaar</string>
+    <string name="not_in_ULB">U bent niet op ULB</string>
+    <string name="rooms_btn_text">Ruimten</string>
+    <string name="search_hint">Zoek...</string>
+    <string name="search_item_title">Zoeken</string>
+    <string name="select_local">Kies een ruimte</string>
+    <string name="select_map">Kies de campus</string>
+    <string name="yes">Ja</string>
+</resources>
