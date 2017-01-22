@@ -91,10 +91,16 @@ Nous avons dans un premier temps choisi de développer sur Android. Ce n'est pas
   C'est en 1990 qu'une première connexion est établie entre un ordinateur et un serveur.  Il ne s'agit la que d'une première étape dans le \textit{World Wide Web}. C'est entre 1997 et 2000 que va réellement se développer le Wi-Fi. Un standard concernant la technologie sans fil est définit (par les laboratoires Bell et l'\textit{Institute of Electrical and Electronics Engineers}).\\
   Depuis 2009, de plus en plus d'entreprise proposent un service de Wi-Fi gratuitement à leurs clients.  On peut le retrouver dans les restaurants, les trains, les aéroports, etc.
   % Source: http://www.ucopia.com/fr/actualites/lhistoire-du-wi-fi/
-  \subsection{Méthodes de localisation}
+
+\section{Modélisation des infrasctructures}
+  \subsection{Recherche du plus court chemin}
+    \subsubsection{Dijkstra}
+    \subsubsection{A*}
+
+\section{Méthodes de localisation}
   Il existe plusieurs méthodes pour se repérer à partir des points d'accès Wi-Fi.
 
-  \subsubsection{Méthode dites par propagation}
+  \subsection{Méthode dites par propagation}
     Cette méthode utilise la trilatération pour déterminer la position actuelle. On peut décomposer cette méthode en plusieurs étapes~:
     \begin{enumerate}
       \item on collecte la qualité de signal d'au moins trois points d'accès wifi~;
@@ -102,7 +108,7 @@ Nous avons dans un premier temps choisi de développer sur Android. Ce n'est pas
       \item à partir de ces distances, on peut «~générer~» trois cercles et garder un point contenu dans l'intersection de ces cercles\footnote{Mathématiquement, trois cercles s'intersectent en un et un seul point. Cependant, toutes interférences prises en comptes, on peut visualiser les cercles comme ayant une \textit{épaisseur} correspondant à l'incertitude. On peut alors parler d'\textit{un point de l'intersection des trois cercles.}} via une méthode appelée \textit{trilatération}.
     \end{enumerate}
 
-    \paragraph{Trilateration}
+    \subsubsection{Trilateration}
       Le principe de la trilatération est de trouver un point du plan se situant dans l'intersection de plusieurs cercles. Dans notre cas, les cerles représentent les régions de l'espace couvertent pas les \textit{Wifi} dont le centre est la position du points d'accès \textit{Wifi} et où le point se trouvant à l'intersection des cercles représente la position de l'utilisateur.
       \begin{center}
         \includegraphics[scale=0.8]{trilateration.png}\\
@@ -110,7 +116,7 @@ Nous avons dans un premier temps choisi de développer sur Android. Ce n'est pas
       \end{center}
       De manière formelle, la détermination de la position de l'utilisateur se fait suivant le raisonnement suivant :\\\\
       Soient $(x, y) \in \mathbb R^2$ la position actuelle de l'utilisateur, $x_{\lambda}$, $y_{\lambda}$ et $r_{\lambda}$ (où $1 \leq \lambda \leq 3$) est le position et la distance de chaque
-	  émetteur. Alors on peut écrire~:
+    émetteur. Alors on peut écrire~:
       \begin{align}
         (x-x_{1})^{2}+(y-y_{1})^{2} = r_{1}^{2}, \\
         (x-x_{2})^{2}+(y-y_{2})^{2} = r_{2}^{2}, \\
@@ -171,24 +177,24 @@ Nous avons dans un premier temps choisi de développer sur Android. Ce n'est pas
         y &= \frac{FA-DC}{EA-BD}
       \end{align*}
 
-    \paragraph{Détermination de la distance}
+    \subsubsection{Détermination de la distance}
       La formule utilisée pour la détermination de la distance est la suivante~:
       \[d_f(s) = 10^{\alpha_f(s)},\]
-	  où~:
-	  \[\alpha_f(s) = \frac{27,55-20\log_{10}(f)+\abs s}{20},\]
-      avec~:
-	  \begin{itemize}
-      \item[] $f$ est la fréquence (généralement 2.4Ghz ou 5.0 GHz)~;
-      \item[] $s$ est la qualité du signal (mesuré en $dBm$).
-    \end{itemize}
-    \begin{center}
-      \includegraphics[scale=0.5]{signal-propagation.jpg}\\
-      \textit{Répartition de la qualité de signal en fonction de la distance.}
-    \end{center}
-    \begin{center}
-      \includegraphics[scale=0.4]{wifi-propagation.png}\\
-      \textit{Représentation de la qualité de signal au sein d'un batiment.}
-    \end{center}
+      où~:
+      \[\alpha_f(s) = \frac{27,55-20\log_{10}(f)+\abs s}{20},\]
+        avec~:
+      \begin{itemize}
+        \item[] $f$ est la fréquence (généralement 2.4Ghz ou 5.0 GHz)~;
+        \item[] $s$ est la qualité du signal (mesuré en $dBm$).
+      \end{itemize}
+      \begin{center}
+        \includegraphics[scale=0.5]{signal-propagation.jpg}\\
+        \textit{Répartition de la qualité de signal en fonction de la distance.}
+      \end{center}
+      \begin{center}
+        \includegraphics[scale=0.4]{wifi-propagation.png}\\
+        \textit{Représentation de la qualité de signal au sein d'un batiment.}
+      \end{center}
 
     \begin{tcolorbox}[title=Avantages :]
       \begin{itemize}
@@ -202,16 +208,22 @@ Nous avons dans un premier temps choisi de développer sur Android. Ce n'est pas
           \begin{itemize}
             \item la quantité de personnes présentent sur le point d'accès~;
             \item divers éléments externe tels que des murs, etc.
-	      \end{itemize}
+        \end{itemize}
       \end{itemize}
     \end{tcolorbox}
-  \subsubsection{Méthode dites de ??? (SSM)}
-    \begin{center}
-      \includegraphics[scale=0.5]{similarity-function.jpg}
-    \end{center}
-    \begin{center}
-      \includegraphics[scale=0.5]{similarity-function-profil.jpg}
-    \end{center}
+  \subsection{Méthode dites de ??? (SSM)}
+    Une autre méthode de localisation utilise une \textit{signal strength map} (notée \textit{SSM}). Une \textit{SSM} est défini comme étant une cartographie des régions couvertes par les signaux \textit{Wifi}. La construction de cette carte se fait en regardant et enregistrant quels sont les points d'accès \textit{Wifi} que l'on capte pour à une certaine position. On va donc enregistrer, dans une base de données, pour chaque position désirée, les identifiants (\textit{BSS}) et les qualités de signal des points d'accès \textit{Wifi} couvrant cette position.
+    \subsubsection{Identification de la position}
+      La base de données va, comme mentionné ci-dessus, contenir pour chaque identifiant un vecteur de points d'accès \textit{Wifi}. On peut schématiser cette base de données comme suit : 
+      %\includegraphics[scale=0.5]{}
+      Le problème à résoudre est donc de trouver le vecteur au sein de la base de données qui est le plus proche du vecteur obtenu par l'utilisateur. Ce genre de problème est assez courant dans certain secteur des sciences informatiques tel que la bioinformatique. En effet, dans la cadre de la bioinformatique, de nombreux algorithmes permettant de déterminer la similarité entre deux séquences ont été mis au point (par exemple : Needlman-Wunsch). Cependant, dans notre cas, nous ne pourrons pas directement utiliser ce genre d'algorithme car les élément que nous désirons analyser présentent des aspects différents de ceux des séquence d'acides aminés.
+      \paragraph{Fonction de similarité}
+        \begin{center}
+          \includegraphics[scale=0.5]{similarity-function.jpg}
+        \end{center}
+        \begin{center}
+          \includegraphics[scale=0.5]{similarity-function-profil.jpg}
+        \end{center}
     
 
 \section{Traitement du graphe}
@@ -236,6 +248,12 @@ Nous avons dans un premier temps choisi de développer sur Android. Ce n'est pas
 		le pire des cas, alors que Dijkstra est de complexité $O(\abs E + \abs V\log\abs V)$ dans le pire des cas.
 
 		Le gain est permis par l'utilisation d'une heuristique qui nous suffira amplement ici.
+
+\section{Base de données}
+  \subsection{"Flat files"}
+  \subsection{SQL}
+
+\section{Conclusion}
 
 \section{Remerciements}
   Payot du service architecture
