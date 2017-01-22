@@ -68,7 +68,9 @@
 25 octobre 2016 \hfill Robin Petit - \emph{000408282}
 \newpage
 
+\tableofcontents
 
+\newpage
 
 \section{Introdution}
 Avant d'entrer dans les détails concernant l'implémentation de notre projet, il est intéressant d'introduire, dans les grandes lignes, l'objectif de réalisation du projet mais également le but final de ce dernier.\\
@@ -97,21 +99,16 @@ Nous avons dans un premier temps choisi de développer sur Android. Ce n'est pas
     \begin{enumerate}
       \item on collecte la qualité de signal d'au moins trois points d'accès wifi~;
       \item pour chacun de ces points d'accès, on détermine la distance à celui-ci via une formule prenant en compte la qualité du signal~;
-      \item à partir de ces distances, on peut «~générer~» trois cercles et garder un point contenu dans l'intersection de ces cercles\footnote{Mathématiquement, trois cercles s'intersectent en un et un seul point. Cependant, toutes interférences prises en comptes, on peut visualiser les cercles comme ayant une \textit{épaisseur} correspondant à l'incertitude. On peut alors parler d'\textit{un point de l'intersection des trois cercles.}}.
+      \item à partir de ces distances, on peut «~générer~» trois cercles et garder un point contenu dans l'intersection de ces cercles\footnote{Mathématiquement, trois cercles s'intersectent en un et un seul point. Cependant, toutes interférences prises en comptes, on peut visualiser les cercles comme ayant une \textit{épaisseur} correspondant à l'incertitude. On peut alors parler d'\textit{un point de l'intersection des trois cercles.}} via une méthode appelée \textit{trilatération}.
     \end{enumerate}
 
-    \paragraph{Détermination de la distance}
-      La formule utilisée pour la détermination de la distance est la suivante~:
-      \[d_f(s) = 10^{\alpha_f(s)},\]
-	  où~:
-	  \[\alpha_f(s) = \frac{27,55-20\log_{10}(f)+\abs s}{20},\]
-      avec~:
-	  \begin{itemize}
-        \item[] $f$ est la fréquence (généralement 2.4Ghz ou 5.0 GHz)~;
-        \item[] $s$ est la qualité du signal (mesuré en $dBm$).
-      \end{itemize}
-
     \paragraph{Trilateration}
+      Le principe de la trilatération est de trouver un point du plan se situant dans l'intersection de plusieurs cercles. Dans notre cas, les cerles représentent les régions de l'espace couvertent pas les \textit{Wifi} dont le centre est la position du points d'accès \textit{Wifi} et où le point se trouvant à l'intersection des cercles représente la position de l'utilisateur.
+      \begin{center}
+        \includegraphics[scale=0.8]{trilateration.png}\\
+        \textit{Simple exemple de trilatération}
+      \end{center}
+      De manière formelle, la détermination de la position de l'utilisateur se fait suivant le raisonnement suivant :\\\\
       Soient $(x, y) \in \mathbb R^2$ la position actuelle de l'utilisateur, $x_{\lambda}$, $y_{\lambda}$ et $r_{\lambda}$ (où $1 \leq \lambda \leq 3$) est le position et la distance de chaque
 	  émetteur. Alors on peut écrire~:
       \begin{align}
@@ -171,8 +168,27 @@ Nous avons dans un premier temps choisi de développer sur Android. Ce n'est pas
         y &= \frac{F-D(\frac{C-By}{A})}{E} \\
         y &= \frac{FA-DC+DBy}{AE} \\
         AEy &= FA-DC+DBy \\
-        y &= \frac{CE-BF}{EA-BD}
+        y &= \frac{FA-DC}{EA-BD}
       \end{align*}
+
+    \paragraph{Détermination de la distance}
+      La formule utilisée pour la détermination de la distance est la suivante~:
+      \[d_f(s) = 10^{\alpha_f(s)},\]
+	  où~:
+	  \[\alpha_f(s) = \frac{27,55-20\log_{10}(f)+\abs s}{20},\]
+      avec~:
+	  \begin{itemize}
+      \item[] $f$ est la fréquence (généralement 2.4Ghz ou 5.0 GHz)~;
+      \item[] $s$ est la qualité du signal (mesuré en $dBm$).
+    \end{itemize}
+    \begin{center}
+      \includegraphics[scale=0.5]{signal-propagation.jpg}\\
+      \textit{Répartition de la qualité de signal en fonction de la distance.}
+    \end{center}
+    \begin{center}
+      \includegraphics[scale=0.4]{wifi-propagation.png}\\
+      \textit{Représentation de la qualité de signal au sein d'un batiment.}
+    \end{center}
 
     \begin{tcolorbox}[title=Avantages :]
       \begin{itemize}
@@ -189,6 +205,14 @@ Nous avons dans un premier temps choisi de développer sur Android. Ce n'est pas
 	      \end{itemize}
       \end{itemize}
     \end{tcolorbox}
+  \subsubsection{Méthode dites de ??? (SSM)}
+    \begin{center}
+      \includegraphics[scale=0.5]{similarity-function.jpg}
+    \end{center}
+    \begin{center}
+      \includegraphics[scale=0.5]{similarity-function-profil.jpg}
+    \end{center}
+    
 
 \section{Traitement du graphe}
 	\subsection{Utilisation de la triangulation}
@@ -212,5 +236,12 @@ Nous avons dans un premier temps choisi de développer sur Android. Ce n'est pas
 		le pire des cas, alors que Dijkstra est de complexité $O(\abs E + \abs V\log\abs V)$ dans le pire des cas.
 
 		Le gain est permis par l'utilisation d'une heuristique qui nous suffira amplement ici.
+
+\section{Remerciements}
+  Payot du service architecture
+
+\section{Bibliographie}
+
+\section{Annexes}
 
 \end{document}
