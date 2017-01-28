@@ -5,6 +5,7 @@
 */
 package be.ulb.owl.graph;
 
+import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.util.Random;
 import be.ulb.owl.MainActivity;
 import be.ulb.owl.Scanner;
 import be.ulb.owl.Wifi;
+import be.ulb.owl.utils.SQLUtils;
 
 /**
  * Represent all Plan<br/>
@@ -145,6 +147,7 @@ public class Graph {
         }
         else {
             ArrayList<Wifi> sensed = _scanner.scan();
+            Log.d(getClass().getName(), "wifi: (" + sensed.size() + ") " + sensed.toString());
             res = whereAmI(sensed);
         }
         return res;
@@ -174,7 +177,11 @@ public class Graph {
             Log.i(getClass().getName(), "You are not at ULB.");
             return null;
         }
-        return res.get(0).getNode(sensed);
+        Node node = res.get(0).getNode(sensed);
+        if(node != null) {
+            Log.d(getClass().getName(), "Node found: " + node.getName() + "(alias: " + node.getAlias() + ")");
+        }
+        return node;
     }
 
 
@@ -285,9 +292,9 @@ public class Graph {
 
         if(resPlan == null && loadIfNotExist) {
             try {
-                resPlan = new Plan(name);
+                resPlan = SQLUtils.loadPlan(name);
                 _allPlan.add(resPlan);
-            } catch (IOException exception) {
+            } catch (SQLiteException exception) {
                 Log.e(Graph.class.getName(), "Can not load the plan: " + name +
                         " (err: " + exception.getMessage()+")");
             }

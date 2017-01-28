@@ -29,6 +29,7 @@ public class Scanner {
     private boolean _defaultWifiEnable = true;
     private WifiManager _wifiManager = null;
     private HashMap<String, ArrayList<Integer>> _accesPoints;
+    private List<ScanResult> _lastRestult = null;
 
     public Scanner () {
         forceEnableWifi();
@@ -45,7 +46,7 @@ public class Scanner {
      * @param tmp list of the frequence
      * @return the average
      */
-    private Integer avg (ArrayList<Integer> tmp) {
+    private Integer avg(ArrayList<Integer> tmp) {
         Integer sum = 0;
         for (Integer elem : tmp) {
             sum += elem;
@@ -58,6 +59,13 @@ public class Scanner {
      */
     private void getData() {
         List<ScanResult> results = _wifiManager.getScanResults();
+
+        if(_lastRestult != null && _lastRestult.equals(results)) {
+            Log.w(getClass().getName(), "");
+        }
+
+        _lastRestult = results;
+
         for (ScanResult res :results) {
             String key = res.BSSID;
             Integer value = res.level;
@@ -77,6 +85,7 @@ public class Scanner {
      * @return the list of all wifi
      */
     public ArrayList<Wifi> scan() {
+        _accesPoints.clear();
         ArrayList<Wifi> temp = new ArrayList<Wifi>();
         for (int i = 0; i < 5; i++) {
             getData();
@@ -146,7 +155,7 @@ public class Scanner {
      * Start the scan task
      */
     public void startScanTask() {
-        if(!_taskInProgress) {
+        if(!_taskInProgress && _scanTask == null) {
             _scanTask = new Thread() {
                 @Override
                 public void run() {
@@ -179,6 +188,7 @@ public class Scanner {
     public void stopScanTask() {
         _scanTask.interrupt();
         _taskInProgress = false;
+        _scanTask = null;
     }
 
 }

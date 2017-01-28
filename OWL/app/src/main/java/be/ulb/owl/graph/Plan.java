@@ -36,10 +36,11 @@ public class Plan {
     private ArrayList<Node> _listNode;
     private ArrayList<String> _allBssWifi;
     private InputStream _image;
-    private float _ppm;  // pixels per metre
-    private float _relativeAngle;
-    private float _xOnParent;
-    private float _yOnParent;
+    private final String _pathImage;
+    private final float _ppm;  // pixels per metre
+    private final float _relativeAngle;
+    private final float _xOnParent;
+    private final float _yOnParent;
 
 
     /**
@@ -48,34 +49,69 @@ public class Plan {
      *
      * @param name of the plan
      * @see Graph#getPlan(java.lang.String)
+     * @deprecated
      */
-    protected Plan(String name) throws IOException {
-        this(name, true);
-    }
+//    protected Plan(String name) throws IOException {
+//        this(name, true);
+//    }
+//
+//    /**
+//     * Create a plan
+//     * <b>Only call by Graph object</b>
+//     *
+//     * @param name name of the plan
+//     * @param loadPlan True if we must load XML file from this plan
+//     * @see Graph#getPlan(java.lang.String, boolean)
+//     * @deprecated
+//     */
+//    protected Plan(String name, boolean loadPlan) throws IOException {
+//        _listNode = new ArrayList<Node>();
+//        _allBssWifi = new ArrayList<String>();
+//        _allAlias = null;
+//
+//        _name = name;
+//        if(loadPlan) {
+//            boolean couldLoad = loadXMLPlan();
+//            if(!couldLoad) {
+//                throw new IOException("Impossible to load this plan " + _name + " (XML not found)");
+//            }
+//        }
+//
+//        loadImage();
+//    }
 
     /**
-     * Create a plan
-     * <b>Only call by Graph object</b>
+     * Constructor (call with SQL informations)
      *
-     * @param name name of the plan
-     * @param loadPlan True if we must load XML file from this plan
-     * @see Graph#getPlan(java.lang.String, boolean)
+     * @param name of the plan
+     * @param pathImage path to the image
+     * @param xOnParent x position on the parent plan
+     * @param yOnParent y position on the parent plan
+     * @param bgCoordX        // TODO @robin ça sert à quoi ? :/
+     * @param bgCoordY        // same ^
+     * @param relativeAngle   // et ça contine encore et encore
+     * @param distance number of pixel for on meter
      */
-    protected Plan(String name, boolean loadPlan) throws IOException {
+    public Plan(String name, String pathImage, float xOnParent, float yOnParent, float bgCoordX,
+                float bgCoordY, float relativeAngle, float distance) {
+
+        this._name = name;
+        this._xOnParent = xOnParent;
+        this._yOnParent = yOnParent;
+        this._bgCoordX = bgCoordX;
+        this._bgCoordY = bgCoordY;
+        this._relativeAngle = relativeAngle;
+        this._ppm = distance;
+        this._pathImage = pathImage;
+
         _listNode = new ArrayList<Node>();
         _allBssWifi = new ArrayList<String>();
         _allAlias = null;
 
-        _name = name;
-        if(loadPlan) {
-            boolean couldLoad = loadXMLPlan();
-            if(!couldLoad) {
-                throw new IOException("Impossible to load this plan " + _name + " (XML not found)");
-            }
-        }
-
-        loadImage();
     }
+
+
+
 
     private double getScore(Float level) {
         return Math.pow((-level+100)/50, 0.6);
@@ -334,6 +370,12 @@ public class Plan {
 
     ///////////////////////////// XML /////////////////////////////
 
+    private boolean loadSQLPlan() {
+        // TODO
+        return false;
+    }
+
+
     /**
      * Load XML from this plan
      *
@@ -379,20 +421,20 @@ public class Plan {
                                 break;
 
                             case "distance_unit":
-                                _ppm = Float.parseFloat(parser.getAttributeValue(null, "value"));
+//                                _ppm = Float.parseFloat(parser.getAttributeValue(null, "value"));
                                 Log.i(getClass().getName(), "PPM is " + _ppm);
                                 parser.next();
                                 break;
 
                             case "angle_with_parent":
-                                _relativeAngle = Float.parseFloat(parser.getAttributeValue(null, "value"));
+//                                _relativeAngle = Float.parseFloat(parser.getAttributeValue(null, "value"));
                                 Log.i(getClass().getName(), "Relative angle is: " + _relativeAngle);
                                 parser.next();
                                 break;
 
                             case "position_on_parent":
-                                _xOnParent = Float.parseFloat(parser.getAttributeValue(null, "x"));
-                                _yOnParent = Float.parseFloat(parser.getAttributeValue(null, "y"));
+//                                _xOnParent = Float.parseFloat(parser.getAttributeValue(null, "x"));
+//                                _yOnParent = Float.parseFloat(parser.getAttributeValue(null, "y"));
                                 parser.next();
                                 break;
 

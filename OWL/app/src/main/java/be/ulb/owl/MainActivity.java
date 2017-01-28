@@ -28,6 +28,7 @@ import be.ulb.owl.gui.listener.QueryTextListener;
 import be.ulb.owl.gui.listener.TouchListener;
 import be.ulb.owl.utils.DialogUtils;
 import be.ulb.owl.utils.LogUtils;
+import be.ulb.owl.utils.SQLUtils;
 import br.com.mauker.materialsearchview.MaterialSearchView;
 
 /**
@@ -98,6 +99,10 @@ public class MainActivity extends AppCompatActivity  {
 
         localizeButton = (Button)findViewById(R.id.localizeButton);
         localizeButton.setOnClickListener(clickListener);
+
+        // Load sql
+        SQLUtils.initSQLUtils(this);
+
     }
 
     @Override

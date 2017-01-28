@@ -31,7 +31,7 @@ import be.ulb.owl.MainActivity;
 public class XMLUtils {
     /**
      * Read XML File and return a XMLPullParser
-     * 
+     *
      * @param name of the file who must be read (without extension !)
      * @return XmlPullParser
      */
@@ -69,9 +69,9 @@ public class XMLUtils {
      * @throws XmlPullParserException
      * @throws IOException
      */
-    public static void removeSpace(XmlPullParser parser) 
+    public static void removeSpace(XmlPullParser parser)
             throws XmlPullParserException, IOException {
-        
+
         while(isSpace(parser)) {
             parser.next();
         }
@@ -85,11 +85,11 @@ public class XMLUtils {
      * @throws XmlPullParserException
      * @throws IOException
      */
-    public static void nextAndRemoveSpace(XmlPullParser parser) 
+    public static void nextAndRemoveSpace(XmlPullParser parser)
             throws XmlPullParserException, IOException {
-        
+
         parser.next();
         removeSpace(parser);
     }
-    
+
 }
