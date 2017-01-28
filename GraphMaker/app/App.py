@@ -161,3 +161,21 @@ class App(t.Frame):
             save_file.write(content)
         print("File saved !")
 
+    def sql(self):
+        queries = []
+        queries.append() #plan data
+        for node_id in self.canvas.nodes():
+            queries.append(self.canvas.nodes()[node_id].sql())
+        for edge_id in self.canvas.edges():
+            queries.append(self.canvas.edges()[edge_id].sql())
+        for ext_edge in self.canvas.external_edges():
+            queries.append(ext_edge.sql(sql))
+        return queries
+
+    def save_to_sql(self):
+        queries = self.sql()
+        conn = sqlite3.connect(Config.DB_PATH)
+        for query in queries:
+            conn.execute(query)
+        conn.commit()
+        conn.close()
