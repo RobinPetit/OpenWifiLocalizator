@@ -189,15 +189,15 @@ public class MainActivity extends AppCompatActivity  {
         for(int i = 0; i < startingEnd.length; ++i) {
             Node src = allNodes.get(startingEnd[i]);
             Node dest = allNodes.get(arrivalEnd[i]);
-            Log.i(getClass().getName(), "Testing best path between nodes " + src.getName() + " and " + dest.getName());
+            Log.i(getClass().getName(), "Testing best path between nodes " + src.getID() + " and " + dest.getID());
             try {
                 ArrayList<Path> overallPath = _graph.bestPath(src, dest);
-                String pathString = src.getName();
+                String pathString = ""+src.getID();
                 Node current = src;
                 int k = 0;
                 while(!current.equals(dest)) {
                     current = overallPath.get(k++).getOppositeNodeOf(current);
-                    pathString += " --> " + current.getName();
+                    pathString += " --> " + current.getID();
                 }
                 Log.i(getClass().getName(), "Found path is given by: " + pathString);
                 if(i == 1)
@@ -238,7 +238,7 @@ public class MainActivity extends AppCompatActivity  {
         Node position = _graph.whereAmI(tmp);
         draw(position);
         System.out.print("Test 1.\n res = ");
-        System.out.println(position.getName());
+        System.out.println(position.getID());
 
         // ---- test ----
 
@@ -266,7 +266,7 @@ public class MainActivity extends AppCompatActivity  {
         position = _graph.whereAmI(tmp);
         draw(position);
         System.out.print("Test 2.\n res = ");
-        System.out.println(position.getName());
+        System.out.println(position.getID());
 
         // ---- test ----
 
@@ -280,7 +280,7 @@ public class MainActivity extends AppCompatActivity  {
         position = _graph.whereAmI(tmp);
         draw(position);
         System.out.print("Test 3.\n res = ");
-        System.out.println(position.getName());
+        System.out.println(position.getID());
 
         // ---- test ----
 
@@ -301,7 +301,7 @@ public class MainActivity extends AppCompatActivity  {
         position = _graph.whereAmI(tmp);
         draw(position);
         System.out.print("Test 4.\n res = ");
-        System.out.println(position.getName());
+        System.out.println(position.getID());
 
         // ---- test ----
 
@@ -325,7 +325,7 @@ public class MainActivity extends AppCompatActivity  {
         position = _graph.whereAmI(tmp);
         draw(position);
         System.out.print("Test 5.\n res = ");
-        System.out.println(position.getName());
+        System.out.println(position.getID());
 
         // ---- test ----
 
@@ -344,7 +344,7 @@ public class MainActivity extends AppCompatActivity  {
         position = _graph.whereAmI(tmp);
         draw(position);
         System.out.print("Test 6.\n res = ");
-        System.out.println(position.getName());
+        System.out.println(position.getID());
     }
 
     /**
@@ -539,7 +539,7 @@ public class MainActivity extends AppCompatActivity  {
                         _graph.findPath(_destinationName);
                     } catch (NoPathException e) {
                         Log.e(getClass().getName(), "Error: should have found an alternative for a path between "
-                                + _currentPosition.getName() + " and " + _destinationName);
+                                + _currentPosition.getID() + " and " + _destinationName);
                     }
                 } else
                     this.draw(current);
