@@ -10,6 +10,7 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
 
 import be.ulb.owl.MainActivity;
@@ -78,9 +79,10 @@ public class Graph {
             ArrayList<Path> p = bestPath(src, closestDestination);
             if(p.size() >= 2)
                 refinePath(p, destination);
-            Log.d(getClass().getName(), "Path between " + src.getName() + " and " + closestDestination.getName());
-            for (Path path : p)
-                Log.i(getClass().getName(), path.getNode().getName() + " - " + path.getOppositeNodeOf(path.getNode()).getName());
+            Log.d(getClass().getName(), "Path between " + src.getID() + " and " + closestDestination.getID());
+            for (Path path : p) {
+                Log.i(getClass().getName(), path.getNode().getID() + " - " + path.getOppositeNodeOf(path.getNode()).getID());
+            }
             main.drawPath(p);
         } else {
             Node dest = destinations.get(0);
@@ -109,7 +111,7 @@ public class Graph {
      * @return An ordered list of nodes the user has to cross to reach the destination
      */
     public ArrayList<Path> bestPath(Node nodeFrom, Node nodeTo) throws NoPathException {
-        Log.d(getClass().getName(), "Searching path between: " + nodeFrom.getName() + " and " + nodeTo.getName());
+        Log.d(getClass().getName(), "Searching path between: " + nodeFrom.getID() + " and " + nodeTo.getID());
         ShortestPathEvaluator evaluator = new ShortestPathEvaluator(getAllNodes(), nodeFrom, nodeTo);
         return evaluator.find();
     }
@@ -117,21 +119,21 @@ public class Graph {
     public void setPlan () {
         if (0 == _offset) {
             Plan currentPlan = getPlan("P.F");
-            _demoMotions.add(currentPlan.getNode("64"));
-            _demoMotions.add(currentPlan.getNode("63"));
-            _demoMotions.add(currentPlan.getNode("9"));
-            _demoMotions.add(currentPlan.getNode("13"));
-            _demoMotions.add(currentPlan.getNode("20"));
-            _demoMotions.add(currentPlan.getNode("21"));
-            _demoMotions.add(currentPlan.getNode("27"));
-            _demoMotions.add(currentPlan.getNode("29"));
-            _demoMotions.add(currentPlan.getNode("31"));
-            _demoMotions.add(currentPlan.getNode("32"));
-            _demoMotions.add(currentPlan.getNode("34"));
-            _demoMotions.add(currentPlan.getNode("35"));
-            _demoMotions.add(currentPlan.getNode("23"));
-            _demoMotions.add(currentPlan.getNode("16"));
-            _demoMotions.add(currentPlan.getNode("42"));
+            _demoMotions.add(currentPlan.getNode(64));
+            _demoMotions.add(currentPlan.getNode(63));
+            _demoMotions.add(currentPlan.getNode(9));
+            _demoMotions.add(currentPlan.getNode(13));
+            _demoMotions.add(currentPlan.getNode(20));
+            _demoMotions.add(currentPlan.getNode(21));
+            _demoMotions.add(currentPlan.getNode(27));
+            _demoMotions.add(currentPlan.getNode(29));
+            _demoMotions.add(currentPlan.getNode(31));
+            _demoMotions.add(currentPlan.getNode(32));
+            _demoMotions.add(currentPlan.getNode(34));
+            _demoMotions.add(currentPlan.getNode(35));
+            _demoMotions.add(currentPlan.getNode(23));
+            _demoMotions.add(currentPlan.getNode(16));
+            _demoMotions.add(currentPlan.getNode(42));
         }
     }
 
@@ -161,7 +163,7 @@ public class Graph {
         ArrayList<Plan> res = new ArrayList<Plan>();
         int biggestSetSize = 0;
         for (Plan plan : _allPlan) {
-            ArrayList<String> tmp = plan.getListWifiBSS();
+            HashSet<String> tmp = plan.getListWifiBSS();
             tmp.retainAll(sensedStr); // set-theoretical and operation
             if (biggestSetSize == tmp.size()) {
                 res.add(plan);
@@ -179,7 +181,7 @@ public class Graph {
         }
         Node node = res.get(0).getNode(sensed);
         if(node != null) {
-            Log.d(getClass().getName(), "Node found: " + node.getName() + "(alias: " + node.getAlias() + ")");
+            Log.d(getClass().getName(), "Node found: " + node.getID() + "(alias: " + node.getAlias() + ")");
         }
         return node;
     }
@@ -223,30 +225,7 @@ public class Graph {
      * Load all plan in the default folder
      */
     private static void loadAllPlan() {
-        String[] strFile = null;
-        try {
-            strFile = MainActivity.getInstance().getAssets().list("XMLMap");
-        } catch(IOException exception) {
-
-        }
-
-        if(strFile != null && strFile.length > 0) {
-
-            for (String filePlan : strFile) {
-
-                if(filePlan == null || filePlan.equalsIgnoreCase("")) {
-                    continue;
-                }
-
-                String namePlan = filePlan.replaceFirst("[.][^.]+$", "");
-
-                // Check if plan is not empty and not an ignored file
-                if(namePlan != null && !namePlan.equalsIgnoreCase("") && !namePlan.contains(IGNOREPLAN)) {
-                    getPlan(namePlan);
-                }
-            }
-        }
-
+        _allPlan = SQLUtils.loadAllPlan();
     }
 
 
@@ -274,6 +253,7 @@ public class Graph {
     public static Plan getPlan(String name) {
         return getPlan(name, true);
     }
+
 
     /**
      * Get a specific plan or <b>create</b> if not exist

@@ -8,6 +8,7 @@ package be.ulb.owl.graph;
 import java.util.ArrayList;
 
 import be.ulb.owl.Wifi;
+import be.ulb.owl.utils.SQLUtils;
 
 /**
  * Point on a specific plan
@@ -16,59 +17,72 @@ import be.ulb.owl.Wifi;
  */
 public class Node {
     
+    private final Plan _parentPlan;
+    private final float _x;
+    private final float _y;
+    private final int _id;
     private ArrayList<Path> _listPath;
     private ArrayList<String> _listAlias;
     private ArrayList<Wifi> _listWifi;
     
-    private final Plan _parentPlan;
-    private final float _x;
-    private final float _y;
-    private final String _name;
     
-    
-    /**
-     * Init a node
-     * 
-     * @param parentPlan plan containing the ndoe
-     * @param x x position of the node
-     * @param y y position of the node
-     * @param name of the node
-     * @param listWifi list of all wifi signals received at this point
-     */
-    public Node(Plan parentPlan, float x, float y, String name, 
-            ArrayList<Wifi> listWifi) {
-        this(parentPlan, x, y, name, listWifi, new ArrayList<String>());
+//    /**
+//     * Init a node
+//     *
+//     * @param parentPlan plan containing the ndoe
+//     * @param x x position of the node
+//     * @param y y position of the node
+//     * @param name of the node
+//     * @param listWifi list of all wifi signals received at this point
+//     */
+//    public Node(Plan parentPlan, float x, float y, String name,
+//            ArrayList<Wifi> listWifi) {
+//        this(parentPlan, x, y, name, listWifi, new ArrayList<String>());
+//    }
+
+//    /**
+//     * Init a node
+//     *
+//     * @param parentPlan plan containing
+//     * @param x x position of the node
+//     * @param y y position of the node
+//     * @param name of the node
+//     * @param listWifi list of all wifi signals received on this point
+//     * @param listAlias list of all aliases of the node
+//     */
+//    public Node(Plan parentPlan, float x, float y, String name,
+//                ArrayList<Wifi> listWifi, ArrayList<String> listAlias) {
+//        this._listPath = new ArrayList<Path>();
+//        this._listWifi = listWifi;
+//        this._listAlias = listAlias;
+//
+//        this._x = x-parentPlan.getBgCoordX();
+//        this._y = y-parentPlan.getBgCoordY();
+//        this._name = name;
+//        this._parentPlan = parentPlan;
+//    }
+
+
+    public Node(Plan parentPlan, float x, float y, int id) {
+        this._x = x-parentPlan.getBgCoordX();
+        this._y = y-parentPlan.getBgCoordY();
+        this._id = id;
+        this._parentPlan = parentPlan;
+
+        this._listAlias = SQLUtils.loadAlias(id);
+        this._listWifi = SQLUtils.loadWifi(id);
+        this._listPath = SQLUtils.loadPath(id);
+
     }
 
-    /**
-     * Init a node
-     *
-     * @param parentPlan plan containing
-     * @param x x position of the node
-     * @param y y position of the node
-     * @param name of the node
-     * @param listWifi list of all wifi signals received on this point
-     * @param listAlias list of all aliases of the node
-     */
-    public Node(Plan parentPlan, float x, float y, String name,
-                ArrayList<Wifi> listWifi, ArrayList<String> listAlias) {
-        this._listPath = new ArrayList<Path>();
-        this._listWifi = listWifi;
-        this._listAlias = listAlias;
-        
-        this._x = x;
-        this._y = y;
-        this._name = name;
-        this._parentPlan = parentPlan;
-    }
-    
+
     
     /**
      * Add an alias to this node
      * 
      * @param alias the alias who must be add
      */
-    public void addAlias(String alias) {
+    private void addAlias(String alias) {
         this._listAlias.add(alias);
     }
     
@@ -87,14 +101,14 @@ public class Node {
     }
     
     /**
-     * Check if the current Node have this name
+     * Check if the current Node have this id
      * 
-     * @param name the name who must be tested
-     * @return True if this node have this name
-     * @see #getName() 
+     * @param id the id who must be tested
+     * @return True if this node have this id
+     * @see #getID()
      */
-    public boolean isNode(String name) {
-        return this._name.equals(name);
+    public boolean isNode(int id) {
+        return this._id == id;
     }
     
     
@@ -103,7 +117,7 @@ public class Node {
      * 
      * @param alias the alias which must be tested
      * @return True if the node match
-     * @see #getAlias() 
+     * @see #getAlias()
      */
     public boolean haveAlias(String alias) {
         for(String a : _listAlias) {
@@ -153,10 +167,10 @@ public class Node {
      * Get the name of the node
      * 
      * @return The name of the node
-     * @see #isNode(java.lang.String)
+     * @see #isNode(int)
      */
-    public String getName() {
-        return _name;
+    public Integer getID() {
+        return _id;
     }
     
     /**
@@ -164,7 +178,7 @@ public class Node {
      * <b>/!\</b> Java use reference... Clone before modification
      * 
      * @return An ArrayList of string that contains all alias
-     * @see #isNode(java.lang.String) 
+     * @see #isNode(int)
      */
     public ArrayList<String> getAlias() {
         return _listAlias;
@@ -174,6 +188,11 @@ public class Node {
         return _listWifi;
     }
 
+    /**
+     * Get the list of all BSS accessible at this node
+     *
+     * @return ArrayList with all BSS (String)
+     */
     public ArrayList<String> getListWifiBSS() {
         ArrayList<String> tmp = new ArrayList<String>();
         for (Wifi wifi : _listWifi) {
@@ -207,6 +226,6 @@ public class Node {
             if(path.getOppositeNodeOf(this).equals(dest))
                 return path;
         }
-        throw new NoPathException("No path between " + getName() + " and " + dest.getName());
+        throw new NoPathException("No path between " + getID() + " and " + dest.getID());
     }
 }

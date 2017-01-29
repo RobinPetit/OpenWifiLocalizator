@@ -15,7 +15,7 @@ public enum BuildingTable implements SQLTable {
     IMAGE_PATH("ImagePath", 4),
     X_ON_PARENT("xOnParent", 5),
     Y_ON_PARENT("yOnParent", 6),
-    BG_COORD_x("bgCoordX", 7),
+    BG_COORD_X("bgCoordX", 7),
     BG_COORD_Y("bgCoordY", 8),
     RELATIVE_ANGLE("relativeAngle", 9);
 
