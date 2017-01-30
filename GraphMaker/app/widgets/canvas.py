@@ -300,8 +300,15 @@ class EditableGraphCanvas(GraphCanvas):
                0 >= coords[1] >= int(self.height())-self.bg_template.size[1]
 
     def handle_right_click_mvt(self, ev):
-        if Config.DEBUG:
-            print('RC MOVING')
+        self.right_moved = True
+        offset = [ev.x - self.click_coord[0], ev.y - self.click_coord[1]]
+        new_pos = [offset[i%2]+self.moving_node_original_coords[i] for i in range(4)]
+        self.coords(self.selected_node, *new_pos)
+        for edge in self.moving_edges_edit_idx:
+            tmp = self.moving_edges_edit_idx[edge][1]
+            tmp[self.moving_edges_edit_idx[edge][0]] = (new_pos[2] + new_pos[0]) // 2
+            tmp[self.moving_edges_edit_idx[edge][0]+1] = (new_pos[3] + new_pos[1]) // 2
+            self.coords(edge, *tmp)
 
     def handle_wheel_click_mvt(self, ev):
         if Config.DEBUG:
@@ -311,7 +318,7 @@ class EditableGraphCanvas(GraphCanvas):
         self.left_src = self.get_selected_el(ev.x, ev.y)
         if self.left_src is not None:
             self.initial_click_coord = [self.nodes()[self.left_src].coord()[0]+GraphCanvas.NODE_SIZE,
-                self.nodes()[self.left_src].coord()[1]+GraphCanvas.NODE_SIZE]
+                                        self.nodes()[self.left_src].coord()[1]+GraphCanvas.NODE_SIZE]
             _ = self.initial_click_coord + self.initial_click_coord
             self.tmp_line_id = self.create_line(*_, width=GraphCanvas.EDGE_WIDTH)
         else:
@@ -337,21 +344,27 @@ class EditableGraphCanvas(GraphCanvas):
             print('\t\tERROR')
 
     def handle_right_click(self, ev):
-        selected = self.get_selected_el(ev.x, ev.y)
-        if selected is None:
-            return
-        if selected in self.nodes():
-            access_points, aliases = self.configure_node(self.nodes()[selected].id(), self.nodes()[selected].aliases())
-            aliases = list(set(aliases))
-            self.nodes()[selected].aliases(aliases)
-            if access_points is not None:
-                self.nodes()[selected].access_points(access_points)
-                self.color = 'green'
-                self.itemconfig(selected, fill='green')
-        elif selected in self.edges():
-            self.edges()[selected].weight(self.configure_edge(self.edges()[selected].weight()))
-        else:
-            print('\t\tERROR')
+        self.right_clicked = True
+        self.right_moved = False
+        self.click_coord = [ev.x, ev.y]
+        self.selected_node = self.get_selected_el(ev.x, ev.y)
+        print(ev.x, ev.y, self.selected_node)
+        self.moving_node_original_coords = self.coords(self.selected_node)
+        if Config.DEBUG:
+            print('selected node: {} with position {}'.format(self.nodes()[self.selected_node].id(), self.moving_node_original_coords))
+        self.moving_edges_edit_idx = dict()
+        for edge in self.edges():
+            if str(self.nodes()[self.selected_node].id()) in self.edges()[edge].extremity_ids:
+                if self.edges()[edge].coord()[0] == self.moving_node_original_coords[0] + GraphCanvas.NODE_SIZE:
+                    self.moving_edges_edit_idx[edge] = [0]
+                elif self.edges()[edge].coord()[2] == self.moving_node_original_coords[0] + GraphCanvas.NODE_SIZE:
+                    self.moving_edges_edit_idx[edge] = [2]
+                else:
+                    print('ERROR')
+                    continue
+                self.moving_edges_edit_idx[edge].append(self.coords(edge)[:])
+                print(self.coords(edge))
+                print('adding edge {}'.format(edge))
 
     def handle_wheel_up(self, ev):
         if Config.DEBUG:
@@ -380,7 +393,7 @@ class EditableGraphCanvas(GraphCanvas):
                         return
                     edge_id = self.create_line(*self.initial_click_coord,
                         self.nodes()[end].coord()[0]+GraphCanvas.NODE_SIZE, self.nodes()[end].coord()[1]+GraphCanvas.NODE_SIZE,
-                        width=2.5)
+                            width=2.5)
                     extremity_ids = (self.nodes()[self.get_selected_el(*self.initial_click_coord)].id(), self.nodes()[end].id())
                     self.add_edge(weight, edge_id, extremity_ids)
             else:
@@ -389,13 +402,35 @@ class EditableGraphCanvas(GraphCanvas):
                     self.nodes()[node_id].coord(self.coords(node_id))
                 for edge_id in self.edges():
                     self.edges()[edge_id].coord(self.coords(edge_id))
-        elif float(time() - self.left_click_time) <= EditableGraphCanvas.CLICK_TIME_SENSIBILITY:
+        elif float(time() - self.left_click_time) <= EditableGraphCanvas.CLICK_TIME_SENSIBILITY and self.left_src is None:
             self.create_node(ev.x, ev.y)
         self.left_moved = False
+        self.left_src = None
 
     def handle_right_release(self, ev):
-        if(Config.DEBUG):
-            print('RR')
+        if self.right_moved:
+            self.nodes()[self.selected_node].coord(self.coords(self.selected_node))
+            for edge in self.moving_edges_edit_idx:
+                print('fixing edge {}'.format(edge))
+                self.edges()[edge].coord(self.coords(edge))
+            return
+        selected = self.get_selected_el(ev.x, ev.y)
+        print(ev.x, ev.y, selected)
+        if selected is None:
+            return
+        if selected in self.nodes():
+            access_points, aliases = self.configure_node(self.nodes()[selected].id(), self.nodes()[selected].aliases())
+            aliases = list(set(aliases))
+            self.nodes()[selected].aliases(aliases)
+            if access_points is not None:
+                self.nodes()[selected].access_points(access_points)
+                self.color = 'green'
+                self.itemconfig(selected, fill='green')
+        elif selected in self.edges():
+            self.edges()[selected].weight(self.configure_edge(self.edges()[selected].weight()))
+        else:
+            print('\t\tERROR')
+        self.right_clicked = self.right_moved = False
 
     def handle_wheel_release(self, ev):
         if(Config.DEBUG):
