@@ -30,7 +30,7 @@ public class ShortestPathEvaluator {
         _reachingScore = new HashMap<>();
         _intermediateScore = new HashMap<>();
         for(Node node: nodes) {
-            if (!node.isNode(from.getName())) {
+            if (!node.isNode(from)) {
                 _reachingScore.put(node, Double.POSITIVE_INFINITY);
                 _intermediateScore.put(node, Double.POSITIVE_INFINITY);
             }

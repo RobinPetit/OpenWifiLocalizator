@@ -85,7 +85,7 @@ public class Path {
 
     @Override
     public String toString() {
-        return "Path of length " + _distance + " between " + _nodeOne.getName() + " and " + _nodeTwo.getName();
+        return "Path of length " + _distance + " between " + _nodeOne.getID() + " and " + _nodeTwo.getID();
     }
 
     /**

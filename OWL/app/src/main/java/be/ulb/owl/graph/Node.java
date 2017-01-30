@@ -110,6 +110,10 @@ public class Node {
     public boolean isNode(int id) {
         return this._id == id;
     }
+
+    public boolean isNode(Node other) {
+        return isNode(other.getID());
+    }
     
     
     /**

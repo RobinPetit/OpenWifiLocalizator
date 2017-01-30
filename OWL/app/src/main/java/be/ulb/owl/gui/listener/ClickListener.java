@@ -7,6 +7,7 @@ import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import be.ulb.owl.MainActivity;
 import be.ulb.owl.R;
@@ -71,7 +72,7 @@ public class ClickListener implements View.OnClickListener {
         String[] items = new String[]{};
         Plan currentPlan = main.getCurrentPlan();
         if(currentPlan != null) {
-            ArrayList<String> allAlias = currentPlan.getAllAlias();
+            HashSet<String> allAlias = currentPlan.getAllAlias();
             Log.d(this.getClass().getName(), allAlias.toString());
 
             if(allAlias.size() > 0) {
