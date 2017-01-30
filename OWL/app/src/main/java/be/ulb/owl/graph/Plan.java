@@ -25,7 +25,15 @@ import be.ulb.owl.utils.SQLUtils;
  */
 public class Plan {
     private final MainActivity main = MainActivity.getInstance();
+    /**
+     * represents the X-axis part of the relative coordinate of the upper left corner of the
+     * background image in GraphMaker (the graph editor).
+     */
     private float _bgCoordX;
+    /**
+     * represents the Y-axis part of the relative coordinate of the upper left corner of the
+     * background image in GraphMaker (the graph editor).
+     */
     private float _bgCoordY;
 
     private final String _name;
@@ -42,16 +50,16 @@ public class Plan {
 
     /**
      * Constructor<br />
-     * <b>Only</b> call with by SQL (to have informations)
+     * <b>Only</b> call with by SQL (to have information)
      *
      * @param name of the plan
      * @param id in the database
      * @param pathImage path to the image
      * @param xOnParent x position on the parent plan
      * @param yOnParent y position on the parent plan
-     * @param bgCoordX        // TODO @robin ça sert à quoi ? :/
-     * @param bgCoordY        // same ^
-     * @param relativeAngle   // et ça contine encore et encore
+     * @param bgCoordX relative x position of the upper left corner of the image
+     * @param bgCoordY relative y position of the upper left corner of the image
+     * @param relativeAngle angle that the plan makes on the parent plan
      * @param distance number of pixel for on meter
      */
     public Plan(String name, int id, String pathImage, float xOnParent, float yOnParent, float bgCoordX,
@@ -94,10 +102,10 @@ public class Plan {
     /**
      * Create a plan <b>and</b> load XML file from this plan
      *
-     * @param wifis list of capted wifis
+     * @param wifis list of sensed wifis
      * @param nodes list of potential nearest nodes
      * @return The node with a minimal diffrence between its avg dbm and the avg
-     * dbm of the capted wifi
+     * dbm of the sensed wifi
      */
     private Node collisionManager(ArrayList<Wifi> wifis, ArrayList<Node> nodes) {
         ArrayList<String> wifisStr = new ArrayList<String>();
@@ -141,9 +149,9 @@ public class Plan {
 
 
     /**
-     * TODO add documentation @robin ?
+     * @link _bgCoordX
      *
-     * @return
+     * @return the relative x position of the upper left corner of the image
      */
     protected float getBgCoordX() {
         return _bgCoordX;
@@ -151,9 +159,9 @@ public class Plan {
 
 
     /**
-     * TODO add documentation @robin ?
+     * @link _bgCoordY
      *
-     * @return
+     * @return the relative y position of the upper left corner of the image
      */
     protected float getBgCoordY() {
         return _bgCoordY;

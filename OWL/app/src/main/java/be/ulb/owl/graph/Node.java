@@ -103,8 +103,8 @@ public class Node {
     /**
      * Check if the current Node have this id
      * 
-     * @param id the id who must be tested
-     * @return True if this node have this id
+     * @param id the id which must be tested
+     * @return True if this node has this id
      * @see #getID()
      */
     public boolean isNode(int id) {
