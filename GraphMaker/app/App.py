@@ -4,6 +4,8 @@ from app.general.constants import *
 from os.path import splitext, relpath
 from app.widgets.canvas import EditableGraphCanvas
 from app.Config import Config
+# std
+import sqlite3
 
 '''
     Available operations:
@@ -13,19 +15,26 @@ from app.Config import Config
         + left click on the image + move to move the background
 '''
 class App(t.Frame):
-    ALPHA_INITIAL_VALUE=128
+    ALPHA_INITIAL_VALUE = 128
+    SAVE_AS_XML = False
+    INSERT_PLAN_QUERY = \
+        """
+        INSERT INTO BuildingPlan(campusId, name, ppm, imagePath, xOnParent, yOnParent, bgCoordX, bgCoordY, angle)
+            VALUES ({0}, '{1}', {2}, '{3}', {4}, {5}, {6}, {7}, {8})
+        """
 
     def __init__(self, master, **options):
         super().__init__(master)
         self.options = options
+        self.plan_exists_in_db = False
 
         self.master = master
-        self.bind('<Control-s>', self.save_to_xml)
+        self.bind('<Control-s>', self.save)
         self.create_widgets(**options)
 
     def on_exit(self):
         if mbox.askquestion('Quit', 'Do you want to save before leaving?') == 'yes':
-            self.save_to_xml()
+            self.save()
 
     def create_widgets(self, **options):
         self.canvas = EditableGraphCanvas(self, width=options['c_width'], height=options['c_height'])
@@ -42,6 +51,8 @@ class App(t.Frame):
             filetypes=[('XML Files', '.xml'), ('PNG Files', '.png')])
         ext = splitext(self.file_name)[1].lower()[1:]
 
+        # @TODO Only load image files and when opening check whether file already exists in database or not.
+        # If it doesn't, then set self.plan_exists_in_db to True
         if ext == 'xml':
             self.canvas.load_xml(self.file_name)
 
@@ -118,7 +129,7 @@ class App(t.Frame):
         menubar=t.Menu(self.master)
         filemenu=t.Menu(menubar,tearoff=0)
         filemenu.add_command(label="Open a new", command=self.open_new_file)
-        filemenu.add_command(label="Save", command=self.save_to_xml)
+        filemenu.add_command(label="Save", command=self.save)
         filemenu.add_separator()
         filemenu.add_command(label="Quit", command=self.master.destroy)
         menubar.add_cascade(label="File", menu=filemenu)
@@ -154,6 +165,9 @@ class App(t.Frame):
 
         return '<plan name="{}">\n{}</plan>\n'.format(plan_name, text)
 
+    def save(self):
+        (self.save_to_xml if App.SAVE_AS_XML else self.save_to_sql)()
+
     def save_to_xml(self):
         path = Config.XMLS_PATH + splitext(relpath(self.canvas.background_file_name, Config.MAPS_PATH))[0] + '.xml'
         content = self.text()
@@ -161,31 +175,55 @@ class App(t.Frame):
             save_file.write(content)
         print("File saved !")
 
-    def parse ():
-        data = self.canvas.background_file_name.split("_")
-        data[0] = "0" if ("P" == data[0]) else "1"
-        data[1] = data[1]+" "+data[2]
-        data[2] = string
-        return data[0:3]
+    class PlanNameData:
+        def _init__(self):
+            self.campus = None
+            self.name = None
+        
+        def __str__(self):
+            return 'campus: {}\tname: {}'.format(self.campus, self.name)
+
+    def parse_plan_name(self):
+        file_name = splitext(relpath(self.canvas.background_file_name, Config.MAPS_PATH))[0]
+        plan_data = App.PlanNameData()
+        plan_data.campus = file_name.split("_")[0]
+        plan_data.name = file_name
+        return plan_data
 
     def sql(self):
         # @Added
         queries = []
-        data = parse()
-        query = "INSERT INTO Building (Id,CampusId,Name,PixelPerMeter,ImagePath,) VALUES ({0}{1}{2}{3}{4}{5}{6}{7}{8}{9})"
-        query = query.format(data[0], data[1], self.canvas.get_pixels_per_metre(), "IMGMap/"+data[2], *self.canvas.get_position_on_parent(), *self.canvas.image_coord(), self.canvas.get_angle_with_parent())
-        queries.append(query)
+        if not self.plan_exists_in_db:
+            plan_name_data = self.parse_plan_name()
+            x_parent, y_parent = self.canvas.get_position_on_parent()
+            x_bg, y_bg = self.canvas.image_coord()
+            query = App.INSERT_PLAN_QUERY.format(
+                "(SELECT id FROM CampusPlan WHERE letter='{}')".format(plan_name_data.campus),
+                plan_name_data.name,
+                self.canvas.get_pixels_per_metre(),
+                Config.MAPS_PATH + plan_name_data.name,
+                x_parent,
+                y_parent,
+                x_bg,
+                y_bg,
+                self.canvas.get_angle_with_parent()
+            )
+            queries.append(query)
+        building_id = "(SELECT id FROM BuildingPlan WHERE name='{}')".format(plan_name_data.name)
         for node_id in self.canvas.nodes():
-            queries.append(self.canvas.nodes()[node_id].sql(data[1]))
+            queries.extend(self.canvas.nodes()[node_id].sql(building_id))
         for edge_id in self.canvas.edges():
-            queries.append(self.canvas.edges()[edge_id].sql())
+            queries.append(self.canvas.edges()[edge_id].sql(building_id))
         for ext_edge in self.canvas.external_edges():
-            queries.append(ext_edge.sql(sql))
+            queries.append(ext_edge.sql(building_id))
         return queries
 
     def save_to_sql(self):
         # @Added
         queries = self.sql()
+        for query in queries:
+            print(query)
+        return
         conn = sqlite3.connect(Config.DB_PATH)
         for query in queries:
             conn.execute(query)

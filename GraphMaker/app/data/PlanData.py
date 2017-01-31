@@ -1,6 +1,17 @@
 from app.general.constants import *
 
 class Node:
+    INSERT_NODE_QUERY = \
+        """
+        INSERT INTO Node(buildingId, xCoord, yCoord, idOnBuilding)
+            VALUES({0}, {1}, {2}, {3})
+        """
+    INSERT_ALIAS_QUERY = \
+        """
+        INSERT INTO Alias(nodeId, alias)
+            VALUES({0}, '{1}')
+        """
+        
     def __init__(self, nb, coords, access_points, aliases=tuple()):
         self.nb = nb
         self.coords = coords
@@ -40,15 +51,27 @@ class Node:
             text += (TAB*(nb_tab+1)) + '</aliases>\n'
         return '{0}<node id="{1}">\n{2}{0}</node>\n'.format(TAB*nb_tab, self.id(), text)
 
-    def sql(self, batiment):
-        # @Added
-        res = "INSERT INTO Node (BuildingId,X,Y) VALUES ({0},{1},{2})"
-        res = res.format(batiment, *self.coord())
+    def sql(self, building_id):
+        query = Node.INSERT_NODE_QUERY.format(
+            building_id,
+            *self.coord(),
+            self.id()
+        )
+        queries = [query]
         for alias in self.aliases():
-            res += "INSERT INTO Aliases (Name) VALUES ('{0}')".format(alias)
-        return res
+            queries.append(Node.INSERT_ALIAS_QUERY.format(
+                self.id(),
+                alias
+            ))
+        return queries
 
 class Edge:
+    INSERT_EDGE_QUERY = \
+        """
+        INSERT INTO Edge(buildingId, node1Id, node2Id, weight)
+            VALUES({0}, {1}, {2}, {3})
+        """
+
     def __init__(self, weight, coords, extremity_ids):
         self.weight_ = weight
         self.coords = coords
@@ -69,11 +92,21 @@ class Edge:
     def text(self, nb_tab=0):
         return (TAB*nb_tab) + '<edge beg="{}" end="{}" weight="{}" />\n'.format(*self.extremity_ids, self.weight())
 
-    def sql(self):
-        res = "INSERT INTO Link (Id,Node1Id,Node2Id,Distance) VALUES ({0}{1}{2}{3})"
-        return res.format("1", *self.extremity_ids, self.weight())
+    def sql(self, building_id):
+        query = Edge.INSERT_EDGE_QUERY.format(
+            building_id,
+            *self.extremity_ids,
+            self.weight()
+        )
+        return query
 
 class ExternalEdge(Edge):
+    INSERT_EXT_EDGE_QUERY = \
+        """
+        INSERT INTO ExternalEdge(buildingId, node1Id, node2Id, building2Id, weight)
+            VALUES({0}, {1}, {2}, {3}, {4})
+        """
+
     def __init__(self, weight, extremity_ids, plan):
         super().__init__(weight, [0, 0], extremity_ids)
         self.plan = plan
@@ -88,10 +121,14 @@ class ExternalEdge(Edge):
         return (TAB*(nb_tab)) + '<edge beg="{}" end="{}" weight="{}" plan="{}" />' \
                                 .format(*self.extremity_ids, self.weight(), self.plan)
 
-    def sql(self):
-        # @Added
-        res = "INSERT INTO Link (Id,Node1Id,Node2Id,Distance,BuildingId) VALUES ({0}{1}{2}{3}{4})"
-        return res.format("1", *self.extremity_ids, self.weight(), self.plan)
+    def sql(self, building_id):
+        query = ExternalEdge.INSERT_EXT_EDGE_QUERY.format(
+            building_id,
+            *self.extremity_ids,
+            "(SELECT id FROM BuildingPlan WHERE name='{}')".format(self.plan),  # TODO check if self.plan contains really the name
+            self.weight()
+        )
+        return query
 
 class PlanData:
     def __init__(self):

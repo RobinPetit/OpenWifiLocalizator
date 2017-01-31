@@ -1,22 +1,23 @@
 -- This file must be run once in order to create the database structure
 
 CREATE TABLE IF NOT EXISTS CampusPlan (
-	id         INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	ppm        INTEGER,
-	IMAGE_PATH TEXT
+	id        INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	ppm       INTEGER,
+	imagePath TEXT,
+	letter    CHAR UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS BuildingPlan (
-	id         INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	campusId   INTEGER NOT NULL REFERENCES CampusPlan,
-	name       TEXT,
-	ppm        INTEGER,
-	IMAGE_PATH TEXT,
-	xOnParent  INTEGER,
-	yOnParent  INTEGER,
-	bgCoordX   INTEGER,
-	bgCoordY   INTEGER,
-	angle      FLOAT  -- in degrees!
+	id        INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	campusId  INTEGER NOT NULL REFERENCES CampusPlan,
+	name      TEXT,
+	ppm       INTEGER,
+	imagePath TEXT,
+	xOnParent INTEGER,
+	yOnParent INTEGER,
+	bgCoordX  INTEGER,
+	bgCoordY  INTEGER,
+	angle     FLOAT  -- in degrees!
 );
 
 CREATE TABLE IF NOT EXISTS Node (
@@ -25,5 +26,28 @@ CREATE TABLE IF NOT EXISTS Node (
 	xCoord       INTEGER,
 	yCoord       INTEGER,
 	idOnBuilding INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS Alias (
+	id     INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	nodeId INTEGER NOT NULL REFERENCES Node,
+	alias  TEXT
+);
+
+CREATE TABLE IF NOT EXISTS Edge (
+	id         INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	buildingId INTEGER NOT NULL REFERENCES BuildingPlan,
+	node1Id    INTEGER NOT NULL REFERENCES Node,
+	node2Id    INTEGER NOT NULL REFERENCES Node,
+	weight     FLOAT
+);
+
+CREATE TABLE IF NOT EXISTS ExternalEdge (
+	id          INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	buildingId  INTEGER NOT NULL REFERENCES BuildingPlan,
+	node1Id     INTEGER NOT NULL REFERENCES Node,
+	node2Id     INTEGER NOT NULL REFERENCES Node,
+	building2Id INTEGER NOT NULL REFERENCES BuildingPlan,
+	weight      FLOAT
 );
 

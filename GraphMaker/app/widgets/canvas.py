@@ -1,16 +1,19 @@
+# tkinter
 from PIL import Image, ImageTk
+# OWL
 from app.general.functions import *
 from app.general.tkinter_imports import *
 from app.general.constants import *
 from app.data.PlanData import *
 from app.widgets.toplevel import NodeConfigurationToplevel
-from xml.etree import ElementTree
-
 from app import App
 from app.Config import Config
 from app.network.access_points import StaticAccessPointList
-
+# std
+import sqlite3
+from xml.etree import ElementTree
 from time import time
+
 
 class GraphCanvas(t.Canvas):
     NODE_SIZE = 10
@@ -179,24 +182,15 @@ class GraphCanvas(t.Canvas):
         x = float(bg_image.get('x'))
         y = float(bg_image.get('y'))
         self.set_bg_coord([x, y])
-        self.load_nodes(root.find('nodes'))
-        self.load_edges(root.find('edges'))
-
-    def load_sql(self, name):
-        # @Added
-        conn = sqlite3.connect(Config.DB_PATH)
-        cursor = conn.execute("SELECT PixelPerMeter, ImagePath, BgCoordX, BgCoordY, Id FROM Building WHERE Name='{0}'".format(name))
-        conn.close()
-        self.set_pixels_per_metre(cursor[0][0])
-        self.background_file_name = Config.MAPS_PATH+cursor[0][1]
-        self.set_bg_image(App.App.ALPHA_INITIAL_VALUE, self.background_file_name)
-        self.set_bg_coord([cursor[0][2], cursor[0][3]])
-        self.load_nodes(cursor[4])
-        self.load_edges(cursor[4])
-
-    def load_nodes(self,identifier):
-        # @Modified
-        """
+        pos_on_parent = root.find('position_on_parent')
+        x = int(pos_on_parent.get('x'))
+        y = int(pos_on_parent.get('y'))
+        self.set_position_on_parent([x, y])
+        self.set_angle_with_parent(float(root.find('angle_with_parent').get('value')))
+        self.load_nodes_xml(root.find('nodes'))
+        self.load_edges_xml(root.find('edges'))
+        
+    def load_nodes_xml(self, xml_tree):
         for point in xml_tree.findall('node'):
             coord = point.find('coord')
             x, y = float(coord.get('x')), float(coord.get('y'))
@@ -218,7 +212,35 @@ class GraphCanvas(t.Canvas):
             self.add_node(point.attrib['id'], node_id, access_points, loaded_aliases)
             if int(point.attrib['id'])  >= self.node_idx:
                 self.node_idx = int(point.attrib['id']) + 1
-        """
+
+    def load_edges_xml(self, xml_tree):
+        internal_edge = xml_tree.find('internal')
+        for edge in internal_edge.findall('edge'):
+            extremities = edge.get('beg'), edge.get('end')
+            extremities_ids = [[node_id for node_id in self.nodes() if self.nodes()[node_id].id() == extremity][0] for extremity in extremities]
+            end_coord = [c + GraphCanvas.NODE_SIZE for c in self.nodes()[extremities_ids[1]].coord()[:2]]
+            beg_coord = [c + GraphCanvas.NODE_SIZE for c in self.nodes()[extremities_ids[0]].coord()[:2]]
+            edge_id = self.create_line(*beg_coord, *end_coord, width=GraphCanvas.EDGE_WIDTH)
+            self.add_edge(float(edge.get('weight')), edge_id, extremities)
+
+        external_edge = xml_tree.find('external')
+        for edge in external_edge.findall('edge'):
+            self.add_external_edge(float(edge.get('weight')), [edge.get('beg'), edge.get('end')], edge.get('plan'))
+
+    def load_sql(self, name):
+        # @Added
+        conn = sqlite3.connect(Config.DB_PATH)
+        cursor = conn.execute("SELECT PixelPerMeter, ImagePath, BgCoordX, BgCoordY, Id FROM Building WHERE Name='{0}'".format(name))
+        conn.close()
+        self.set_pixels_per_metre(cursor[0][0])
+        self.background_file_name = Config.MAPS_PATH+cursor[0][1]
+        self.set_bg_image(App.App.ALPHA_INITIAL_VALUE, self.background_file_name)
+        self.set_bg_coord([cursor[0][2], cursor[0][3]])
+        self.load_nodes_sql(cursor[4])
+        self.load_edges_sql(cursor[4])
+
+    def load_nodes_sql(self,identifier):
+        # @Modified
         conn = sqlite3.connect(Config.DB_PATH)
         nodes = conn.execute("SELECT Id, X, Y FROM Node WHERE BuildingId={0}".format(identifier))
         conn.close()
@@ -241,22 +263,7 @@ class GraphCanvas(t.Canvas):
             if int(point.attrib['id'])  >= self.node_idx:
                 self.node_idx = point[0] + 1
 
-    def load_edges(self, identifier):
-        # @Modified
-        """
-        internal_edge = xml_tree.find('internal')
-        for edge in internal_edge.findall('edge'):
-            extremities = edge.get('beg'), edge.get('end')
-            extremities_ids = [[node_id for node_id in self.nodes() if self.nodes()[node_id].id() == extremity][0] for extremity in extremities]
-            end_coord = [c + GraphCanvas.NODE_SIZE for c in self.nodes()[extremities_ids[1]].coord()[:2]]
-            beg_coord = [c + GraphCanvas.NODE_SIZE for c in self.nodes()[extremities_ids[0]].coord()[:2]]
-            edge_id = self.create_line(*beg_coord, *end_coord, width=GraphCanvas.EDGE_WIDTH)
-            self.add_edge(float(edge.get('weight')), edge_id, extremities)
-
-        external_edge = xml_tree.find('external')
-        for edge in external_edge.findall('edge'):
-            self.add_external_edge(float(edge.get('weight')), [edge.get('beg'), edge.get('end')], edge.get('plan'))
-        """
+    def load_edges_sql(self, identifier):
         conn = sqlite3.connect(Config.DB_PATH)
         internal_edge = conn.execute("SELECT Id, Node1Id, Node2Id, Distance FROM Link WHERE Node1Id=(SELECT Id FROM Node WHERE BuildingId={0}) AND BuildingId=NULL".format(identifier))
         conn.close()
