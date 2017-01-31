@@ -40,6 +40,14 @@ class Node:
             text += (TAB*(nb_tab+1)) + '</aliases>\n'
         return '{0}<node id="{1}">\n{2}{0}</node>\n'.format(TAB*nb_tab, self.id(), text)
 
+    def sql(self, batiment):
+        # @Added
+        res = "INSERT INTO Node (BuildingId,X,Y) VALUES ({0},{1},{2})"
+        res = res.format(batiment, *self.coord())
+        for alias in self.aliases():
+            res += "INSERT INTO Aliases (Name) VALUES ('{0}')".format(alias)
+        return res
+
 class Edge:
     def __init__(self, weight, coords, extremity_ids):
         self.weight_ = weight
@@ -59,8 +67,11 @@ class Edge:
             self.weight_ = w
 
     def text(self, nb_tab=0):
-        return (TAB*nb_tab) + '<edge beg="{}" end="{}" weight="{}" />\n' \
-                              .format(*self.extremity_ids, self.weight())
+        return (TAB*nb_tab) + '<edge beg="{}" end="{}" weight="{}" />\n'.format(*self.extremity_ids, self.weight())
+
+    def sql(self):
+        res = "INSERT INTO Link (Id,Node1Id,Node2Id,Distance) VALUES ({0}{1}{2}{3})"
+        return res.format("1", *self.extremity_ids, self.weight())
 
 class ExternalEdge(Edge):
     def __init__(self, weight, extremity_ids, plan):
@@ -76,6 +87,11 @@ class ExternalEdge(Edge):
     def text(self, nb_tab=0):
         return (TAB*(nb_tab)) + '<edge beg="{}" end="{}" weight="{}" plan="{}" />' \
                                 .format(*self.extremity_ids, self.weight(), self.plan)
+
+    def sql(self):
+        # @Added
+        res = "INSERT INTO Link (Id,Node1Id,Node2Id,Distance,BuildingId) VALUES ({0}{1}{2}{3}{4})"
+        return res.format("1", *self.extremity_ids, self.weight(), self.plan)
 
 class PlanData:
     def __init__(self):
@@ -108,4 +124,3 @@ class PlanData:
 
     def remove_external_edges_from(self, name):
         self.external_edges = [edge for edge in self.external_edges if name not in edge.extremities()]
-

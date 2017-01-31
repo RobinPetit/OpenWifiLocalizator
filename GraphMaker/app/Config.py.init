@@ -5,7 +5,7 @@ class Config:
     # Debug Mode
     DEBUG = True
     # MAPS location
-    MAPS_PATH = '../OWL/app/src/main/assets/IMGMap/'
+    MAPS_PATH = '../OWL/app/src/main/assets/'
     # XMLs location
     XMLS_PATH = '../OWL/app/src/main/assets/XMLMap/'
     DB_PATH = '../OWL/app/src/main/assets/OWL-DB.db'
