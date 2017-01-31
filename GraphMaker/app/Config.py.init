@@ -8,4 +8,4 @@ class Config:
     MAPS_PATH = '../OWL/app/src/main/assets/IMGMap/'
     # XMLs location
     XMLS_PATH = '../OWL/app/src/main/assets/XMLMap/'
-    DB_PATH = '../OWL/app/src/main/assets/OWL-DB.sql'
+    DB_PATH = '../OWL/app/src/main/assets/OWL-DB.db'

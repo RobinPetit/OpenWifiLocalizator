@@ -23,4 +23,4 @@ GraphMaker/app/Config.py
 
 ### OWL ###
 OWL/app/src/main/assets/IMGMap/
-OWL/app/src/main/assets/OWL-DB.sql
+OWL/app/src/main/assets/OWL-DB.db
