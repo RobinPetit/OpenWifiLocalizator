@@ -21,7 +21,6 @@ CREATE TABLE "Link" (
 	`Node1Id`	INTEGER,
 	`Node2Id`	INTEGER,
 	`Distance`	REAL,
-	`BuildingId`	INTEGER
 );
 
 CREATE TABLE "Campus" (
