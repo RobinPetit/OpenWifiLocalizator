@@ -3,15 +3,15 @@ from app.general.constants import *
 class Node:
     INSERT_NODE_QUERY = \
         """
-        INSERT INTO Node(buildingId, xCoord, yCoord, idOnBuilding)
-            VALUES({0}, {1}, {2}, {3})
+        INSERT INTO Node(buildingId, X, Y)
+            VALUES({0}, {1}, {2})
         """
     INSERT_ALIAS_QUERY = \
         """
-        INSERT INTO Alias(nodeId, alias)
+        INSERT INTO Aliases(Id, Name)
             VALUES({0}, '{1}')
         """
-        
+
     def __init__(self, nb, coords, access_points, aliases=tuple()):
         self.nb = nb
         self.coords = coords
@@ -54,8 +54,8 @@ class Node:
     def sql(self, building_id):
         query = Node.INSERT_NODE_QUERY.format(
             building_id,
-            *self.coord(),
-            self.id()
+            *self.coord()
+            #self.id()
         )
         queries = [query]
         for alias in self.aliases():
@@ -68,9 +68,9 @@ class Node:
 class Edge:
     INSERT_EDGE_QUERY = \
         """
-        INSERT INTO Edge(buildingId, node1Id, node2Id, weight)
-            VALUES({0}, {1}, {2}, {3})
-        """
+        INSERT INTO Edge(Node1Id, Node2Id, Weight)
+            VALUES({0}, {1}, {2})
+        """ # -BuildingId
 
     def __init__(self, weight, coords, extremity_ids):
         self.weight_ = weight
@@ -94,7 +94,7 @@ class Edge:
 
     def sql(self, building_id):
         query = Edge.INSERT_EDGE_QUERY.format(
-            building_id,
+            #building_id,
             *self.extremity_ids,
             self.weight()
         )
@@ -103,9 +103,9 @@ class Edge:
 class ExternalEdge(Edge):
     INSERT_EXT_EDGE_QUERY = \
         """
-        INSERT INTO ExternalEdge(buildingId, node1Id, node2Id, building2Id, weight)
-            VALUES({0}, {1}, {2}, {3}, {4})
-        """
+        INSERT INTO Edge(Node1Id, Node2Id, Weight)
+            VALUES({0}, {1}, {2})
+        """ # -BuildingId et BuildingId2
 
     def __init__(self, weight, extremity_ids, plan):
         super().__init__(weight, [0, 0], extremity_ids)
@@ -123,9 +123,9 @@ class ExternalEdge(Edge):
 
     def sql(self, building_id):
         query = ExternalEdge.INSERT_EXT_EDGE_QUERY.format(
-            building_id,
+            #building_id,
             *self.extremity_ids,
-            "(SELECT id FROM BuildingPlan WHERE name='{}')".format(self.plan),  # TODO check if self.plan contains really the name
+            #"(SELECT id FROM Building WHERE name='{}')".format(self.plan),  # TODO check if self.plan contains really the name TODO check if necessary
             self.weight()
         )
         return query

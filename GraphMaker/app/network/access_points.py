@@ -20,8 +20,8 @@ class AP:
                .format(self.key, -min(self.values), -max(self.values), -self.avg())
 
     def sql(self):
-        # @Added
-        res = "INSERT INTO Wifi () VALUES({0}{1}{2}{3})"
+        # @TODO NodeId missing
+        res = "INSERT INTO Wifi (Bss,Min,Max,Avg) VALUES({0}{1}{2}{3})"
         return res.format(self.key, -min(self.values), -max(self.values), -self.avg())
 
 class AccessPointList:

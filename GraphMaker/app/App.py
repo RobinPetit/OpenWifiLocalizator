@@ -19,7 +19,7 @@ class App(t.Frame):
     SAVE_AS_XML = False
     INSERT_PLAN_QUERY = \
         """
-        INSERT INTO BuildingPlan(campusId, name, ppm, imagePath, xOnParent, yOnParent, bgCoordX, bgCoordY, angle)
+        INSERT INTO Building(CampusId, Name, Ppm, ImagePath, XOnParent, YOnParent, BgCoordX, BgCoordY, RelativeAngle)
             VALUES ({0}, '{1}', {2}, '{3}', {4}, {5}, {6}, {7}, {8})
         """
 
@@ -179,7 +179,7 @@ class App(t.Frame):
         def _init__(self):
             self.campus = None
             self.name = None
-        
+
         def __str__(self):
             return 'campus: {}\tname: {}'.format(self.campus, self.name)
 
@@ -198,7 +198,7 @@ class App(t.Frame):
             x_parent, y_parent = self.canvas.get_position_on_parent()
             x_bg, y_bg = self.canvas.image_coord()
             query = App.INSERT_PLAN_QUERY.format(
-                "(SELECT id FROM CampusPlan WHERE letter='{}')".format(plan_name_data.campus),
+                "(SELECT Id FROM Campus WHERE Abbrev='{}')".format(plan_name_data.campus),
                 plan_name_data.name,
                 self.canvas.get_pixels_per_metre(),
                 Config.MAPS_PATH + plan_name_data.name,
@@ -209,7 +209,7 @@ class App(t.Frame):
                 self.canvas.get_angle_with_parent()
             )
             queries.append(query)
-        building_id = "(SELECT id FROM BuildingPlan WHERE name='{}')".format(plan_name_data.name)
+        building_id = "(SELECT id FROM Building WHERE Name='{}')".format(plan_name_data.name)
         for node_id in self.canvas.nodes():
             queries.extend(self.canvas.nodes()[node_id].sql(building_id))
         for edge_id in self.canvas.edges():
@@ -223,7 +223,7 @@ class App(t.Frame):
         queries = self.sql()
         for query in queries:
             print(query)
-        return
+        #return
         conn = sqlite3.connect(Config.DB_PATH)
         for query in queries:
             conn.execute(query)

@@ -16,11 +16,11 @@ CREATE TABLE "Node" (
 	`Y`	REAL
 );
 
-CREATE TABLE "Link" (
+CREATE TABLE "Edge" (
 	`Id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 	`Node1Id`	INTEGER,
 	`Node2Id`	INTEGER,
-	`Distance`	REAL,
+	`Weight`	REAL
 );
 
 CREATE TABLE "Campus" (
@@ -32,7 +32,7 @@ CREATE TABLE "Building" (
 	`Id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 	`CampusId`	REAL,
 	`Name`	TEXT,
-	`PixelPerMeter`	REAL DEFAULT 0.0,
+	`Ppm`	REAL DEFAULT 0.0,
 	`ImagePath`	TEXT,
 	`XOnParent`	REAL DEFAULT 0.0,
 	`YOnParent`	REAL DEFAULT 0.0,

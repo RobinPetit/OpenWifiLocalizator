@@ -189,7 +189,7 @@ class GraphCanvas(t.Canvas):
         self.set_angle_with_parent(float(root.find('angle_with_parent').get('value')))
         self.load_nodes_xml(root.find('nodes'))
         self.load_edges_xml(root.find('edges'))
-        
+
     def load_nodes_xml(self, xml_tree):
         for point in xml_tree.findall('node'):
             coord = point.find('coord')
@@ -247,15 +247,6 @@ class GraphCanvas(t.Canvas):
         for point in nodes:
             x, y = point[1], point[2]
             coord = x, y, x+2*GraphCanvas.NODE_SIZE, y+2*GraphCanvas.NODE_SIZE
-            listWifi = point.find('listWifi')
-            # @TODO Créer requêtes sql pour wifi
-            # ------------------------------------------------------------------
-            if listWifi is None:
-                access_points = None
-            else:
-                access_points = StaticAccessPointList()
-                access_points.fromXml(listWifi)
-            # ------------------------------------------------------------------
             conn = sqlite3.connect(Config.DB_PATH)
             aliases = conn.execute("SELECT Name FROM Aliases WHERE Id=(SELECT AliasId FROM AliasesLink WHERE NodeID={0})".format(point[0]))
             conn.close()
@@ -265,7 +256,7 @@ class GraphCanvas(t.Canvas):
 
     def load_edges_sql(self, identifier):
         conn = sqlite3.connect(Config.DB_PATH)
-        internal_edge = conn.execute("SELECT Id, Node1Id, Node2Id, Distance FROM Link WHERE Node1Id=(SELECT Id FROM Node WHERE BuildingId={0}) AND BuildingId=NULL".format(identifier))
+        internal_edge = conn.execute("SELECT Id, Node1Id, Node2Id, Distance FROM Edge WHERE Node1Id=(SELECT Id FROM Node WHERE BuildingId={0}) AND BuildingId=NULL".format(identifier))
         conn.close()
         for edge in internal_edge:
             extremities = edge[1], edge[2]
@@ -275,7 +266,7 @@ class GraphCanvas(t.Canvas):
             edge_id = self.create_line(*beg_coord, *end_coord, width=GraphCanvas.EDGE_WIDTH)
             self.add_edge(edge[3], edge_id, extremities)
         conn = sqlite3.connect(Config.DB_PATH)
-        external_edge = conn.execute("SELECT Id, Node1Id, Node2Id, Distance, BuildingId FROM Link WHERE Node1Id=(SELECT Id FROM Node WHERE BuildingId={0}) AND BuildingId!=NULL".format(identifier))
+        external_edge = conn.execute("SELECT Id, Node1Id, Node2Id, Distance, BuildingId FROM Edge WHERE Node1Id=(SELECT Id FROM Node WHERE BuildingId={0}) AND BuildingId!=NULL".format(identifier))
         conn.close()
         for edge in external_edge:
             self.add_external_edge(edge[3], [edge[1], edge[2]], edge[4])
