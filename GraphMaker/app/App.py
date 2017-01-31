@@ -161,11 +161,22 @@ class App(t.Frame):
             save_file.write(content)
         print("File saved !")
 
+    def parse ():
+        data = self.canvas.background_file_name.split("_")
+        data[0] = "0" if ("P" == data[0]) else "1"
+        data[1] = data[1]+" "+data[2]
+        data[2] = string
+        return data[0:3]
+
     def sql(self):
+        # @Added
         queries = []
-        queries.append() #plan data
+        data = parse()
+        query = "INSERT INTO Building (Id,CampusId,Name,PixelPerMeter,ImagePath,) VALUES ({0}{1}{2}{3}{4}{5}{6}{7}{8}{9})"
+        query = query.format(data[0], data[1], self.canvas.get_pixels_per_metre(), "IMGMap/"+data[2], *self.canvas.get_position_on_parent(), *self.canvas.image_coord(), self.canvas.get_angle_with_parent())
+        queries.append(query)
         for node_id in self.canvas.nodes():
-            queries.append(self.canvas.nodes()[node_id].sql())
+            queries.append(self.canvas.nodes()[node_id].sql(data[1]))
         for edge_id in self.canvas.edges():
             queries.append(self.canvas.edges()[edge_id].sql())
         for ext_edge in self.canvas.external_edges():
@@ -173,6 +184,7 @@ class App(t.Frame):
         return queries
 
     def save_to_sql(self):
+        # @Added
         queries = self.sql()
         conn = sqlite3.connect(Config.DB_PATH)
         for query in queries:

@@ -19,6 +19,11 @@ class AP:
         return '<wifi BSS="{}" max="{:2.1f}" min="{:2.1f}" avg="{:2.1f}" />' \
                .format(self.key, -min(self.values), -max(self.values), -self.avg())
 
+    def sql(self):
+        # @Added
+        res = "INSERT INTO Wifi () VALUES({0}{1}{2}{3})"
+        return res.format(self.key, -min(self.values), -max(self.values), -self.avg())
+
 class AccessPointList:
     def __init__(self, tmpfile = "temp.txt", iterations = 5, wait = 2):
         self.network = Config.NETWORK_INTERFACE
@@ -73,6 +78,7 @@ class StaticAccessPointList:
             self.elements.append(wifi)
 
     def text(self, nb_tab=0):
+        # @TODO
         output = (TAB * nb_tab) + '<listWifi>\n'
         for elem in self.elements:
             _ = '<wifi BSS="{}" max="{}" min="{}" avg="{}" />' \
@@ -80,4 +86,3 @@ class StaticAccessPointList:
             output += (TAB * (nb_tab+1)) + _ + '\n'
         output += (TAB * nb_tab) + '</listWifi>\n'
         return output
-
