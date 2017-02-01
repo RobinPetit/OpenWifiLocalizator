@@ -228,35 +228,46 @@ class GraphCanvas(t.Canvas):
             self.add_external_edge(float(edge.get('weight')), [edge.get('beg'), edge.get('end')], edge.get('plan'))
 
     def load_sql(self, name):
-        # @Added
         conn = sqlite3.connect(Config.DB_PATH)
-        cursor = conn.execute("SELECT PixelPerMeter, ImagePath, BgCoordX, BgCoordY, Id FROM Building WHERE Name='{0}'".format(name))
+        cursor = conn.execute("SELECT Ppm, Name, BgCoordX, BgCoordY, Id FROM Building WHERE Name='{0}'".format(name))
+        cursor = cursor.fetchall()
         conn.close()
         self.set_pixels_per_metre(cursor[0][0])
-        self.background_file_name = Config.MAPS_PATH+cursor[0][1]
+        self.background_file_name = Config.MAPS_PATH+cursor[0][1]+".png"
         self.set_bg_image(App.App.ALPHA_INITIAL_VALUE, self.background_file_name)
         self.set_bg_coord([cursor[0][2], cursor[0][3]])
-        self.load_nodes_sql(cursor[4])
-        self.load_edges_sql(cursor[4])
+        self.load_nodes_sql(cursor[0][4])
+        self.load_edges_sql(cursor[0][4])
 
     def load_nodes_sql(self,identifier):
-        # @Modified
         conn = sqlite3.connect(Config.DB_PATH)
         nodes = conn.execute("SELECT Id, X, Y FROM Node WHERE BuildingId={0}".format(identifier))
+        nodes = nodes.fetchall()
         conn.close()
         for point in nodes:
             x, y = point[1], point[2]
             coord = x, y, x+2*GraphCanvas.NODE_SIZE, y+2*GraphCanvas.NODE_SIZE
             conn = sqlite3.connect(Config.DB_PATH)
-            aliases = conn.execute("SELECT Name FROM Aliases WHERE Id=(SELECT AliasId FROM AliasesLink WHERE NodeID={0})".format(point[0]))
+            listWifi = conn.execute("SELECT Id FROM Wifi WHERE NodeId={0}".format(point[0]))
+            n = len(listWifi.fetchall())
             conn.close()
-            self.add_node(point[0], point[0], access_points, aliases[0])
-            if int(point.attrib['id'])  >= self.node_idx:
-                self.node_idx = point[0] + 1
+            access_points = StaticAccessPointList() if (n) else None
+            node_id = self.create_oval(*coord, fill='green' if access_points is not None else 'red')
+            conn = sqlite3.connect(Config.DB_PATH)
+            aliases = conn.execute("SELECT Name FROM Aliases WHERE NodeID={0}".format(point[0]))
+            aliases = aliases.fetchall()
+            conn.close()
+            aliases = [alias[0] for alias in aliases]
+            self.add_node(point[0], point[0], access_points, aliases)
+        conn = sqlite3.connect(Config.DB_PATH)
+        maxid = conn.execute("SELECT MAX(Id) FROM Node")
+        self.node_idx = maxid.fetchall()[0][0]
+        conn.close()
 
     def load_edges_sql(self, identifier):
         conn = sqlite3.connect(Config.DB_PATH)
-        internal_edge = conn.execute("SELECT Id, Node1Id, Node2Id, Distance FROM Edge WHERE Node1Id=(SELECT Id FROM Node WHERE BuildingId={0}) AND BuildingId=NULL".format(identifier))
+        internal_edge = conn.execute("SELECT Id, Node1Id, Node2Id, weight FROM Edge WHERE Node1Id=(SELECT Id FROM Node WHERE BuildingId={0})".format(identifier))
+        internal_edge = internal_edge.fetchall()
         conn.close()
         for edge in internal_edge:
             extremities = edge[1], edge[2]
@@ -265,11 +276,12 @@ class GraphCanvas(t.Canvas):
             beg_coord = [c + GraphCanvas.NODE_SIZE for c in self.nodes()[extremities_ids[0]].coord()[:2]]
             edge_id = self.create_line(*beg_coord, *end_coord, width=GraphCanvas.EDGE_WIDTH)
             self.add_edge(edge[3], edge_id, extremities)
-        conn = sqlite3.connect(Config.DB_PATH)
-        external_edge = conn.execute("SELECT Id, Node1Id, Node2Id, Distance, BuildingId FROM Edge WHERE Node1Id=(SELECT Id FROM Node WHERE BuildingId={0}) AND BuildingId!=NULL".format(identifier))
-        conn.close()
-        for edge in external_edge:
-            self.add_external_edge(edge[3], [edge[1], edge[2]], edge[4])
+        # @TODO external still used ?????
+        #conn = sqlite3.connect(Config.DB_PATH)
+        #external_edge = conn.execute("SELECT Id, Node1Id, Node2Id, Distance, BuildingId FROM Edge WHERE Node1Id=(SELECT Id FROM Node WHERE BuildingId={0}) AND BuildingId!=NULL".format(identifier))
+        #conn.close()
+        #for edge in external_edge:
+        #    self.add_external_edge(edge[3], [edge[1], edge[2]], edge[4])
 
 class SelectableGraphCanvas(GraphCanvas):
     def __init__(self, master, **options):

@@ -1,7 +1,7 @@
 from app.general.tkinter_imports import *
 from app.general.functions import purge_plan_name
 from app.general.constants import *
-from os.path import splitext, relpath
+from os.path import splitext, relpath, basename
 from app.widgets.canvas import EditableGraphCanvas
 from app.Config import Config
 # std
@@ -48,15 +48,19 @@ class App(t.Frame):
 
     def open_file(self):
         self.file_name = t.filedialog.askopenfilename(initialdir=Config.MAPS_PATH,
-            filetypes=[('XML Files', '.xml'), ('PNG Files', '.png')])
+            filetypes=[('PNG Files', '.png')])
         ext = splitext(self.file_name)[1].lower()[1:]
-
+        filename, bidon = splitext(basename(self.file_name))
         # @TODO Only load image files and when opening check whether file already exists in database or not.
         # If it doesn't, then set self.plan_exists_in_db to True
-        if ext == 'xml':
-            self.canvas.load_xml(self.file_name)
-
-        elif ext:
+        conn = sqlite3.connect(Config.DB_PATH)
+        cursor = conn.execute("SELECT Id FROM Building WHERE Name='{0}'".format(filename))
+        n = len(cursor.fetchall())
+        conn.close()
+        if (n): # == 0 Check that there is at least one answer
+            self.plan_exists_in_db = True
+            self.canvas.load_sql(filename)
+        else :
             new_plan_data = self.ask_new_plan_data()
             if None not in new_plan_data:
                 self.canvas.set_pixels_per_metre(new_plan_data.ppm)
