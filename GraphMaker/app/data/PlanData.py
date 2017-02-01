@@ -8,7 +8,7 @@ class Node:
         """
     INSERT_ALIAS_QUERY = \
         """
-        INSERT INTO Aliases(Id, Name)
+        INSERT INTO Aliases(NodeId, Name)
             VALUES({0}, '{1}')
         """
 
