@@ -6,17 +6,19 @@ import java.util.ArrayList;
  * Created by Detobel36
  */
 
-public enum NodeTable implements SQLTable {
-    ID("Id"),
-    BUILDING_ID("BuildingId"),
-    X("X"),
-    Y("Y");
+public enum EdgeTable implements SQLTable {
 
-    private static String _NAME = "Node";
+    ID("Id"),
+    NODE_1_ID("Node1Id"),
+    NODE_2_ID("Node2Id"),
+    WEIGHT("Weight");
+
+
+    private static String _NAME = "Edge";
 
     private final String _value;
 
-    NodeTable(String value) {
+    EdgeTable(String value) {
         _value = value;
     }
 
@@ -44,7 +46,7 @@ public enum NodeTable implements SQLTable {
     //////////////////////////////////////////// STATIC ////////////////////////////////////////////
 
     /**
-     * Get the name of the building table
+     * Get the name of the current table
      *
      * @return the name of the table
      */
@@ -64,6 +66,5 @@ public enum NodeTable implements SQLTable {
         }
         return (String[]) res.toArray();
     }
-
 
 }

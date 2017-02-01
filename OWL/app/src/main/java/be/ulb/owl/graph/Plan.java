@@ -41,7 +41,7 @@ public class Plan {
     private ArrayList<Node> _listNode;
     private HashSet<String> _allBssWifi;
     private InputStream _image;
-    private final String _pathImage;
+//    private final String _pathImage;
     private final float _ppm;  // pixels per metre
     private final float _relativeAngle;
     private final float _xOnParent;
@@ -73,7 +73,7 @@ public class Plan {
         this._bgCoordY = bgCoordY;
         this._relativeAngle = relativeAngle;
         this._ppm = distance;
-        this._pathImage = pathImage;
+//        this._pathImage = pathImage;
 
         _listNode = SQLUtils.loadNodes(this, id);
 

@@ -71,7 +71,7 @@ public class Node {
 
         this._listAlias = SQLUtils.loadAlias(id);
         this._listWifi = SQLUtils.loadWifi(id);
-        this._listPath = SQLUtils.loadPath(id);
+        this._listPath = SQLUtils.loadPath(id, this);
 
     }
 

@@ -9,12 +9,7 @@ import java.util.ArrayList;
  */
 public interface SQLTable {
 
-    public abstract String toString();
+    public String getCol();
+    public String getFullCol();
 
-    /**
-     * Get the index of the column
-     *
-     * @return the index of the column
-     */
-    public abstract int getIndex();
 }

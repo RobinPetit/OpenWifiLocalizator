@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity  {
     private static final boolean TEST = true;   // active to call test
     private static final boolean DEMO = false; // active to active
     private static final String[] NOT_SUGGESTED = {"Mystery"};
+    // TODO supprimé pour remplacer par une req sql
     private static final String PLAINE_PLAN = "Plaine";
     private static final String SOLBOSCH_PLAN = "Solbosch";
 

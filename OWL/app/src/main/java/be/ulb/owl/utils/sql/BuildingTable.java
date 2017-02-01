@@ -8,42 +8,46 @@ import java.util.ArrayList;
 
 public enum BuildingTable implements SQLTable {
 
-    ID("Id", 0),
-    CAMPUS_ID("CampusId", 1),
-    NAME("Name", 2),
-    PIXEL_PER_METER("PixelPerMeter", 3),
-    IMAGE_PATH("ImagePath", 4),
-    X_ON_PARENT("xOnParent", 5),
-    Y_ON_PARENT("yOnParent", 6),
-    BG_COORD_X("bgCoordX", 7),
-    BG_COORD_Y("bgCoordY", 8),
-    RELATIVE_ANGLE("relativeAngle", 9);
+    ID("Id"),
+    CAMPUS_ID("CampusId"),
+    NAME("Name"),
+    PPM("Ppm"),
+    IMAGE_PATH("ImagePath"),
+    X_ON_PARENT("XOnParent"),
+    Y_ON_PARENT("YOnParent"),
+    BG_COORD_X("BgCoordX"),
+    BG_COORD_Y("BgCoordY"),
+    RELATIVE_ANGLE("RelativeAngle");
 
 
     private static String _NAME = "Building";
 
-    private String _value;
-    private int _number;
+    private final String _value;
 
-    BuildingTable(String value, int number) {
+    BuildingTable(String value) {
         _value = value;
-        _number = number;
     }
 
+    /**
+     * Get the name of the column
+     *
+     * @return the column name
+     */
     @Override
-    public String toString() {
+    public String getCol() {
         return _value;
     }
 
     /**
-     * Get the index of the column
+     * Get the full name of the column
      *
-     * @return the index of the column
+     * @return the column name with table name before
      */
     @Override
-    public int getIndex() {
-        return _number;
+    public String getFullCol() {
+        return _NAME+"."+_value;
     }
+
 
     //////////////////////////////////////////// STATIC ////////////////////////////////////////////
 

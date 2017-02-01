@@ -6,17 +6,18 @@ import java.util.ArrayList;
  * Created by Detobel36
  */
 
-public enum NodeTable implements SQLTable {
-    ID("Id"),
-    BUILDING_ID("BuildingId"),
-    X("X"),
-    Y("Y");
+public enum CampusTable implements SQLTable {
 
-    private static String _NAME = "Node";
+    ID("Id"),
+    NAME("Name"),
+    ABBREV("Abbrev");
+
+
+    private static String _NAME = "Campus";
 
     private final String _value;
 
-    NodeTable(String value) {
+    CampusTable(String value) {
         _value = value;
     }
 
@@ -44,7 +45,7 @@ public enum NodeTable implements SQLTable {
     //////////////////////////////////////////// STATIC ////////////////////////////////////////////
 
     /**
-     * Get the name of the building table
+     * Get the name of the current table
      *
      * @return the name of the table
      */
@@ -64,6 +65,5 @@ public enum NodeTable implements SQLTable {
         }
         return (String[]) res.toArray();
     }
-
 
 }

@@ -25,6 +25,7 @@ import be.ulb.owl.utils.SQLUtils;
  * @author Detobel36
  */
 public class Graph {
+
     MainActivity main = MainActivity.getInstance();
     private static final String IGNOREPLAN = "Example";
     private static ArrayList<Plan> _allPlan;
@@ -50,6 +51,7 @@ public class Graph {
     }
 
     /**
+     * Return all node of the graph
      *
      * @return A list containing every node of the graph
      */
@@ -59,6 +61,7 @@ public class Graph {
             allNodes.addAll(plan.getAllNodes());
         return allNodes;
     }
+
 
     public void findPath(String destination) throws NoPathException {
         ArrayList<Node> destinations = searchNode(destination);
@@ -160,25 +163,30 @@ public class Graph {
         for (Wifi wifi : sensed) {
             sensedStr.add(wifi.getBSS());
         }
+
         ArrayList<Plan> res = new ArrayList<Plan>();
         int biggestSetSize = 0;
+
         for (Plan plan : _allPlan) {
             HashSet<String> tmp = plan.getListWifiBSS();
             tmp.retainAll(sensedStr); // set-theoretical and operation
+
             if (biggestSetSize == tmp.size()) {
                 res.add(plan);
-            }
-            else if (biggestSetSize < tmp.size()) {
+
+            } else if (biggestSetSize < tmp.size()) {
                 res = new ArrayList<Plan>();
                 res.add(plan);
                 biggestSetSize = tmp.size();
             }
+
         }
 
         if (res.size() == 0) {
             Log.i(getClass().getName(), "You are not at ULB.");
             return null;
         }
+
         Node node = res.get(0).getNode(sensed);
         if(node != null) {
             Log.d(getClass().getName(), "Node found: " + node.getID() + "(alias: " + node.getAlias() + ")");
@@ -243,6 +251,22 @@ public class Graph {
         return listeNode;
     }
 
+    /**
+     * Get a specific node
+     *
+     * @param nodeId the id of the node
+     * @return the Node or null if not found
+     */
+    public static Node getNode(int nodeId) {
+        for(Plan plan : _allPlan) {
+            Node node = plan.getNode(nodeId);
+            if(node != null) {
+                return node;
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Get a specific plan or <b>create</b> if not exist
@@ -282,4 +306,6 @@ public class Graph {
 
         return resPlan;
     }
+
+
 }

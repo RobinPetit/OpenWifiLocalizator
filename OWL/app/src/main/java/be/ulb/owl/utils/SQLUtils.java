@@ -5,15 +5,27 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 import be.ulb.owl.Wifi;
+import be.ulb.owl.graph.Graph;
 import be.ulb.owl.graph.Node;
 import be.ulb.owl.graph.Path;
 import be.ulb.owl.graph.Plan;
+import be.ulb.owl.utils.sql.AliasesLinkTable;
+import be.ulb.owl.utils.sql.AliasesTable;
 import be.ulb.owl.utils.sql.BuildingTable;
+import be.ulb.owl.utils.sql.EdgeTable;
 import be.ulb.owl.utils.sql.NodeTable;
+import be.ulb.owl.utils.sql.WifiTable;
 
 /**
  * Tool to manage SQL
@@ -25,35 +37,156 @@ public class SQLUtils extends SQLiteOpenHelper {
 
     private static SQLiteDatabase _db = null;
 
+    private static final String DB_NAME = "OWL-DB.db";
+    private static String DB_PATH = "";
+
+    private Context _context;
+
 
     // TODO ajouter la documenter
     /**
      * Constructor
      *
      * @param context
-     * @param name
-     * @param factory
-     * @param version
      */
-    public SQLUtils(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, name, factory, version);
+    public SQLUtils(Context context) {
+        super(context, DB_NAME, null, 1);
 
-        if(_db == null) {
+        if(_db != null) {
             throw new IllegalArgumentException("Une instance de SQLUtils existe déjà");
         }
 
-        _db = this.getWritableDatabase();
+        this._context = context;
+
+        if(android.os.Build.VERSION.SDK_INT >= 17){
+            DB_PATH = context.getApplicationInfo().dataDir + "/databases/";
+//            DB_PATH = "OWL" +File.separator + "databases" + File.separator;
+        } else {
+            DB_PATH = context.getFilesDir().getPath() + context.getPackageName() + "/databases/";
+            Log.i(getClass().getName(), "old :P");
+        }
+
+        new File(DB_PATH).mkdir();
+
+        Log.d(getClass().getName(), "DB_Path: " + DB_PATH);
+
+        if (!checkdatabase()) {
+            Log.i(getClass().getName(), "Database doesn't exist -> creation");
+            createDataBase();
+        }
+
+        Log.d(getClass().getName(), "Open existing database");
+        opendatabase();
+
+
+//        _db = SQLiteDatabase.openDatabase(, null, SQLiteDatabase.OPEN_READWRITE);;
     }
+
+    ////////////////////////// FUNCTION TO MOVE AND CHECK ASSETS DATABASE //////////////////////////
+
+    /**
+     * Check if database have allready be moved
+     *
+     * @return True if database allready exist
+     */
+    private boolean checkdatabase() {
+        boolean check_db_exists = false;
+
+        try {
+            String myPath = DB_PATH + DB_NAME;
+            File dbFile = new File(myPath);
+            check_db_exists = dbFile.exists();
+
+        } catch(SQLiteException e) {
+            Log.w(getClass().getName(), "Database doesn't exist");
+        }
+
+        return check_db_exists;
+    }
+
+    private void createDataBase() {
+        //If the database does not exist, copy it from the assets.
+        this.getReadableDatabase();
+        this.close();
+
+        copyDataBase();
+        Log.i(getClass().getName(), "Database created");
+
+    }
+
+    /**
+     * Copy the database frome the assets folder to
+     *
+     */
+    private void copyDataBase() {
+        //Open your local db as the input stream
+        InputStream myinput = null;
+        try {
+            myinput = _context.getAssets().open(DB_NAME);
+        } catch (IOException e) {
+            Log.w(getClass().getName(), "Error open " + e.getMessage());
+        }
+
+        // Path to the just created empty db
+        String outfilename = DB_PATH + DB_NAME;
+
+        //Open the empty db as the output stream
+        OutputStream myoutput = null;
+        try {
+            myoutput = new FileOutputStream(outfilename);
+        } catch (FileNotFoundException e) {
+            Log.w(getClass().getName(), "Error not found " + e.getMessage());
+        }
+
+        // transfer byte to inputfile to outputfile
+        byte[] buffer = new byte[1024];
+        int length;
+
+        try {
+            while ((length = myinput.read(buffer))>0) {
+                myoutput.write(buffer, 0, length);
+            }
+        } catch (IOException e) {
+            Log.w(getClass().getName(), "Error copy " + e.getMessage());
+        }
+
+        //Close the streams
+
+        try {
+            myoutput.flush();
+            myoutput.close();
+            myinput.close();
+        } catch (IOException e) {
+            Log.w(getClass().getName(), "Error close " + e.getMessage());
+        }
+
+    }
+
+    /**
+     * Open the database which was copied from assets
+     */
+    public void opendatabase() {
+        //Open the database
+        String mypath = DB_PATH + DB_NAME;
+        _db = SQLiteDatabase.openDatabase(mypath, null, SQLiteDatabase.OPEN_READWRITE);
+    }
+
+
+
+
+    ///////////////////////////////// EVENT SQL /////////////////////////////////
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        // TODO
+        Log.i(getClass().getName(), "The database is allready created (in assets folder)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        // TODO
+        Log.i(getClass().getName(), "Database is directly updated when the file bd is override " +
+                "(in assets folder)");
     }
+
 
 
     /////////////////////////////////////////// STATIC ///////////////////////////////////////////
@@ -73,7 +206,7 @@ public class SQLUtils extends SQLiteOpenHelper {
      * @param context
      */
     public static void initSQLUtils(Context context) {
-        new SQLUtils(context, "OWL-DB.sql", null, 1);
+        new SQLUtils(context);
 
     }
 
@@ -87,15 +220,15 @@ public class SQLUtils extends SQLiteOpenHelper {
 
         Cursor cursor = getDatabase().query(BuildingTable.getName(),
                 new String[] {
-                        BuildingTable.NAME.toString(),
-                        BuildingTable.ID.toString(),
-                        BuildingTable.IMAGE_PATH.toString(),
-                        BuildingTable.X_ON_PARENT.toString(),
-                        BuildingTable.Y_ON_PARENT.toString(),
-                        BuildingTable.BG_COORD_X.toString(),
-                        BuildingTable.BG_COORD_Y.toString(),
-                        BuildingTable.RELATIVE_ANGLE.toString(),
-                        BuildingTable.PIXEL_PER_METER.toString()},
+                        BuildingTable.NAME.getCol(),
+                        BuildingTable.ID.getCol(),
+                        BuildingTable.IMAGE_PATH.getCol(),
+                        BuildingTable.X_ON_PARENT.getCol(),
+                        BuildingTable.Y_ON_PARENT.getCol(),
+                        BuildingTable.BG_COORD_X.getCol(),
+                        BuildingTable.BG_COORD_Y.getCol(),
+                        BuildingTable.RELATIVE_ANGLE.getCol(),
+                        BuildingTable.PPM.getCol()},
                 "", null, null, null, null);
 
         int id;
@@ -114,15 +247,15 @@ public class SQLUtils extends SQLiteOpenHelper {
             while (cursor.isAfterLast() == false) {
                 cursor.moveToFirst();
 
-                planName = cursor.getString(BuildingTable.NAME.getIndex());
-                id = cursor.getInt(BuildingTable.ID.getIndex());
-                pathImage = cursor.getString(BuildingTable.IMAGE_PATH.getIndex());
-                xOnParent = cursor.getFloat(BuildingTable.X_ON_PARENT.getIndex());
-                yOnParent = cursor.getFloat(BuildingTable.Y_ON_PARENT.getIndex());
-                bgCoordX = cursor.getFloat(BuildingTable.BG_COORD_X.getIndex());
-                bgCoordY = cursor.getFloat(BuildingTable.BG_COORD_Y.getIndex());
-                relativeAngle = cursor.getFloat(BuildingTable.RELATIVE_ANGLE.getIndex());
-                distance = cursor.getFloat(BuildingTable.PIXEL_PER_METER.getIndex());
+                planName = getString(cursor, BuildingTable.NAME.getCol());;
+                id = getInt(cursor, BuildingTable.ID.getCol());
+                pathImage = getString(cursor, BuildingTable.IMAGE_PATH.getCol());
+                xOnParent = getFloat(cursor, BuildingTable.X_ON_PARENT.getCol());
+                yOnParent = getFloat(cursor, BuildingTable.Y_ON_PARENT.getCol());
+                bgCoordX = getFloat(cursor, BuildingTable.BG_COORD_X.getCol());
+                bgCoordY = getFloat(cursor, BuildingTable.BG_COORD_Y.getCol());
+                relativeAngle = getFloat(cursor, BuildingTable.RELATIVE_ANGLE.getCol());
+                distance = getFloat(cursor, BuildingTable.PPM.getCol());
 
                 res.add(new Plan(planName, id, pathImage, xOnParent, yOnParent, bgCoordX, bgCoordY,
                         relativeAngle, distance));
@@ -147,15 +280,15 @@ public class SQLUtils extends SQLiteOpenHelper {
     public static Plan loadPlan(String planName) throws SQLiteException {
         Cursor cursor = getDatabase().query(BuildingTable.getName(),
                 new String[] {
-                        BuildingTable.ID.toString(),
-                        BuildingTable.IMAGE_PATH.toString(),
-                        BuildingTable.X_ON_PARENT.toString(),
-                        BuildingTable.Y_ON_PARENT.toString(),
-                        BuildingTable.BG_COORD_X.toString(),
-                        BuildingTable.BG_COORD_Y.toString(),
-                        BuildingTable.RELATIVE_ANGLE.toString(),
-                        BuildingTable.PIXEL_PER_METER.toString()},
-                BuildingTable.NAME + " = " + planName, null, null, null, null);
+                        BuildingTable.ID.getCol(),
+                        BuildingTable.IMAGE_PATH.getCol(),
+                        BuildingTable.X_ON_PARENT.getCol(),
+                        BuildingTable.Y_ON_PARENT.getCol(),
+                        BuildingTable.BG_COORD_X.getCol(),
+                        BuildingTable.BG_COORD_Y.getCol(),
+                        BuildingTable.RELATIVE_ANGLE.getCol(),
+                        BuildingTable.PPM.getCol()},
+                BuildingTable.NAME.getCol() + " = " + planName, null, null, null, null);
 
         int id;
         String pathImage;
@@ -168,14 +301,14 @@ public class SQLUtils extends SQLiteOpenHelper {
 
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
-            id = cursor.getInt(BuildingTable.ID.getIndex());
-            pathImage = cursor.getString(BuildingTable.IMAGE_PATH.getIndex());
-            xOnParent = cursor.getFloat(BuildingTable.X_ON_PARENT.getIndex());
-            yOnParent = cursor.getFloat(BuildingTable.Y_ON_PARENT.getIndex());
-            bgCoordX = cursor.getFloat(BuildingTable.BG_COORD_X.getIndex());
-            bgCoordY = cursor.getFloat(BuildingTable.BG_COORD_Y.getIndex());
-            relativeAngle = cursor.getFloat(BuildingTable.RELATIVE_ANGLE.getIndex());
-            distance = cursor.getFloat(BuildingTable.PIXEL_PER_METER.getIndex());
+            id = getInt(cursor, BuildingTable.ID.getCol());
+            pathImage = getString(cursor, BuildingTable.IMAGE_PATH.getCol());
+            xOnParent = getFloat(cursor, BuildingTable.X_ON_PARENT.getCol());
+            yOnParent = getFloat(cursor, BuildingTable.Y_ON_PARENT.getCol());
+            bgCoordX = getFloat(cursor, BuildingTable.BG_COORD_X.getCol());
+            bgCoordY = getFloat(cursor, BuildingTable.BG_COORD_Y.getCol());
+            relativeAngle = getFloat(cursor, BuildingTable.RELATIVE_ANGLE.getCol());
+            distance = getFloat(cursor, BuildingTable.PPM.getCol());
 
         } else {
             throw new SQLiteException("Il y a plusieurs batiments avec le nom: " + planName);
@@ -198,19 +331,18 @@ public class SQLUtils extends SQLiteOpenHelper {
 
         Cursor cursor = getDatabase().query(NodeTable.getName(),
                 new String[] {
-                        NodeTable.ID.toString(),
-                        NodeTable.X.toString(),
-                        NodeTable.Y.toString(),
-                        NodeTable.BUILDING_2_ID.toString()},
+                        NodeTable.ID.getCol(),
+                        NodeTable.X.getCol(),
+                        NodeTable.Y.getCol()},
                 NodeTable.BUILDING_ID + " = " + planID, null, null, null, null);
 
         if(cursor.getCount() > 0) {
             cursor.moveToFirst();
 
             while (cursor.isAfterLast() == false) {
-                float x = cursor.getInt(NodeTable.X.getIndex());
-                float y = cursor.getInt(NodeTable.Y.getIndex());
-                int id = cursor.getInt(NodeTable.ID.getIndex());
+                float x = getInt(cursor, NodeTable.X.getCol());
+                float y = getInt(cursor, NodeTable.Y.getCol());
+                int id = getInt(cursor, NodeTable.ID.getCol());
 
                 res.add(new Node(plan, x, y, id));
 
@@ -231,7 +363,25 @@ public class SQLUtils extends SQLiteOpenHelper {
      */
     public static ArrayList<String> loadAlias(int nodeID) {
         ArrayList<String> res = new ArrayList<String>();
-        // TODO
+
+        String reqStr = "SELECT " + AliasesTable.NAME.getFullCol() + " " +
+                "FROM " + AliasesLinkTable.getName() + " " +
+                    "JOIN " + AliasesTable.getName() + " " +
+                    "ON " + AliasesLinkTable.ALIAS_ID.getFullCol() + " = " + AliasesTable.ID.getFullCol() + " " +
+                "WHERE " + AliasesLinkTable.NODE_ID.getFullCol() + " = ?";
+
+        Cursor cursor = getDatabase().rawQuery(reqStr, new String[]{""+nodeID});
+
+        if(cursor.getCount() > 0) {
+            cursor.moveToFirst();
+
+            while(cursor.isAfterLast() == false) {
+                res.add(getString(cursor, AliasesTable.NAME.getCol()));
+
+                cursor.moveToNext();
+            }
+
+        }
 
         return res;
     }
@@ -245,8 +395,35 @@ public class SQLUtils extends SQLiteOpenHelper {
      */
     public static ArrayList<Wifi> loadWifi(int nodeID) {
         ArrayList<Wifi> res = new ArrayList<Wifi>();
-        // TODO
-        // new wifi
+
+        Cursor cursor = getDatabase().query(WifiTable.getName(),
+                new String[] {
+                        WifiTable.BSS.getCol(),
+                        WifiTable.MAX.getCol(),
+                        WifiTable.MIN.getCol(),
+                        WifiTable.AVG.getCol()},
+                WifiTable.NODE_ID.getCol() + " = " + nodeID, null, null, null, null);
+
+        if(cursor.getCount() > 0) {
+            cursor.moveToFirst();
+
+            String bss;
+            float max;
+            float min;
+            float avg;
+
+            while (cursor.isAfterLast() == false) {
+                bss = getString(cursor, WifiTable.BSS.getCol());
+                max = getFloat(cursor, WifiTable.MAX.getCol());
+                min = getFloat(cursor, WifiTable.MIN.getCol());
+                avg = getFloat(cursor, WifiTable.AVG.getCol());
+
+                res.add(new Wifi(bss, max, min, avg));
+
+                cursor.moveToNext();
+            }
+
+        }
 
         return res;
     }
@@ -257,15 +434,118 @@ public class SQLUtils extends SQLiteOpenHelper {
      * A path is create only if the two node exist !
      *
      * @param nodeID the id of the node
+     * @param node which contains the path
      * @return ArrayList with all path
      */
-    public static ArrayList<Path> loadPath(int nodeID) {
+    public static ArrayList<Path> loadPath(int nodeID, Node node) {
+        return loadPath(nodeID, node, null);
+    }
+
+    /**
+     * Load all paht on a specific node<br />
+     * A path is create only if the two node exist !
+     *
+     * @param nodeID the id of the node
+     * @param node which contains the path
+     * @param plan of the current node
+     * @return ArrayList with all path
+     */
+    public static ArrayList<Path> loadPath(int nodeID, Node node, Plan plan) {
+
         ArrayList<Path> res = new ArrayList<Path>();
-        // TODO
-        // new Path
+
+        Cursor cursor = getDatabase().query(EdgeTable.getName(),
+                new String[] {
+                    EdgeTable.NODE_1_ID.getCol(),
+                    EdgeTable.NODE_2_ID.getCol(),
+                    EdgeTable.WEIGHT.getCol()
+                },
+                EdgeTable.NODE_1_ID.getCol() + " = " + nodeID +
+                " OR " + EdgeTable.NODE_2_ID.getCol() + " = " + nodeID, null, null, null, null);
+
+
+        if(cursor.getCount() > 0) {
+            cursor.moveToFirst();
+
+            int idOne;
+            int idTwo;
+            int weight;
+
+            Node nodeOne;
+            Node nodeTwo;
+
+            while(cursor.isAfterLast() == false) {
+                idOne = getInt(cursor, EdgeTable.NODE_1_ID.getCol());
+                idTwo = getInt(cursor, EdgeTable.NODE_2_ID.getCol());
+                weight = getInt(cursor, EdgeTable.WEIGHT.getCol());
+
+                // All the time nodeOne will be the node in param
+                // so if idTwo egals searched node, we switch the two ;)
+                if(idTwo == nodeID) {
+                    idTwo = idOne;
+
+                } else if(idOne != nodeID) { // We check that node one have the good id
+                    // If not, create an error !
+                    Log.e(SQLUtils.class.getName(), "The SQL response is not valide (Search edge with " +
+                            "node: " + nodeID + " and return: " + idOne + " & " + idTwo + ")");
+                    cursor.moveToNext();
+                    continue; // next !
+                }
+
+                nodeOne = node;
+
+                // Now we search the second id:
+                nodeTwo = plan.getNode(idTwo);
+                if(nodeTwo == null) { // If not found in the current plan
+                    nodeTwo = Graph.getNode(idTwo); // Search in all plan
+                }
+
+                if(nodeTwo != null) { // If found :)
+                    res.add(new Path(nodeOne, nodeTwo, weight));
+                }
+
+                cursor.moveToNext();
+            }
+
+        }
 
         return res;
     }
 
+
+    //////////////////////////////// Utils ////////////////////////////////
+
+    /**
+     * Get the int value
+     *
+     * @param cursor the bdd cursor
+     * @param columnName the name of the column
+     * @return the value
+     */
+    private static int getInt(Cursor cursor, String columnName) {
+        return cursor.getInt(cursor.getColumnIndex(columnName));
+    }
+
+    /**
+     * Get the String value
+     *
+     * @param cursor the bdd cursor
+     * @param columnName the name of the column
+     * @return the value
+     */
+    private static String getString(Cursor cursor, String columnName) {
+        return cursor.getString(cursor.getColumnIndex(columnName));
+    }
+
+    /**
+     * Get the Float value
+     *
+     * @param cursor the bdd cursor
+     * @param columnName the name of the column
+     * @return the value
+     */
+    private static Float getFloat(Cursor cursor, String columnName) {
+        return cursor.getFloat(cursor.getColumnIndex(columnName));
+    }
 
 }

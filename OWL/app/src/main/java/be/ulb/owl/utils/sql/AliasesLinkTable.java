@@ -5,18 +5,17 @@ import java.util.ArrayList;
 /**
  * Created by Detobel36
  */
+public enum AliasesLinkTable implements SQLTable {
 
-public enum NodeTable implements SQLTable {
-    ID("Id"),
-    BUILDING_ID("BuildingId"),
-    X("X"),
-    Y("Y");
+    NODE_ID("NodeId"),
+    ALIAS_ID("AliasId");
 
-    private static String _NAME = "Node";
+
+    private static String _NAME = "AliasesLink";
 
     private final String _value;
 
-    NodeTable(String value) {
+    AliasesLinkTable(String value) {
         _value = value;
     }
 
@@ -44,7 +43,7 @@ public enum NodeTable implements SQLTable {
     //////////////////////////////////////////// STATIC ////////////////////////////////////////////
 
     /**
-     * Get the name of the building table
+     * Get the name of the current table
      *
      * @return the name of the table
      */
@@ -64,6 +63,5 @@ public enum NodeTable implements SQLTable {
         }
         return (String[]) res.toArray();
     }
-
 
 }
