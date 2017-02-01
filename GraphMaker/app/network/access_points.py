@@ -20,7 +20,7 @@ class AP:
                .format(self.key, -min(self.values), -max(self.values), -self.avg())
 
     def sql(self):
-        # @TODO NodeId missing
+        # @TODO format looks awful
         res = "INSERT INTO Wifi (Bss,NodeId,Min,Max,Avg) VALUES('{0}',{1},{2},{3},{4})"
         return res.format(self.key, "{0}", -min(self.values), -max(self.values), -self.avg())
 
