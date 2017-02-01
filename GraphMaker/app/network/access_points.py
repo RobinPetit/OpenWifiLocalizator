@@ -21,8 +21,8 @@ class AP:
 
     def sql(self):
         # @TODO NodeId missing
-        res = "INSERT INTO Wifi (Bss,Min,Max,Avg) VALUES({0}{1}{2}{3})"
-        return res.format(self.key, -min(self.values), -max(self.values), -self.avg())
+        res = "INSERT INTO Wifi (Bss,NodeId,Min,Max,Avg) VALUES('{0}',{1},{2},{3},{4})"
+        return res.format(self.key, "{0}", -min(self.values), -max(self.values), -self.avg())
 
 class AccessPointList:
     def __init__(self, tmpfile = "temp.txt", iterations = 5, wait = 2):
@@ -37,6 +37,15 @@ class AccessPointList:
         for elem in self.elements:
             output += (TAB * (nb_tab+1)) + elem.text()+'\n'
         output += (TAB * nb_tab) + '</listWifi>\n'
+        return output
+
+    def sql(self):
+        output = ""
+        n = len(self.elements)
+        for i in range(n):
+            output += (self.elements[i]).sql()
+            if (i < n-1):
+                output += ";"
         return output
 
     def findAP(self, key):

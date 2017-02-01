@@ -63,6 +63,9 @@ class Node:
                 self.id(),
                 alias
             ))
+        temp = self.access_points_.sql()
+        temp = (temp.format(self.id())).split(";")
+        queries.extend(temp)
         return queries
 
 class Edge:
