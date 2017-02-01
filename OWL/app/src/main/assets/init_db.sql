@@ -1,4 +1,4 @@
--- This file must be run once in order to create the database structure
+BEGIN TRANSACTION;
 
 CREATE TABLE "Wifi" (
 	`Id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
@@ -25,12 +25,16 @@ CREATE TABLE "Edge" (
 
 CREATE TABLE "Campus" (
 	`Id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-	`Name`	TEXT NOT NULL
+	`Name`	TEXT NOT NULL,
+	`Abbrev`	TEXT
 );
+
+INSERT INTO `Campus` VALUES (1,'Plaine','P');
+INSERT INTO `Campus` VALUES (2,'Solbosch','S');
 
 CREATE TABLE "Building" (
 	`Id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-	`CampusId`	REAL,
+	`CampusId`	INTEGER,
 	`Name`	TEXT,
 	`Ppm`	REAL DEFAULT 0.0,
 	`ImagePath`	TEXT,
@@ -50,3 +54,5 @@ CREATE TABLE "Aliases" (
 	`Id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	`Name`	TEXT NOT NULL
 );
+
+COMMIT;
