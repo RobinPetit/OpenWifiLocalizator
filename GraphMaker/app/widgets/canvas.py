@@ -17,9 +17,6 @@ from time import time
 
 
 class GraphCanvas(t.Canvas):
-    NODE_SIZE = 10
-    EDGE_WIDTH = 2.5
-
     def __init__(self, master, **options):
         super().__init__(master, **options)
         self.master = master
@@ -202,7 +199,7 @@ class GraphCanvas(t.Canvas):
         for point in xml_tree.findall('node'):
             coord = point.find('coord')
             x, y = float(coord.get('x')), float(coord.get('y'))
-            coord = x, y, x+2*GraphCanvas.NODE_SIZE, y+2*GraphCanvas.NODE_SIZE
+            coord = x, y, x+2*NODE_SIZE, y+2*NODE_SIZE
             listWifi = point.find('listWifi')
             if listWifi is None:
                 access_points = None
@@ -226,8 +223,8 @@ class GraphCanvas(t.Canvas):
         for edge in internal_edge.findall('edge'):
             extremities = edge.get('beg'), edge.get('end')
             extremities_ids = [[node_id for node_id in self.nodes() if self.nodes()[node_id].id() == extremity][0] for extremity in extremities]
-            end_coord = [c + GraphCanvas.NODE_SIZE for c in self.nodes()[extremities_ids[1]].coord()[:2]]
-            beg_coord = [c + GraphCanvas.NODE_SIZE for c in self.nodes()[extremities_ids[0]].coord()[:2]]
+            end_coord = [c + NODE_SIZE for c in self.nodes()[extremities_ids[1]].coord()[:2]]
+            beg_coord = [c + NODE_SIZE for c in self.nodes()[extremities_ids[0]].coord()[:2]]
             edge_id = self.create_line(*beg_coord, *end_coord, width=GraphCanvas.EDGE_WIDTH)
             self.add_edge(float(edge.get('weight')), edge_id, extremities)
 
@@ -254,7 +251,7 @@ class GraphCanvas(t.Canvas):
         conn.close()
         for point in nodes:
             x, y = point[1], point[2]
-            coord = x, y, x+2*GraphCanvas.NODE_SIZE, y+2*GraphCanvas.NODE_SIZE
+            coord = x, y, x+2*NODE_SIZE, y+2*NODE_SIZE
             conn = sqlite3.connect(Config.DB_PATH)
             listWifi = conn.execute("SELECT Id FROM Wifi WHERE NodeId={0}".format(point[0]))
             n = len(listWifi.fetchall())
@@ -280,8 +277,8 @@ class GraphCanvas(t.Canvas):
         for edge in internal_edge:
             extremities = edge[1], edge[2]
             extremities_ids = [[node_id for node_id in self.nodes() if self.nodes()[node_id].id() == extremity][0] for extremity in extremities]
-            end_coord = [c + GraphCanvas.NODE_SIZE for c in self.nodes()[extremities_ids[1]].coord()[:2]]
-            beg_coord = [c + GraphCanvas.NODE_SIZE for c in self.nodes()[extremities_ids[0]].coord()[:2]]
+            end_coord = [c + NODE_SIZE for c in self.nodes()[extremities_ids[1]].coord()[:2]]
+            beg_coord = [c + NODE_SIZE for c in self.nodes()[extremities_ids[0]].coord()[:2]]
             edge_id = self.create_line(*beg_coord, *end_coord, width=GraphCanvas.EDGE_WIDTH)
             self.add_edge(edge[3], edge_id, extremities)
         # @TODO external still used ?????
@@ -380,8 +377,8 @@ class EditableGraphCanvas(GraphCanvas):
     def handle_left_click(self, ev):
         self.left_src = self.get_selected_el(ev.x, ev.y)
         if self.left_src is not None:
-            self.initial_click_coord = [self.nodes()[self.left_src].coord()[0]+GraphCanvas.NODE_SIZE,
-                self.nodes()[self.left_src].coord()[1]+GraphCanvas.NODE_SIZE]
+            self.initial_click_coord = [self.nodes()[self.left_src].coord()[0]+NODE_SIZE,
+                self.nodes()[self.left_src].coord()[1]+NODE_SIZE]
             _ = self.initial_click_coord + self.initial_click_coord
             self.tmp_line_id = self.create_line(*_, width=GraphCanvas.EDGE_WIDTH)
         else:
@@ -394,7 +391,7 @@ class EditableGraphCanvas(GraphCanvas):
             return
         if selected in self.nodes():
             node_center = self.nodes()[selected].coord()[:2]
-            node_center = [c+GraphCanvas.NODE_SIZE for c in node_center]
+            node_center = [c+NODE_SIZE for c in node_center]
             self.delete(selected)
             for edge_id in self.edges():
                 if selected in self.edges()[edge_id].extreimity_ids:
@@ -441,7 +438,7 @@ class EditableGraphCanvas(GraphCanvas):
                 self.tmp_line_id = None
                 if end is not None:
                     node_coord = self.nodes()[end].coord()
-                    final_point = [node_coord[i]+GraphCanvas.NODE_SIZE for i in range(2)]
+                    final_point = [node_coord[i]+NODE_SIZE for i in range(2)]
                     distance = euclidian_distance(self.initial_click_coord, final_point)
                     try:
                         weight = self.configure_edge(distance/self.px_p_m)
@@ -449,7 +446,7 @@ class EditableGraphCanvas(GraphCanvas):
                         print(e)
                         return
                     edge_id = self.create_line(*self.initial_click_coord,
-                        self.nodes()[end].coord()[0]+GraphCanvas.NODE_SIZE, self.nodes()[end].coord()[1]+GraphCanvas.NODE_SIZE,
+                        self.nodes()[end].coord()[0]+NODE_SIZE, self.nodes()[end].coord()[1]+NODE_SIZE,
                         width=2.5)
                     extremity_ids = (self.nodes()[self.get_selected_el(*self.initial_click_coord)].id(), self.nodes()[end].id())
                     self.add_edge(weight, edge_id, extremity_ids)
@@ -490,8 +487,8 @@ class EditableGraphCanvas(GraphCanvas):
 
     def create_node(self, x, y):
         access_points, aliases = NodeConfigurationToplevel(self, self.background_file_name).configure()
-        node_coord = (x-GraphCanvas.NODE_SIZE, y-GraphCanvas.NODE_SIZE,
-                      x+GraphCanvas.NODE_SIZE, y+GraphCanvas.NODE_SIZE)
+        node_coord = (x-NODE_SIZE, y-NODE_SIZE,
+                      x+NODE_SIZE, y+NODE_SIZE)
         node_id = self.create_oval(*node_coord, fill='green' if type(access_points) is not list else 'red')
         self.add_node(node_id, access_points, aliases)
 

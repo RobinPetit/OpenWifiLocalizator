@@ -1,4 +1,5 @@
 # OWL
+from app.general.constants import *
 from app.Config import Config
 from app.database.tables import *
 from app.data.PlanData import Node, Edge, ExternalEdge
@@ -39,8 +40,16 @@ class Database:
         """
     INSERT_ALIAS_QUERY = \
         """
-        INSERT INTO Aliases(NodeId, Name)
-            VALUES(?, ?)
+        INSERT INTO Aliases(Name)
+            VALUES(?)
+        """
+    LINK_NODE_TO_ALIAS = \
+        """
+        INSERT INTO AliasesLink(NodeId, AliasId)
+            VALUES(?, (
+                SELECT id
+                    FROM Aliases
+                    WHERE Name=?))
         """
     INSERT_ACCESS_POINT_QUERY = \
         """
@@ -60,6 +69,27 @@ class Database:
         SELECT Ppm, XOnParent, YOnParent, BgCoordX, BgCoordY, RelativeAngle
             FROM Building
             WHERE NAME=?
+        """
+    LOAD_NODES_FROM_BUILDING_QUERY = \
+        """
+        SELECT Id, X, Y
+            FROM Node
+            WHERE BuildingId=(
+                SELECT if
+                    FROM Building
+                    WHERE Name=?)
+        """
+    LOAD_ALL_ALIASES = \
+        """
+        SELECT Name
+            From Aliases;
+        """
+    LOAD_ALIASES_FROM_NODE_ID = \
+        """
+        SELECT A.Name
+            FROM Aliases A
+            JOIN AliasesLink L
+            WHERE L.NodeId=?
         """
     
     ########## UPDATE
@@ -91,6 +121,12 @@ class Database:
             FROM Building
             WHERE Name=?
         """
+    CHECK_IF_NODE_HAS_ACCESS_POINTS = \
+        """
+        SELECT COUNT(Id)
+            FROM Wifi
+            WHERE NodeId=?
+        """
         
     ##### Code
 
@@ -100,12 +136,20 @@ class Database:
         self.conn = sqlite3.connect(path)
         # set to False for big updates and only commit at the end
         self.allowed_to_commit = True
+        self.all_aliases = self.get_all_aliases()
+        if Config.DEBUG:
+            print(self.all_aliases)
 
     def close(self, need_to_commit=False):
         """properly closes the connection to the database"""
         if need_to_commit:
             self.commit()
         self.conn.close()
+        
+    def get_all_aliases(self):
+        """return a list of all aliases currently in the database"""
+        query = Database.LOAD_ALL_ALIASES
+        return [r[0] for r in self.conn.execute(query).fetchall()]
 
     ##### static
 
@@ -155,14 +199,23 @@ class Database:
         cursor = self.conn.execute(query, (plan_name, *Database.center_of_rectangle(node.coord())))
         node_id = cursor.lastrowid
         print('node id is: ' + str(node_id))
-        query = Database.INSERT_ALIAS_QUERY
+        query = Database.LINK_NODE_TO_ALIAS
         for alias in node.aliases():
+            if not alias in self.all_aliases:
+                self.all_aliases.append(alias)
+                self.add_alias(alias)
             self.conn.execute(query, (node_id, alias))
         query = Database.INSERT_ACCESS_POINT_QUERY
         for ap in node.access_points():
             self.conn.execute(query, (ap.get_bss(), node_id, -ap.get_min(), -ap.get_max(), -ap.avg(), ap.get_variance()))
         self.commit()
         return node_id
+        
+    def add_alias(self, alias):
+        """add a brand new alias into the database alias list"""
+        query = Database.INSERT_ALIAS_QUERY
+        self.conn.execute(query, (alias,))
+        self.commit()
         
     def update_node(self, node):
         """changes the coordinate of a node"""
@@ -200,6 +253,33 @@ class Database:
         plan = cursor.fetchone()
         return BuildingTable(filename, plan[0], tuple(plan[1:3]), tuple(plan[3:5]), plan[5])
 
-    #def load_node
+    def load_nodes_from_building(self, plan_name):
+        """returns a list of tuples (Node, bool) of all the Nodes on the given plan
+        and where the boolean tells whether the node has scanned wifis"""
+        nodes = list()
+        query = Database.LOAD_NODES_FROM_BUILDING_QUERY
+        nodes_cursor = self.conn.execute(query, (plan_name,))
+        for result in nodes_cursor.fetchall():
+            node_id = result[0]
+            coords = [result[1]-NODE_SIZE, result[2]-GraphCanvas,
+                      result[1]+NODE_SIZE, result[2]+GraphCanvas]
+            has_ap = self.load_access_points_from_node(node_id)
+            aliases = load_aliases_of_node(node_id)
+            ## create node
+            # nb, coords, access_points, aliases
+            node = Node(node_id, coords, [], aliases)
+            nodes.append((node, has_ap))
+            
+    def node_has_access_point(self, node_id):
+        """returns True if node has scanned wifis"""
+        query = Database.CHECK_IF_NODE_HAS_ACCESS_POINTS
+        cursor = self.conn.execute(query, (node_id,))
+        return cursor.fetchone()[0] > 0
+    
+    def load_aliases_of_node(self, node_id):
+        """returns a list sof aliases for a given node"""
+        query = Database.LOAD_ALIASES_FROM_NODE_ID
+        return [r[0] for r in self.conn.execute(query, (node_id,)).fetchall()]
+            
 
 

@@ -5,8 +5,8 @@ from time import sleep
 from app.general.constants import *
 
 class AP:
-    def __init__(self, key, variance=.0):
-        self.key = key
+    def __init__(self, bss, variance=.0):
+        self.key = bss
         self.values = list()
         self.variance = variance
 
