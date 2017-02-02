@@ -86,7 +86,7 @@ class Edge:
         else:
             self.weight_ = w
             
-    def get_extremity_ids():
+    def get_extremity_ids(self):
         return self.extremity_ids
 
     def text(self, nb_tab=0):

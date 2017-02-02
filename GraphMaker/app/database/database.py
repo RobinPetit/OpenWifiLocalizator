@@ -264,7 +264,7 @@ class Database:
             # @TODO Maybe: remove alias if no node is linked to it
         self.add_aliases_to_node(node.id(), added)
         
-    def set_node_acess_points(self, node, access_points):
+    def set_node_access_points(self, node, access_points):
         """set (replaces if exists) the access points linked to a given node"""
         self.remove_access_points_from_node(node.id())
         query = Database.INSERT_ACCESS_POINT_QUERY

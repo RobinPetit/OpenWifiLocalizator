@@ -81,6 +81,8 @@ class App(t.Frame):
     def draw_loaded(self, nodes, edges):
         for node_id, x, y, aliases, has_ap in nodes:
             self.canvas.create_node_from_db(x, y, aliases, has_ap, node_id)
+        for edge in edges:
+            self.canvas.create_edge_from_db(*edge)
 
     class NewPlanData:
         def __init__(self, ppm, angle, pos):

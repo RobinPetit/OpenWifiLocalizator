@@ -230,7 +230,7 @@ class GraphCanvas(t.Canvas):
             extremities_ids = [[node_id for node_id in self.nodes() if self.nodes()[node_id].id() == extremity][0] for extremity in extremities]
             end_coord = [c + NODE_SIZE for c in self.nodes()[extremities_ids[1]].coord()[:2]]
             beg_coord = [c + NODE_SIZE for c in self.nodes()[extremities_ids[0]].coord()[:2]]
-            edge_id = self.create_line(*beg_coord, *end_coord, width=GraphCanvas.EDGE_WIDTH)
+            edge_id = self.create_line(*beg_coord, *end_coord, width=EDGE_WIDTH)
             self.add_edge(float(edge.get('weight')), edge_id, extremities)
 
         external_edge = xml_tree.find('external')
@@ -284,7 +284,7 @@ class GraphCanvas(t.Canvas):
             extremities_ids = [[node_id for node_id in self.nodes() if self.nodes()[node_id].id() == extremity][0] for extremity in extremities]
             end_coord = [c + NODE_SIZE for c in self.nodes()[extremities_ids[1]].coord()[:2]]
             beg_coord = [c + NODE_SIZE for c in self.nodes()[extremities_ids[0]].coord()[:2]]
-            edge_id = self.create_line(*beg_coord, *end_coord, width=GraphCanvas.EDGE_WIDTH)
+            edge_id = self.create_line(*beg_coord, *end_coord, width=EDGE_WIDTH)
             self.add_edge(edge[3], edge_id, extremities)
         # @TODO external still used ?????
         #conn = sqlite3.connect(Config.DB_PATH)
@@ -392,7 +392,7 @@ class EditableGraphCanvas(GraphCanvas):
             self.initial_click_coord = [self.nodes()[self.left_src].coord()[0]+NODE_SIZE,
                                         self.nodes()[self.left_src].coord()[1]+NODE_SIZE]
             _ = self.initial_click_coord + self.initial_click_coord
-            self.tmp_line_id = self.create_line(*_, width=GraphCanvas.EDGE_WIDTH)
+            self.tmp_line_id = self.create_line(*_, width=EDGE_WIDTH)
         else:
             self.click_coord = [ev.x, ev.y]
         self.left_click_time = time()
@@ -548,6 +548,17 @@ class EditableGraphCanvas(GraphCanvas):
                       x+NODE_SIZE, y+NODE_SIZE)
         node_id = self.create_oval(*node_coord, fill='green' if has_ap else 'red')
         self.add_node(node_id, [], node_name=db_id)
+        
+    def create_edge_from_db(self, id1, id2, weight):
+        for n in self.nodes():
+            if self.nodes()[n].id() == id1:
+                n1 = n
+            elif self.nodes()[n].id() == id2:
+                n2 = n
+        beg_coord = [c + NODE_SIZE for c in self.nodes()[n1].coord()[:2]]
+        end_coord = [c + NODE_SIZE for c in self.nodes()[n2].coord()[:2]]
+        edge_id = self.create_line(*beg_coord, *end_coord, width=EDGE_WIDTH)
+        self.add_edge(weight, edge_id, [n1, n2], save=False)
 
     def create_external_edge(self, internal_node, plan_name, external_node, weight=.0):
         self.add_external_edge(weight, [internal_node, external_node], plan_name)
