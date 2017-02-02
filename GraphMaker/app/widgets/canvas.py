@@ -45,12 +45,12 @@ class GraphCanvas(t.Canvas):
         print('name: ' + str(node_name))
         if node_name == 0:
             print('saving node in db')
-            node.id(self.master.database.save_node(node, Database.path_to_building_name(self.master.file_name)))
+            node.id(self.master.database.save_node(node, path_to_building_name(self.master.file_name)))
 
-    def add_edge(self, weight, edge_id, extremities, save=True):
-        edge = Edge(weight, self.coords(edge_id), extremities)
+    def add_edge(self, weight, edge_id, extremities, nb=0):
+        edge = Edge(weight, self.coords(edge_id), extremities, nb=nb)
         self.plan_data.add_edge(edge_id, edge)
-        if save:
+        if nb == 0:
             edge.id(self.master.database.save_edge(edge))
 
     def add_external_edge(self, weight, extremities, plan, save=False):
@@ -459,7 +459,7 @@ class EditableGraphCanvas(GraphCanvas):
                     final_point = [node_coord[i]+NODE_SIZE for i in range(2)]
                     distance = euclidian_distance(self.initial_click_coord, final_point)
                     try:
-                        weight = self.configure_edge(distance/self.px_p_m)
+                        weight = self.configure_edge(distance)
                     except Exception as e:
                         print(e)
                         return
@@ -486,6 +486,9 @@ class EditableGraphCanvas(GraphCanvas):
             for edge in self.moving_edges_edit_idx:
                 print('fixing edge {}'.format(edge))
                 self.edges()[edge].coord(self.coords(edge))
+                self.edges()[edge].recompute_weight(self.nodes())
+                print('new weight:', self.edges()[edge].weight())
+                self.master.database.update_edge(self.edges()[edge])
             return
         selected = self.get_selected_el(ev.x, ev.y)
         print(ev.x, ev.y, selected)
@@ -549,7 +552,7 @@ class EditableGraphCanvas(GraphCanvas):
         node_id = self.create_oval(*node_coord, fill='green' if has_ap else 'red')
         self.add_node(node_id, [], node_name=db_id)
         
-    def create_edge_from_db(self, id1, id2, weight):
+    def create_edge_from_db(self, nb, id1, id2, weight):
         for n in self.nodes():
             if self.nodes()[n].id() == id1:
                 n1 = n
@@ -558,7 +561,7 @@ class EditableGraphCanvas(GraphCanvas):
         beg_coord = [c + NODE_SIZE for c in self.nodes()[n1].coord()[:2]]
         end_coord = [c + NODE_SIZE for c in self.nodes()[n2].coord()[:2]]
         edge_id = self.create_line(*beg_coord, *end_coord, width=EDGE_WIDTH)
-        self.add_edge(weight, edge_id, [id1, id2], save=False)
+        self.add_edge(weight, edge_id, [id1, id2], nb=nb)
 
     def create_external_edge(self, internal_node, plan_name, external_node, weight=.0):
         self.add_external_edge(weight, [internal_node, external_node], plan_name)

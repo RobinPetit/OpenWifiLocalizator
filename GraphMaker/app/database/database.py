@@ -1,5 +1,6 @@
 # OWL
 from app.general.constants import *
+from app.general.functions import *
 from app.Config import Config
 from app.database.tables import *
 from app.data.PlanData import Node, Edge, ExternalEdge
@@ -93,7 +94,7 @@ class Database:
         """
     LOAD_EDGES_FROM_BUILDING_QUERY = \
         """
-        SELECT E.Node1Id, E.Node2Id, E.Weight
+        SELECT E.Id, E.Node1Id, E.Node2Id, E.Weight
             FROM Edge E
             JOIN Node N1 on N1.Id=E.Node1Id
             JOIN Node N2 on N2.Id=E.Node2Id
@@ -116,14 +117,14 @@ class Database:
         """
         UPDATE Node
             SET X=?, Y=?
-            WHERE id=?
+            WHERE Id=?
         """
     #UPDATE_
     UPDATE_EDGE_QUERY = \
         """
         UPDATE Edge
             SET Weight=?
-            WHERE id=?
+            WHERE Id=?
         """
         
     ########## DELETE
@@ -179,16 +180,6 @@ class Database:
         query = Database.LOAD_ALL_ALIASES_QUERY
         return [r[0] for r in self.conn.execute(query).fetchall()]
 
-    ##### static
-
-    @staticmethod
-    def path_to_building_name(path):
-        return splitext(basename(path))[0]
-        
-    @staticmethod
-    def center_of_rectangle(rectangle):
-        return [(rectangle[i]+rectangle[2+i])//2 for i in (0, 1)]
-
     ##### save functions
 
     ## private
@@ -226,7 +217,7 @@ class Database:
         query = Database.INSERT_NODE_QUERY
         cursor = self.conn.execute(query, (
             plan_name,
-            *Database.center_of_rectangle(node.coord())))
+            *center_of_rectangle(node.coord())))
         node_id = cursor.lastrowid
         self.add_aliases_to_node(node_id, node.aliases())
         self.set_node_access_points(node_id, node.access_points())
@@ -252,7 +243,7 @@ class Database:
     def update_node_position(self, node):
         """changes the coordinate of a node"""
         query = Database.UPDATE_NODE_POSITION_QUERY
-        self.conn.execute(query, (*Database.center_of_rectangle(node.coord()), node.id()))
+        self.conn.execute(query, (*center_of_rectangle(node.coord()), node.id()))
         self.commit()
         
     def update_node_aliases(self, node, removed, added):
@@ -264,7 +255,7 @@ class Database:
             # @TODO Maybe: remove alias if no node is linked to it
         self.add_aliases_to_node(node.id(), added)
         
-    def set_node_access_points(self, node, access_points):
+    def set_node_access_points(self, node_id, access_points):
         """set (replaces if exists) the access points linked to a given node"""
         self.remove_access_points_from_node(node.id())
         query = Database.INSERT_ACCESS_POINT_QUERY
@@ -277,11 +268,12 @@ class Database:
                 -ap.avg(),
                 ap.get_variance())
             )
+        self.commit()
         
     def save_edge(self, edge):
         """register a new edge
         returns the id of the fresh edge"""
-        assert type(edge) is Edge or type(edge) is ExternalEdge
+        assert type(edge) in (Edge, ExternalEdge)
         query = Database.INSERT_EDGE_QUERY
         cursor = self.conn.execute(query, (*edge.get_extremity_ids(), edge.weight()))
         self.commit()
@@ -289,8 +281,9 @@ class Database:
 
     def update_edge(self, edge):
         """changes the weight of an edge"""
+        print('setting weight to {} for id = {}'.format(edge.weight(), edge.id()))
         query = Database.UPDATE_EDGE_QUERY
-        self.conn.execute(query, (edge.weight(),))
+        self.conn.execute(query, (edge.weight(),edge.id()))
         self.commit()
 
     ##### load functions

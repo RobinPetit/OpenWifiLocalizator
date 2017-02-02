@@ -1,5 +1,5 @@
 from app.general.tkinter_imports import *
-from app.general.functions import purge_plan_name
+from app.general.functions import *
 from app.general.constants import *
 from os.path import splitext, relpath, basename
 from app.widgets.canvas import EditableGraphCanvas
@@ -49,7 +49,7 @@ class App(t.Frame):
         self.file_name = t.filedialog.askopenfilename(initialdir=Config.MAPS_PATH,
             filetypes=[('PNG Files', '.png')])
         ext = splitext(self.file_name)[1].lower()[1:]
-        filename = Database.path_to_building_name(self.file_name)
+        filename = path_to_building_name(self.file_name)
         if self.database.exists_plan(filename):
             self.plan_exists_in_db = True
             self.load_plan(filename)
@@ -208,5 +208,5 @@ class App(t.Frame):
         return plan_data
 
     def save_to_sql(self):
-        self.database.update_plan(self.canvas.get_bg_coord(), Database.path_to_building_name(self.file_name))
+        self.database.update_plan(self.canvas.get_bg_coord(), path_to_building_name(self.file_name))
 
