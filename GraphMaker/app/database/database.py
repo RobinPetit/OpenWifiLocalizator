@@ -112,17 +112,35 @@ class Database:
             SET BgCoordX=?, BgCoordY=?
             WHERE Name=?
         """
-    UPDATE_NODE_QUERY = \
+    UPDATE_NODE_POSITION_QUERY = \
         """
         UPDATE Node
             SET X=?, Y=?
             WHERE id=?
         """
+    #UPDATE_
     UPDATE_EDGE_QUERY = \
         """
         UPDATE Edge
             SET Weight=?
             WHERE id=?
+        """
+        
+    ########## DELETE
+    
+    REMOVE_ALIAS_FROM_NODE = \
+        """
+        DELETE FROM AliasesLink
+            WHERE AliasId=(
+                SELECT Id
+                    FROM Aliases
+                    WHERE Name=?)
+                AND NodeId=?
+        """
+    REMOVE_ACCESS_POINTS_OF_NODE_QUERY = \
+        """
+        DELETE FROM Wifi
+            WHERE NodeId=?
         """
     
     ########## MISC
@@ -210,24 +228,20 @@ class Database:
             plan_name,
             *Database.center_of_rectangle(node.coord())))
         node_id = cursor.lastrowid
-        print('node id is: ' + str(node_id))
+        self.add_aliases_to_node(node_id, node.aliases())
+        self.set_node_access_points(node_id, node.access_points())
+        self.commit()
+        return node_id
+        
+    def add_aliases_to_node(self, node_id, aliases):
+        """add the given aliases to the given node"""
         query = Database.LINK_NODE_TO_ALIAS
-        for alias in node.aliases():
+        for alias in aliases:
             if not alias in self.all_aliases:
                 self.all_aliases.append(alias)
                 self.add_alias(alias)
             self.conn.execute(query, (node_id, alias))
-        query = Database.INSERT_ACCESS_POINT_QUERY
-        for ap in node.access_points():
-            self.conn.execute(query, (
-                ap.get_bss(),
-                node_id,
-                -ap.get_min(),
-                -ap.get_max(),
-                -ap.avg(),
-                ap.get_variance()))
         self.commit()
-        return node_id
         
     def add_alias(self, alias):
         """add a brand new alias into the database alias list"""
@@ -235,11 +249,34 @@ class Database:
         self.conn.execute(query, (alias,))
         self.commit()
         
-    def update_node(self, node):
+    def update_node_position(self, node):
         """changes the coordinate of a node"""
-        query = Database.UPDATE_NODE_QUERY
+        query = Database.UPDATE_NODE_POSITION_QUERY
         self.conn.execute(query, (*node.coord(), node.id()))
         self.commit()
+        
+    def update_node_aliases(self, node, removed, added):
+        """updates aliases of a node"""
+        assert type(removed) is type(added) is set
+        for alias in removed:
+            query = Database.REMOVE_ALIAS_FROM_NODE
+            self.conn.execute(query, (alias, node.id(),))
+            # @TODO Maybe: remove alias if no node is linked to it
+        self.add_aliases_to_node(node.id(), added)
+        
+    def set_node_acess_points(self, node, access_points):
+        """set (replaces if exists) the access points linked to a given node"""
+        self.remove_access_points_from_node(node.id())
+        query = Database.INSERT_ACCESS_POINT_QUERY
+        for ap in access_points:
+            self.conn.execute(query, (
+                ap.get_bss(),
+                node_id,
+                -ap.get_min(),
+                -ap.get_max(),
+                -ap.avg(),
+                ap.get_variance())
+            )
         
     def save_edge(self, edge):
         """register a new edge
@@ -294,9 +331,7 @@ class Database:
         """returns True if node has scanned wifis"""
         query = Database.CHECK_IF_NODE_HAS_ACCESS_POINTS_QUERY
         cursor = self.conn.execute(query, (node_id,))
-        _ = cursor.fetchone()[0]
-        print(_, 'aps')
-        return _ > 0
+        return cursor.fetchone()[0] > 0
     
     def load_aliases_of_node(self, node_id):
         """returns a list sof aliases for a given node"""
@@ -308,5 +343,13 @@ class Database:
         edges from/to and weight is the weight of the edge"""
         query = Database.LOAD_EDGES_FROM_BUILDING_QUERY
         return self.conn.execute(query, (plan_name,)).fetchall()
+        
+    ##### remove functions
+    
+    def remove_access_points_from_node(self, node_id):
+        """removes all the access points linked to a node"""
+        query = Database.REMOVE_ACCESS_POINTS_OF_NODE_QUERY
+        self.conn.execute(query, (node_id,))
+        self.commit()
 
 

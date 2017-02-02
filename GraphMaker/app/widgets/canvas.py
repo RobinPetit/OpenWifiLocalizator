@@ -482,6 +482,7 @@ class EditableGraphCanvas(GraphCanvas):
     def handle_right_release(self, ev):
         if self.right_moved:
             self.nodes()[self.selected_node].coord(self.coords(self.selected_node))
+            self.master.database.update_node_position(self.nodes()[self.selected_node])
             for edge in self.moving_edges_edit_idx:
                 print('fixing edge {}'.format(edge))
                 self.edges()[edge].coord(self.coords(edge))
@@ -491,15 +492,25 @@ class EditableGraphCanvas(GraphCanvas):
         if selected is None:
             return
         if selected in self.nodes():
-            access_points, aliases = self.configure_node(self.nodes()[selected].id(), self.nodes()[selected].aliases())
-            aliases = list(set(aliases))
+            access_points, aliaseses = self.configure_node(self.nodes()[selected].id(), self.nodes()[selected].aliases())
+            # update aliases
+            set_new_aliases = set(aliases)
+            set_old_aliases = set(self.nodes()[selected].aliases())
+            removed_aliases = set_old_aliases - set_new_aliases
+            new_aliases = set_new_alias - set_old_alias
+            assert removed_alias & new_aliases == set_new_aliases ^ set_old_aliases
+            self.master.database.update_node_aliases(self.nodes()[selected], removed_aliases, new_aliases)
+            aliases = list(set_new_aliases)
             self.nodes()[selected].aliases(aliases)
+            # update access points
             if access_points is not None:
                 self.nodes()[selected].access_points(access_points)
+                self.maser.database.set_node_access_points(self.nodes()[selected], access_points)
                 self.color = 'green'
                 self.itemconfig(selected, fill='green')
         elif selected in self.edges():
             self.edges()[selected].weight(self.configure_edge(self.edges()[selected].weight()))
+            self.master.database.update_edge(self.edges()[selected])
         else:
             print('\t\tERROR')
         self.right_clicked = self.right_moved = False
