@@ -45,6 +45,9 @@ CREATE TABLE "Building" (
 	`RelativeAngle`	REAL DEFAULT 0.0
 );
 
+INSERT INTO Building(CampusId, Name, Ppm, ImagePath, XOnParent, XOnParent) VALUES (0, 'Plaine', 2.78, NULL, NULL, NULL);
+INSERT INTO Building(CampusId, Name, Ppm, ImagePath, XOnParent, XOnParent) VALUES (0, 'Solbosch', 2.97, NULL, NULL, NULL);
+
 CREATE TABLE `AliasesLink` (
 	`NodeId`	INTEGER,
 	`AliasId`	INTEGER

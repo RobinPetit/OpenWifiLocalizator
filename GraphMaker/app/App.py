@@ -4,6 +4,7 @@ from app.general.constants import *
 from os.path import splitext, relpath, basename
 from app.widgets.canvas import EditableGraphCanvas
 from app.Config import Config
+from app.database.database import Database
 # std
 import sqlite3
 
@@ -15,17 +16,14 @@ import sqlite3
         + left click on the image + move to move the background
 '''
 class App(t.Frame):
+    database = None
     ALPHA_INITIAL_VALUE = 128
     SAVE_AS_XML = False
-    INSERT_PLAN_QUERY = \
-        """
-        INSERT INTO Building(CampusId, Name, Ppm, ImagePath, XOnParent, YOnParent, BgCoordX, BgCoordY, RelativeAngle)
-            VALUES ({0}, '{1}', {2}, '{3}', {4}, {5}, {6}, {7}, {8})
-        """
 
     def __init__(self, master, **options):
         super().__init__(master)
         self.options = options
+        App.database = Database()
         self.plan_exists_in_db = False
 
         self.master = master
@@ -35,6 +33,7 @@ class App(t.Frame):
     def on_exit(self):
         if mbox.askquestion('Quit', 'Do you want to save before leaving?') == 'yes':
             self.save()
+        self.database.close()
 
     def create_widgets(self, **options):
         self.canvas = EditableGraphCanvas(self, width=options['c_width'], height=options['c_height'])
@@ -50,17 +49,16 @@ class App(t.Frame):
         self.file_name = t.filedialog.askopenfilename(initialdir=Config.MAPS_PATH,
             filetypes=[('PNG Files', '.png')])
         ext = splitext(self.file_name)[1].lower()[1:]
-        filename, bidon = splitext(basename(self.file_name))
+        filename = Database.path_to_building_name(self.file_name)  #splitext(basename(self.file_name))[0]
         # @TODO Only load image files and when opening check whether file already exists in database or not.
         # If it doesn't, then set self.plan_exists_in_db to True
-        conn = sqlite3.connect(Config.DB_PATH)
-        cursor = conn.execute("SELECT Id FROM Building WHERE Name='{0}'".format(filename))
-        n = len(cursor.fetchall())
-        conn.close()
-        if (n): # == 0 Check that there is at least one answer
+        if App.database.exists_plan(filename): # == 0 Check that there is at least one answer
+            print('ALREADY EXISTS')
             self.plan_exists_in_db = True
-            self.canvas.load_sql(filename)
-        else :
+            self.load_plan(filename)
+            #self.canvas.load_sql(filename)
+        else:
+            print('IS CREATED')
             new_plan_data = self.ask_new_plan_data()
             if None not in new_plan_data:
                 self.canvas.set_pixels_per_metre(new_plan_data.ppm)
@@ -68,8 +66,18 @@ class App(t.Frame):
                 self.canvas.set_position_on_parent([new_plan_data.x, new_plan_data.y])
                 self.background_file_name = self.file_name
                 self.canvas.set_bg_image(App.ALPHA_INITIAL_VALUE, self.background_file_name)
+                App.database.save_plan(filename, new_plan_data)
             else:
                 self.destroy()
+
+    def load_plan(self, filename):
+        plan = App.database.load_plan(filename)
+        self.canvas.set_pixels_per_metre(plan.ppm)
+        self.canvas.set_angle_with_parent(plan.angle)
+        self.canvas.set_position_on_parent(plan.on_parent)
+        self.background_file_name = self.file_name
+        self.canvas.set_bg_image(App.ALPHA_INITIAL_VALUE, self.background_file_name)
+        self.canvas.set_bg_coord(plan.bg_coord)
 
     class NewPlanData:
         def __init__(self, ppm, angle, pos):
@@ -115,7 +123,7 @@ class App(t.Frame):
         toplevel.bind('<Return>', lambda _: toplevel.destroy())
         toplevel.wait_window()
         try:
-            ppm = int(nb_pixels.get())
+            ppm = float(nb_pixels.get())
             angle = float(angle.get())
             x = int(x_on_parent.get())
             y = int(y_on_parent.get())
@@ -197,7 +205,7 @@ class App(t.Frame):
     def sql(self):
         # @Added
         queries = []
-        if not self.plan_exists_in_db:
+        '''if not self.plan_exists_in_db:
             plan_name_data = self.parse_plan_name()
             x_parent, y_parent = self.canvas.get_position_on_parent()
             x_bg, y_bg = self.canvas.image_coord()
@@ -212,7 +220,7 @@ class App(t.Frame):
                 y_bg,
                 self.canvas.get_angle_with_parent()
             )
-            queries.append(query)
+            queries.append(query)'''
         building_id = "(SELECT id FROM Building WHERE Name='{}')".format(plan_name_data.name)
         for node_id in self.canvas.nodes():
             queries.extend(self.canvas.nodes()[node_id].sql(building_id))
@@ -223,11 +231,11 @@ class App(t.Frame):
         return queries
 
     def save_to_sql(self):
-        # @Added
-        queries = self.sql()
+        App.database.update_plan(self.canvas.get_bg_coord(), Database.path_to_building_name(self.file_name))
+        '''queries = self.sql()
         for query in queries:
-            print(query)
-        #return
+            print(query)'''
+        return
         conn = sqlite3.connect(Config.DB_PATH)
         for query in queries:
             conn.execute(query)

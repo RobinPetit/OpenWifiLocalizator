@@ -99,7 +99,7 @@ class GraphCanvas(t.Canvas):
             self.itemconfig(self.cv_image_id, image=self.bg_image)
 
     def set_pixels_per_metre(self, px_p_m):
-        assert isinstance(px_p_m, int)
+        assert isinstance(px_p_m, (int, float))
         self.px_p_m = px_p_m
 
     def set_angle_with_parent(self, angle):
@@ -107,7 +107,7 @@ class GraphCanvas(t.Canvas):
         self.parent_angle = angle
 
     def set_position_on_parent(self, c):
-        assert isinstance(c, list) and len(list(filter(lambda e: isinstance(e, int), c))) == len(c)
+        assert isinstance(c, (list, tuple)) and len(list(filter(lambda e: isinstance(e, (int, float)), c))) == len(c)
         self.pos_on_parent = c
 
     # data getters
@@ -138,6 +138,9 @@ class GraphCanvas(t.Canvas):
 
     def get_position_on_parent(self):
         return self.pos_on_parent
+
+    def get_bg_coord(self):
+        return self.cv_image_coord
 
     # events
 
@@ -175,7 +178,7 @@ class GraphCanvas(t.Canvas):
     def load_xml(self, path):
         xml_tree = ElementTree.parse(path)
         root = xml_tree.getroot()
-        self.set_pixels_per_metre(int(root.find('distance_unit').get('value')))
+        self.set_pixels_per_metre(float(root.find('distance_unit').get('value')))
         bg_image = root.find('background_image')
         self.background_file_name = Config.MAPS_PATH + str(root.get('name')) + '.png'
         self.set_bg_image(App.App.ALPHA_INITIAL_VALUE, self.background_file_name)

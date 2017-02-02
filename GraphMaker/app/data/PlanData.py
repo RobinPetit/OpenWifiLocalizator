@@ -1,11 +1,6 @@
 from app.general.constants import *
 
 class Node:
-    INSERT_NODE_QUERY = \
-        """
-        INSERT INTO Node(buildingId, X, Y)
-            VALUES({0}, {1}, {2})
-        """
     INSERT_ALIAS_QUERY = \
         """
         INSERT INTO Aliases(NodeId, Name)
@@ -125,14 +120,15 @@ class ExternalEdge(Edge):
         return (TAB*(nb_tab)) + '<edge beg="{}" end="{}" weight="{}" plan="{}" />' \
                                 .format(*self.extremity_ids, self.weight(), self.plan)
 
-    def sql(self, building_id):
+    # Not necesary to override
+    """def sql(self, building_id):
         query = ExternalEdge.INSERT_EXT_EDGE_QUERY.format(
             #building_id,
             *self.extremity_ids,
             #"(SELECT id FROM Building WHERE name='{}')".format(self.plan),  # TODO check if self.plan contains really the name TODO check if necessary
             self.weight()
         )
-        return query
+        return query"""
 
 class PlanData:
     def __init__(self):
@@ -148,8 +144,7 @@ class PlanData:
         self.internal_edges[edge_id] = edge
 
     def add_external_edge(self, edge):
-        # internal_node, plan_name, external_node, weight):
-        self.external_edges.append(edge)  #ExternalEdge(weight, [internal_node, external_node], plan_name))
+        self.external_edges.append(edge)
 
     def set_bg_image(self, bg_image):
         self.bg_image = bg_image
