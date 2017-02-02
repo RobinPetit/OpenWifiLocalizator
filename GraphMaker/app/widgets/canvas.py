@@ -8,7 +8,7 @@ from app.general.tkinter_imports import *
 from app.general.constants import *
 from app.data.PlanData import *
 from app.widgets.toplevel import NodeConfigurationToplevel
-from app.network.access_points import StaticAccessPointList
+from app.network.access_points import StaticAccessPointList, AccessPointList
 from app.database.database import Database
 # std
 import sqlite3
@@ -207,7 +207,7 @@ class GraphCanvas(t.Canvas):
             else:
                 access_points = StaticAccessPointList()
                 access_points.fromXml(listWifi)
-            node_id = self.create_oval(*coord, fill='green' if access_points is not None else 'red')
+            node_id = self.create_oval(*coord, fill='green' if type(access_points) is not list else 'red')
             aliases = point.find('aliases')
             if aliases is not None:
                 loaded_aliases = list()
@@ -258,7 +258,7 @@ class GraphCanvas(t.Canvas):
             n = len(listWifi.fetchall())
             conn.close()
             access_points = StaticAccessPointList() if (n) else None
-            node_id = self.create_oval(*coord, fill='green' if access_points is not None else 'red')
+            node_id = self.create_oval(*coord, fill='green' if type(access_points) is not list else 'red')
             conn = sqlite3.connect(Config.DB_PATH)
             aliases = conn.execute("SELECT Name FROM Aliases WHERE NodeID={0}".format(point[0]))
             aliases = aliases.fetchall()
@@ -412,7 +412,7 @@ class EditableGraphCanvas(GraphCanvas):
             access_points, aliases = self.configure_node(self.nodes()[selected].id(), self.nodes()[selected].aliases())
             aliases = list(set(aliases))
             self.nodes()[selected].aliases(aliases)
-            if access_points is not None:
+            if type(access_points) is not list:
                 self.nodes()[selected].access_points(access_points)
                 self.color = 'green'
                 self.itemconfig(selected, fill='green')
@@ -490,7 +490,7 @@ class EditableGraphCanvas(GraphCanvas):
         access_points, aliases = NodeConfigurationToplevel(self, self.background_file_name).configure()
         node_coord = (x-GraphCanvas.NODE_SIZE, y-GraphCanvas.NODE_SIZE,
                       x+GraphCanvas.NODE_SIZE, y+GraphCanvas.NODE_SIZE)
-        node_id = self.create_oval(*node_coord, fill='green' if access_points is not None else 'red')
+        node_id = self.create_oval(*node_coord, fill='green' if type(access_points) is not list else 'red')
         self.add_node(node_id, access_points, aliases)
 
     def create_external_edge(self, internal_node, plan_name, external_node, weight=.0):
