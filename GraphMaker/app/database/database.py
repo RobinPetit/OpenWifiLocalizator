@@ -66,8 +66,8 @@ class Database:
         """
     INSERT_ACCESS_POINT_QUERY = \
         """
-        INSERT INTO Wifi(Bss, NodeId, Min, Max, Avg)
-            VALUES(?, ?, ?, ?, ?)
+        INSERT INTO Wifi(Bss, NodeId, Min, Max, Avg, Variance)
+            VALUES(?, ?, ?, ?, ?, ?)
         """
     INSERT_EDGE_QUERY = \
         """
@@ -147,7 +147,7 @@ class Database:
             self.conn.execute(query, (node_id, alias))
         query = Database.INSERT_ACCESS_POINT_QUERY
         for ap in node.access_points():
-            self.conn.execute(query, (ap.get_bss(), node_id, -ap.get_min(), -ap.get_max(), -ap.avg()))
+            self.conn.execute(query, (ap.get_bss(), node_id, -ap.get_min(), -ap.get_max(), -ap.avg(), ap.get_variance()))
         self.commit()
         return node_id
         

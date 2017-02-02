@@ -5,9 +5,10 @@ from time import sleep
 from app.general.constants import *
 
 class AP:
-    def __init__(self, key):
+    def __init__(self, key, variance=.0):
         self.key = key
         self.values = list()
+        self.variance = variance
 
     def avg (self):
         return sum(self.values)/len(self.values)
@@ -27,6 +28,9 @@ class AP:
         
     def get_max(self):
         return max(self.values)
+        
+    def get_variance(self):
+        return self.variance
 
     def sql(self):
         # @TODO format looks awful
