@@ -75,21 +75,33 @@ class Database:
         SELECT Id, X, Y
             FROM Node
             WHERE BuildingId=(
-                SELECT if
+                SELECT Id
                     FROM Building
                     WHERE Name=?)
         """
-    LOAD_ALL_ALIASES = \
+    LOAD_ALL_ALIASES_QUERY = \
         """
         SELECT Name
             From Aliases;
         """
-    LOAD_ALIASES_FROM_NODE_ID = \
+    LOAD_ALIASES_FROM_NODE_ID_QUERY = \
         """
         SELECT A.Name
             FROM Aliases A
             JOIN AliasesLink L
             WHERE L.NodeId=?
+        """
+    LOAD_EDGES_FROM_BUILDING_QUERY = \
+        """
+        SELECT E.Node1Id, E.Node2Id, E.Weight
+            FROM Edge E
+            JOIN Node N1 on N1.Id=E.Node1Id
+            JOIN Node N2 on N2.Id=E.Node2Id
+            WHERE N1.BuildingId=N2.BuildingId
+                AND N1.BuildingId=(
+                    SELECT Id
+                        FROM Building
+                        WHERE Name=?)
         """
     
     ########## UPDATE
@@ -121,7 +133,7 @@ class Database:
             FROM Building
             WHERE Name=?
         """
-    CHECK_IF_NODE_HAS_ACCESS_POINTS = \
+    CHECK_IF_NODE_HAS_ACCESS_POINTS_QUERY = \
         """
         SELECT COUNT(Id)
             FROM Wifi
@@ -137,8 +149,6 @@ class Database:
         # set to False for big updates and only commit at the end
         self.allowed_to_commit = True
         self.all_aliases = self.get_all_aliases()
-        if Config.DEBUG:
-            print(self.all_aliases)
 
     def close(self, need_to_commit=False):
         """properly closes the connection to the database"""
@@ -148,7 +158,7 @@ class Database:
         
     def get_all_aliases(self):
         """return a list of all aliases currently in the database"""
-        query = Database.LOAD_ALL_ALIASES
+        query = Database.LOAD_ALL_ALIASES_QUERY
         return [r[0] for r in self.conn.execute(query).fetchall()]
 
     ##### static
@@ -196,7 +206,9 @@ class Database:
         returns the id of the fresh node"""
         assert type(node) is Node
         query = Database.INSERT_NODE_QUERY
-        cursor = self.conn.execute(query, (plan_name, *Database.center_of_rectangle(node.coord())))
+        cursor = self.conn.execute(query, (
+            plan_name,
+            *Database.center_of_rectangle(node.coord())))
         node_id = cursor.lastrowid
         print('node id is: ' + str(node_id))
         query = Database.LINK_NODE_TO_ALIAS
@@ -207,7 +219,13 @@ class Database:
             self.conn.execute(query, (node_id, alias))
         query = Database.INSERT_ACCESS_POINT_QUERY
         for ap in node.access_points():
-            self.conn.execute(query, (ap.get_bss(), node_id, -ap.get_min(), -ap.get_max(), -ap.avg(), ap.get_variance()))
+            self.conn.execute(query, (
+                ap.get_bss(),
+                node_id,
+                -ap.get_min(),
+                -ap.get_max(),
+                -ap.avg(),
+                ap.get_variance()))
         self.commit()
         return node_id
         
@@ -261,25 +279,31 @@ class Database:
         nodes_cursor = self.conn.execute(query, (plan_name,))
         for result in nodes_cursor.fetchall():
             node_id = result[0]
-            coords = [result[1]-NODE_SIZE, result[2]-GraphCanvas,
-                      result[1]+NODE_SIZE, result[2]+GraphCanvas]
-            has_ap = self.load_access_points_from_node(node_id)
-            aliases = load_aliases_of_node(node_id)
+            coords = [result[1]-NODE_SIZE, result[2]-NODE_SIZE,
+                      result[1]+NODE_SIZE, result[2]+NODE_SIZE]
+            has_ap = self.node_has_access_point(node_id)
+            aliases = self.load_aliases_of_node(node_id)
             ## create node
             # nb, coords, access_points, aliases
             node = Node(node_id, coords, [], aliases)
             nodes.append((node, has_ap))
+        return nodes
             
     def node_has_access_point(self, node_id):
         """returns True if node has scanned wifis"""
-        query = Database.CHECK_IF_NODE_HAS_ACCESS_POINTS
+        query = Database.CHECK_IF_NODE_HAS_ACCESS_POINTS_QUERY
         cursor = self.conn.execute(query, (node_id,))
         return cursor.fetchone()[0] > 0
     
     def load_aliases_of_node(self, node_id):
         """returns a list sof aliases for a given node"""
-        query = Database.LOAD_ALIASES_FROM_NODE_ID
+        query = Database.LOAD_ALIASES_FROM_NODE_ID_QUERY
         return [r[0] for r in self.conn.execute(query, (node_id,)).fetchall()]
-            
+        
+    def load_edges_from_building(self, plan_name):
+        """returns a list of (id, id, weight) where ids are nodes ids to draw the
+        edges from/to and weight is the weight of the edge"""
+        query = Database.LOAD_EDGES_FROM_BUILDING_QUERY
+        return self.conn.execute(query, (plan_name,)).fetchall()
 
 

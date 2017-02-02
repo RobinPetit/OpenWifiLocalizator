@@ -49,16 +49,12 @@ class App(t.Frame):
         self.file_name = t.filedialog.askopenfilename(initialdir=Config.MAPS_PATH,
             filetypes=[('PNG Files', '.png')])
         ext = splitext(self.file_name)[1].lower()[1:]
-        filename = Database.path_to_building_name(self.file_name)  #splitext(basename(self.file_name))[0]
-        # @TODO Only load image files and when opening check whether file already exists in database or not.
-        # If it doesn't, then set self.plan_exists_in_db to True
-        if self.database.exists_plan(filename): # == 0 Check that there is at least one answer
-            print('ALREADY EXISTS')
+        filename = Database.path_to_building_name(self.file_name)
+        if self.database.exists_plan(filename):
             self.plan_exists_in_db = True
             self.load_plan(filename)
             #self.canvas.load_sql(filename)
         else:
-            print('IS CREATED')
             new_plan_data = self.ask_new_plan_data()
             if None not in new_plan_data:
                 self.canvas.set_pixels_per_metre(new_plan_data.ppm)
@@ -78,6 +74,9 @@ class App(t.Frame):
         self.background_file_name = self.file_name
         self.canvas.set_bg_image(App.ALPHA_INITIAL_VALUE, self.background_file_name)
         self.canvas.set_bg_coord(plan.bg_coord)
+        nodes = self.database.load_nodes_from_building(filename)
+        edges = self.database.load_edges_from_building(filename)
+        #@TODO: use ndoes and edges
 
     class NewPlanData:
         def __init__(self, ppm, angle, pos):
