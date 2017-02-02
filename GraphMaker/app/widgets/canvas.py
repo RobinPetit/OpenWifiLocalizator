@@ -425,7 +425,7 @@ class EditableGraphCanvas(GraphCanvas):
             print('selected node: {} with position {}'.format(self.nodes()[self.selected_node].id(), self.moving_node_original_coords))
         self.moving_edges_edit_idx = dict()
         for edge in self.edges():
-            if str(self.nodes()[self.selected_node].id()) in self.edges()[edge].extremity_ids:
+            if self.nodes()[self.selected_node].id() in self.edges()[edge].extremity_ids:
                 if self.edges()[edge].coord()[0] == self.moving_node_original_coords[0] + NODE_SIZE:
                     self.moving_edges_edit_idx[edge] = [0]
                 elif self.edges()[edge].coord()[2] == self.moving_node_original_coords[0] + NODE_SIZE:
@@ -558,7 +558,7 @@ class EditableGraphCanvas(GraphCanvas):
         beg_coord = [c + NODE_SIZE for c in self.nodes()[n1].coord()[:2]]
         end_coord = [c + NODE_SIZE for c in self.nodes()[n2].coord()[:2]]
         edge_id = self.create_line(*beg_coord, *end_coord, width=EDGE_WIDTH)
-        self.add_edge(weight, edge_id, [n1, n2], save=False)
+        self.add_edge(weight, edge_id, [id1, id2], save=False)
 
     def create_external_edge(self, internal_node, plan_name, external_node, weight=.0):
         self.add_external_edge(weight, [internal_node, external_node], plan_name)

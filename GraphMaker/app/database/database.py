@@ -252,7 +252,7 @@ class Database:
     def update_node_position(self, node):
         """changes the coordinate of a node"""
         query = Database.UPDATE_NODE_POSITION_QUERY
-        self.conn.execute(query, (*node.coord(), node.id()))
+        self.conn.execute(query, (*Database.center_of_rectangle(node.coord()), node.id()))
         self.commit()
         
     def update_node_aliases(self, node, removed, added):
