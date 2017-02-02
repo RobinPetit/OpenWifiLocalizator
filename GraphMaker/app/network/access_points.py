@@ -5,13 +5,19 @@ from time import sleep
 from app.general.constants import *
 
 class AP:
-    def __init__(self, bss, variance=.0):
+    def __init__(self, bss, variance=.0, avg=.0):
         self.key = bss
         self.values = list()
         self.variance = variance
+        self.avg = avg
+
+    def k():
+        return len(self.values)
 
     def avg (self):
-        return sum(self.values)/len(self.values)
+        if (self.avg == .0):
+            self.avg = sum(self.values)/self.k()
+        return self.avg
 
     def add(self, dbm):
         self.values.append(dbm)
@@ -22,14 +28,18 @@ class AP:
 
     def get_bss(self):
         return self.key
-        
+
     def get_min(self):
         return min(self.values)
-        
+
     def get_max(self):
         return max(self.values)
-        
+
     def get_variance(self):
+        if (self.variance == .0):
+            for i in range(self.k()):
+                self.variance += (self.values[i]-self.avg())**2
+            self.variance *= 1/(self.k()-1)
         return self.variance
 
     def sql(self):
