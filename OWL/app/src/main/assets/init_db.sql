@@ -6,7 +6,8 @@ CREATE TABLE "Wifi" (
 	`NodeId`	INTEGER,
 	`Min`	REAL,
 	`Max`	REAL,
-	`Avg`	REAL
+	`Avg`	REAL,
+	`Variance`	REAL
 );
 
 CREATE TABLE "Node" (
