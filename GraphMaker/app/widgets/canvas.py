@@ -39,20 +39,25 @@ class GraphCanvas(t.Canvas):
         for event in callbacks:
             self.bind(event, callbacks[event])
 
-    def add_node(self, node_id, access_points, aliases=tuple()):
-        node = Node(0, self.coords(node_id), access_points, aliases)
+    def add_node(self, node_id, access_points, aliases=tuple(), node_name=0):
+        node = Node(node_name, self.coords(node_id), access_points, aliases)
         self.plan_data.add_node(node_id, node)
-        node.id(self.master.database.save_node(node, Database.path_to_building_name(self.master.file_name)))
+        print('name: ' + str(node_name))
+        if node_name == 0:
+            print('saving node in db')
+            node.id(self.master.database.save_node(node, Database.path_to_building_name(self.master.file_name)))
 
-    def add_edge(self, weight, edge_id, extremities):
+    def add_edge(self, weight, edge_id, extremities, save=True):
         edge = Edge(weight, self.coords(edge_id), extremities)
         self.plan_data.add_edge(edge_id, edge)
-        edge.id(self.master.database.save_edge(edge))
+        if save:
+            edge.id(self.master.database.save_edge(edge))
 
-    def add_external_edge(self, weight, extremities, plan):
+    def add_external_edge(self, weight, extremities, plan, save=False):
         edge = ExternalEdge(weight, extremities, plan)
         self.plan_data.add_external_edge(edge)
-        edge.id(self.master.database.save_edge(edge))
+        if save:
+            edge.id(self.master.database.save_edge(edge))
 
     def refresh(self):
         pass
@@ -491,6 +496,12 @@ class EditableGraphCanvas(GraphCanvas):
                       x+NODE_SIZE, y+NODE_SIZE)
         node_id = self.create_oval(*node_coord, fill='green' if type(access_points) is not list else 'red')
         self.add_node(node_id, access_points, aliases)
+    
+    def create_node_from_db(self, x, y, aliases, has_ap, db_id):
+        node_coord = (x-NODE_SIZE, y-NODE_SIZE,
+                      x+NODE_SIZE, y+NODE_SIZE)
+        node_id = self.create_oval(*node_coord, fill='green' if has_ap else 'red')
+        self.add_node(node_id, [], node_name=db_id)
 
     def create_external_edge(self, internal_node, plan_name, external_node, weight=.0):
         self.add_external_edge(weight, [internal_node, external_node], plan_name)

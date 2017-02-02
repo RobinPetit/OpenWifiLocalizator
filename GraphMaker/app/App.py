@@ -76,7 +76,11 @@ class App(t.Frame):
         self.canvas.set_bg_coord(plan.bg_coord)
         nodes = self.database.load_nodes_from_building(filename)
         edges = self.database.load_edges_from_building(filename)
-        #@TODO: use ndoes and edges
+        self.draw_loaded(nodes, edges)
+        
+    def draw_loaded(self, nodes, edges):
+        for node_id, x, y, aliases, has_ap in nodes:
+            self.canvas.create_node_from_db(x, y, aliases, has_ap, node_id)
 
     class NewPlanData:
         def __init__(self, ppm, angle, pos):

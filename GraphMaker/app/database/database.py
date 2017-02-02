@@ -272,28 +272,31 @@ class Database:
         return BuildingTable(filename, plan[0], tuple(plan[1:3]), tuple(plan[3:5]), plan[5])
 
     def load_nodes_from_building(self, plan_name):
-        """returns a list of tuples (Node, bool) of all the Nodes on the given plan
-        and where the boolean tells whether the node has scanned wifis"""
+        """returns a list of tuples (id, coords, aliases, has_ap) of all the
+        Nodes on the given plan where:
+        + id is the node id
+        + coords are the coordinates of the node
+        + aliases are the aliases of the node
+        + has_ap tells whether node has already been scanned"""
         nodes = list()
         query = Database.LOAD_NODES_FROM_BUILDING_QUERY
         nodes_cursor = self.conn.execute(query, (plan_name,))
         for result in nodes_cursor.fetchall():
             node_id = result[0]
-            coords = [result[1]-NODE_SIZE, result[2]-NODE_SIZE,
-                      result[1]+NODE_SIZE, result[2]+NODE_SIZE]
+            coords = result[1:3]
             has_ap = self.node_has_access_point(node_id)
             aliases = self.load_aliases_of_node(node_id)
             ## create node
-            # nb, coords, access_points, aliases
-            node = Node(node_id, coords, [], aliases)
-            nodes.append((node, has_ap))
+            nodes.append((node_id, *coords, aliases, has_ap))
         return nodes
             
     def node_has_access_point(self, node_id):
         """returns True if node has scanned wifis"""
         query = Database.CHECK_IF_NODE_HAS_ACCESS_POINTS_QUERY
         cursor = self.conn.execute(query, (node_id,))
-        return cursor.fetchone()[0] > 0
+        _ = cursor.fetchone()[0]
+        print(_, 'aps')
+        return _ > 0
     
     def load_aliases_of_node(self, node_id):
         """returns a list sof aliases for a given node"""
