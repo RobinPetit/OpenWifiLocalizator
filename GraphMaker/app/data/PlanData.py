@@ -62,28 +62,32 @@ class Node:
         return queries
 
 class Edge:
-    INSERT_EDGE_QUERY = \
-        """
-        INSERT INTO Edge(Node1Id, Node2Id, Weight)
-            VALUES({0}, {1}, {2})
-        """ # -BuildingId
-
-    def __init__(self, weight, coords, extremity_ids):
+    def __init__(self, weight, coords, extremity_ids, nb=0):
         self.weight_ = weight
         self.coords = coords
         self.extremity_ids = extremity_ids
+        self.nb = nb
 
     def coord(self, c=None):
         if c is None:
             return self.coords
         else:
             self.coords = c
+    
+    def id(self, nb=None):
+        if nb is None:
+            return self.nb
+        else:
+            self.nb = nb
 
     def weight(self, w=None):
         if w is None:
             return self.weight_
         else:
             self.weight_ = w
+            
+    def get_extremity_ids():
+        return self.extremity_ids
 
     def text(self, nb_tab=0):
         return (TAB*nb_tab) + '<edge beg="{}" end="{}" weight="{}" />\n'.format(*self.extremity_ids, self.weight())

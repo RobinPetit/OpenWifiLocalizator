@@ -202,42 +202,6 @@ class App(t.Frame):
         plan_data.name = file_name
         return plan_data
 
-    def sql(self):
-        # @Added
-        queries = []
-        '''if not self.plan_exists_in_db:
-            plan_name_data = self.parse_plan_name()
-            x_parent, y_parent = self.canvas.get_position_on_parent()
-            x_bg, y_bg = self.canvas.image_coord()
-            query = App.INSERT_PLAN_QUERY.format(
-                "(SELECT Id FROM Campus WHERE Abbrev='{}')".format(plan_name_data.campus),
-                plan_name_data.name,
-                self.canvas.get_pixels_per_metre(),
-                Config.MAPS_PATH + plan_name_data.name,
-                x_parent,
-                y_parent,
-                x_bg,
-                y_bg,
-                self.canvas.get_angle_with_parent()
-            )
-            queries.append(query)'''
-        building_id = "(SELECT id FROM Building WHERE Name='{}')".format(plan_name_data.name)
-        for node_id in self.canvas.nodes():
-            queries.extend(self.canvas.nodes()[node_id].sql(building_id))
-        for edge_id in self.canvas.edges():
-            queries.append(self.canvas.edges()[edge_id].sql(building_id))
-        for ext_edge in self.canvas.external_edges():
-            queries.append(ext_edge.sql(building_id))
-        return queries
-
     def save_to_sql(self):
         self.database.update_plan(self.canvas.get_bg_coord(), Database.path_to_building_name(self.file_name))
-        '''queries = self.sql()
-        for query in queries:
-            print(query)'''
-        return
-        conn = sqlite3.connect(Config.DB_PATH)
-        for query in queries:
-            conn.execute(query)
-        conn.commit()
-        conn.close()
+

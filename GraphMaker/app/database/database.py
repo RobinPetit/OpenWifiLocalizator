@@ -1,7 +1,7 @@
 # OWL
 from app.Config import Config
 from app.database.tables import *
-from app.data.PlanData import Node, Edge
+from app.data.PlanData import Node, Edge, ExternalEdge
 # std
 import sqlite3
 from os.path import splitext, basename
@@ -68,6 +68,17 @@ class Database:
         """
         INSERT INTO Wifi(Bss, NodeId, Min, Max, Avg)
             VALUES(?, ?, ?, ?, ?)
+        """
+    INSERT_EDGE_QUERY = \
+        """
+        INSERT INTO Edge(Node1Id, Node2Id, Weight)
+            VALUES(?, ?, ?)
+        """
+    UPDATE_EDGE_QUERY = \
+        """
+        UPDATE Edge
+            SET Weight=?
+            WHERE id=?
         """
 
     def __init__(self, path=Config.DB_PATH):
@@ -136,7 +147,7 @@ class Database:
             self.conn.execute(query, (node_id, alias))
         query = Database.INSERT_ACCESS_POINT_QUERY
         for ap in node.access_points():
-            self.conn.execute(query, (ap.get_bss(), node_id, ap.get_min(), ap.get_max(), ap.avg()))
+            self.conn.execute(query, (ap.get_bss(), node_id, -ap.get_min(), -ap.get_max(), -ap.avg()))
         self.commit()
         return node_id
         
@@ -144,6 +155,21 @@ class Database:
         """changes the coordinate of a node"""
         query = Database.UPDATE_NODE_QUERY
         self.conn.execute(query, (*node.coord(), node.id()))
+        self.commit()
+        
+    def save_edge(self, edge):
+        """register a new edge
+        returns the id of the fresh edge"""
+        assert type(edge) is Edge or type(edge) is ExternalEdge
+        query = Database.INSERT_EDGE_QUERY
+        cursor = self.conn.execute(query, (*edge.get_extremity_ids(), edge.weight()))
+        self.commit()
+        return cursor.lastrowid
+
+    def update_edge(self, edge):
+        """changes the weight of an edge"""
+        query = Database.UPDATE_EDGE_QUERY
+        self.conn.execute(query, (edge.weight(),))
         self.commit()
 
     ##### load functions

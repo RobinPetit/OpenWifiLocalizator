@@ -23,10 +23,10 @@ class AP:
         return self.key
         
     def get_min(self):
-        return -min(self.values)
+        return min(self.values)
         
     def get_max(self):
-        return -max(self.values)
+        return max(self.values)
 
     def sql(self):
         # @TODO format looks awful

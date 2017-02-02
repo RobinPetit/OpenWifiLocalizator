@@ -50,10 +50,12 @@ class GraphCanvas(t.Canvas):
     def add_edge(self, weight, edge_id, extremities):
         edge = Edge(weight, self.coords(edge_id), extremities)
         self.plan_data.add_edge(edge_id, edge)
+        edge.id(self.master.database.save_edge(edge))
 
     def add_external_edge(self, weight, extremities, plan):
         edge = ExternalEdge(weight, extremities, plan)
         self.plan_data.add_external_edge(edge)
+        edge.id(self.master.database.save_edge(edge))
 
     def refresh(self):
         pass
