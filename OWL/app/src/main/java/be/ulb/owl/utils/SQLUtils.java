@@ -58,16 +58,9 @@ public class SQLUtils extends SQLiteOpenHelper {
 
         this._context = context;
 
-        if(android.os.Build.VERSION.SDK_INT >= 17){
-            DB_PATH = context.getApplicationInfo().dataDir + "/databases/";
-//            DB_PATH = "OWL" +File.separator + "databases" + File.separator;
-        } else {
-            DB_PATH = context.getFilesDir().getPath() + context.getPackageName() + "/databases/";
-            Log.i(getClass().getName(), "old :P");
-        }
+        DB_PATH = context.getApplicationInfo().dataDir + "/databases";
 
         new File(DB_PATH).mkdir();
-
         Log.d(getClass().getName(), "DB_Path: " + DB_PATH);
 
         if (!checkdatabase()) {
@@ -78,8 +71,6 @@ public class SQLUtils extends SQLiteOpenHelper {
         Log.d(getClass().getName(), "Open existing database");
         opendatabase();
 
-
-//        _db = SQLiteDatabase.openDatabase(, null, SQLiteDatabase.OPEN_READWRITE);;
     }
 
     ////////////////////////// FUNCTION TO MOVE AND CHECK ASSETS DATABASE //////////////////////////
@@ -311,7 +302,7 @@ public class SQLUtils extends SQLiteOpenHelper {
             distance = getFloat(cursor, BuildingTable.PPM.getCol());
 
         } else {
-            throw new SQLiteException("Il y a plusieurs batiments avec le nom: " + planName);
+            throw new SQLiteException("Multiple building have the same name: " + planName);
         }
 
         cursor.close(); // end of the request
