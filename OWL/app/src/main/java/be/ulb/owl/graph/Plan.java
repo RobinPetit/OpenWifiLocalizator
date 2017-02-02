@@ -37,6 +37,7 @@ public class Plan {
     private float _bgCoordY;
 
     private final String _name;
+    private final Campus _parentPlan;
     private HashSet<String> _allAlias; // Cache
     private ArrayList<Node> _listNode;
     private HashSet<String> _allBssWifi;
@@ -54,6 +55,7 @@ public class Plan {
      *
      * @param name of the plan
      * @param id in the database
+     * @param parentPlan the parent plan reference (campus plan)
      * @param pathImage path to the image
      * @param xOnParent x position on the parent plan
      * @param yOnParent y position on the parent plan
@@ -62,11 +64,12 @@ public class Plan {
      * @param relativeAngle angle that the plan makes on the parent plan
      * @param distance number of pixel for on meter
      */
-    public Plan(String name, int id, String pathImage, float xOnParent, float yOnParent, float bgCoordX,
+    public Plan(String name, int id, Campus parentPlan, String pathImage, float xOnParent, float yOnParent, float bgCoordX,
                 float bgCoordY, float relativeAngle, float distance) {
 
         this._name = name;
 
+        this._parentPlan = parentPlan;
         this._xOnParent = xOnParent;
         this._yOnParent = yOnParent;
         this._bgCoordX = bgCoordX;
@@ -278,8 +281,7 @@ public class Plan {
      * @return The pseudo-absolute y coordinate of the origin of the plan
      */
     public double getAbsoluteX(float x) {
-        Plan root = MainActivity.getRootParentOfPlan(this);
-        double originX = getXOnParent() / root.getPpm();
+        double originX = getXOnParent() / _parentPlan.getPpm();
         return originX + Math.cos(Math.PI/180 * _relativeAngle)*x/getPpm();
     }
 
@@ -289,8 +291,7 @@ public class Plan {
      * @return The pseudo-absolute y coordinate of the origin of the plan
      */
     public double getAbsoluteY(float y) {
-        Plan root = MainActivity.getRootParentOfPlan(this);
-        double originY = getYOnParent() / root.getPpm();
+        double originY = getYOnParent() / _parentPlan.getPpm();
         return originY - Math.sin(Math.PI/180 * _relativeAngle)*y/getPpm();
     }
 

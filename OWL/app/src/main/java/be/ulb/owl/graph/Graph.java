@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
@@ -28,7 +29,8 @@ public class Graph {
 
     MainActivity main = MainActivity.getInstance();
     private static final String IGNOREPLAN = "Example";
-    private static ArrayList<Plan> _allPlan;
+//    private static ArrayList<Plan> _allPlan;
+    private static ArrayList<Campus> _allCampus;
 
     private Scanner _scanner;
 
@@ -36,15 +38,23 @@ public class Graph {
     private int _offset;
     private ArrayList<Node> _demoMotions = new ArrayList<Node>();
 
+    /**
+     * Constructor<br />
+     * Load all campus and plan<br />
+     * <br />
+     * Init scanner
+     */
     public Graph () {
-        _allPlan = new ArrayList<Plan>();
+//        _allPlan = new ArrayList<Plan>();
+        _allCampus = new ArrayList<Campus>();
         loadAllPlan();
+
         if (MainActivity.isDemo()) {
             _offset = 0;
         }
 
-        if(_allPlan.isEmpty()) {
-            Log.w(getClass().getName(), "No plan has been loaded");
+        if(_allCampus.isEmpty()) {
+            Log.w(getClass().getName(), "No campus has been loaded");
         }
 
         _scanner = new Scanner();
@@ -57,8 +67,10 @@ public class Graph {
      */
     public ArrayList<Node> getAllNodes() {
         ArrayList<Node> allNodes = new ArrayList<>();
-        for(Plan plan : _allPlan)
-            allNodes.addAll(plan.getAllNodes());
+        for(Campus campus : _allCampus) {
+            allNodes.addAll(campus.getAllNodes());
+        }
+
         return allNodes;
     }
 
@@ -121,7 +133,8 @@ public class Graph {
 
     public void setPlan () {
         if (0 == _offset) {
-            Plan currentPlan = getPlan("P.F");
+            Campus campus = getCampus("Solbosh");
+            Plan currentPlan = campus.getPlan("P.F");
             _demoMotions.add(currentPlan.getNode(64));
             _demoMotions.add(currentPlan.getNode(63));
             _demoMotions.add(currentPlan.getNode(9));
@@ -167,7 +180,7 @@ public class Graph {
         ArrayList<Plan> res = new ArrayList<Plan>();
         int biggestSetSize = 0;
 
-        for (Plan plan : _allPlan) {
+        for (Plan plan : getAllPlan()) {
             HashSet<String> tmp = plan.getListWifiBSS();
             tmp.retainAll(sensedStr); // set-theoretical and operation
 
@@ -220,7 +233,7 @@ public class Graph {
      * @return the Plan object
      */
     public Plan getPlanByName(String name) {
-        for(Plan plan: _allPlan)
+        for(Plan plan: getAllPlan())
             if(plan.getName().equals(name))
                 return plan;
         return null;
@@ -233,7 +246,9 @@ public class Graph {
      * Load all plan in the default folder
      */
     private static void loadAllPlan() {
-        _allPlan = SQLUtils.loadAllPlan();
+        _allCampus = SQLUtils.loadAllCampus();
+        // TODO get all plan ?
+//        _allPlan = SQLUtils.loadAllPlan();
     }
 
 
@@ -245,7 +260,7 @@ public class Graph {
      */
     public static ArrayList<Node> searchNode(String name) {
         ArrayList<Node> listeNode = new ArrayList<Node>();
-        for(Plan plan : _allPlan) {
+        for(Plan plan : getAllPlan()) {
             listeNode.addAll(plan.searchNode(name));
         }
         return listeNode;
@@ -258,7 +273,7 @@ public class Graph {
      * @return the Node or null if not found
      */
     public static Node getNode(int nodeId) {
-        for(Plan plan : _allPlan) {
+        for(Plan plan : getAllPlan()) {
             Node node = plan.getNode(nodeId);
             if(node != null) {
                 return node;
@@ -268,43 +283,54 @@ public class Graph {
     }
 
 
-    /**
-     * Get a specific plan or <b>create</b> if not exist
-     *
-     * @param name the name of the specific plan
-     * @return The plan (or null if not found)
-     */
-    public static Plan getPlan(String name) {
-        return getPlan(name, true);
+    private static ArrayList<Plan> getAllPlan() {
+        ArrayList<Plan> allPlan = new ArrayList<Plan>();
+        for(Campus campus : _allCampus) {
+            allPlan.addAll(campus.getAllPlans());
+        }
+        return allPlan;
     }
 
 
     /**
-     * Get a specific plan or <b>create</b> if not exist
+     * Get all campus of the graph
      *
-     * @param name the name of the specific plan
-     * @param loadIfNotExist try to load if the plan is not found
-     * @return The plan (or null if not found)
+     * @return all Campus
      */
-    public static Plan getPlan(String name, boolean loadIfNotExist) {
-        Plan resPlan = null;
-        for(Plan plan : _allPlan) {
-            if(plan.isName(name)) {
-                return plan;
+    public static ArrayList<Campus> getAllCampus() {
+        return _allCampus;
+    }
+
+    /**
+     * Get a specific campus or <b>create</b> if not exist
+     *
+     * @param name the name of the specific campus
+     * @return the campus (or null if not found)
+     */
+    public static Campus getCampus(String name) {
+        return getCampus(name, true);
+    }
+
+    /**
+     * Get a specific campus
+     *
+     * @param name of the campus
+     * @param loadIfNotExist True to load if Campus not found
+     * @return Campus or null if not found
+     */
+    public static Campus getCampus(String name, boolean loadIfNotExist) {
+        for(Campus campus : _allCampus) {
+            if(campus.isName(name)) {
+                return campus;
             }
         }
 
-        if(resPlan == null && loadIfNotExist) {
-            try {
-                resPlan = SQLUtils.loadPlan(name);
-                _allPlan.add(resPlan);
-            } catch (SQLiteException exception) {
-                Log.e(Graph.class.getName(), "Can not load the plan: " + name +
-                        " (err: " + exception.getMessage()+")");
-            }
+        Campus resCampus = null;
+        if(loadIfNotExist) {
+            resCampus = SQLUtils.loadCampus(name);
         }
 
-        return resPlan;
+        return resCampus;
     }
 
 
