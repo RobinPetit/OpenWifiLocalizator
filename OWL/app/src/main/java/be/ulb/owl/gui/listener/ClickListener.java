@@ -11,6 +11,7 @@ import java.util.HashSet;
 
 import be.ulb.owl.MainActivity;
 import be.ulb.owl.R;
+import be.ulb.owl.graph.Campus;
 import be.ulb.owl.graph.Graph;
 import be.ulb.owl.graph.Plan;
 
@@ -47,7 +48,16 @@ public class ClickListener implements View.OnClickListener {
      * Switch between the two different global plans
      */
     private void switchPlan() {
-        final String[] items = {"Plaine", "Solbosch", "P.F"}; // TODO Remove test (P.F)
+
+        ArrayList<String> campusName = new ArrayList<String>();
+        for(Campus campus : Graph.getAllCampus()) {
+            campusName.add(campus.getName());
+        }
+
+        /// DEBUG
+        campusName.add("P.F");
+
+        final String[] items = (String[]) campusName.toArray(); // TODO Remove test (P.F)
 
         AlertDialog.Builder builder = new AlertDialog.Builder(main);
         builder.setTitle(R.string.select_map);
@@ -56,7 +66,7 @@ public class ClickListener implements View.OnClickListener {
 
                 String name = items[item];
                 Log.d(getClass().getName(), "Name of the map: " + name);
-                main.setCurrentPlan(Graph.getPlan(name));
+                main.setCurrentPlan(Graph.getCampus(name));
 
             }
         });

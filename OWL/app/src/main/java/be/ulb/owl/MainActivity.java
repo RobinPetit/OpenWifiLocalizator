@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity  {
         _graph.startScanTask();
 
         // Set default plan
-        setCurrentPlan(Graph.getPlan(SOLBOSCH_PLAN));
+        setCurrentPlan(Graph.getCampus(SOLBOSCH_PLAN));
         this.setUpCanvas();
         _drawer = new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor());
 
@@ -146,16 +146,6 @@ public class MainActivity extends AppCompatActivity  {
         } else {
             Log.w(getClass().getName(), "_imageView have no drawable");
         }
-    }
-
-    /**
-     * Returns the campus plan of a given plan
-     *
-     * @param plan The plan to determine the campus of
-     * @return The campus plan containing plan
-     */
-    public static Plan getRootParentOfPlan(Plan plan) {
-        return plan.getName().charAt(0) == 'S' ? Graph.getPlan(SOLBOSCH_PLAN, false) : Graph.getPlan(PLAINE_PLAN, false);
     }
 
     public final Graph getGraph() {
