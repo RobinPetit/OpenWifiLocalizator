@@ -16,13 +16,9 @@ class Database:
         connection.execute replace the values (see documentation fir more information)
     """
     ##### queries definition
-
-    CHECK_IF_PLAN_EXISTS_QUERY = \
-        """
-        SELECT COUNT(*)
-            FROM Building
-            WHERE Name=?
-        """
+    
+    ########## INSERTS
+    
     INSERT_PLAN_QUERY = \
         """
         INSERT INTO Building(CampusId, Name, Ppm, ImagePath, XOnParent, YOnParent, BgCoordX, BgCoordY, RelativeAngle)
@@ -32,18 +28,6 @@ class Database:
                     WHERE CampusId=0 AND Name LIKE ?),
                 ?, ?, ?, ?, ?, ?, ?, ?)
         """
-    UPDATE_PLAN_QUERY = \
-        """
-        UPDATE Building
-            SET BgCoordX=?, BgCoordY=?
-            WHERE Name=?
-        """
-    LOAD_PLAN_QUERY = \
-        """
-        SELECT Ppm, XOnParent, YOnParent, BgCoordX, BgCoordY, RelativeAngle
-            FROM Building
-            WHERE NAME=?
-        """
     INSERT_NODE_QUERY = \
         """
         INSERT INTO Node(buildingId, X, Y)
@@ -52,12 +36,6 @@ class Database:
                     FROM Building
                     WHERE Name=?),
                 ?, ?)
-        """
-    UPDATE_NODE_QUERY = \
-        """
-        UPDATE Node
-            SET X=?, Y=?
-            WHERE id=?
         """
     INSERT_ALIAS_QUERY = \
         """
@@ -74,12 +52,47 @@ class Database:
         INSERT INTO Edge(Node1Id, Node2Id, Weight)
             VALUES(?, ?, ?)
         """
+    
+    ########## LOAD
+    
+    LOAD_PLAN_QUERY = \
+        """
+        SELECT Ppm, XOnParent, YOnParent, BgCoordX, BgCoordY, RelativeAngle
+            FROM Building
+            WHERE NAME=?
+        """
+    
+    ########## UPDATE
+    
+    UPDATE_PLAN_QUERY = \
+        """
+        UPDATE Building
+            SET BgCoordX=?, BgCoordY=?
+            WHERE Name=?
+        """
+    UPDATE_NODE_QUERY = \
+        """
+        UPDATE Node
+            SET X=?, Y=?
+            WHERE id=?
+        """
     UPDATE_EDGE_QUERY = \
         """
         UPDATE Edge
             SET Weight=?
             WHERE id=?
         """
+    
+    ########## MISC
+
+    CHECK_IF_PLAN_EXISTS_QUERY = \
+        """
+        SELECT COUNT(*)
+            FROM Building
+            WHERE Name=?
+        """
+        
+    ##### Code
 
     def __init__(self, path=Config.DB_PATH):
         """constructor: creates an open connection"""
