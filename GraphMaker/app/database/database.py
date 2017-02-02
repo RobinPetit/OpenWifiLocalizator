@@ -53,6 +53,22 @@ class Database:
                     WHERE Name=?),
                 ?, ?)
         """
+    UPDATE_NODE_QUERY = \
+        """
+        UPDATE Node
+            SET X=?, Y=?
+            WHERE id=?
+        """
+    INSERT_ALIAS_QUERY = \
+        """
+        INSERT INTO Aliases(NodeId, Name)
+            VALUES(?, ?)
+        """
+    INSERT_ACCESS_POINT_QUERY = \
+        """
+        INSERT INTO Wifi(Bss, NodeId, Min, Max, Avg)
+            VALUES(?, ?, ?, ?, ?)
+        """
 
     def __init__(self, path=Config.DB_PATH):
         """constructor: creates an open connection"""
@@ -67,9 +83,15 @@ class Database:
             self.commit()
         self.conn.close()
 
+    ##### static
+
     @staticmethod
     def path_to_building_name(path):
         return splitext(basename(path))[0]
+        
+    @staticmethod
+    def center_of_rectangle(rectangle):
+        return [(rectangle[i]+rectangle[2+i])//2 for i in (0, 1)]
 
     ##### save functions
 
@@ -102,11 +124,27 @@ class Database:
         self.commit()
 
     def save_node(self, node, plan_name):
-        """regiusters a new node"""
+        """registers a new node
+        returns the id of the fresh node"""
         assert type(node) is Node
         query = Database.INSERT_NODE_QUERY
-        self.conn.execute(query, (plan_name, node.coord()))
-
+        cursor = self.conn.execute(query, (plan_name, *Database.center_of_rectangle(node.coord())))
+        node_id = cursor.lastrowid
+        print('node id is: ' + str(node_id))
+        query = Database.INSERT_ALIAS_QUERY
+        for alias in node.aliases():
+            self.conn.execute(query, (node_id, alias))
+        query = Database.INSERT_ACCESS_POINT_QUERY
+        for ap in node.access_points():
+            self.conn.execute(query, (ap.get_bss(), node_id, ap.get_min(), ap.get_max(), ap.avg()))
+        self.commit()
+        return node_id
+        
+    def update_node(self, node):
+        """changes the coordinate of a node"""
+        query = Database.UPDATE_NODE_QUERY
+        self.conn.execute(query, (*node.coord(), node.id()))
+        self.commit()
 
     ##### load functions
 

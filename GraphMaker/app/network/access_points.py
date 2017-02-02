@@ -19,6 +19,15 @@ class AP:
         return '<wifi BSS="{}" max="{:2.1f}" min="{:2.1f}" avg="{:2.1f}" />' \
                .format(self.key, -min(self.values), -max(self.values), -self.avg())
 
+    def get_bss(self):
+        return self.key
+        
+    def get_min(self):
+        return -min(self.values)
+        
+    def get_max(self):
+        return -max(self.values)
+
     def sql(self):
         # @TODO format looks awful
         res = "INSERT INTO Wifi (Bss,NodeId,Min,Max,Avg) VALUES('{0}',{1},{2},{3},{4})"

@@ -14,16 +14,16 @@ import sqlite3
         + right click on a node to edit it
         + left click on a node + move to create an edge
         + left click on the image + move to move the background
+        + right click on a node + move to move the node and the edges related to it
 '''
 class App(t.Frame):
-    database = None
     ALPHA_INITIAL_VALUE = 128
     SAVE_AS_XML = False
 
     def __init__(self, master, **options):
         super().__init__(master)
         self.options = options
-        App.database = Database()
+        self.database = Database()
         self.plan_exists_in_db = False
 
         self.master = master
@@ -52,7 +52,7 @@ class App(t.Frame):
         filename = Database.path_to_building_name(self.file_name)  #splitext(basename(self.file_name))[0]
         # @TODO Only load image files and when opening check whether file already exists in database or not.
         # If it doesn't, then set self.plan_exists_in_db to True
-        if App.database.exists_plan(filename): # == 0 Check that there is at least one answer
+        if self.database.exists_plan(filename): # == 0 Check that there is at least one answer
             print('ALREADY EXISTS')
             self.plan_exists_in_db = True
             self.load_plan(filename)
@@ -66,12 +66,12 @@ class App(t.Frame):
                 self.canvas.set_position_on_parent([new_plan_data.x, new_plan_data.y])
                 self.background_file_name = self.file_name
                 self.canvas.set_bg_image(App.ALPHA_INITIAL_VALUE, self.background_file_name)
-                App.database.save_plan(filename, new_plan_data)
+                self.database.save_plan(filename, new_plan_data)
             else:
                 self.destroy()
 
     def load_plan(self, filename):
-        plan = App.database.load_plan(filename)
+        plan = self.database.load_plan(filename)
         self.canvas.set_pixels_per_metre(plan.ppm)
         self.canvas.set_angle_with_parent(plan.angle)
         self.canvas.set_position_on_parent(plan.on_parent)
@@ -231,7 +231,7 @@ class App(t.Frame):
         return queries
 
     def save_to_sql(self):
-        App.database.update_plan(self.canvas.get_bg_coord(), Database.path_to_building_name(self.file_name))
+        self.database.update_plan(self.canvas.get_bg_coord(), Database.path_to_building_name(self.file_name))
         '''queries = self.sql()
         for query in queries:
             print(query)'''

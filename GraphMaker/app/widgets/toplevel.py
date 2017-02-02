@@ -34,6 +34,7 @@ class NodeConfigurationToplevel(t.Toplevel):
         self.wm_attributes("-topmost", 1)
         self.focus_force()
 
+    #@TODO Use this when improving code
     def init_variables(self):
         # start at -1 so that increment makes it start from 0
         self.row = -1
@@ -125,7 +126,7 @@ class NodeConfigurationToplevel(t.Toplevel):
         if hasattr(self, 'ext_edges'):
             self.configure_external_edges()
         aliases = list(set(self.aliases))
-        return ap, aliases
+        return list() if ap is None else ap, aliases
 
     def configure_external_edges(self):
         current_name = self.node_data.name

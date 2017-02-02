@@ -1,14 +1,15 @@
 # tkinter
 from PIL import Image, ImageTk
 # OWL
+from app import App
+from app.Config import Config
 from app.general.functions import *
 from app.general.tkinter_imports import *
 from app.general.constants import *
 from app.data.PlanData import *
 from app.widgets.toplevel import NodeConfigurationToplevel
-from app import App
-from app.Config import Config
 from app.network.access_points import StaticAccessPointList
+from app.database.database import Database
 # std
 import sqlite3
 from xml.etree import ElementTree
@@ -21,6 +22,7 @@ class GraphCanvas(t.Canvas):
 
     def __init__(self, master, **options):
         super().__init__(master, **options)
+        self.master = master
         self.init_variables()
         self.bind_events()
 
@@ -40,9 +42,10 @@ class GraphCanvas(t.Canvas):
         for event in callbacks:
             self.bind(event, callbacks[event])
 
-    def add_node(self, name, node_id, access_points, aliases=tuple()):
-        node = Node(name, self.coords(node_id), access_points, aliases)
+    def add_node(self, node_id, access_points, aliases=tuple()):
+        node = Node(0, self.coords(node_id), access_points, aliases)
         self.plan_data.add_node(node_id, node)
+        node.id(self.master.database.save_node(node, Database.path_to_building_name(self.master.file_name)))
 
     def add_edge(self, weight, edge_id, extremities):
         edge = Edge(weight, self.coords(edge_id), extremities)
@@ -488,7 +491,7 @@ class EditableGraphCanvas(GraphCanvas):
         node_coord = (x-GraphCanvas.NODE_SIZE, y-GraphCanvas.NODE_SIZE,
                       x+GraphCanvas.NODE_SIZE, y+GraphCanvas.NODE_SIZE)
         node_id = self.create_oval(*node_coord, fill='green' if access_points is not None else 'red')
-        self.add_node(self.get_node_id(), node_id, access_points, aliases)
+        self.add_node(node_id, access_points, aliases)
 
     def create_external_edge(self, internal_node, plan_name, external_node, weight=.0):
         self.add_external_edge(weight, [internal_node, external_node], plan_name)

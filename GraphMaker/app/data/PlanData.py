@@ -1,12 +1,6 @@
 from app.general.constants import *
 
 class Node:
-    INSERT_ALIAS_QUERY = \
-        """
-        INSERT INTO Aliases(NodeId, Name)
-            VALUES({0}, '{1}')
-        """
-
     def __init__(self, nb, coords, access_points, aliases=tuple()):
         self.nb = nb
         self.coords = coords
@@ -20,8 +14,11 @@ class Node:
         else:
             self.coords = c
 
-    def id(self):
-        return self.nb
+    def id(self, nb=None):
+        if nb is None:
+            return self.nb
+        else:
+            self.nb = nb
 
     def access_points(self, ap=None):
         if ap is None:
