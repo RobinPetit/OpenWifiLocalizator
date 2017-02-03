@@ -90,6 +90,7 @@ class Database:
         SELECT A.Name
             FROM Aliases A
             JOIN AliasesLink L
+                ON L.AliasId=A.Id
             WHERE L.NodeId=?
         """
     LOAD_EDGES_FROM_BUILDING_QUERY = \

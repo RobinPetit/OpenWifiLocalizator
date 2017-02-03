@@ -550,7 +550,7 @@ class EditableGraphCanvas(GraphCanvas):
         node_coord = (x-NODE_SIZE, y-NODE_SIZE,
                       x+NODE_SIZE, y+NODE_SIZE)
         node_id = self.create_oval(*node_coord, fill='green' if has_ap else 'red')
-        self.add_node(node_id, [], node_name=db_id)
+        self.add_node(node_id, [], aliases=aliases, node_name=db_id)
         
     def create_edge_from_db(self, nb, id1, id2, weight):
         for n in self.nodes():
