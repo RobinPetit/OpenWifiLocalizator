@@ -397,5 +397,10 @@ public class Plan {
         return distance / _ppm;
     }
 
-
+    static public double euclidianDistance(Node a, Node b) {
+        assert(a.getParentPlan() == b.getParentPlan());
+        double xOffset = a.getX() - b.getX();
+        double yOffset = a.getY() - b.getY();
+        return Math.sqrt(xOffset*xOffset + yOffset*yOffset);
+    }
 }

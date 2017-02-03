@@ -10,8 +10,7 @@ public enum EdgeTable implements SQLTable {
 
     ID("Id"),
     NODE_1_ID("Node1Id"),
-    NODE_2_ID("Node2Id"),
-    WEIGHT("Weight");
+    NODE_2_ID("Node2Id");
 
 
     private static String _NAME = "Edge";

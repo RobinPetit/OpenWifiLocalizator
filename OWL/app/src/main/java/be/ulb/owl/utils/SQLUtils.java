@@ -553,8 +553,7 @@ public class SQLUtils extends SQLiteOpenHelper {
         Cursor cursor = getDatabase().query(EdgeTable.getName(),
                 new String[] {
                     EdgeTable.NODE_1_ID.getCol(),
-                    EdgeTable.NODE_2_ID.getCol(),
-                    EdgeTable.WEIGHT.getCol()
+                    EdgeTable.NODE_2_ID.getCol()
                 },
                 EdgeTable.NODE_1_ID.getCol() + " = ?" +
                 " OR " + EdgeTable.NODE_2_ID.getCol() + " = ?", new String[]{""+nodeID,""+nodeID}, null, null, null);
@@ -565,7 +564,6 @@ public class SQLUtils extends SQLiteOpenHelper {
 
             int idOne;
             int idTwo;
-            int weight;
 
             Node nodeOne;
             Node nodeTwo;
@@ -573,7 +571,6 @@ public class SQLUtils extends SQLiteOpenHelper {
             while(cursor.isAfterLast() == false) {
                 idOne = getInt(cursor, EdgeTable.NODE_1_ID.getCol());
                 idTwo = getInt(cursor, EdgeTable.NODE_2_ID.getCol());
-                weight = getInt(cursor, EdgeTable.WEIGHT.getCol());
 
                 // All the time nodeOne will be the node in param
                 // so if idTwo egals searched node, we switch the two ;)
@@ -597,7 +594,7 @@ public class SQLUtils extends SQLiteOpenHelper {
                 }
 
                 if(nodeTwo != null) { // If found :)
-                    res.add(new Path(nodeOne, nodeTwo, weight));
+                    res.add(new Path(nodeOne, nodeTwo));
                 }
 
                 cursor.moveToNext();
