@@ -1,17 +1,8 @@
+# OWL
 from app.general.constants import *
+from app.general.functions import *
 
 class Node:
-    INSERT_NODE_QUERY = \
-        """
-        INSERT INTO Node(buildingId, X, Y)
-            VALUES({0}, {1}, {2})
-        """
-    INSERT_ALIAS_QUERY = \
-        """
-        INSERT INTO Aliases(NodeId, Name)
-            VALUES({0}, '{1}')
-        """
-
     def __init__(self, nb, coords, access_points, aliases=tuple()):
         self.nb = nb
         self.coords = coords
@@ -25,8 +16,11 @@ class Node:
         else:
             self.coords = c
 
-    def id(self):
-        return self.nb
+    def id(self, nb=None):
+        if nb is None:
+            return self.nb
+        else:
+            self.nb = nb
 
     def access_points(self, ap=None):
         if ap is None:
@@ -40,79 +34,47 @@ class Node:
         else:
             self.aliases_ = list(a)
 
-    def text(self, nb_tab=0):
-        text = (TAB * (nb_tab+1)) + '<coord x="{}" y="{}" />\n'.format(*self.coord())
-        if self.access_points() is not None:
-            text += self.access_points().text(nb_tab+1)
-        if self.aliases() and len(self.aliases()) > 0:
-            text += (TAB*(nb_tab+1)) + '<aliases>\n'
-            for alias in self.aliases():
-                text += (TAB*(nb_tab+2)) + '<alias>{}</alias>\n'.format(alias)
-            text += (TAB*(nb_tab+1)) + '</aliases>\n'
-        return '{0}<node id="{1}">\n{2}{0}</node>\n'.format(TAB*nb_tab, self.id(), text)
-
-    def sql(self, building_id):
-        query = Node.INSERT_NODE_QUERY.format(
-            building_id,
-            *self.coord()
-            #self.id()
-        )
-        queries = [query]
-        for alias in self.aliases():
-            queries.append(Node.INSERT_ALIAS_QUERY.format(
-                self.id(),
-                alias
-            ))
-        if (self.access_points_ is not None):
-            temp = self.access_points_.sql()
-            temp = (temp.format(self.id())).split(";")
-            queries.extend(temp)
-        return queries
-
 class Edge:
-    INSERT_EDGE_QUERY = \
-        """
-        INSERT INTO Edge(Node1Id, Node2Id, Weight)
-            VALUES({0}, {1}, {2})
-        """ # -BuildingId
-
-    def __init__(self, weight, coords, extremity_ids):
-        self.weight_ = weight
+    def __init__(self, coords, extremity_ids, nb=0):
+        self.weight_ = -float('inf')
         self.coords = coords
         self.extremity_ids = extremity_ids
+        self.nb = nb
 
     def coord(self, c=None):
         if c is None:
             return self.coords
         else:
             self.coords = c
+    
+    def id(self, nb=None):
+        if nb is None:
+            return self.nb
+        else:
+            self.nb = nb
 
     def weight(self, w=None):
         if w is None:
             return self.weight_
         else:
             self.weight_ = w
-
-    def text(self, nb_tab=0):
-        return (TAB*nb_tab) + '<edge beg="{}" end="{}" weight="{}" />\n'.format(*self.extremity_ids, self.weight())
-
-    def sql(self, building_id):
-        query = Edge.INSERT_EDGE_QUERY.format(
-            #building_id,
-            *self.extremity_ids,
-            self.weight()
-        )
-        return query
+            
+    def recompute_weight(self, all_nodes):
+        for n in all_nodes:
+            if all_nodes[n].id() == self.get_extremity_ids()[0]:
+                n1 = all_nodes[n]
+            elif all_nodes[n].id() == self.get_extremity_ids()[1]:
+                n2 = all_nodes[n]
+        coord1, coord2 = [center_of_rectangle(n.coord()) for n in (n1, n2)]
+        self.weight(euclidian_distance(coord1, coord2))
+            
+    def get_extremity_ids(self):
+        return self.extremity_ids
 
 class ExternalEdge(Edge):
-    INSERT_EXT_EDGE_QUERY = \
-        """
-        INSERT INTO Edge(Node1Id, Node2Id, Weight)
-            VALUES({0}, {1}, {2})
-        """ # -BuildingId et BuildingId2
 
-    def __init__(self, weight, extremity_ids, plan):
-        super().__init__(weight, [0, 0], extremity_ids)
+    def __init__(self, extremity_ids, plan):
+        super().__init__([0, 0], extremity_ids)
         self.plan = plan
 
     def extremities(self, ext=None):
@@ -120,19 +82,6 @@ class ExternalEdge(Edge):
             self.extremity_ids = ext[:]
         else:
             return self.extremity_ids
-
-    def text(self, nb_tab=0):
-        return (TAB*(nb_tab)) + '<edge beg="{}" end="{}" weight="{}" plan="{}" />' \
-                                .format(*self.extremity_ids, self.weight(), self.plan)
-
-    def sql(self, building_id):
-        query = ExternalEdge.INSERT_EXT_EDGE_QUERY.format(
-            #building_id,
-            *self.extremity_ids,
-            #"(SELECT id FROM Building WHERE name='{}')".format(self.plan),  # TODO check if self.plan contains really the name TODO check if necessary
-            self.weight()
-        )
-        return query
 
 class PlanData:
     def __init__(self):
@@ -148,8 +97,7 @@ class PlanData:
         self.internal_edges[edge_id] = edge
 
     def add_external_edge(self, edge):
-        # internal_node, plan_name, external_node, weight):
-        self.external_edges.append(edge)  #ExternalEdge(weight, [internal_node, external_node], plan_name))
+        self.external_edges.append(edge)
 
     def set_bg_image(self, bg_image):
         self.bg_image = bg_image
