@@ -59,10 +59,10 @@ public class Path {
     }
 
     /**
-     * Get the node on the opostif of the current node
+     * Get the other node of the path
      *
      * @param node the start node
-     * @return the oposit node
+     * @return the opposite node
      */
     public Node getOppositeNodeOf(Node node) {
         // return _nodeOne.equals(node) ? _nodeTwo : _nodeOne;
@@ -88,7 +88,7 @@ public class Path {
 
     /**
      *
-     * @param p
+     * @param p the path to test an intersection with
      * @return The intersection node between this path if one exists
      * @throws IllegalArgumentException
      */

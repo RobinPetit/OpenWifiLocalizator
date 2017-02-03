@@ -210,7 +210,7 @@ public class Plan {
 
 
     /**
-     * Check if a wifi signal (BSS) could be capted in this plan
+     * Check if a wifi signal (BSS) could be sensed in this plan
      *
      * @param bss the plan which must be test
      * @return True if we can capt it
@@ -222,7 +222,7 @@ public class Plan {
 
 
     /**
-     * Get the list of the BSS which could be capted in this plan<br/>
+     * Get the list of the BSS which could be sensed in this plan<br/>
      * <b>/!\</b> in Java list are reference (clone before modification)
      *
      * @return a list of String which contains all BSS
@@ -380,7 +380,7 @@ public class Plan {
 
 
     /**
-     * Get the distance between two node
+     * Get the distance between two nodes
      *
      * @param a first node
      * @param b second node

@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Build;
 import android.util.Log;
 
 import java.io.File;
@@ -45,7 +44,7 @@ public class SQLUtils extends SQLiteOpenHelper {
     private Context _context;
 
 
-    // TODO ajouter la documenter
+    // TODO add documentation
     /**
      * Constructor
      *
@@ -78,23 +77,23 @@ public class SQLUtils extends SQLiteOpenHelper {
     ////////////////////////// FUNCTION TO MOVE AND CHECK ASSETS DATABASE //////////////////////////
 
     /**
-     * Check if database have allready be moved
+     * Check if database has already been copied
      *
-     * @return True if database allready exist
+     * @return True if database already exist
      */
     private boolean checkdatabase() {
-        boolean check_db_exists = false;
+        boolean checkDbExists = false;
 
         try {
             String myPath = DB_PATH + DB_NAME;
             File dbFile = new File(myPath);
-            check_db_exists = dbFile.exists();
+            checkDbExists  = dbFile.exists();
 
         } catch(SQLiteException e) {
             Log.w(getClass().getName(), "Database doesn't exist");
         }
 
-        return check_db_exists;
+        return checkDbExists ;
     }
 
     private void createDataBase() {
@@ -108,7 +107,7 @@ public class SQLUtils extends SQLiteOpenHelper {
     }
 
     /**
-     * Copy the database frome the assets folder to
+     * Copy the database from the assets folder to
      *
      */
     private void copyDataBase() {
@@ -124,20 +123,20 @@ public class SQLUtils extends SQLiteOpenHelper {
         String outfilename = DB_PATH + DB_NAME;
 
         //Open the empty db as the output stream
-        OutputStream myoutput = null;
+        OutputStream myOutput = null;
         try {
-            myoutput = new FileOutputStream(outfilename);
+            myOutput = new FileOutputStream(outfilename);
         } catch (FileNotFoundException e) {
             Log.w(getClass().getName(), "Error not found " + e.getMessage());
         }
 
-        // transfer byte to inputfile to outputfile
+        // transfer byte from inputfile to outputfile
         byte[] buffer = new byte[1024];
         int length;
 
         try {
             while ((length = myinput.read(buffer))>0) {
-                myoutput.write(buffer, 0, length);
+                myOutput.write(buffer, 0, length);
             }
         } catch (IOException e) {
             Log.w(getClass().getName(), "Error copy " + e.getMessage());
@@ -146,8 +145,8 @@ public class SQLUtils extends SQLiteOpenHelper {
         //Close the streams
 
         try {
-            myoutput.flush();
-            myoutput.close();
+            myOutput.flush();
+            myOutput.close();
             myinput.close();
         } catch (IOException e) {
             Log.w(getClass().getName(), "Error close " + e.getMessage());
@@ -160,8 +159,8 @@ public class SQLUtils extends SQLiteOpenHelper {
      */
     public void opendatabase() {
         //Open the database
-        String mypath = DB_PATH + DB_NAME;
-        _db = SQLiteDatabase.openDatabase(mypath, null, SQLiteDatabase.OPEN_READWRITE);
+        String myPath = DB_PATH + DB_NAME;
+        _db = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
     }
 
 
@@ -171,11 +170,12 @@ public class SQLUtils extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        Log.i(getClass().getName(), "The database is allready created (in assets folder)");
+        Log.i(getClass().getName(), "The database is already created (in assets folder)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+        // @detobel36 Quel est le sens de cette phrase ? :/
         Log.i(getClass().getName(), "Database is directly updated when the file bd is override " +
                 "(in assets folder)");
     }
@@ -185,7 +185,7 @@ public class SQLUtils extends SQLiteOpenHelper {
     /////////////////////////////////////////// STATIC ///////////////////////////////////////////
 
     /**
-     * Get the instance of SQLiteDatabase to make request
+     * Get the instance of SQLiteDatabase to send requests to
      *
      * @return the SQLitleDatabse instance
      */
@@ -227,7 +227,7 @@ public class SQLUtils extends SQLiteOpenHelper {
         if(cursor.getCount() > 0) {
             cursor.moveToFirst();
 
-            while(cursor.isAfterLast() == false) {
+            while(!cursor.isAfterLast()) {
 
                 id = getInt(cursor, BuildingTable.ID.getCol());
                 planName = getString(cursor, BuildingTable.NAME.getCol());
@@ -295,9 +295,9 @@ public class SQLUtils extends SQLiteOpenHelper {
 
 
     /**
-     * Load all plan contains in the databse from a specific campus
+     * Load all plan contains in the database from a specific campus
      *
-     * @param campus refrence to the parent campus
+     * @param campus reference to the parent campus
      * @param campusID the id of the parent campus
      * @return an ArrayList with all plan
      */
@@ -330,7 +330,7 @@ public class SQLUtils extends SQLiteOpenHelper {
         if(cursor.getCount() > 0) {
             cursor.moveToFirst();
 
-            while (cursor.isAfterLast() == false) {
+            while (!cursor.isAfterLast()) {
                 planName = getString(cursor, BuildingTable.NAME.getCol());;
                 id = getInt(cursor, BuildingTable.ID.getCol());
                 pathImage = getString(cursor, BuildingTable.IMAGE_PATH.getCol());
@@ -416,8 +416,8 @@ public class SQLUtils extends SQLiteOpenHelper {
      * Load all node of a specific plan
      *
      * @param plan reference to the plan
-     * @param planID numero du plan
-     * @return an arraylist with all node created
+     * @param planID id number du plan
+     * @return an arraylist with all created nodes
      */
     public static ArrayList<Node> loadNodes(Plan plan, int planID) {
         ArrayList<Node> res = new ArrayList<Node>();
@@ -432,7 +432,7 @@ public class SQLUtils extends SQLiteOpenHelper {
         if(cursor.getCount() > 0) {
             cursor.moveToFirst();
 
-            while (cursor.isAfterLast() == false) {
+            while (!cursor.isAfterLast()) {
                 float x = getInt(cursor, NodeTable.X.getCol());
                 float y = getInt(cursor, NodeTable.Y.getCol());
                 int id = getInt(cursor, NodeTable.ID.getCol());
@@ -449,7 +449,7 @@ public class SQLUtils extends SQLiteOpenHelper {
     }
 
     /**
-     * Load all alias of a specific node
+     * Load all aliases of a specific node
      *
      * @param nodeID the id of the node
      * @return ArrayList with all alias
@@ -468,7 +468,7 @@ public class SQLUtils extends SQLiteOpenHelper {
         if(cursor.getCount() > 0) {
             cursor.moveToFirst();
 
-            while(cursor.isAfterLast() == false) {
+            while(!cursor.isAfterLast()) {
                 res.add(getString(cursor, AliasesTable.NAME.getCol()));
 
                 cursor.moveToNext();
@@ -481,7 +481,7 @@ public class SQLUtils extends SQLiteOpenHelper {
 
 
     /**
-     * Load all wifi of a specific node
+     * Load all wifis of a specific node
      *
      * @param nodeID the id of the node
      * @return ArrayList with all wifi
@@ -507,7 +507,7 @@ public class SQLUtils extends SQLiteOpenHelper {
             float avg;
             float variance;
 
-            while (cursor.isAfterLast() == false) {
+            while (!cursor.isAfterLast()) {
                 bss = getString(cursor, WifiTable.BSS.getCol());
                 max = getFloat(cursor, WifiTable.MAX.getCol());
                 min = getFloat(cursor, WifiTable.MIN.getCol());
@@ -526,8 +526,8 @@ public class SQLUtils extends SQLiteOpenHelper {
 
 
     /**
-     * Load all path on a specific node<br />
-     * A path is create only if the two node exist !
+     * Load all paths on a specific node<br />
+     * A path is created only if the two nodes exist !
      *
      * @param nodeID the id of the node
      * @param node which contains the path
@@ -538,8 +538,8 @@ public class SQLUtils extends SQLiteOpenHelper {
     }
 
     /**
-     * Load all paht on a specific node<br />
-     * A path is create only if the two node exist !
+     * Load all paths on a specific node<br />
+     * A path is created only if the two nodes exist !
      *
      * @param nodeID the id of the node
      * @param node which contains the path
@@ -568,16 +568,16 @@ public class SQLUtils extends SQLiteOpenHelper {
             Node nodeOne;
             Node nodeTwo;
 
-            while(cursor.isAfterLast() == false) {
+            while(!cursor.isAfterLast()) {
                 idOne = getInt(cursor, EdgeTable.NODE_1_ID.getCol());
                 idTwo = getInt(cursor, EdgeTable.NODE_2_ID.getCol());
 
                 // All the time nodeOne will be the node in param
-                // so if idTwo egals searched node, we switch the two ;)
+                // so if idTwo equals searched node, we switch the two ;)
                 if(idTwo == nodeID) {
                     idTwo = idOne;
 
-                } else if(idOne != nodeID) { // We check that node one have the good id
+                } else if(idOne != nodeID) { // We check that node one has the good id
                     // If not, create an error !
                     Log.e(SQLUtils.class.getName(), "The SQL response is not valide (Search edge with " +
                             "node: " + nodeID + " and return: " + idOne + " & " + idTwo + ")");
@@ -590,7 +590,7 @@ public class SQLUtils extends SQLiteOpenHelper {
                 // Now we search the second id:
                 nodeTwo = plan.getNode(idTwo);
                 if(nodeTwo == null) { // If not found in the current plan
-                    nodeTwo = Graph.getNode(idTwo); // Search in all plan
+                    nodeTwo = Graph.getNode(idTwo); // Search in all plans
                 }
 
                 if(nodeTwo != null) { // If found :)
