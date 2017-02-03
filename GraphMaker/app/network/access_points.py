@@ -5,18 +5,18 @@ from time import sleep
 from app.general.constants import *
 
 class AP:
-    def __init__(self, bss, variance=.0, avg=.0):
+    def __init__(self, bss, variance=.0, avg=None):
         self.key = bss
         self.values = list()
         self.variance = variance
         self.avg = avg
 
-    def k():
+    def __len__(self):
         return len(self.values)
 
-    def avg (self):
-        if (self.avg == .0):
-            self.avg = sum(self.values)/self.k()
+    def get_avg(self):
+        if self.avg == None:
+            self.avg = sum(self.values)/len(self)
         return self.avg
 
     def add(self, dbm):
@@ -24,7 +24,7 @@ class AP:
 
     def text(self):
         return '<wifi BSS="{}" max="{:2.1f}" min="{:2.1f}" avg="{:2.1f}" />' \
-               .format(self.key, -min(self.values), -max(self.values), -self.avg())
+               .format(self.key, -min(self.values), -max(self.values), -self.get_avg())
 
     def get_bss(self):
         return self.key
@@ -37,18 +37,17 @@ class AP:
 
     def get_variance(self):
         if (self.variance == .0):
-            for i in range(self.k()):
-                self.variance += (self.values[i]-self.avg())**2
-            self.variance *= 1/(self.k()-1)
+            for i in range(len(self)):
+                self.variance += (self.values[i]-self.get_avg())**2
+            self.variance *= 1/(len(self)-1)
         return self.variance
 
     def sql(self):
         # @TODO format looks awful
         res = "INSERT INTO Wifi (Bss,NodeId,Min,Max,Avg) VALUES('{0}',{1},{2},{3},{4})"
-        return res.format(self.key, "{0}", -min(self.values), -max(self.values), -self.avg())
+        return res.format(self.key, "{0}", -min(self.values), -max(self.values), -self.get_avg())
 
 class AccessPointList:
-
     def __init__(self, tmpfile = "temp.txt", iterations = 5, wait = 2, threshold = 1):
         self.threshold = threshold
         self.network = Config.NETWORK_INTERFACE
@@ -68,11 +67,17 @@ class AccessPointList:
         output = ""
         n = len(self.elements)
         for i in range(n):
-            if ((self.elements[i]).k() > self.threshold): # avoid saving irrelevant ap(s) (an ap should, at least, appaers n-times to be considered)
+            if ((len(self.elements[i])) > self.threshold): # avoid saving irrelevant ap(s) (an ap should, at least, appaers n-times to be considered)
                 output += (self.elements[i]).sql()
                 if (i < n-1):
                     output += ";"
         return output
+        
+    def __iter__(self):
+        """iterates over wifis, checking on a threshold to avoir irrelevant access points"""
+        for e in self.elements:
+            if len(e) > self.threshold:
+                yield e
 
     def findAP(self, key):
         for elem in self.elements:

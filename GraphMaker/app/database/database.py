@@ -273,6 +273,9 @@ class Database:
         
     def set_node_access_points(self, node_id, access_points):
         """set (replaces if exists) the access points linked to a given node"""
+        if type(node_id) is Node:
+            node_id = node_id.id()
+        assert type(node_id) is int
         self.remove_access_points_from_node(node_id)
         query = Database.INSERT_ACCESS_POINT_QUERY
         for ap in access_points:
@@ -281,7 +284,7 @@ class Database:
                 node_id,
                 -ap.get_min(),
                 -ap.get_max(),
-                -ap.avg(),
+                -ap.get_avg(),
                 ap.get_variance())
             )
         self.commit()
