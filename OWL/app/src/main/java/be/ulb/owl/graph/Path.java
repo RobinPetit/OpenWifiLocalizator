@@ -23,7 +23,13 @@ public class Path {
      * @param nodeTwo the second node
      */
     public Path(Node nodeOne, Node nodeTwo) {
-        this(nodeOne, nodeTwo, false);
+        this(nodeOne, nodeTwo, -1., false);
+    }
+
+    /* SHOULD ONLY BE USED FOR SPECIAL EDGES
+    * */
+    public Path(Node nodeOne, Node nodeTwo, double distance) {
+        this(nodeOne, nodeTwo, distance, false);
     }
 
     /**
@@ -33,10 +39,10 @@ public class Path {
      * @param nodeTwo the second node
      * @param addPathToNode True to add this path in the PathList of the Node
      */
-    public Path(Node nodeOne, Node nodeTwo, boolean addPathToNode) {
+    public Path(Node nodeOne, Node nodeTwo, double distance, boolean addPathToNode) {
         this._nodeOne = nodeOne;
         this._nodeTwo = nodeTwo;
-        this._distance = Plan.euclidianDistance(nodeOne, nodeTwo);
+        this._distance = distance > 0 ? distance : Plan.euclidianDistance(nodeOne, nodeTwo);
 
         if(addPathToNode) {
             nodeOne.addPath(this);

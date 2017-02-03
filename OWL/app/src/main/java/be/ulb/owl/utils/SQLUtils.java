@@ -26,6 +26,7 @@ import be.ulb.owl.utils.sql.AliasesTable;
 import be.ulb.owl.utils.sql.BuildingTable;
 import be.ulb.owl.utils.sql.EdgeTable;
 import be.ulb.owl.utils.sql.NodeTable;
+import be.ulb.owl.utils.sql.SpecialEdgeTable;
 import be.ulb.owl.utils.sql.WifiTable;
 
 /**
@@ -547,7 +548,6 @@ public class SQLUtils extends SQLiteOpenHelper {
      * @return ArrayList with all path
      */
     public static ArrayList<Path> loadPath(int nodeID, Node node, Plan plan) {
-
         ArrayList<Path> res = new ArrayList<Path>();
 
         Cursor cursor = getDatabase().query(EdgeTable.getName(),
@@ -602,6 +602,56 @@ public class SQLUtils extends SQLiteOpenHelper {
 
         }
 
+        res.addAll(loadSpecialPath(nodeID, node, plan));
+        return res;
+    }
+
+    /**
+     * @link loadPath
+     */
+    private static ArrayList<Path> loadSpecialPath(int nodeID, Node node, Plan plan) {
+        ArrayList<Path> res = new ArrayList<Path>();
+
+        Cursor cursor = getDatabase().query(SpecialEdgeTable.getName(),
+                new String[] {
+                        SpecialEdgeTable.NODE_1_ID.getCol(),
+                        SpecialEdgeTable.NODE_2_ID.getCol(),
+                        SpecialEdgeTable.WEIGHT.getCol()
+                },
+                EdgeTable.NODE_1_ID.getCol() + " = ?" +
+                        " OR " + EdgeTable.NODE_2_ID.getCol() + " = ?", new String[]{""+nodeID,""+nodeID}, null, null, null);
+
+        if(cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            int idOne;
+            int idTwo;
+            double weight;
+            Node nodeOne;
+            Node nodeTwo;
+
+            while(!cursor.isAfterLast()) {
+                idOne = getInt(cursor, SpecialEdgeTable.NODE_1_ID.getCol());
+                idTwo = getInt(cursor, SpecialEdgeTable.NODE_2_ID.getCol());
+                weight = getFloat(cursor, SpecialEdgeTable.WEIGHT.getCol());
+
+                if(idTwo == nodeID)
+                    idTwo = idOne;
+                else if(idOne != nodeID) {
+                    Log.e(SQLUtils.class.getName(), "The SQL response is not valid (Search special edge with " +
+                            "node: " + nodeID + " and return: " + idOne + " & " + idTwo + ")");
+                    cursor.moveToNext();
+                    continue; // next !
+                }
+                nodeOne = node;
+                nodeTwo = plan.getNode(idTwo);
+                if(nodeTwo == null)
+                    nodeTwo = Graph.getNode(idTwo);
+                if(nodeTwo != null)
+                    res.add(new Path(nodeOne, nodeTwo, weight));
+
+                cursor.moveToNext();
+            }
+        }
         return res;
     }
 
