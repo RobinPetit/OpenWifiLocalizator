@@ -36,7 +36,6 @@ class Node:
 
 class Edge:
     def __init__(self, coords, extremity_ids, nb=0):
-        self.weight_ = -float('inf')
         self.coords = coords
         self.extremity_ids = extremity_ids
         self.nb = nb
@@ -52,21 +51,6 @@ class Edge:
             return self.nb
         else:
             self.nb = nb
-
-    def weight(self, w=None):
-        if w is None:
-            return self.weight_
-        else:
-            self.weight_ = w
-            
-    def recompute_weight(self, all_nodes):
-        for n in all_nodes:
-            if all_nodes[n].id() == self.get_extremity_ids()[0]:
-                n1 = all_nodes[n]
-            elif all_nodes[n].id() == self.get_extremity_ids()[1]:
-                n2 = all_nodes[n]
-        coord1, coord2 = [center_of_rectangle(n.coord()) for n in (n1, n2)]
-        self.weight(euclidian_distance(coord1, coord2))
             
     def get_extremity_ids(self):
         return self.extremity_ids

@@ -50,13 +50,12 @@ class GraphCanvas(t.Canvas):
 
     def add_edge(self, edge_id, extremities, nb=0):
         edge = Edge(self.coords(edge_id), extremities, nb=nb)
-        edge.recompute_weight(self.nodes())
         self.plan_data.add_edge(edge_id, edge)
         if nb == 0:
             edge.id(self.database.save_edge(edge))
 
-    def add_external_edge(self, weight, extremities, plan, save=False):
-        edge = ExternalEdge(weight, extremities, plan)
+    def add_external_edge(self, extremities, plan, save=False):
+        edge = ExternalEdge(extremities, plan)
         self.plan_data.add_external_edge(edge)
         if save:
             edge.id(self.database.save_edge(edge))
@@ -387,7 +386,6 @@ class EditableGraphCanvas(GraphCanvas):
                 if end is not None:
                     node_coord = self.nodes()[end].coord()
                     final_point = [node_coord[i]+NODE_SIZE for i in range(2)]
-                    weight = euclidian_distance(self.initial_click_coord, final_point)
                     edge_id = self.create_line(*self.initial_click_coord,
                         self.nodes()[end].coord()[0]+NODE_SIZE, self.nodes()[end].coord()[1]+NODE_SIZE,
                             width=2.5)
@@ -410,7 +408,6 @@ class EditableGraphCanvas(GraphCanvas):
             self.database.update_node_position(self.nodes()[self.selected_node])
             for edge in self.moving_edges_edit_idx:
                 self.edges()[edge].coord(self.coords(edge))
-                self.edges()[edge].recompute_weight(self.nodes())
             return
         selected = self.get_selected_el(ev.x, ev.y)
         if selected is None:
@@ -452,5 +449,5 @@ class EditableGraphCanvas(GraphCanvas):
         node_id = self.create_oval(*node_coord, fill='green' if type(access_points) is not list else 'red')
         self.add_node(node_id, access_points, aliases)
 
-    def create_external_edge(self, internal_node, plan_name, external_node, weight=.0):
-        self.add_external_edge(weight, [internal_node, external_node], plan_name)
+    def create_external_edge(self, internal_node, plan_name, external_node):
+        self.add_external_edge([internal_node, external_node], plan_name)
