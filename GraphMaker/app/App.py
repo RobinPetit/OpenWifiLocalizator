@@ -30,6 +30,7 @@ class App(t.Frame):
         self.create_widgets(**options)
 
     def on_exit(self):
+        self.save()
         self.database.close()
 
     def create_widgets(self, **options):
@@ -137,6 +138,7 @@ class App(t.Frame):
 
     def save(self):
         self.database.update_plan(self.canvas.get_bg_coord(), path_to_building_name(self.file_name))
+        self.canvas.update_nodes_position()
 
     class PlanNameData:
         def _init__(self):

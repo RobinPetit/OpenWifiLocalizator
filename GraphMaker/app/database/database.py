@@ -141,7 +141,6 @@ class Database:
             SET X=?, Y=?
             WHERE Id=?
         """
-    #UPDATE_
         
     ########## DELETE
     

@@ -185,6 +185,7 @@ class GraphCanvas(t.Canvas):
     def load_plan(self, background_file_name):
         filename = path_to_building_name(background_file_name)
         plan = self.database.load_plan(filename)
+        print(plan.bg_coord)
         self.set_pixels_per_metre(plan.ppm)
         self.set_angle_with_parent(plan.angle)
         self.set_position_on_parent(plan.on_parent)
@@ -211,6 +212,10 @@ class GraphCanvas(t.Canvas):
         end_coord = [c + NODE_SIZE for c in self.nodes()[n2].coord()[:2]]
         edge_id = self.create_line(*beg_coord, *end_coord, width=EDGE_WIDTH)
         self.add_edge(edge_id, [id1, id2], nb=nb)
+        
+    def update_nodes_position(self):
+        for node in self.nodes():
+            self.database.update_node_position(self.nodes()[node])
 
 class SelectableGraphCanvas(GraphCanvas):
     def __init__(self, master, database, **options):
@@ -329,6 +334,7 @@ class EditableGraphCanvas(GraphCanvas):
             for edge_id in self.edges():
                 if self.nodes()[selected].id() in self.edges()[edge_id].get_extremity_ids():
                     self.delete(edge_id)
+                    del self.edges()[edge_id]
             del self.nodes()[selected]
         elif selected in self.edges():
             self.delete(selected)
@@ -381,12 +387,7 @@ class EditableGraphCanvas(GraphCanvas):
                 if end is not None:
                     node_coord = self.nodes()[end].coord()
                     final_point = [node_coord[i]+NODE_SIZE for i in range(2)]
-                    distance = euclidian_distance(self.initial_click_coord, final_point)
-                    try:
-                        weight = self.configure_edge(distance)
-                    except Exception as e:
-                        print(e)
-                        return
+                    weight = euclidian_distance(self.initial_click_coord, final_point)
                     edge_id = self.create_line(*self.initial_click_coord,
                         self.nodes()[end].coord()[0]+NODE_SIZE, self.nodes()[end].coord()[1]+NODE_SIZE,
                             width=2.5)
@@ -410,7 +411,6 @@ class EditableGraphCanvas(GraphCanvas):
             for edge in self.moving_edges_edit_idx:
                 self.edges()[edge].coord(self.coords(edge))
                 self.edges()[edge].recompute_weight(self.nodes())
-                self.database.update_edge(self.edges()[edge])
             return
         selected = self.get_selected_el(ev.x, ev.y)
         if selected is None:
@@ -446,16 +446,6 @@ class EditableGraphCanvas(GraphCanvas):
     def remove_ext_edge(self):
         del self.ext_edges[self.ext_edges_lb.curselection()]
         self.ext_edges_lb.delete(t.ANCHOR)
-
-    def configure_edge(self, current_weight=''):
-        toplevel = t.Toplevel(self)
-        t.Label(toplevel, text='Edge Weight').grid(row=0, column=0)
-        value = t.StringVar()
-        value.set('{:.2f}'.format(current_weight))
-        t.Entry(toplevel, textvariable=value).grid(row=0, column=1)
-        t.Button(toplevel, text='Ok', command=toplevel.destroy).grid(row=1)
-        toplevel.wait_window()
-        return float(value.get())
 
     def create_node(self, x, y):
         access_points, aliases = NodeConfigurationToplevel(self, self.background_file_name, self.database).configure()
