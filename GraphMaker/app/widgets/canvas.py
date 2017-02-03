@@ -408,14 +408,11 @@ class EditableGraphCanvas(GraphCanvas):
             self.nodes()[self.selected_node].coord(self.coords(self.selected_node))
             self.database.update_node_position(self.nodes()[self.selected_node])
             for edge in self.moving_edges_edit_idx:
-                print('fixing edge {}'.format(edge))
                 self.edges()[edge].coord(self.coords(edge))
                 self.edges()[edge].recompute_weight(self.nodes())
-                print('new weight:', self.edges()[edge].weight())
                 self.database.update_edge(self.edges()[edge])
             return
         selected = self.get_selected_el(ev.x, ev.y)
-        print(ev.x, ev.y, selected)
         if selected is None:
             return
         if selected in self.nodes():
@@ -435,9 +432,6 @@ class EditableGraphCanvas(GraphCanvas):
                 self.database.set_node_access_points(self.nodes()[selected], access_points)
                 self.color = 'green'
                 self.itemconfig(selected, fill='green')
-        elif selected in self.edges():
-            self.edges()[selected].weight(self.configure_edge(self.edges()[selected].weight()))
-            self.database.update_edge(self.edges()[selected])
         else:
             print('\t\tERROR')
         self.right_clicked = self.right_moved = False
