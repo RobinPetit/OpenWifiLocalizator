@@ -13,7 +13,8 @@ public enum WifiTable implements SQLTable {
     NODE_ID("NodeId"),
     MIN("Min"),
     MAX("Max"),
-    AVG("Avg");
+    AVG("Avg"),
+    VARIANCE("Variance");
 
 
     private static String _NAME = "Wifi";

@@ -103,12 +103,11 @@ public class Plan {
 
 
     /**
-     * Create a plan <b>and</b> load XML file from this plan
+     * Get the node with a minimal difference between its avg dbm and the avg dbm of th sensed wifi
      *
      * @param wifis list of sensed wifis
      * @param nodes list of potential nearest nodes
-     * @return The node with a minimal diffrence between its avg dbm and the avg
-     * dbm of the sensed wifi
+     * @return the good node
      */
     private Node collisionManager(ArrayList<Wifi> wifis, ArrayList<Node> nodes) {
         ArrayList<String> wifisStr = new ArrayList<String>();
