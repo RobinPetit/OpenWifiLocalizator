@@ -35,7 +35,7 @@ class AP:
         if (self.variance == .0):
             for i in range(len(self)):
                 self.variance += (self.values[i]-self.get_avg())**2
-            self.variance *= 1/(len(self)-1)
+            self.variance /= (len(self)-1)
         return self.variance
 
 class AccessPointList:

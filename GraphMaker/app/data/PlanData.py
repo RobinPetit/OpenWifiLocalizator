@@ -61,9 +61,9 @@ class Edge:
             
     def recompute_weight(self, all_nodes):
         for n in all_nodes:
-            if all_nodes[n].id() == self.extremity_ids[0]:
+            if all_nodes[n].id() == self.get_extremity_ids()[0]:
                 n1 = all_nodes[n]
-            elif all_nodes[n].id() == self.extremity_ids[1]:
+            elif all_nodes[n].id() == self.get_extremity_ids()[1]:
                 n2 = all_nodes[n]
         coord1, coord2 = [center_of_rectangle(n.coord()) for n in (n1, n2)]
         self.weight(euclidian_distance(coord1, coord2))
@@ -72,11 +72,6 @@ class Edge:
         return self.extremity_ids
 
 class ExternalEdge(Edge):
-    INSERT_EXT_EDGE_QUERY = \
-        """
-        INSERT INTO Edge(Node1Id, Node2Id, Weight)
-            VALUES({0}, {1}, {2})
-        """ # -BuildingId et BuildingId2
 
     def __init__(self, weight, extremity_ids, plan):
         super().__init__(weight, [0, 0], extremity_ids)

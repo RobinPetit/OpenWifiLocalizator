@@ -310,8 +310,8 @@ class EditableGraphCanvas(GraphCanvas):
         if self.left_src is not None:
             self.initial_click_coord = [self.nodes()[self.left_src].coord()[0]+NODE_SIZE,
                                         self.nodes()[self.left_src].coord()[1]+NODE_SIZE]
-            _ = self.initial_click_coord + self.initial_click_coord
-            self.tmp_line_id = self.create_line(*_, width=EDGE_WIDTH)
+            coords = self.initial_click_coord + self.initial_click_coord
+            self.tmp_line_id = self.create_line(*coords, width=EDGE_WIDTH)
         else:
             self.click_coord = [ev.x, ev.y]
         self.left_click_time = time()
@@ -324,12 +324,15 @@ class EditableGraphCanvas(GraphCanvas):
             node_center = self.nodes()[selected].coord()[:2]
             node_center = [c+NODE_SIZE for c in node_center]
             self.delete(selected)
+            # remove node from db
+            self.database.remove_node(self.nodes()[selected])
             for edge_id in self.edges():
-                if selected in self.edges()[edge_id].extreimity_ids:
+                if self.nodes()[selected].id() in self.edges()[edge_id].get_extremity_ids():
                     self.delete(edge_id)
             del self.nodes()[selected]
         elif selected in self.edges():
             self.delete(selected)
+            self.database.remove_edge(self.edges()[selected])
             del self.edges()[selected]
         else:
             print('\t\tERROR')
@@ -388,7 +391,7 @@ class EditableGraphCanvas(GraphCanvas):
                         self.nodes()[end].coord()[0]+NODE_SIZE, self.nodes()[end].coord()[1]+NODE_SIZE,
                             width=2.5)
                     extremity_ids = (self.nodes()[self.get_selected_el(*self.initial_click_coord)].id(), self.nodes()[end].id())
-                    self.add_edge(weight, edge_id, extremity_ids)
+                    self.add_edge(edge_id, extremity_ids)
             else:
                 self.cv_image_coord = self.coords(self.cv_image_id)
                 for node_id in self.nodes():

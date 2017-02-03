@@ -180,6 +180,11 @@ class Database:
         DELETE FROM Edge
             WHERE (Node1Id=? AND Node2Id=?) OR (Node1Id=? AND Node2Id=?)
         """
+    REOMVE_EDGES_FROM_NODE_ID_QUERY = \
+        """
+        DELETE FROM Edge
+            WHERE Node1Id=? OR Node2Id=?
+        """
     REMOVE_NODE_QUERY = \
         """
         DELETE FROM Node
@@ -304,7 +309,6 @@ class Database:
             self.conn.execute(query, (alias, node.id(),))
             if self.is_alias_unused(alias):
                 self.remove_alias(alias)
-            # @TODO Maybe: remove alias if no node is linked to it
         self.add_aliases_to_node(node.id(), added)
         
     def set_node_access_points(self, node_id, access_points):
@@ -401,7 +405,7 @@ class Database:
         return self.conn.execute(query, (plan_name,)).fetchall()
     
     def load_external_edges_from_node(self, node_id):
-        """TODO"""
+        """returns a list of edges going from the given node to other plans"""
         query = Database.LOAD_EXTERNAL_EDGES_FROM_NODE_ID
         return [edge for edge in self.conn.execute(query, (node_id, node_id)).fetchall()]
         
@@ -433,7 +437,7 @@ class Database:
         self.commit()
         
     def remove_edge_by_nodes(self, node1_id, node2_id):
-        """TODO"""
+        """removes the edge(s) joining the given nodes"""
         query = Database.REMOVE_EDGE_BY_NODES_IDS_QUERY
         self.conn.execute(query, (node1_id, node2_id, node2_id, node1_id))
         self.commit()
@@ -442,7 +446,8 @@ class Database:
         """removes a node from the database and removes all of the edges connected to it"""
         query = Database.REMOVE_NODE_QUERY
         self.conn.execute(query, (node.id(),))
-        #TODO: remove the edges connected to the node
+        query = Database.REOMVE_EDGES_FROM_NODE_ID_QUERY
+        self.conn.execute(query, (node.id(), node.id()))
         self.commit()
 
 
