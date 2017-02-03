@@ -144,12 +144,17 @@ class Database:
         DELETE FROM Wifi
             WHERE NodeId=?
         """
+    REMOVE_ALIAS_QUERY = \
+        """
+        DELETE FROM Aliases
+            WHERE Name=?
+        """
     
     ########## MISC
 
     CHECK_IF_PLAN_EXISTS_QUERY = \
         """
-        SELECT COUNT(*)
+        SELECT COUNT(id)
             FROM Building
             WHERE Name=?
         """
@@ -158,6 +163,14 @@ class Database:
         SELECT COUNT(Id)
             FROM Wifi
             WHERE NodeId=?
+        """
+    CHECK_IF_ALIAS_IS_UNUSED = \
+        """
+        SELECT COUNT(L.NodeId)
+            FROM AliasesLink L
+            JOIN Aliases A
+                ON A.Id=L.AliasId
+            WHERE A.Name=?
         """
         
     ##### Code
@@ -253,6 +266,8 @@ class Database:
         for alias in removed:
             query = Database.REMOVE_ALIAS_FROM_NODE
             self.conn.execute(query, (alias, node.id(),))
+            if self.is_alias_unused(alias):
+                self.remove_alias(alias)
             # @TODO Maybe: remove alias if no node is linked to it
         self.add_aliases_to_node(node.id(), added)
         
@@ -292,6 +307,15 @@ class Database:
         """returns True if the plan already exists in database and False otherwise"""
         query = Database.CHECK_IF_PLAN_EXISTS_QUERY
         return self.conn.execute(query, (plan_name,)).fetchone()[0] != 0
+    
+    def is_alias_unused(self, alias):
+        """return True if no node is linked to the given alias and False otherwise"""
+        query = Database.CHECK_IF_ALIAS_IS_UNUSED
+        return self.conn.execute(query, (alias,)).fetchone()[0] == 0
+        
+    def is_alias_used(self, alias):
+        """@see is_alias_unused"""
+        return not self.is_alias_unused(alias)
 
     def load_plan(self, filename):
         """retrieves a plan"""
@@ -343,6 +367,14 @@ class Database:
         """removes all the access points linked to a node"""
         query = Database.REMOVE_ACCESS_POINTS_OF_NODE_QUERY
         self.conn.execute(query, (node_id,))
+        self.commit()
+    
+    def remove_alias(self, alias):
+        """removes an alias from the aliases list
+        WARNING: does not check if any node is still linked to the alias.
+        NEVER CALL THIS FUNCTION FROM OUTSIDE THE CLASS!"""
+        query = Database.REMOVE_ALIAS_QUERY
+        self.conn.execute(query, (alias,))
         self.commit()
 
 
