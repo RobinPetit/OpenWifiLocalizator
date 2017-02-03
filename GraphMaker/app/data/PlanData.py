@@ -73,8 +73,8 @@ class Edge:
 
 class ExternalEdge(Edge):
 
-    def __init__(self, weight, extremity_ids, plan):
-        super().__init__(weight, [0, 0], extremity_ids)
+    def __init__(self, extremity_ids, plan):
+        super().__init__([0, 0], extremity_ids)
         self.plan = plan
 
     def extremities(self, ext=None):

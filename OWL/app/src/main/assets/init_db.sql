@@ -20,9 +20,38 @@ CREATE TABLE "Node" (
 CREATE TABLE "Edge" (
 	`Id`      INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 	`Node1Id` INTEGER,
-	`Node2Id` INTEGER,
-	`Weight`  REAL
+	`Node2Id` INTEGER
 );
+
+CREATE TRIGGER CheckEdgeOnSameCampus
+	BEFORE INSERT
+	ON "Edge"
+	WHEN
+		(SELECT B.CampusId
+			FROM Building B
+			WHERE B.Id=(SELECT N.BuildingId
+				FROM Node N
+				WHERE N.Id=NEW.Node1Id))
+		!=
+		(SELECT B.CampusId
+			FROM Building B
+			WHERE B.Id=(SELECT N.BuildingId
+				FROM Node N
+				WHERE N.Id=NEW.Node2Id))
+BEGIN
+	SELECT RAISE(ABORT, 'Nodes from an edge must be from the same campus');
+END;
+
+-- table to store exceptional edges that don't fit the `Edge` table
+-- for instance edges between campus
+CREATE TABLE "SpecialEdges" (
+	`Id`      INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	`Node1Id` INTEGER REFERENCES Node,
+	`Node2Id` INTEGER REFERENCES Node,
+	`Weight`  REAL NOT NULL
+);
+
+-- TODO: INSERT INTO  `SpecialEdges` VALULES(NodeBorderPlaine, NodeBorderSolbosch, Distance);
 
 CREATE TABLE "Campus" (
 	`Id`     INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
@@ -34,7 +63,7 @@ INSERT INTO `Campus` VALUES (1,'Plaine','P');
 INSERT INTO `Campus` VALUES (2,'Solbosch','S');
 
 CREATE TABLE "Building" (
-	`Id`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	`Id`            INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 	`CampusId`      INTEGER,
 	`Name`          TEXT,
 	`Ppm`           REAL DEFAULT 0.0,

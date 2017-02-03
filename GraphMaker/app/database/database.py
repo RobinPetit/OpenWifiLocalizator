@@ -59,8 +59,8 @@ class Database:
         """
     INSERT_EDGE_QUERY = \
         """
-        INSERT INTO Edge(Node1Id, Node2Id, Weight)
-            VALUES(?, ?, ?)
+        INSERT INTO Edge(Node1Id, Node2Id)
+            VALUES(?, ?)
         """
     
     ########## LOAD
@@ -109,7 +109,7 @@ class Database:
         """
     LOAD_EXTERNAL_EDGES_FROM_NODE_ID = \
         """
-        SELECT E.Id, E.Node1Id, E.Node2Id, E.Weight
+        SELECT E.Id, E.Node1Id, E.Node2Id
             FROM Edge E
             JOIN Node N1
                 ON N1.Id=E.Node1Id
@@ -142,12 +142,6 @@ class Database:
             WHERE Id=?
         """
     #UPDATE_
-    UPDATE_EDGE_QUERY = \
-        """
-        UPDATE Edge
-            SET Weight=?
-            WHERE Id=?
-        """
         
     ########## DELETE
     
@@ -334,15 +328,9 @@ class Database:
         returns the id of the fresh edge"""
         assert type(edge) in (Edge, ExternalEdge)
         query = Database.INSERT_EDGE_QUERY
-        cursor = self.conn.execute(query, (*edge.get_extremity_ids(), edge.weight()))
+        cursor = self.conn.execute(query, tuple(edge.get_extremity_ids()))
         self.commit()
         return cursor.lastrowid
-
-    def update_edge(self, edge):
-        """changes the weight of an edge"""
-        query = Database.UPDATE_EDGE_QUERY
-        self.conn.execute(query, (edge.weight(),edge.id()))
-        self.commit()
 
     ##### load functions
 
@@ -399,8 +387,7 @@ class Database:
         return [r[0] for r in self.conn.execute(query, (node_id,)).fetchall()]
         
     def load_edges_from_building(self, plan_name):
-        """returns a list of (id, id, weight) where ids are nodes ids to draw the
-        edges from/to and weight is the weight of the edge"""
+        """returns a list of (id, id) where ids are nodes ids to draw the edges from/to"""
         query = Database.LOAD_EDGES_FROM_BUILDING_QUERY
         return self.conn.execute(query, (plan_name,)).fetchall()
     

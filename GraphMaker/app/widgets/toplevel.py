@@ -6,9 +6,10 @@ from app.data.NodeData import *
 from app.widgets import canvas
 from app.Config import Config
 from app.network.access_points import AccessPointList
-
+# std
 from xml.etree import ElementTree
 from os.path import splitext, relpath
+import sqlite3
 
 class ExternalNodeFinder:
     @staticmethod
@@ -96,16 +97,7 @@ class NodeConfigurationToplevel(t.Toplevel):
         for edge in already_existing_external_edges:
             other_id = edge[1] if edge[2] == self.node_data.name else edge[2]
             plan = self.database.get_plan_name_from_node(other_id)
-            self.ext_edges_lb.insert(t.END, plan + EXTERNAL_EDGES_SEPARATOR + str(other_id) + EXTERNAL_EDGES_SEPARATOR + str(edge[3]))
-        '''
-        for edge in self.master.external_edges():
-            ext = edge.extremities()
-            beg, end = (ext[0], ext[1]) if ext[0] in [self.master.nodes()[n].id() for n in self.master.nodes()] else (ext[1], ext[0])
-            # Only consider external edges related to the current node
-            if self.node_data.name == beg:
-                self.ext_edges_lb.insert(t.END, edge.plan + EXTERNAL_EDGES_SEPARATOR + end)
-                self.ext_edges.append(edge)
-        '''
+            self.ext_edges_lb.insert(t.END, plan + EXTERNAL_EDGES_SEPARATOR + str(other_id))
         self.ext_edges_lb.grid(row=5, column=0, rowspan=2)
         t.Button(self.ext_edges_group, text='Add external edge \nfrom this node',
                  command=self.get_external_node).grid(row=5, column=1)
@@ -125,6 +117,7 @@ class NodeConfigurationToplevel(t.Toplevel):
 
     def remove_ext_edge(self):
         for sel in self.ext_edges_lb.curselection():
+            print(sel)
             # remove edge from db
             str_edge = self.ext_edges_lb.get(sel)
             other_node_id = int(str_edge.split(EXTERNAL_EDGES_SEPARATOR)[1])
@@ -137,51 +130,8 @@ class NodeConfigurationToplevel(t.Toplevel):
         self.wait_window()
         self.master.master.master.deiconify()
         ap = self.ap
-        #if hasattr(self, 'ext_edges'):
-        #    self.configure_external_edges()
         aliases = list(set(self.aliases))
         return list() if ap is None else ap, aliases
-
-    #def configure_external_edges(self):
-        # TODO: register new new edges in db
-        #pass
-
-    '''
-    def configure_external_edges_XML(self):
-        current_name = self.node_data.name
-        self.master.plan_data.remove_external_edges_from(current_name)
-        edges_dict = dict()
-        for external_edge in self.ext_edges:
-            extremities = external_edge.extremities()
-            if current_name == extremities[0]:
-                end = extremities[1]
-            else:
-                end = extremities[0]
-            beg = current_name
-            plan = external_edge.plan
-            weight = external_edge.weight()
-            if plan in edges_dict:
-                edges_dict[plan].append((end, weight))
-            else:
-                edges_dict[plan] = [(end, weight)]
-        for plan in edges_dict:
-            xml_path = Config.XMLS_PATH + plan + '.xml'
-            tree = ElementTree.ElementTree()
-            root = tree.parse(xml_path)
-            edges_markup = root.find('edges')
-            XML_external_edges = edges_markup.find('external')
-            if XML_external_edges is None:
-                XML_external_edges = ElementTree.SubElement(edges_markup, 'external')
-            for edge in XML_external_edges:
-                 if edge.get('dest') == current_name:
-                    XML_external_edges.remove(edge)
-            for node, weight in edges_dict[plan]:
-                self.master.create_external_edge(current_name, plan, node, weight)
-                # verify edge is in the other XML as well
-                _ = ElementTree.SubElement(XML_external_edges, 'edge')
-                _.attrib = {'weight': str(weight), 'beg': node, 'plan': splitext(relpath(self.plan_name, Config.MAPS_PATH))[0], 'end': current_name}
-            tree.write(xml_path)
-    '''
 
     def get_external_node(self):
         name = self.node_data.name
@@ -191,15 +141,17 @@ class NodeConfigurationToplevel(t.Toplevel):
         if plan_path == '' or plan_path is None:
             print('ERROR')  # TODO: handle properly with a popup
             return
-        node_name = ExternalNodeFinder.find(self, plan_path, self.database)
-        plan_short_name =  purge_plan_name(plan_path, Config.MAPS_PATH)
-        weight = askfloat('Edge weight', 'How long is this edge? (metres)', minvalue=.0)
-        str_to_add = plan_short_name + EXTERNAL_EDGES_SEPARATOR + str(node_name) + EXTERNAL_EDGES_SEPARATOR + str(weight)
-        self.ext_edges_lb.insert(t.END, str_to_add)
-        edge = canvas.ExternalEdge(weight, [node_name, name], plan_short_name)
-        self.ext_edges.append(edge)
-        # add edge to db
-        self.database.save_edge(edge)
+        try:
+            node_name = ExternalNodeFinder.find(self, plan_path, self.database)
+            plan_short_name =  purge_plan_name(plan_path, Config.MAPS_PATH)
+            edge = canvas.ExternalEdge([node_name, name], plan_short_name)
+            # add edge to db
+            self.database.save_edge(edge)
+            self.ext_edges.append(edge)
+            str_to_add = plan_short_name + EXTERNAL_EDGES_SEPARATOR + str(node_name)
+            self.ext_edges_lb.insert(t.END, str_to_add)
+        except sqlite3.IntegrityError as e:
+            print('SQLite error:', e)
 
     def scan(self):
         self.wm_title('Scanning access points...')
