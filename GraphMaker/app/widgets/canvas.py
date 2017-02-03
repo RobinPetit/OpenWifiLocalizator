@@ -432,8 +432,6 @@ class EditableGraphCanvas(GraphCanvas):
                 self.database.set_node_access_points(self.nodes()[selected], access_points)
                 self.color = 'green'
                 self.itemconfig(selected, fill='green')
-        else:
-            print('\t\tERROR')
         self.right_clicked = self.right_moved = False
 
     def handle_wheel_release(self, ev):
