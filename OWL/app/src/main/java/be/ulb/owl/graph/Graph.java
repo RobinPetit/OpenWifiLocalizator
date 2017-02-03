@@ -200,7 +200,7 @@ public class Graph {
             return null;
         }
 
-        Node node = res.get(0).getNode(sensed);
+        Node node = res.get(0).getNode(sensed); // @TODO manage case where two plans could contain the solution.
         if(node != null) {
             Log.d(getClass().getName(), "Node found: " + node.getID() + "(alias: " + node.getAlias() + ")");
         }
