@@ -258,7 +258,7 @@ class Database:
         
     def set_node_access_points(self, node_id, access_points):
         """set (replaces if exists) the access points linked to a given node"""
-        self.remove_access_points_from_node(node.id())
+        self.remove_access_points_from_node(node_id)
         query = Database.INSERT_ACCESS_POINT_QUERY
         for ap in access_points:
             self.conn.execute(query, (
@@ -282,7 +282,6 @@ class Database:
 
     def update_edge(self, edge):
         """changes the weight of an edge"""
-        print('setting weight to {} for id = {}'.format(edge.weight(), edge.id()))
         query = Database.UPDATE_EDGE_QUERY
         self.conn.execute(query, (edge.weight(),edge.id()))
         self.commit()

@@ -420,6 +420,8 @@ class EditableGraphCanvas(GraphCanvas):
         self.right_moved = False
         self.click_coord = [ev.x, ev.y]
         self.selected_node = self.get_selected_el(ev.x, ev.y)
+        if self.selected_node not in self.nodes():
+            return
         self.moving_node_original_coords = self.coords(self.selected_node)
         if Config.DEBUG:
             print('selected node: {} with position {}'.format(self.nodes()[self.selected_node].id(), self.moving_node_original_coords))
@@ -495,20 +497,20 @@ class EditableGraphCanvas(GraphCanvas):
         if selected is None:
             return
         if selected in self.nodes():
-            access_points, aliaseses = self.configure_node(self.nodes()[selected].id(), self.nodes()[selected].aliases())
+            access_points, aliases = self.configure_node(self.nodes()[selected].id(), self.nodes()[selected].aliases())
             # update aliases
             set_new_aliases = set(aliases)
             set_old_aliases = set(self.nodes()[selected].aliases())
             removed_aliases = set_old_aliases - set_new_aliases
-            new_aliases = set_new_alias - set_old_alias
-            assert removed_alias & new_aliases == set_new_aliases ^ set_old_aliases
+            new_aliases = set_new_aliases - set_old_aliases
+            assert (removed_aliases | new_aliases) == (set_new_aliases ^ set_old_aliases)
             self.master.database.update_node_aliases(self.nodes()[selected], removed_aliases, new_aliases)
             aliases = list(set_new_aliases)
             self.nodes()[selected].aliases(aliases)
             # update access points
-            if access_points is not None:
+            if type(access_points) is AccessPointList:
                 self.nodes()[selected].access_points(access_points)
-                self.maser.database.set_node_access_points(self.nodes()[selected], access_points)
+                self.master.database.set_node_access_points(self.nodes()[selected], access_points)
                 self.color = 'green'
                 self.itemconfig(selected, fill='green')
         elif selected in self.edges():
