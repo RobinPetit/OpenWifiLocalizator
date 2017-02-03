@@ -4,8 +4,9 @@ import java.util.ArrayList;
 
 /**
  * Created by Detobel36
+ *
+ * @deprecated campus table removed
  */
-
 public enum CampusTable implements SQLTable {
 
     ID("Id"),
