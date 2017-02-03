@@ -97,13 +97,34 @@ class Database:
         """
         SELECT E.Id, E.Node1Id, E.Node2Id, E.Weight
             FROM Edge E
-            JOIN Node N1 on N1.Id=E.Node1Id
-            JOIN Node N2 on N2.Id=E.Node2Id
+            JOIN Node N1
+                ON N1.Id=E.Node1Id
+            JOIN Node N2
+                ON N2.Id=E.Node2Id
             WHERE N1.BuildingId=N2.BuildingId
                 AND N1.BuildingId=(
                     SELECT Id
                         FROM Building
                         WHERE Name=?)
+        """
+    LOAD_EXTERNAL_EDGES_FROM_NODE_ID = \
+        """
+        SELECT E.Id, E.Node1Id, E.Node2Id, E.Weight
+            FROM Edge E
+            JOIN Node N1
+                ON N1.Id=E.Node1Id
+            JOIN Node N2
+                ON N2.Id=E.Node2Id
+            WHERE N1.BuildingId!=N2.BuildingId
+                AND (N1.Id=? OR N2.Id=?)
+        """
+    LOAD_BUILDING_NAME_FROM_NODE_ID = \
+        """
+        SELECT B.Name
+            FROM Building B
+            JOIN Node N
+                ON N.BuildingId=B.Id
+            WHERE N.Id=?
         """
     
     ########## UPDATE
@@ -148,6 +169,21 @@ class Database:
         """
         DELETE FROM Aliases
             WHERE Name=?
+        """
+    REMOVE_EDGE_BY_ID_QUERY = \
+        """
+        DELETE FROM Edge
+            WHERE Id=?
+        """
+    REMOVE_EDGE_BY_NODES_IDS_QUERY = \
+        """
+        DELETE FROM Edge
+            WHERE (Node1Id=? AND Node2Id=?) OR (Node1Id=? AND Node2Id=?)
+        """
+    REMOVE_NODE_QUERY = \
+        """
+        DELETE FROM Node
+            WHERE Id=?
         """
     
     ########## MISC
@@ -363,6 +399,16 @@ class Database:
         edges from/to and weight is the weight of the edge"""
         query = Database.LOAD_EDGES_FROM_BUILDING_QUERY
         return self.conn.execute(query, (plan_name,)).fetchall()
+    
+    def load_external_edges_from_node(self, node_id):
+        """TODO"""
+        query = Database.LOAD_EXTERNAL_EDGES_FROM_NODE_ID
+        return [edge for edge in self.conn.execute(query, (node_id, node_id)).fetchall()]
+        
+    def get_plan_name_from_node(self, node_id):
+        """returns the name of the plan the given ode stands in"""
+        query = Database.LOAD_BUILDING_NAME_FROM_NODE_ID
+        return self.conn.execute(query, (node_id,)).fetchone()[0]
         
     ##### remove functions
     
@@ -378,6 +424,25 @@ class Database:
         NEVER CALL THIS FUNCTION FROM OUTSIDE THE CLASS!"""
         query = Database.REMOVE_ALIAS_QUERY
         self.conn.execute(query, (alias,))
+        self.commit()
+        
+    def remove_edge(self, edge):
+        """remove an edge from database"""
+        query = Database.REMOVE_EDGE_BY_ID_QUERY
+        self.conn.execute(query, (edge.id(),))
+        self.commit()
+        
+    def remove_edge_by_nodes(self, node1_id, node2_id):
+        """TODO"""
+        query = Database.REMOVE_EDGE_BY_NODES_IDS_QUERY
+        self.conn.execute(query, (node1_id, node2_id, node2_id, node1_id))
+        self.commit()
+    
+    def remove_node(self, node):
+        """removes a node from the database and removes all of the edges connected to it"""
+        query = Database.REMOVE_NODE_QUERY
+        self.conn.execute(query, (node.id(),))
+        #TODO: remove the edges connected to the node
         self.commit()
 
 

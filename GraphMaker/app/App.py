@@ -36,7 +36,7 @@ class App(t.Frame):
         self.database.close()
 
     def create_widgets(self, **options):
-        self.canvas = EditableGraphCanvas(self, width=options['c_width'], height=options['c_height'])
+        self.canvas = EditableGraphCanvas(self, self.database, width=options['c_width'], height=options['c_height'])
         self.canvas.pack(fill="both", expand="YES")
         self.open_file()
         self.alpha_scale = t.Scale(self, from_=1, to=255,
@@ -52,7 +52,8 @@ class App(t.Frame):
         filename = path_to_building_name(self.file_name)
         if self.database.exists_plan(filename):
             self.plan_exists_in_db = True
-            self.load_plan(filename)
+            self.background_file_name = self.file_name
+            self.canvas.load_plan(self.file_name)
             #self.canvas.load_sql(filename)
         else:
             new_plan_data = self.ask_new_plan_data()
@@ -65,24 +66,6 @@ class App(t.Frame):
                 self.database.save_plan(filename, new_plan_data)
             else:
                 self.destroy()
-
-    def load_plan(self, filename):
-        plan = self.database.load_plan(filename)
-        self.canvas.set_pixels_per_metre(plan.ppm)
-        self.canvas.set_angle_with_parent(plan.angle)
-        self.canvas.set_position_on_parent(plan.on_parent)
-        self.background_file_name = self.file_name
-        self.canvas.set_bg_image(App.ALPHA_INITIAL_VALUE, self.background_file_name)
-        self.canvas.set_bg_coord(plan.bg_coord)
-        nodes = self.database.load_nodes_from_building(filename)
-        edges = self.database.load_edges_from_building(filename)
-        self.draw_loaded(nodes, edges)
-        
-    def draw_loaded(self, nodes, edges):
-        for node_id, x, y, aliases, has_ap in nodes:
-            self.canvas.create_node_from_db(x, y, aliases, has_ap, node_id)
-        for edge in edges:
-            self.canvas.create_edge_from_db(*edge)
 
     class NewPlanData:
         def __init__(self, ppm, angle, pos):

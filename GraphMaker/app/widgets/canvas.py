@@ -17,8 +17,9 @@ from time import time
 
 
 class GraphCanvas(t.Canvas):
-    def __init__(self, master, **options):
+    def __init__(self, master, database, **options):
         super().__init__(master, **options)
+        self.database = database
         self.master = master
         self.init_variables()
         self.bind_events()
@@ -40,24 +41,24 @@ class GraphCanvas(t.Canvas):
             self.bind(event, callbacks[event])
 
     def add_node(self, node_id, access_points, aliases=tuple(), node_name=0):
-        node = Node(node_name, self.coords(node_id), access_points, aliases)
+        node = Node(node_name, self.coords(node_id), access_points, aliases=aliases)
         self.plan_data.add_node(node_id, node)
         print('name: ' + str(node_name))
         if node_name == 0:
             print('saving node in db')
-            node.id(self.master.database.save_node(node, path_to_building_name(self.master.file_name)))
+            node.id(self.database.save_node(node, path_to_building_name(self.master.file_name)))
 
     def add_edge(self, weight, edge_id, extremities, nb=0):
         edge = Edge(weight, self.coords(edge_id), extremities, nb=nb)
         self.plan_data.add_edge(edge_id, edge)
         if nb == 0:
-            edge.id(self.master.database.save_edge(edge))
+            edge.id(self.database.save_edge(edge))
 
     def add_external_edge(self, weight, extremities, plan, save=False):
         edge = ExternalEdge(weight, extremities, plan)
         self.plan_data.add_external_edge(edge)
         if save:
-            edge.id(self.master.database.save_edge(edge))
+            edge.id(self.database.save_edge(edge))
 
     def refresh(self):
         pass
@@ -236,66 +237,40 @@ class GraphCanvas(t.Canvas):
         external_edge = xml_tree.find('external')
         for edge in external_edge.findall('edge'):
             self.add_external_edge(float(edge.get('weight')), [edge.get('beg'), edge.get('end')], edge.get('plan'))
-
-    def load_sql(self, name):
-        conn = sqlite3.connect(Config.DB_PATH)
-        cursor = conn.execute("SELECT Ppm, Name, BgCoordX, BgCoordY, Id FROM Building WHERE Name='{0}'".format(name))
-        cursor = cursor.fetchall()
-        conn.close()
-        self.set_pixels_per_metre(cursor[0][0])
-        self.background_file_name = Config.MAPS_PATH+cursor[0][1]+".png"
-        self.set_bg_image(App.App.ALPHA_INITIAL_VALUE, self.background_file_name)
-        self.set_bg_coord([cursor[0][2], cursor[0][3]])
-        self.load_nodes_sql(cursor[0][4])
-        self.load_edges_sql(cursor[0][4])
-
-    def load_nodes_sql(self,identifier):
-        conn = sqlite3.connect(Config.DB_PATH)
-        nodes = conn.execute("SELECT Id, X, Y FROM Node WHERE BuildingId={0}".format(identifier))
-        nodes = nodes.fetchall()
-        conn.close()
-        for point in nodes:
-            x, y = point[1], point[2]
-            coord = x, y, x+2*NODE_SIZE, y+2*NODE_SIZE
-            conn = sqlite3.connect(Config.DB_PATH)
-            listWifi = conn.execute("SELECT Id FROM Wifi WHERE NodeId={0}".format(point[0]))
-            n = len(listWifi.fetchall())
-            conn.close()
-            access_points = StaticAccessPointList() if (n) else None
-            node_id = self.create_oval(*coord, fill='green' if type(access_points) is not list else 'red')
-            conn = sqlite3.connect(Config.DB_PATH)
-            aliases = conn.execute("SELECT Name FROM Aliases WHERE NodeID={0}".format(point[0]))
-            aliases = aliases.fetchall()
-            conn.close()
-            aliases = [alias[0] for alias in aliases]
-            self.add_node(point[0], point[0], access_points, aliases)
-        conn = sqlite3.connect(Config.DB_PATH)
-        maxid = conn.execute("SELECT MAX(Id) FROM Node")
-        self.node_idx = maxid.fetchall()[0][0]
-        conn.close()
-
-    def load_edges_sql(self, identifier):
-        conn = sqlite3.connect(Config.DB_PATH)
-        internal_edge = conn.execute("SELECT Id, Node1Id, Node2Id, weight FROM Edge WHERE Node1Id=(SELECT Id FROM Node WHERE BuildingId={0})".format(identifier))
-        internal_edge = internal_edge.fetchall()
-        conn.close()
-        for edge in internal_edge:
-            extremities = edge[1], edge[2]
-            extremities_ids = [[node_id for node_id in self.nodes() if self.nodes()[node_id].id() == extremity][0] for extremity in extremities]
-            end_coord = [c + NODE_SIZE for c in self.nodes()[extremities_ids[1]].coord()[:2]]
-            beg_coord = [c + NODE_SIZE for c in self.nodes()[extremities_ids[0]].coord()[:2]]
-            edge_id = self.create_line(*beg_coord, *end_coord, width=EDGE_WIDTH)
-            self.add_edge(edge[3], edge_id, extremities)
-        # @TODO external still used ?????
-        #conn = sqlite3.connect(Config.DB_PATH)
-        #external_edge = conn.execute("SELECT Id, Node1Id, Node2Id, Distance, BuildingId FROM Edge WHERE Node1Id=(SELECT Id FROM Node WHERE BuildingId={0}) AND BuildingId!=NULL".format(identifier))
-        #conn.close()
-        #for edge in external_edge:
-        #    self.add_external_edge(edge[3], [edge[1], edge[2]], edge[4])
+    
+    def load_plan(self, background_file_name):
+        filename = path_to_building_name(background_file_name)
+        plan = self.database.load_plan(filename)
+        self.set_pixels_per_metre(plan.ppm)
+        self.set_angle_with_parent(plan.angle)
+        self.set_position_on_parent(plan.on_parent)
+        self.set_bg_image(App.App.ALPHA_INITIAL_VALUE, background_file_name)
+        self.set_bg_coord(plan.bg_coord)
+        for node_id, x, y, aliases, has_ap in self.database.load_nodes_from_building(filename):
+            self.create_node_from_db(x, y, aliases, has_ap, node_id)
+        for edge in self.database.load_edges_from_building(filename):
+            self.create_edge_from_db(*edge)
+            
+    def create_node_from_db(self, x, y, aliases, has_ap, db_id):
+        node_coord = (x-NODE_SIZE, y-NODE_SIZE,
+                      x+NODE_SIZE, y+NODE_SIZE)
+        node_id = self.create_oval(*node_coord, fill='green' if has_ap else 'red')
+        self.add_node(node_id, [], aliases=aliases, node_name=db_id)
+        
+    def create_edge_from_db(self, nb, id1, id2, weight):
+        for n in self.nodes():
+            if self.nodes()[n].id() == id1:
+                n1 = n
+            elif self.nodes()[n].id() == id2:
+                n2 = n
+        beg_coord = [c + NODE_SIZE for c in self.nodes()[n1].coord()[:2]]
+        end_coord = [c + NODE_SIZE for c in self.nodes()[n2].coord()[:2]]
+        edge_id = self.create_line(*beg_coord, *end_coord, width=EDGE_WIDTH)
+        self.add_edge(weight, edge_id, [id1, id2], nb=nb)
 
 class SelectableGraphCanvas(GraphCanvas):
-    def __init__(self, master, **options):
-        super().__init__(master, **options)
+    def __init__(self, master, database, **options):
+        super().__init__(master, database, **options)
 
     def handle_left_release(self, ev):
         if not super().handle_left_release(ev):
@@ -314,8 +289,8 @@ class SelectableGraphCanvas(GraphCanvas):
 class EditableGraphCanvas(GraphCanvas):
     CLICK_TIME_SENSIBILITY = 0.1  # maximum time before click and release to be accepted
 
-    def __init__(self, master, **options):
-        super().__init__(master, **options)
+    def __init__(self, master, database, **options):
+        super().__init__(master, database, **options)
         self.master = master
         self.init_variables()
         self.bind_events()
@@ -484,13 +459,13 @@ class EditableGraphCanvas(GraphCanvas):
     def handle_right_release(self, ev):
         if self.right_moved:
             self.nodes()[self.selected_node].coord(self.coords(self.selected_node))
-            self.master.database.update_node_position(self.nodes()[self.selected_node])
+            self.database.update_node_position(self.nodes()[self.selected_node])
             for edge in self.moving_edges_edit_idx:
                 print('fixing edge {}'.format(edge))
                 self.edges()[edge].coord(self.coords(edge))
                 self.edges()[edge].recompute_weight(self.nodes())
                 print('new weight:', self.edges()[edge].weight())
-                self.master.database.update_edge(self.edges()[edge])
+                self.database.update_edge(self.edges()[edge])
             return
         selected = self.get_selected_el(ev.x, ev.y)
         print(ev.x, ev.y, selected)
@@ -504,18 +479,18 @@ class EditableGraphCanvas(GraphCanvas):
             removed_aliases = set_old_aliases - set_new_aliases
             new_aliases = set_new_aliases - set_old_aliases
             assert (removed_aliases | new_aliases) == (set_new_aliases ^ set_old_aliases)
-            self.master.database.update_node_aliases(self.nodes()[selected], removed_aliases, new_aliases)
+            self.database.update_node_aliases(self.nodes()[selected], removed_aliases, new_aliases)
             aliases = list(set_new_aliases)
             self.nodes()[selected].aliases(aliases)
             # update access points
             if type(access_points) is AccessPointList:
                 self.nodes()[selected].access_points(access_points)
-                self.master.database.set_node_access_points(self.nodes()[selected], access_points)
+                self.database.set_node_access_points(self.nodes()[selected], access_points)
                 self.color = 'green'
                 self.itemconfig(selected, fill='green')
         elif selected in self.edges():
             self.edges()[selected].weight(self.configure_edge(self.edges()[selected].weight()))
-            self.master.database.update_edge(self.edges()[selected])
+            self.database.update_edge(self.edges()[selected])
         else:
             print('\t\tERROR')
         self.right_clicked = self.right_moved = False
@@ -525,7 +500,7 @@ class EditableGraphCanvas(GraphCanvas):
             print('WR')
 
     def configure_node(self, current_name='', current_aliases=tuple()):
-        return NodeConfigurationToplevel(self, self.background_file_name, current_name, current_aliases, handle_external=True).configure()
+        return NodeConfigurationToplevel(self, self.background_file_name, self.database, current_name, current_aliases, handle_external=True).configure()
 
     def remove_ext_edge(self):
         del self.ext_edges[self.ext_edges_lb.curselection()]
@@ -542,28 +517,11 @@ class EditableGraphCanvas(GraphCanvas):
         return float(value.get())
 
     def create_node(self, x, y):
-        access_points, aliases = NodeConfigurationToplevel(self, self.background_file_name).configure()
+        access_points, aliases = NodeConfigurationToplevel(self, self.background_file_name, self.database).configure()
         node_coord = (x-NODE_SIZE, y-NODE_SIZE,
                       x+NODE_SIZE, y+NODE_SIZE)
         node_id = self.create_oval(*node_coord, fill='green' if type(access_points) is not list else 'red')
         self.add_node(node_id, access_points, aliases)
-    
-    def create_node_from_db(self, x, y, aliases, has_ap, db_id):
-        node_coord = (x-NODE_SIZE, y-NODE_SIZE,
-                      x+NODE_SIZE, y+NODE_SIZE)
-        node_id = self.create_oval(*node_coord, fill='green' if has_ap else 'red')
-        self.add_node(node_id, [], aliases=aliases, node_name=db_id)
-        
-    def create_edge_from_db(self, nb, id1, id2, weight):
-        for n in self.nodes():
-            if self.nodes()[n].id() == id1:
-                n1 = n
-            elif self.nodes()[n].id() == id2:
-                n2 = n
-        beg_coord = [c + NODE_SIZE for c in self.nodes()[n1].coord()[:2]]
-        end_coord = [c + NODE_SIZE for c in self.nodes()[n2].coord()[:2]]
-        edge_id = self.create_line(*beg_coord, *end_coord, width=EDGE_WIDTH)
-        self.add_edge(weight, edge_id, [id1, id2], nb=nb)
 
     def create_external_edge(self, internal_node, plan_name, external_node, weight=.0):
         self.add_external_edge(weight, [internal_node, external_node], plan_name)
