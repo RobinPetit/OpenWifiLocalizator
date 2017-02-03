@@ -119,16 +119,14 @@ public class Plan {
         for (int i = 0; i < nodes.size(); i++) { // for each node
             scores.add(0.0);
             ArrayList<Wifi> tmp = nodes.get(i).getWifi();
-            double totaldbm = 0.0;
-            Integer commonWifi = 0;
+            double z = 0.0;
             for (Wifi wifi: tmp) {
                 if (wifisStr.contains(wifi.getBSS())) { // has a Wifi with the same BSS
                     Integer offset = wifisStr.indexOf(wifi.getBSS());
-                    totaldbm += Math.abs((wifis.get(offset)).getAvg()-wifi.getAvg())/getScore((wifis.get(offset).getAvg()+wifi.getAvg())/2);
-                    commonWifi++;
+                    z += Math.pow((wifis.get(offset)).getAvg()-wifi.getAvg(), 2)/(wifis.get(offset)).getVariance();
                 }
             }
-            scores.set(i, totaldbm/(commonWifi*commonWifi));
+            scores.set(i, z);
         }
         res = nodes.get(scores.indexOf(Collections.min(scores)));
         return res;
@@ -331,11 +329,8 @@ public class Plan {
                 res.add(node);
             }
         }
-        if (res.size() > 1) {
+        if (res.size() > 0) {
             return collisionManager(wifis, res);
-        }
-        else if (res.size() == 1) {
-            return res.get(0);
         }
         return null;
     }
