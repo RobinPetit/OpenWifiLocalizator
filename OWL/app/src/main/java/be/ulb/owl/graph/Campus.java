@@ -1,10 +1,8 @@
 package be.ulb.owl.graph;
 
-import android.content.res.Resources;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import be.ulb.owl.utils.SQLUtils;

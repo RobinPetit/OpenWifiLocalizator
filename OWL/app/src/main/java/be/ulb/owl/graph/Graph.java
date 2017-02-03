@@ -5,11 +5,8 @@
 */
 package be.ulb.owl.graph;
 
-import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
