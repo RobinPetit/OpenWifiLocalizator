@@ -95,7 +95,7 @@ class Database:
         """
     LOAD_EDGES_FROM_BUILDING_QUERY = \
         """
-        SELECT E.Id, E.Node1Id, E.Node2Id, E.Weight
+        SELECT E.Id, E.Node1Id, E.Node2Id
             FROM Edge E
             JOIN Node N1
                 ON N1.Id=E.Node1Id

@@ -18,7 +18,6 @@ import sqlite3
 '''
 class App(t.Frame):
     ALPHA_INITIAL_VALUE = 128
-    SAVE_AS_XML = False
 
     def __init__(self, master, **options):
         super().__init__(master)
@@ -31,8 +30,6 @@ class App(t.Frame):
         self.create_widgets(**options)
 
     def on_exit(self):
-        if mbox.askquestion('Quit', 'Do you want to save before leaving?') == 'yes':
-            self.save()
         self.database.close()
 
     def create_widgets(self, **options):
@@ -54,7 +51,6 @@ class App(t.Frame):
             self.plan_exists_in_db = True
             self.background_file_name = self.file_name
             self.canvas.load_plan(self.file_name)
-            #self.canvas.load_sql(filename)
         else:
             new_plan_data = self.ask_new_plan_data()
             if None not in new_plan_data:
@@ -139,41 +135,8 @@ class App(t.Frame):
 
     # Save functions
 
-    def text(self, nb_tab=0):
-        text  = (TAB * (nb_tab+1)) + '<background_image x="{}" y="{}" />\n'.format(*self.canvas.image_coord())
-        text += (TAB * (nb_tab+1)) + '<distance_unit value="{}" />\n'.format(self.canvas.get_pixels_per_metre())
-        text += (TAB * (nb_tab+1)) + '<angle_with_parent value="{}" />\n'.format(self.canvas.get_angle_with_parent())
-        text += (TAB * (nb_tab+1)) + '<position_on_parent x="{}" y="{}" />\n'.format(*self.canvas.get_position_on_parent())
-
-        plan_name = purge_plan_name(self.canvas.background_file_name, Config.MAPS_PATH)
-        text += (TAB * (nb_tab+1)) + '<nodes>\n'
-        for node_id in self.canvas.nodes():
-            text += self.canvas.nodes()[node_id].text(nb_tab+2)
-        text += (TAB * (nb_tab+1)) + '</nodes>\n'
-
-        text += (TAB * (nb_tab+1)) + '<edges>\n'
-        text += (TAB * (nb_tab+2)) + '<internal>\n'
-        for edge_id in self.canvas.edges():
-            text += self.canvas.edges()[edge_id].text(nb_tab+3)
-        text += (TAB * (nb_tab+2)) + '</internal>\n'
-        text += (TAB * (nb_tab+2)) + '<external>\n'
-        for ext_edge in self.canvas.external_edges():
-            # internal_node_name, plan_name, external_node_name = ext_edge
-            text += ext_edge.text(nb_tab+3)
-        text += (TAB * (nb_tab+2)) + '</external>\n'
-        text += (TAB * (nb_tab+1)) + '</edges>\n'
-
-        return '<plan name="{}">\n{}</plan>\n'.format(plan_name, text)
-
     def save(self):
-        (self.save_to_xml if App.SAVE_AS_XML else self.save_to_sql)()
-
-    def save_to_xml(self):
-        path = Config.XMLS_PATH + splitext(relpath(self.canvas.background_file_name, Config.MAPS_PATH))[0] + '.xml'
-        content = self.text()
-        with open(path, 'w') as save_file:
-            save_file.write(content)
-        print("File saved !")
+        self.database.update_plan(self.canvas.get_bg_coord(), path_to_building_name(self.file_name))
 
     class PlanNameData:
         def _init__(self):
@@ -189,7 +152,4 @@ class App(t.Frame):
         plan_data.campus = file_name.split("_")[0]
         plan_data.name = file_name
         return plan_data
-
-    def save_to_sql(self):
-        self.database.update_plan(self.canvas.get_bg_coord(), path_to_building_name(self.file_name))
 

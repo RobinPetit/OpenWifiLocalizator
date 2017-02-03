@@ -8,7 +8,7 @@ from app.general.tkinter_imports import *
 from app.general.constants import *
 from app.data.PlanData import *
 from app.widgets.toplevel import NodeConfigurationToplevel
-from app.network.access_points import StaticAccessPointList, AccessPointList
+from app.network.access_points import AccessPointList
 from app.database.database import Database
 # std
 import sqlite3
@@ -48,8 +48,9 @@ class GraphCanvas(t.Canvas):
             print('saving node in db')
             node.id(self.database.save_node(node, path_to_building_name(self.master.file_name)))
 
-    def add_edge(self, weight, edge_id, extremities, nb=0):
-        edge = Edge(weight, self.coords(edge_id), extremities, nb=nb)
+    def add_edge(self, edge_id, extremities, nb=0):
+        edge = Edge(self.coords(edge_id), extremities, nb=nb)
+        edge.recompute_weight(self.nodes())
         self.plan_data.add_edge(edge_id, edge)
         if nb == 0:
             edge.id(self.database.save_edge(edge))
@@ -180,63 +181,6 @@ class GraphCanvas(t.Canvas):
         for node_id in self.nodes():
             self.coords(node_id, self.nodes()[node_id].coord()[0]+x_offset, self.nodes()[node_id].coord()[1]+y_offset,
                         self.nodes()[node_id].coord()[2]+x_offset, self.nodes()[node_id].coord()[3]+y_offset)
-
-    # XML loading
-
-    def load_xml(self, path):
-        xml_tree = ElementTree.parse(path)
-        root = xml_tree.getroot()
-        self.set_pixels_per_metre(float(root.find('distance_unit').get('value')))
-        bg_image = root.find('background_image')
-        self.background_file_name = Config.MAPS_PATH + str(root.get('name')) + '.png'
-        self.set_bg_image(App.App.ALPHA_INITIAL_VALUE, self.background_file_name)
-        x = float(bg_image.get('x'))
-        y = float(bg_image.get('y'))
-        self.set_bg_coord([x, y])
-        pos_on_parent = root.find('position_on_parent')
-        x = int(pos_on_parent.get('x'))
-        y = int(pos_on_parent.get('y'))
-        self.set_position_on_parent([x, y])
-        self.set_angle_with_parent(float(root.find('angle_with_parent').get('value')))
-        self.load_nodes_xml(root.find('nodes'))
-        self.load_edges_xml(root.find('edges'))
-
-    def load_nodes_xml(self, xml_tree):
-        for point in xml_tree.findall('node'):
-            coord = point.find('coord')
-            x, y = float(coord.get('x')), float(coord.get('y'))
-            coord = x, y, x+2*NODE_SIZE, y+2*NODE_SIZE
-            listWifi = point.find('listWifi')
-            if listWifi is None:
-                access_points = None
-            else:
-                access_points = StaticAccessPointList()
-                access_points.fromXml(listWifi)
-            node_id = self.create_oval(*coord, fill='green' if type(access_points) is not list else 'red')
-            aliases = point.find('aliases')
-            if aliases is not None:
-                loaded_aliases = list()
-                for alias in aliases.findall('alias'):
-                    loaded_aliases.append(alias.text)
-            else:
-                loaded_aliases = list()
-            self.add_node(point.attrib['id'], node_id, access_points, loaded_aliases)
-            if int(point.attrib['id'])  >= self.node_idx:
-                self.node_idx = int(point.attrib['id']) + 1
-
-    def load_edges_xml(self, xml_tree):
-        internal_edge = xml_tree.find('internal')
-        for edge in internal_edge.findall('edge'):
-            extremities = edge.get('beg'), edge.get('end')
-            extremities_ids = [[node_id for node_id in self.nodes() if self.nodes()[node_id].id() == extremity][0] for extremity in extremities]
-            end_coord = [c + NODE_SIZE for c in self.nodes()[extremities_ids[1]].coord()[:2]]
-            beg_coord = [c + NODE_SIZE for c in self.nodes()[extremities_ids[0]].coord()[:2]]
-            edge_id = self.create_line(*beg_coord, *end_coord, width=EDGE_WIDTH)
-            self.add_edge(float(edge.get('weight')), edge_id, extremities)
-
-        external_edge = xml_tree.find('external')
-        for edge in external_edge.findall('edge'):
-            self.add_external_edge(float(edge.get('weight')), [edge.get('beg'), edge.get('end')], edge.get('plan'))
     
     def load_plan(self, background_file_name):
         filename = path_to_building_name(background_file_name)
@@ -257,7 +201,7 @@ class GraphCanvas(t.Canvas):
         node_id = self.create_oval(*node_coord, fill='green' if has_ap else 'red')
         self.add_node(node_id, [], aliases=aliases, node_name=db_id)
         
-    def create_edge_from_db(self, nb, id1, id2, weight):
+    def create_edge_from_db(self, nb, id1, id2):
         for n in self.nodes():
             if self.nodes()[n].id() == id1:
                 n1 = n
@@ -266,7 +210,7 @@ class GraphCanvas(t.Canvas):
         beg_coord = [c + NODE_SIZE for c in self.nodes()[n1].coord()[:2]]
         end_coord = [c + NODE_SIZE for c in self.nodes()[n2].coord()[:2]]
         edge_id = self.create_line(*beg_coord, *end_coord, width=EDGE_WIDTH)
-        self.add_edge(weight, edge_id, [id1, id2], nb=nb)
+        self.add_edge(edge_id, [id1, id2], nb=nb)
 
 class SelectableGraphCanvas(GraphCanvas):
     def __init__(self, master, database, **options):

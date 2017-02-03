@@ -34,38 +34,9 @@ class Node:
         else:
             self.aliases_ = list(a)
 
-    def text(self, nb_tab=0):
-        text = (TAB * (nb_tab+1)) + '<coord x="{}" y="{}" />\n'.format(*self.coord())
-        if self.access_points() is not None:
-            text += self.access_points().text(nb_tab+1)
-        if self.aliases() and len(self.aliases()) > 0:
-            text += (TAB*(nb_tab+1)) + '<aliases>\n'
-            for alias in self.aliases():
-                text += (TAB*(nb_tab+2)) + '<alias>{}</alias>\n'.format(alias)
-            text += (TAB*(nb_tab+1)) + '</aliases>\n'
-        return '{0}<node id="{1}">\n{2}{0}</node>\n'.format(TAB*nb_tab, self.id(), text)
-
-    def sql(self, building_id):
-        query = Node.INSERT_NODE_QUERY.format(
-            building_id,
-            *self.coord()
-            #self.id()
-        )
-        queries = [query]
-        for alias in self.aliases():
-            queries.append(Node.INSERT_ALIAS_QUERY.format(
-                self.id(),
-                alias
-            ))
-        if (self.access_points_ is not None):
-            temp = self.access_points_.sql()
-            temp = (temp.format(self.id())).split(";")
-            queries.extend(temp)
-        return queries
-
 class Edge:
-    def __init__(self, weight, coords, extremity_ids, nb=0):
-        self.weight_ = weight
+    def __init__(self, coords, extremity_ids, nb=0):
+        self.weight_ = -float('inf')
         self.coords = coords
         self.extremity_ids = extremity_ids
         self.nb = nb
@@ -95,23 +66,10 @@ class Edge:
             elif all_nodes[n].id() == self.extremity_ids[1]:
                 n2 = all_nodes[n]
         coord1, coord2 = [center_of_rectangle(n.coord()) for n in (n1, n2)]
-        print('old weight:', self.weight())
         self.weight(euclidian_distance(coord1, coord2))
-        print('new weight:', self.weight())
             
     def get_extremity_ids(self):
         return self.extremity_ids
-
-    def text(self, nb_tab=0):
-        return (TAB*nb_tab) + '<edge beg="{}" end="{}" weight="{}" />\n'.format(*self.extremity_ids, self.weight())
-
-    def sql(self, building_id):
-        query = Edge.INSERT_EDGE_QUERY.format(
-            #building_id,
-            *self.extremity_ids,
-            self.weight()
-        )
-        return query
 
 class ExternalEdge(Edge):
     INSERT_EXT_EDGE_QUERY = \
@@ -129,20 +87,6 @@ class ExternalEdge(Edge):
             self.extremity_ids = ext[:]
         else:
             return self.extremity_ids
-
-    def text(self, nb_tab=0):
-        return (TAB*(nb_tab)) + '<edge beg="{}" end="{}" weight="{}" plan="{}" />' \
-                                .format(*self.extremity_ids, self.weight(), self.plan)
-
-    # Not necesary to override
-    """def sql(self, building_id):
-        query = ExternalEdge.INSERT_EXT_EDGE_QUERY.format(
-            #building_id,
-            *self.extremity_ids,
-            #"(SELECT id FROM Building WHERE name='{}')".format(self.plan),  # TODO check if self.plan contains really the name TODO check if necessary
-            self.weight()
-        )
-        return query"""
 
 class PlanData:
     def __init__(self):
