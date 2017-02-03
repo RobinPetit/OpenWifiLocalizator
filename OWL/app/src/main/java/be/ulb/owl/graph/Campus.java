@@ -1,5 +1,6 @@
 package be.ulb.owl.graph;
 
+import android.content.res.Resources;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
@@ -97,6 +98,16 @@ public class Campus extends Plan {
         }
 
         return resPlan;
+    }
+
+    @Override
+    public double getAbsoluteX(float x) {
+        return 0;
+    }
+
+    @Override
+    public double getAbsoluteY(float x) {
+        return 0;
     }
 
 }
