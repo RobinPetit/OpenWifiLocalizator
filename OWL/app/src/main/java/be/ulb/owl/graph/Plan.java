@@ -24,7 +24,10 @@ import be.ulb.owl.utils.SQLUtils;
  * @author Detobel36
  */
 public class Plan {
+
     private final MainActivity main = MainActivity.getInstance();
+
+
     /**
      * represents the X-axis part of the relative coordinate of the upper left corner of the
      * background image in GraphMaker (the graph editor).
@@ -42,7 +45,7 @@ public class Plan {
     private ArrayList<Node> _listNode;
     private HashSet<String> _allBssWifi;
     private InputStream _image;
-//    private final String _pathImage;
+    private final String _pathImage;
     private final float _ppm;  // pixels per metre
     private final float _relativeAngle;
     private final float _xOnParent;
@@ -56,7 +59,7 @@ public class Plan {
      * @param name of the plan
      * @param id in the database
      * @param parentPlan the parent plan reference (campus plan)
-     * @param pathImage path to the image
+     * @param pathImage path to the image (only the folder after IMGMap)
      * @param xOnParent x position on the parent plan
      * @param yOnParent y position on the parent plan
      * @param bgCoordX relative x position of the upper left corner of the image
@@ -76,7 +79,7 @@ public class Plan {
         this._bgCoordY = bgCoordY;
         this._relativeAngle = relativeAngle;
         this._ppm = distance;
-//        this._pathImage = pathImage;
+        this._pathImage = pathImage;
 
         _listNode = SQLUtils.loadNodes(this, id);
 
@@ -140,8 +143,8 @@ public class Plan {
      */
     private void loadImage() throws IOException {
         try {
-            // TODO optimisation ? :/
-            _image = main.getAssets().open("IMGMap" + File.separator + _name +".png");
+            _image = main.getAssets().open("IMGMap" + File.separator + _pathImage +
+                    File.separator + _name +".png");
         } catch (IOException e) {
             throw new IOException("Impossible to load the image of this plan (" + _name + ")");
         }
