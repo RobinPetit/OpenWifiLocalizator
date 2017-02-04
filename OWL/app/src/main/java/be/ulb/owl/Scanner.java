@@ -89,8 +89,7 @@ public class Scanner {
         
         for(String key : _accesPoints.keySet()) {
             ArrayList<Integer> values = _accesPoints.get(key);
-            temp.add(new Wifi(key, Collections.max(values), 
-                    Collections.min(values), avg(values), -1));
+            temp.add(new Wifi(key, avg(values), -1));
         }
 
         if(temp.isEmpty()) {

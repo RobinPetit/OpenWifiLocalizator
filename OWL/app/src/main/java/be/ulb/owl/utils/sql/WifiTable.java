@@ -11,8 +11,6 @@ public enum WifiTable implements SQLTable {
     ID("Id"),
     BSS("BSS"),
     NODE_ID("NodeId"),
-    MIN("Min"),
-    MAX("Max"),
     AVG("Avg"),
     VARIANCE("Variance");
 

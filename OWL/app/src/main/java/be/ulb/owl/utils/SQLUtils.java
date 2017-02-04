@@ -493,8 +493,6 @@ public class SQLUtils extends SQLiteOpenHelper {
         Cursor cursor = getDatabase().query(WifiTable.getName(),
                 new String[] {
                         WifiTable.BSS.getCol(),
-                        WifiTable.MAX.getCol(),
-                        WifiTable.MIN.getCol(),
                         WifiTable.AVG.getCol(),
                         WifiTable.VARIANCE.getCol()},
                 WifiTable.NODE_ID.getCol() + " = ?", new String[]{""+nodeID}, null, null, null);
@@ -503,19 +501,15 @@ public class SQLUtils extends SQLiteOpenHelper {
             cursor.moveToFirst();
 
             String bss;
-            float max;
-            float min;
             float avg;
             float variance;
 
             while (!cursor.isAfterLast()) {
                 bss = getString(cursor, WifiTable.BSS.getCol());
-                max = getFloat(cursor, WifiTable.MAX.getCol());
-                min = getFloat(cursor, WifiTable.MIN.getCol());
                 avg = getFloat(cursor, WifiTable.AVG.getCol());
                 variance = getFloat(cursor, WifiTable.VARIANCE.getCol());
 
-                res.add(new Wifi(bss, max, min, avg, variance));
+                res.add(new Wifi(bss, avg, variance));
 
                 cursor.moveToNext();
             }
