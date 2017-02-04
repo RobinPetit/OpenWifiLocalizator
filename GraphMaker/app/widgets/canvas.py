@@ -397,7 +397,8 @@ class EditableGraphCanvas(GraphCanvas):
                         self.nodes()[end].coord()[0]+NODE_SIZE, self.nodes()[end].coord()[1]+NODE_SIZE,
                             width=2.5)
                     extremity_ids = (self.nodes()[self.get_selected_el(*self.initial_click_coord)].id(), self.nodes()[end].id())
-                    self.add_edge(edge_id, extremity_ids)
+                    if len(set(extremity_ids)) == 2:
+                        self.add_edge(edge_id, extremity_ids)
             else:
                 self.cv_image_coord = self.coords(self.cv_image_id)
                 for node_id in self.nodes():
