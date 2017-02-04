@@ -200,11 +200,20 @@ class GraphCanvas(t.Canvas):
         self.add_node(node_id, [], aliases=aliases, node_name=db_id)
         
     def create_edge_from_db(self, nb, id1, id2):
+        n1 = n2 = None
         for n in self.nodes():
             if self.nodes()[n].id() == id1:
                 n1 = n
             elif self.nodes()[n].id() == id2:
                 n2 = n
+        if None in (n1, n2):
+            err = ''
+            if n1 is None:
+                err += ' {} does not exist'.format(id1)
+            if n2 is None:
+                err += ' {} does not exist'.format(id2)
+            print('unable to create an edge between nodes {} and {}. Reason is:{}' \
+                  .format(id1, id2, err))
         beg_coord = [c + NODE_SIZE for c in self.nodes()[n1].coord()[:2]]
         end_coord = [c + NODE_SIZE for c in self.nodes()[n2].coord()[:2]]
         edge_id = self.create_line(*beg_coord, *end_coord, width=EDGE_WIDTH)

@@ -47,7 +47,7 @@ class App(t.Frame):
         self.file_name = t.filedialog.askopenfilename(initialdir=Config.MAPS_PATH,
             filetypes=[('PNG Files', '.png')])
         ext = splitext(self.file_name)[1].lower()[1:]
-        filename = path_to_building_name(self.file_name)
+        filename = path_to_plan_name(self.file_name)
         if self.database.exists_plan(filename):
             self.plan_exists_in_db = True
             self.background_file_name = self.file_name
@@ -137,7 +137,7 @@ class App(t.Frame):
     # Save functions
 
     def save(self):
-        self.database.update_plan(self.canvas.get_bg_coord(), path_to_building_name(self.file_name))
+        self.database.update_plan(self.canvas.get_bg_coord(), path_to_plan_name(self.file_name))
         self.canvas.update_nodes_position()
 
     class PlanNameData:
