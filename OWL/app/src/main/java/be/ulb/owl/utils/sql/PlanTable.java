@@ -1,18 +1,16 @@
 package be.ulb.owl.utils.sql;
 
-import java.util.ArrayList;
-
 /**
  * Created by Detobel36
  */
 
-public enum BuildingTable implements SQLTable {
+public enum PlanTable implements SQLTable {
 
     ID("Id"),
     CAMPUS_ID("CampusId"),
     NAME("Name"),
     PPM("Ppm"),
-    IMAGE_PATH("ImagePath"),
+    IMAGE_DIRECTORY("ImageDirectory"),
     X_ON_PARENT("XOnParent"),
     Y_ON_PARENT("YOnParent"),
     BG_COORD_X("BgCoordX"),
@@ -20,10 +18,10 @@ public enum BuildingTable implements SQLTable {
     RELATIVE_ANGLE("RelativeAngle");
 
 
-    private static String _NAME = "Building";
+    private static String _NAME = "Plan";
     private final String _value;
 
-    BuildingTable(String value) {
+    PlanTable(String value) {
         _value = value;
     }
 

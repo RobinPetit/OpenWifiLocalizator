@@ -45,7 +45,7 @@ public class Plan {
     private ArrayList<Node> _listNode;
     private HashSet<String> _allBssWifi;
     private InputStream _image;
-    private final String _pathImage;
+    private final String _directoryImage;
     private final float _ppm;  // pixels per metre
     private final float _relativeAngle;
     private final float _xOnParent;
@@ -59,7 +59,7 @@ public class Plan {
      * @param name of the plan
      * @param id in the database
      * @param parentPlan the parent plan reference (campus plan)
-     * @param pathImage path to the image (only the folder after IMGMap)
+     * @param directoryImage path to the image (only the folder after IMGMap)
      * @param xOnParent x position on the parent plan
      * @param yOnParent y position on the parent plan
      * @param bgCoordX relative x position of the upper left corner of the image
@@ -67,8 +67,8 @@ public class Plan {
      * @param relativeAngle angle that the plan makes on the parent plan
      * @param distance number of pixel for on meter
      */
-    public Plan(String name, int id, Campus parentPlan, String pathImage, float xOnParent, float yOnParent, float bgCoordX,
-                float bgCoordY, float relativeAngle, float distance) {
+    public Plan(String name, int id, Campus parentPlan, String directoryImage, float xOnParent,
+                float yOnParent, float bgCoordX, float bgCoordY, float relativeAngle, float distance) {
 
         this._name = name;
 
@@ -79,7 +79,7 @@ public class Plan {
         this._bgCoordY = bgCoordY;
         this._relativeAngle = relativeAngle;
         this._ppm = distance;
-        this._pathImage = pathImage;
+        this._directoryImage = directoryImage;
 
         _listNode = SQLUtils.loadNodes(this, id);
 
@@ -143,7 +143,7 @@ public class Plan {
      */
     private void loadImage() throws IOException {
         try {
-            _image = main.getAssets().open("IMGMap" + File.separator + _pathImage +
+            _image = main.getAssets().open("IMGMap" + File.separator + _directoryImage +
                     File.separator + _name +".png");
         } catch (IOException e) {
             throw new IOException("Impossible to load the image of this plan (" + _name + ")");
