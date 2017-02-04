@@ -53,15 +53,6 @@ CREATE TABLE "SpecialEdges" (
 
 -- TODO: INSERT INTO  `SpecialEdges` VALULES(NodeBorderPlaine, NodeBorderSolbosch, Distance);
 
-CREATE TABLE "Campus" (
-	`Id`     INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-	`Name`   TEXT NOT NULL,
-	`Abbrev` TEXT
-);
-
-INSERT INTO `Campus` VALUES (1,'Plaine','P');
-INSERT INTO `Campus` VALUES (2,'Solbosch','S');
-
 CREATE TABLE "Building" (
 	`Id`            INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 	`CampusId`      INTEGER,
@@ -75,8 +66,8 @@ CREATE TABLE "Building" (
 	`RelativeAngle` REAL DEFAULT 0.0
 );
 
-INSERT INTO Building(CampusId, Name, Ppm, ImagePath, XOnParent, XOnParent) VALUES (0, 'Plaine', 2.78, NULL, NULL, NULL);
-INSERT INTO Building(CampusId, Name, Ppm, ImagePath, XOnParent, XOnParent) VALUES (0, 'Solbosch', 2.97, NULL, NULL, NULL);
+INSERT INTO Building(CampusId, Name, ImagePath) VALUES (0, 'Plaine', '');
+INSERT INTO Building(CampusId, Name, ImagePath) VALUES (0, 'Solbosch', '');
 
 CREATE TABLE `AliasesLink` (
 	`NodeId`  INTEGER,
