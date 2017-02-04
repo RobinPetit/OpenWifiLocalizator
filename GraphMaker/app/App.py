@@ -123,12 +123,6 @@ class App(t.Frame):
             ppm = angle = x = y = None
         return self.NewPlanData(ppm, angle, [x, y])
 
-    def scan(self):
-        self.toplevel.wm_title('Scanning access points...')
-        self.ap = AccessPointList(iterations=5)
-        self.ap.scan()
-        self.toplevel.wm_title('access points scanned')
-
     def createMenu(self):
         menubar=t.Menu(self.master)
         filemenu=t.Menu(menubar,tearoff=0)
@@ -139,7 +133,6 @@ class App(t.Frame):
         menubar.add_cascade(label="File", menu=filemenu)
 
         self.master.config(menu=menubar)
-
 
     # Save functions
 
