@@ -1,13 +1,17 @@
-package be.ulb.owl.graph;
+package be.ulb.owl.graph.shortestpath;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import be.ulb.owl.graph.NoPathException;
+import be.ulb.owl.graph.Node;
+import be.ulb.owl.graph.Path;
+
 /**
- * Created by robin on 10/12/16.
+ * Created by robin on 04/02/17.
  */
 
-public class ShortestPathEvaluator {
+public class ShortestPathAStar extends ShortestPathEvaluator {
     private ArrayList<Node> _evaluatedNodes;           // contains all the nodes which have already been treated
     private ArrayList<Node> _toBeEvaluated;            // contains all the nodes that have already been discovered
                                                        // by the algorithm but which haven't been treated yet
@@ -16,13 +20,9 @@ public class ShortestPathEvaluator {
                                                        // by the algorithm but which haven(t been treated yet
     private HashMap<Node, Double> _intermediateScore;  // maps each node to the score of the path (from -> to)
                                                        // which contains the given node
-    private Node _src;
-    private Node _dest;
 
-    private boolean _found;
-    private boolean _executed;
-
-    public ShortestPathEvaluator(ArrayList<Node> nodes, Node from, Node to) {
+    public ShortestPathAStar(ArrayList<Node> nodes, Node from, Node to) {
+        super(from, to);
         _evaluatedNodes = new ArrayList<>();
         _toBeEvaluated = new ArrayList<>();
         _toBeEvaluated.add(from);
@@ -37,24 +37,10 @@ public class ShortestPathEvaluator {
         }
         _reachingScore.put(from, .0);
         _intermediateScore.put(from, heuristic(from, to));
-        _src = from;
-        _dest = to;
-        _found = _executed = false;
     }
 
-    /**
-     *
-     * @param a
-     * @param b
-     * @return The euclidian distance between two nodes
-     */
-    static public double heuristic(Node a, Node b) {
-        double deltaX = a.getX() - b.getX();
-        double deltaY = a.getY() - b.getY();
-        return Math.sqrt(deltaX*deltaX + deltaY*deltaY);
-    }
-
-    private void lookup() {
+    @Override
+    public void lookup() {
         while(!_toBeEvaluated.isEmpty()) {
             Node current = getLowestIntermediateScore();
             assert(_toBeEvaluated.contains(current));
@@ -72,16 +58,8 @@ public class ShortestPathEvaluator {
         _executed = true;
     }
 
-    /**
-     *
-     * @return A list of path representing where the user needs to reach the given points
-     * @throws NoPathException
-     */
+    @Override
     public ArrayList<Path> find() throws NoPathException {
-        if(!_executed)
-            lookup();
-        if(!_found)
-            throw new NoPathException("Unable to find a path between nodes");
         ArrayList<Path> path = new ArrayList<>();
         Node current = _dest;
         while(!current.equals(_src)) {
@@ -129,4 +107,16 @@ public class ShortestPathEvaluator {
         }
         return toReturn;
     }
+    /**
+     *
+     * @param a
+     * @param b
+     * @return The euclidian distance between two nodes
+     */
+    static public double heuristic(Node a, Node b) {
+        double deltaX = a.getX() - b.getX();
+        double deltaY = a.getY() - b.getY();
+        return Math.sqrt(deltaX*deltaX + deltaY*deltaY);
+    }
+
 }

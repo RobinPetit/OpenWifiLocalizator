@@ -14,6 +14,8 @@ import java.util.Random;
 import be.ulb.owl.MainActivity;
 import be.ulb.owl.Scanner;
 import be.ulb.owl.Wifi;
+import be.ulb.owl.graph.shortestpath.ShortestPathAStar;
+import be.ulb.owl.graph.shortestpath.ShortestPathEvaluator;
 import be.ulb.owl.utils.SQLUtils;
 
 /**
@@ -80,7 +82,7 @@ public class Graph {
             double minHeuristic = Double.POSITIVE_INFINITY;
             Node closestDestination = null;
             for (Node node : destinations) {
-                double currentHeuristic = ShortestPathEvaluator.heuristic(src, node);
+                double currentHeuristic = ShortestPathAStar.heuristic(src, node);
                 if (currentHeuristic < minHeuristic) {
                     closestDestination = node;
                     minHeuristic = currentHeuristic;
@@ -124,7 +126,7 @@ public class Graph {
      */
     public ArrayList<Path> bestPath(Node nodeFrom, Node nodeTo) throws NoPathException {
         Log.d(getClass().getName(), "Searching path between: " + nodeFrom.getID() + " and " + nodeTo.getID());
-        ShortestPathEvaluator evaluator = new ShortestPathEvaluator(getAllNodes(), nodeFrom, nodeTo);
+        ShortestPathEvaluator evaluator = new ShortestPathAStar(getAllNodes(), nodeFrom, nodeTo);
         return evaluator.find();
     }
 
