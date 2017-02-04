@@ -23,12 +23,19 @@ class Config:
     NETWORK_INTERFACE = 'wlo1'
     # Debug Mode
     DEBUG = True
-    # MAPS location
-    MAPS_PATH = '../plans/'
-    # XMLs location
-    XMLS_PATH = '../OWL/app/src/main/assets/XMLMap/'
+    # Path to the images map
+    MAPS_PATH = '../OWL/app/src/main/assets/'
+    # Path to the database
+    DB_PATH = '../OWL/app/src/main/assets/OWL-DB.db'
+
 
 ```
+
+If you don't configure GraphMaker, you will get this error:
+´´´
+ImportError: No module named 'app.Config'
+´´´
+
 
 
 
