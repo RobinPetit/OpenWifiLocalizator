@@ -26,15 +26,15 @@ CREATE TRIGGER CheckEdgeOnSameCampus
 	BEFORE INSERT
 	ON "Edge"
 	WHEN
-		(SELECT B.CampusId
-			FROM Building B
-			WHERE B.Id=(SELECT N.BuildingId
+		(SELECT P.CampusId
+			FROM Plan P
+			WHERE P.Id=(SELECT N.PlanId
 				FROM Node N
 				WHERE N.Id=NEW.Node1Id))
 		!=
-		(SELECT B.CampusId
-			FROM Building B
-			WHERE B.Id=(SELECT N.BuildingId
+		(SELECT P.CampusId
+			FROM Plan P
+			WHERE P.Id=(SELECT N.PlanId
 				FROM Node N
 				WHERE N.Id=NEW.Node2Id))
 BEGIN
