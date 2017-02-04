@@ -60,6 +60,7 @@ public class ShortestPathAStar extends ShortestPathEvaluator {
 
     @Override
     public ArrayList<Path> find() throws NoPathException {
+        super.find();
         ArrayList<Path> path = new ArrayList<>();
         Node current = _dest;
         while(!current.equals(_src)) {
