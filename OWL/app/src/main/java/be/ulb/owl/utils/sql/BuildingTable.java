@@ -21,7 +21,6 @@ public enum BuildingTable implements SQLTable {
 
 
     private static String _NAME = "Building";
-
     private final String _value;
 
     BuildingTable(String value) {
@@ -59,19 +58,5 @@ public enum BuildingTable implements SQLTable {
     public static String getName() {
         return _NAME;
     }
-
-    /**
-     * Get all column
-     *
-     * @return all column
-     */
-    public static String[] strValues() {
-        ArrayList<String> res = new ArrayList<String>();
-        for(SQLTable val : values()) {
-            res.add(val.toString());
-        }
-        return (String[]) res.toArray();
-    }
-
 
 }
