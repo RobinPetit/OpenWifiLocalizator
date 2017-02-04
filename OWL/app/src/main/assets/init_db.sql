@@ -1,13 +1,14 @@
 BEGIN TRANSACTION;
 
 CREATE TABLE "Wifi" (
-	`Id`       INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-	`BSS`      TEXT,
-	`NodeId`   INTEGER,
-	`Min`      REAL,
-	`Max`      REAL,
-	`Avg`      REAL,
-	`Variance` REAL
+	`Id`           INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	`BSS`          TEXT,
+	`NodeId`       INTEGER,
+	`Min`          REAL,
+	`Max`          REAL,
+	`Avg`          REAL,
+	`Variance`     REAL,
+	`ScanningDate` DATE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "Node" (
