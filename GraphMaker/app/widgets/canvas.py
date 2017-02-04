@@ -45,8 +45,7 @@ class GraphCanvas(t.Canvas):
         self.plan_data.add_node(node_id, node)
         print('name: ' + str(node_name))
         if node_name == 0:
-            print('saving node in db')
-            node.id(self.database.save_node(node, path_to_building_name(self.master.file_name)))
+            node.id(self.database.save_node(node, path_to_plan_name(self.master.file_name)))
 
     def add_edge(self, edge_id, extremities, nb=0):
         edge = Edge(self.coords(edge_id), extremities, nb=nb)
@@ -182,17 +181,16 @@ class GraphCanvas(t.Canvas):
                         self.nodes()[node_id].coord()[2]+x_offset, self.nodes()[node_id].coord()[3]+y_offset)
     
     def load_plan(self, background_file_name):
-        filename = path_to_building_name(background_file_name)
+        filename = path_to_plan_name(background_file_name)
         plan = self.database.load_plan(filename)
-        print(plan.bg_coord)
         self.set_pixels_per_metre(plan.ppm)
         self.set_angle_with_parent(plan.angle)
         self.set_position_on_parent(plan.on_parent)
         self.set_bg_image(App.App.ALPHA_INITIAL_VALUE, background_file_name)
         self.set_bg_coord(plan.bg_coord)
-        for node_id, x, y, aliases, has_ap in self.database.load_nodes_from_building(filename):
+        for node_id, x, y, aliases, has_ap in self.database.load_nodes_from_plan(filename):
             self.create_node_from_db(x, y, aliases, has_ap, node_id)
-        for edge in self.database.load_edges_from_building(filename):
+        for edge in self.database.load_edges_from_plan(filename):
             self.create_edge_from_db(*edge)
             
     def create_node_from_db(self, x, y, aliases, has_ap, db_id):

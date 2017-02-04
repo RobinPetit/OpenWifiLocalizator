@@ -60,6 +60,13 @@ class App(t.Frame):
                 self.canvas.set_position_on_parent([new_plan_data.x, new_plan_data.y])
                 self.background_file_name = self.file_name
                 self.canvas.set_bg_image(App.ALPHA_INITIAL_VALUE, self.background_file_name)
+                new_plan_data.image_dir = purge_plan_name(self.file_name, Config.MAPS_PATH)
+                print(new_plan_data.image_dir)
+                slash_idx = new_plan_data.image_dir.rfind('/')
+                if slash_idx == -1:
+                    new_plan_data.image_dir = './'
+                else:
+                    new_plan_data.image_dir = new_plan_data.image_dir[:slash_idx] + '/'
                 self.database.save_plan(filename, new_plan_data)
             else:
                 self.destroy()
@@ -92,14 +99,14 @@ class App(t.Frame):
         # Angle with parent
         angle = t.StringVar()
         t.Label(toplevel, text='Enter the angle (trigonometric direction but in degrees) of\n'
-                               'this building relative to its parent plan (Solbosch or Plaine): ') \
+                               'this plan relative to its parent plan (Solbosch or Plaine): ') \
                 .grid(row=1, column=0)
         angle_entry = t.Entry(toplevel, textvariable=angle)
         angle_entry.grid(row=1, column=1, columnspan=2)
         # Position on parent plan
         x_on_parent = t.StringVar()
         y_on_parent = t.StringVar()
-        t.Label(toplevel, text='Enter the building position on parent plan: ').grid(row=2, column=0)
+        t.Label(toplevel, text='Enter the plan position on parent plan: ').grid(row=2, column=0)
         x_entry = t.Entry(toplevel, textvariable=x_on_parent)
         y_entry = t.Entry(toplevel, textvariable=y_on_parent)
         x_entry.grid(row=2, column=1)

@@ -1,18 +1,17 @@
 BEGIN TRANSACTION;
 
 CREATE TABLE "Wifi" (
-	`Id`       INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-	`BSS`      TEXT,
-	`NodeId`   INTEGER,
-	`Min`      REAL,
-	`Max`      REAL,
-	`Avg`      REAL,
-	`Variance` REAL
+	`Id`           INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	`BSS`          TEXT,
+	`NodeId`       INTEGER,
+	`Avg`          REAL,
+	`Variance`     REAL,
+	`ScanningDate` DATE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "Node" (
 	`Id`         INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-	`BuildingId` INTEGER,
+	`PlanId` INTEGER,
 	`X`          REAL,
 	`Y`          REAL
 );
@@ -53,21 +52,21 @@ CREATE TABLE "SpecialEdges" (
 
 -- TODO: INSERT INTO  `SpecialEdges` VALULES(NodeBorderPlaine, NodeBorderSolbosch, Distance);
 
-CREATE TABLE "Building" (
-	`Id`            INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-	`CampusId`      INTEGER,
-	`Name`          TEXT,
-	`Ppm`           REAL DEFAULT 0.0,
-	`ImagePath`     TEXT,
-	`XOnParent`     REAL DEFAULT 0.0,
-	`YOnParent`     REAL DEFAULT 0.0,
-	`BgCoordX`      REAL DEFAULT 0.0,
-	`BgCoordY`      REAL DEFAULT 0.0,
-	`RelativeAngle` REAL DEFAULT 0.0
+CREATE TABLE "Plan" (
+	`Id`             INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	`CampusId`       INTEGER,
+	`Name`           TEXT,
+	`Ppm`            REAL DEFAULT 0.0,
+	`ImageDirectory` TEXT,
+	`XOnParent`      REAL DEFAULT 0.0,
+	`YOnParent`      REAL DEFAULT 0.0,
+	`BgCoordX`       REAL DEFAULT 0.0,
+	`BgCoordY`       REAL DEFAULT 0.0,
+	`RelativeAngle`  REAL DEFAULT 0.0
 );
 
-INSERT INTO Building(CampusId, Name, ImagePath) VALUES (0, 'Plaine', '');
-INSERT INTO Building(CampusId, Name, ImagePath) VALUES (0, 'Solbosch', '');
+INSERT INTO Plan(CampusId, Name, ImageDirectory) VALUES (0, 'Plaine', '');
+INSERT INTO Plan(CampusId, Name, ImageDirectory) VALUES (0, 'Solbosch', '');
 
 CREATE TABLE `AliasesLink` (
 	`NodeId`  INTEGER,
