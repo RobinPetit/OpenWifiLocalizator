@@ -1,4 +1,4 @@
-# OpenWifiLocalizator (OWL)
+# GraphMaker
 
 ## Conventions
 
