@@ -13,7 +13,9 @@ When writing python code, please follow the given rules:
 ## Configuration
 
 To configure GraphMaker you must copy `app/Config.py.init` to `app/Config.py`.
-`cp app/Config.py.init app/Config.py`
+```
+cp app/Config.py.init app/Config.py
+```
 Here you have an example of config:
 ```
 
@@ -32,9 +34,9 @@ class Config:
 ```
 
 If you don't configure GraphMaker, you will get this error:
-´´´
+```
 ImportError: No module named 'app.Config'
-´´´
+```
 
 
 
@@ -46,4 +48,11 @@ To start the application run:
 sudo python3 GraphMaker.py
 ```
 **in this folder** (`GraphMaker`)
+        
+If you will not start GraphMaker with *root/sudo*, you can use the following command:
+```
+python3 GraphMakder.py --force
+```
+:warning: You can **only** scan wifi if you have the permission.
+
 
