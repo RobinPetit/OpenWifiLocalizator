@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public enum NodeTable implements SQLTable {
     ID("Id"),
-    BUILDING_ID("BuildingId"),
+    PLAN_ID("PlanId"),
     X("X"),
     Y("Y");
 

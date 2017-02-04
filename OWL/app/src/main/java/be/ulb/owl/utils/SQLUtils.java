@@ -23,7 +23,7 @@ import be.ulb.owl.graph.Path;
 import be.ulb.owl.graph.Plan;
 import be.ulb.owl.utils.sql.AliasesLinkTable;
 import be.ulb.owl.utils.sql.AliasesTable;
-import be.ulb.owl.utils.sql.BuildingTable;
+import be.ulb.owl.utils.sql.PlanTable;
 import be.ulb.owl.utils.sql.EdgeTable;
 import be.ulb.owl.utils.sql.NodeTable;
 import be.ulb.owl.utils.sql.SpecialEdgeTable;
@@ -208,19 +208,19 @@ public class SQLUtils extends SQLiteOpenHelper {
     public static ArrayList<Campus> loadAllCampus() {
         ArrayList<Campus> res = new ArrayList<Campus>();
 
-        Cursor cursor = getDatabase().query(BuildingTable.getName(),
+        Cursor cursor = getDatabase().query(PlanTable.getName(),
                 new String[] {
-                        BuildingTable.NAME.getCol(),
-                        BuildingTable.ID.getCol(),
-                        BuildingTable.IMAGE_PATH.getCol(),
-                        BuildingTable.BG_COORD_X.getCol(),
-                        BuildingTable.BG_COORD_Y.getCol(),
-                        BuildingTable.PPM.getCol()},
-                BuildingTable.CAMPUS_ID.getCol() + " = 0", null, null, null, null);
+                        PlanTable.NAME.getCol(),
+                        PlanTable.ID.getCol(),
+                        PlanTable.IMAGE_DIRECTORY.getCol(),
+                        PlanTable.BG_COORD_X.getCol(),
+                        PlanTable.BG_COORD_Y.getCol(),
+                        PlanTable.PPM.getCol()},
+                PlanTable.CAMPUS_ID.getCol() + " = 0", null, null, null, null);
 
         int id;
         String planName;
-        String pathImage;
+        String directoryImage;
         float bgCoordX;
         float bgCoordY;
         float distance;
@@ -230,15 +230,15 @@ public class SQLUtils extends SQLiteOpenHelper {
 
             while(!cursor.isAfterLast()) {
 
-                id = getInt(cursor, BuildingTable.ID.getCol());
-                planName = getString(cursor, BuildingTable.NAME.getCol());
-                pathImage = getString(cursor, BuildingTable.IMAGE_PATH.getCol());
+                id = getInt(cursor, PlanTable.ID.getCol());
+                planName = getString(cursor, PlanTable.NAME.getCol());
+                directoryImage = getString(cursor, PlanTable.IMAGE_DIRECTORY.getCol());
 
-                bgCoordX = getFloat(cursor, BuildingTable.BG_COORD_X.getCol());
-                bgCoordY = getFloat(cursor, BuildingTable.BG_COORD_Y.getCol());
-                distance = getFloat(cursor, BuildingTable.PPM.getCol());
+                bgCoordX = getFloat(cursor, PlanTable.BG_COORD_X.getCol());
+                bgCoordY = getFloat(cursor, PlanTable.BG_COORD_Y.getCol());
+                distance = getFloat(cursor, PlanTable.PPM.getCol());
 
-                res.add(new Campus(planName, id, pathImage, bgCoordX, bgCoordY, distance));
+                res.add(new Campus(planName, id, directoryImage, bgCoordX, bgCoordY, distance));
 
                 cursor.moveToNext();
             }
@@ -256,20 +256,20 @@ public class SQLUtils extends SQLiteOpenHelper {
     public static Campus loadCampus(String name) {
         Campus res = null;
 
-        Cursor cursor = getDatabase().query(BuildingTable.getName(),
+        Cursor cursor = getDatabase().query(PlanTable.getName(),
                 new String[] {
-                        BuildingTable.NAME.getCol(),
-                        BuildingTable.ID.getCol(),
-                        BuildingTable.IMAGE_PATH.getCol(),
-                        BuildingTable.BG_COORD_X.getCol(),
-                        BuildingTable.BG_COORD_Y.getCol(),
-                        BuildingTable.PPM.getCol()},
-                BuildingTable.CAMPUS_ID.getCol() + " = 0 AND " +
-                BuildingTable.NAME.getCol() + " = ?", new String[]{name}, null, null, null);
+                        PlanTable.NAME.getCol(),
+                        PlanTable.ID.getCol(),
+                        PlanTable.IMAGE_DIRECTORY.getCol(),
+                        PlanTable.BG_COORD_X.getCol(),
+                        PlanTable.BG_COORD_Y.getCol(),
+                        PlanTable.PPM.getCol()},
+                PlanTable.CAMPUS_ID.getCol() + " = 0 AND " +
+                PlanTable.NAME.getCol() + " = ?", new String[]{name}, null, null, null);
 
         int id;
         String planName;
-        String pathImage;
+        String directoryImage;
         float bgCoordX;
         float bgCoordY;
         float distance;
@@ -278,15 +278,15 @@ public class SQLUtils extends SQLiteOpenHelper {
             cursor.moveToFirst();
 
 
-            id = getInt(cursor, BuildingTable.ID.getCol());
-            planName = getString(cursor, BuildingTable.NAME.getCol());
-            pathImage = getString(cursor, BuildingTable.IMAGE_PATH.getCol());
+            id = getInt(cursor, PlanTable.ID.getCol());
+            planName = getString(cursor, PlanTable.NAME.getCol());
+            directoryImage = getString(cursor, PlanTable.IMAGE_DIRECTORY.getCol());
 
-            bgCoordX = getFloat(cursor, BuildingTable.BG_COORD_X.getCol());
-            bgCoordY = getFloat(cursor, BuildingTable.BG_COORD_Y.getCol());
-            distance = getFloat(cursor, BuildingTable.PPM.getCol());
+            bgCoordX = getFloat(cursor, PlanTable.BG_COORD_X.getCol());
+            bgCoordY = getFloat(cursor, PlanTable.BG_COORD_Y.getCol());
+            distance = getFloat(cursor, PlanTable.PPM.getCol());
 
-            res = new Campus(planName, id, pathImage, bgCoordX, bgCoordY, distance);
+            res = new Campus(planName, id, directoryImage, bgCoordX, bgCoordY, distance);
 
         }
 
@@ -305,22 +305,22 @@ public class SQLUtils extends SQLiteOpenHelper {
     public static ArrayList<Plan> loadAllPlan(Campus campus, int campusID) {
         ArrayList<Plan> res = new ArrayList<Plan>();
 
-        Cursor cursor = getDatabase().query(BuildingTable.getName(),
+        Cursor cursor = getDatabase().query(PlanTable.getName(),
                 new String[] {
-                        BuildingTable.NAME.getCol(),
-                        BuildingTable.ID.getCol(),
-                        BuildingTable.IMAGE_PATH.getCol(),
-                        BuildingTable.X_ON_PARENT.getCol(),
-                        BuildingTable.Y_ON_PARENT.getCol(),
-                        BuildingTable.BG_COORD_X.getCol(),
-                        BuildingTable.BG_COORD_Y.getCol(),
-                        BuildingTable.RELATIVE_ANGLE.getCol(),
-                        BuildingTable.PPM.getCol()},
-                BuildingTable.CAMPUS_ID.getCol() + " = ?", new String[]{""+campusID}, null, null, null);
+                        PlanTable.NAME.getCol(),
+                        PlanTable.ID.getCol(),
+                        PlanTable.IMAGE_DIRECTORY.getCol(),
+                        PlanTable.X_ON_PARENT.getCol(),
+                        PlanTable.Y_ON_PARENT.getCol(),
+                        PlanTable.BG_COORD_X.getCol(),
+                        PlanTable.BG_COORD_Y.getCol(),
+                        PlanTable.RELATIVE_ANGLE.getCol(),
+                        PlanTable.PPM.getCol()},
+                PlanTable.CAMPUS_ID.getCol() + " = ?", new String[]{""+campusID}, null, null, null);
 
         int id;
         String planName;
-        String pathImage;
+        String directoryImage;
         float xOnParent;
         float yOnParent;
         float bgCoordX;
@@ -332,18 +332,18 @@ public class SQLUtils extends SQLiteOpenHelper {
             cursor.moveToFirst();
 
             while (!cursor.isAfterLast()) {
-                planName = getString(cursor, BuildingTable.NAME.getCol());;
-                id = getInt(cursor, BuildingTable.ID.getCol());
-                pathImage = getString(cursor, BuildingTable.IMAGE_PATH.getCol());
-                xOnParent = getFloat(cursor, BuildingTable.X_ON_PARENT.getCol());
-                yOnParent = getFloat(cursor, BuildingTable.Y_ON_PARENT.getCol());
-                bgCoordX = getFloat(cursor, BuildingTable.BG_COORD_X.getCol());
-                bgCoordY = getFloat(cursor, BuildingTable.BG_COORD_Y.getCol());
-                relativeAngle = getFloat(cursor, BuildingTable.RELATIVE_ANGLE.getCol());
-                distance = getFloat(cursor, BuildingTable.PPM.getCol());
+                planName = getString(cursor, PlanTable.NAME.getCol());;
+                id = getInt(cursor, PlanTable.ID.getCol());
+                directoryImage = getString(cursor, PlanTable.IMAGE_DIRECTORY.getCol());
+                xOnParent = getFloat(cursor, PlanTable.X_ON_PARENT.getCol());
+                yOnParent = getFloat(cursor, PlanTable.Y_ON_PARENT.getCol());
+                bgCoordX = getFloat(cursor, PlanTable.BG_COORD_X.getCol());
+                bgCoordY = getFloat(cursor, PlanTable.BG_COORD_Y.getCol());
+                relativeAngle = getFloat(cursor, PlanTable.RELATIVE_ANGLE.getCol());
+                distance = getFloat(cursor, PlanTable.PPM.getCol());
 
-                res.add(new Plan(planName, id, campus, pathImage, xOnParent, yOnParent, bgCoordX, bgCoordY,
-                        relativeAngle, distance));
+                res.add(new Plan(planName, id, campus, directoryImage, xOnParent, yOnParent, bgCoordX,
+                        bgCoordY, relativeAngle, distance));
 
                 cursor.moveToNext(); // next entry
             }
@@ -364,18 +364,18 @@ public class SQLUtils extends SQLiteOpenHelper {
      */
     public static Plan loadPlan(String planName) throws SQLiteException {
         Cursor cursor = getDatabase().rawQuery("SELECT bSource.*, " +
-                    "bCampus." + BuildingTable.NAME.getCol() + " AS campusName " +
-                "FROM " + BuildingTable.getName() + " bSource " +
-                    "JOIN " + BuildingTable.getName() + " bCampus " +
-                    "ON bCampus." + BuildingTable.ID.getCol() + " = bSource." + BuildingTable.CAMPUS_ID.getCol() +" " +
-                "WHERE bSource." + BuildingTable.NAME.getCol() + " = ?",
+                    "bCampus." + PlanTable.NAME.getCol() + " AS campusName " +
+                "FROM " + PlanTable.getName() + " bSource " +
+                    "JOIN " + PlanTable.getName() + " bCampus " +
+                    "ON bCampus." + PlanTable.ID.getCol() + " = bSource." + PlanTable.CAMPUS_ID.getCol() +" " +
+                "WHERE bSource." + PlanTable.NAME.getCol() + " = ?",
                 new String[] {planName});
 
 
         int id;
         String campusName;
 
-        String pathImage;
+        String directoryImage;
         float xOnParent;
         float yOnParent;
         float bgCoordX;
@@ -385,16 +385,16 @@ public class SQLUtils extends SQLiteOpenHelper {
 
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
-            id = getInt(cursor, BuildingTable.ID.getCol());
+            id = getInt(cursor, PlanTable.ID.getCol());
             campusName = getString(cursor, "campusName");
 
-            pathImage = getString(cursor, BuildingTable.IMAGE_PATH.getCol());
-            xOnParent = getFloat(cursor, BuildingTable.X_ON_PARENT.getCol());
-            yOnParent = getFloat(cursor, BuildingTable.Y_ON_PARENT.getCol());
-            bgCoordX = getFloat(cursor, BuildingTable.BG_COORD_X.getCol());
-            bgCoordY = getFloat(cursor, BuildingTable.BG_COORD_Y.getCol());
-            relativeAngle = getFloat(cursor, BuildingTable.RELATIVE_ANGLE.getCol());
-            distance = getFloat(cursor, BuildingTable.PPM.getCol());
+            directoryImage = getString(cursor, PlanTable.IMAGE_DIRECTORY.getCol());
+            xOnParent = getFloat(cursor, PlanTable.X_ON_PARENT.getCol());
+            yOnParent = getFloat(cursor, PlanTable.Y_ON_PARENT.getCol());
+            bgCoordX = getFloat(cursor, PlanTable.BG_COORD_X.getCol());
+            bgCoordY = getFloat(cursor, PlanTable.BG_COORD_Y.getCol());
+            relativeAngle = getFloat(cursor, PlanTable.RELATIVE_ANGLE.getCol());
+            distance = getFloat(cursor, PlanTable.PPM.getCol());
 
         } else {
             throw new SQLiteException("Multiple building have the same name: " + planName);
@@ -408,7 +408,8 @@ public class SQLUtils extends SQLiteOpenHelper {
             return null;
         }
 
-        return new Plan(planName, id, campus, pathImage, xOnParent, yOnParent, bgCoordX, bgCoordY, relativeAngle, distance);
+        return new Plan(planName, id, campus, directoryImage, xOnParent, yOnParent, bgCoordX, bgCoordY,
+                    relativeAngle, distance);
     }
 
 
@@ -428,7 +429,7 @@ public class SQLUtils extends SQLiteOpenHelper {
                         NodeTable.ID.getCol(),
                         NodeTable.X.getCol(),
                         NodeTable.Y.getCol()},
-                NodeTable.BUILDING_ID.getCol() + " = ?", new String[]{""+planID}, null, null, null);
+                NodeTable.PLAN_ID.getCol() + " = ?", new String[]{""+planID}, null, null, null);
 
         if(cursor.getCount() > 0) {
             cursor.moveToFirst();

@@ -23,13 +23,13 @@ public class Campus extends Plan {
      *
      * @param name          of the plan
      * @param id            in the database
-     * @param pathImage     path to the image
+     * @param directoryImage     path to the image
      * @param bgCoordX      relative x position of the upper left corner of the image
      * @param bgCoordY      relative y position of the upper left corner of the image
      * @param distance      number of pixel for on meter
      */
-    public Campus(String name, int id, String pathImage, float bgCoordX, float bgCoordY, float distance) {
-        super(name, id, null, pathImage, -1, -1, bgCoordX, bgCoordY, 0, distance);
+    public Campus(String name, int id, String directoryImage, float bgCoordX, float bgCoordY, float distance) {
+        super(name, id, null, directoryImage, -1, -1, bgCoordX, bgCoordY, 0, distance);
 
         _allPlan = SQLUtils.loadAllPlan(this, id);
     }
