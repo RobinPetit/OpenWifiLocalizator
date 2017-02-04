@@ -41,6 +41,14 @@ BEGIN
 	SELECT RAISE(ABORT, 'Nodes from an edge must be from the same campus');
 END;
 
+CREATE TRIGGER CheckEdgeGoingFromTwoSeparateNodes
+	BEFORE INSERT
+	ON "Edge"
+	WHEN NEW.Node1Id=NEW.Node2Id
+BEGIN
+	SELECT RAISE(ABORT, 'An edge must join two separate nodes');
+END;
+
 -- table to store exceptional edges that don't fit the `Edge` table
 -- for instance edges between campus
 CREATE TABLE "SpecialEdges" (
