@@ -36,40 +36,57 @@ class App(t.Frame):
     def create_widgets(self, **options):
         self.canvas = EditableGraphCanvas(self, self.database, width=options['c_width'], height=options['c_height'])
         self.canvas.pack(fill="both", expand="YES")
-        self.open_file()
-        self.alpha_scale = t.Scale(self, from_=1, to=255,
-            command=lambda v: self.canvas.set_bg_image(v), orient=t.HORIZONTAL)
-        self.alpha_scale.set(App.ALPHA_INITIAL_VALUE)
-        self.alpha_scale.pack()
-        self.createMenu()
+
+        # If we can open a file
+        if(self.open_file()):
+            self.alpha_scale = t.Scale(self, from_=1, to=255,
+                command=lambda v: self.canvas.set_bg_image(v), orient=t.HORIZONTAL)
+            self.alpha_scale.set(App.ALPHA_INITIAL_VALUE)
+            self.alpha_scale.pack()
+            self.createMenu()
+        else:
+            raise IOError('Use haven\'t select a file')
+
+
 
     def open_file(self):
+        allOk = True
         self.file_name = t.filedialog.askopenfilename(initialdir=Config.MAPS_PATH,
             filetypes=[('PNG Files', '.png')])
-        ext = splitext(self.file_name)[1].lower()[1:]
-        filename = path_to_plan_name(self.file_name)
-        if self.database.exists_plan(filename):
-            self.plan_exists_in_db = True
-            self.background_file_name = self.file_name
-            self.canvas.load_plan(self.file_name)
+
+        # If user have chose a file
+        if(len(self.file_name) == 0):
+            self.destroy()
+            allOk = False
+
         else:
-            new_plan_data = self.ask_new_plan_data()
-            if None not in new_plan_data:
-                self.canvas.set_pixels_per_metre(new_plan_data.ppm)
-                self.canvas.set_angle_with_parent(new_plan_data.angle)
-                self.canvas.set_position_on_parent([new_plan_data.x, new_plan_data.y])
+            ext = splitext(self.file_name)[1].lower()[1:]
+            filename = path_to_plan_name(self.file_name)
+            if self.database.exists_plan(filename):
+                self.plan_exists_in_db = True
                 self.background_file_name = self.file_name
-                self.canvas.set_bg_image(App.ALPHA_INITIAL_VALUE, self.background_file_name)
-                new_plan_data.image_dir = purge_plan_name(self.file_name, Config.MAPS_PATH)
-                print(new_plan_data.image_dir)
-                slash_idx = new_plan_data.image_dir.rfind('/')
-                if slash_idx == -1:
-                    new_plan_data.image_dir = './'
-                else:
-                    new_plan_data.image_dir = new_plan_data.image_dir[:slash_idx] + '/'
-                self.database.save_plan(filename, new_plan_data)
+                self.canvas.load_plan(self.file_name)
             else:
-                self.destroy()
+                new_plan_data = self.ask_new_plan_data()
+                if None not in new_plan_data:
+                    self.canvas.set_pixels_per_metre(new_plan_data.ppm)
+                    self.canvas.set_angle_with_parent(new_plan_data.angle)
+                    self.canvas.set_position_on_parent([new_plan_data.x, new_plan_data.y])
+                    self.background_file_name = self.file_name
+                    self.canvas.set_bg_image(App.ALPHA_INITIAL_VALUE, self.background_file_name)
+                    new_plan_data.image_dir = purge_plan_name(self.file_name, Config.MAPS_PATH)
+                    print(new_plan_data.image_dir)
+                    slash_idx = new_plan_data.image_dir.rfind('/')
+                    if slash_idx == -1:
+                        new_plan_data.image_dir = './'
+                    else:
+                        new_plan_data.image_dir = new_plan_data.image_dir[:slash_idx] + '/'
+                    self.database.save_plan(filename, new_plan_data)
+                else:
+                    self.destroy()
+
+        return allOk
+
 
     class NewPlanData:
         def __init__(self, ppm, angle, pos):

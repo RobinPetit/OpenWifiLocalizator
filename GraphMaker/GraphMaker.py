@@ -16,10 +16,17 @@ from app.App import App
 def main():
     root = t.Tk()
     root.wm_title("GraphMaker")
-    app = App(root, c_width=800, c_height=800)
-    app.pack(fill='both', expand='yes')
-    root.protocol("WM_DELETE_WINDOW", lambda: (app.on_exit(),root.destroy()))
-    root.mainloop()
+    try:
+        app = App(root, c_width=800, c_height=800)
+
+    except IOError as e:
+        print("Stop application: " + str(e))
+
+    else:
+        app.pack(fill='both', expand='yes')
+        root.protocol("WM_DELETE_WINDOW", lambda: (app.on_exit(),root.destroy()))
+        root.mainloop()
+
 
 if __name__ == '__main__':
 
