@@ -36,6 +36,7 @@ public class ClickListener implements View.OnClickListener {
             case R.id.local:
                 searchLocal();
                 break;
+
             case R.id.localizeButton:
                 localize();
                 break;
@@ -54,10 +55,10 @@ public class ClickListener implements View.OnClickListener {
             campusName.add(campus.getName());
         }
 
-        /// DEBUG
+        /// TODO DEBUG (remove)
         campusName.add("P.F");
 
-        final String[] items = (String[]) campusName.toArray(); // TODO Remove test (P.F)
+        final String[] items = (String[]) campusName.toArray();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(main);
         builder.setTitle(R.string.select_map);
