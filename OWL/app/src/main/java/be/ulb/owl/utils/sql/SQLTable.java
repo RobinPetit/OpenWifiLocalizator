@@ -1,5 +1,7 @@
 package be.ulb.owl.utils.sql;
 
+import java.util.ArrayList;
+
 /**
  * Interface to have same function in all Table object
  *
@@ -9,5 +11,6 @@ public interface SQLTable {
 
     public String getCol();
     public String getFullCol();
+
 
 }

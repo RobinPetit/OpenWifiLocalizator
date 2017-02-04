@@ -51,17 +51,4 @@ public enum AliasesLinkTable implements SQLTable {
         return _NAME;
     }
 
-    /**
-     * Get all column
-     *
-     * @return all column
-     */
-    public static String[] strValues() {
-        ArrayList<String> res = new ArrayList<String>();
-        for(SQLTable val : values()) {
-            res.add(val.toString());
-        }
-        return (String[]) res.toArray();
-    }
-
 }
