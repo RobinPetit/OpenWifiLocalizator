@@ -220,8 +220,8 @@ class GraphCanvas(t.Canvas):
         self.add_edge(edge_id, [id1, id2], nb=nb)
         
     def update_nodes_position(self):
-        for node in self.nodes():
-            self.database.update_node_position(self.nodes()[node])
+        nodes_list = [self.nodes()[n] for n in self.nodes()]
+        self.database.update_all_nodes_position(nodes_list)
 
 class SelectableGraphCanvas(GraphCanvas):
     def __init__(self, master, database, **options):

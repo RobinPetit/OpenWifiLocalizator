@@ -216,6 +216,7 @@ class Database:
         # set to False for big updates and only commit at the end
         self.allowed_to_commit = True
         self.all_aliases = self.get_all_aliases()
+        self.disable_counter = 0
 
     def close(self, need_to_commit=False):
         """properly closes the connection to the database"""
@@ -227,6 +228,14 @@ class Database:
         """return a list of all aliases currently in the database"""
         query = Database.LOAD_ALL_ALIASES_QUERY
         return [r[0] for r in self.conn.execute(query).fetchall()]
+        
+    def disable_commit(self):
+        self.disable_counter += 1
+        self.allowed_to_commit = False
+        
+    def enable_commit(self):
+        self.disable_counter -= 1
+        self.allowed_to_commit = self.disable_counter == 0
 
     ##### save functions
 
@@ -234,6 +243,8 @@ class Database:
     def commit(self):
         if self.allowed_to_commit:
             self.conn.commit()
+            if Config.DEBUG:
+                print('commiting change')
 
     def save_plan(self, path, plan_data, bg_coord=(0, 0)):
         """registers a new plan"""
@@ -272,12 +283,14 @@ class Database:
         
     def add_aliases_to_node(self, node_id, aliases):
         """add the given aliases to the given node"""
+        self.disable_commit()
         query = Database.LINK_NODE_TO_ALIAS
         for alias in aliases:
             if not alias in self.all_aliases:
                 self.all_aliases.append(alias)
                 self.add_alias(alias)
             self.conn.execute(query, (node_id, alias))
+        self.enable_commit()
         self.commit()
         
     def add_alias(self, alias):
@@ -292,15 +305,26 @@ class Database:
         self.conn.execute(query, (*center_of_rectangle(node.coord()), node.id()))
         self.commit()
         
+    def update_all_nodes_position(self, nodes_list):
+        """changes the coordinate of every given node"""
+        self.disable_commit()
+        for node in nodes_list:
+            self.update_node_position(node)
+        self.enable_commit()
+        self.commit()
+        
     def update_node_aliases(self, node, removed, added):
         """updates aliases of a node"""
         assert type(removed) is type(added) is set
+        self.disable_commit()
         for alias in removed:
             query = Database.REMOVE_ALIAS_FROM_NODE
             self.conn.execute(query, (alias, node.id(),))
             if self.is_alias_unused(alias):
                 self.remove_alias(alias)
         self.add_aliases_to_node(node.id(), added)
+        self.enable_commit()
+        self.commit()
         
     def set_node_access_points(self, node_id, access_points):
         """set (replaces if exists) the access points linked to a given node"""
