@@ -4,7 +4,7 @@
 
 **Denis Hoornaert** - *000413326*
 
-**Nathan Licardo** - *000408278*
+**Nathan Liccardo** - *000408278*
 
 **Robin Petit** - *000408282*
 
