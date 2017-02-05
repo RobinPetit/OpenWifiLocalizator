@@ -83,6 +83,19 @@ class ReadableDatabase(AbstractDatabase):
             ret[node[0]] = node[1:]
         return ret
 
+    def get_all_edges(self):
+        """return a dictionary mapping an id to a tuple containing:
+        + Node1Id
+        + Node2Id"""
+        query = \
+            """
+            SELECT * FROM Edge;
+            """
+        ret = dict()
+        for edge in self.connection.execute(query):
+            ret[edge[0]] = edge[1:]
+        return ret
+
 class WritableDatabase(ReadableDatabase):
     def __init__(self, path):
         super().__init__(path)
@@ -109,6 +122,15 @@ class WritableDatabase(ReadableDatabase):
                 VALUES(?, ?, ?)
             """
         return self.connection.execute(query, (plan_id, x, y)).lastrowid
+
+    def insert_edge(self, node1_id, node2_id):
+        """insert an edge and return its id"""
+        query = \
+            """
+            INSERT INTO Edge(Node1Id, Node2Id)
+                VALUES(?, ?)
+            """
+        return self.connection.execute(query, (node1_id, node2_id)).lastrowid
 
 class DatabasesMerger:
     def __init__(self, write, read):
@@ -157,12 +179,30 @@ class DatabasesMerger:
                 read_nodes[node_id] = None
         self.nodes_id_map = read_nodes
 
+    def merge_edges(self):
+        """copy all edges joining nodes that have both been copied"""
+        read_edges = self.read_db.get_all_edges()
+        for edge_id in read_edges:
+            n1_id = read_edges[edge_id][0]
+            n2_id = read_edges[edge_id][1]
+            if self.has_read_node_id(n1_id) and self.has_read_node_id(n2_id):
+                read_edges[edge_id] = self.write_db.insert_edge(
+                    self.convert_node_id(n1_id),
+                    self.convert_node_id(n2_id))
+            else:
+                read_edges[edge_id] = None
+        self.edges_id_map = read_edges
+
     def merge(self):
         # copy all plans and retrieve a dictionary mapping id in read -> id in write
+        log('\tMerging plans')
         self.merge_plans()
         # copy all nodes and retrieve a dictionary mapping id in read -> id in write
+        log('\tMerging nodes')
         self.merge_nodes()
         # copy all edges from nodes ids
+        log('\tMerging edges')
+        self.merge_edges()
         # copy all aliases if not existing
         # copy then all aliases links
         # copy all wifis (unconditionally)
@@ -198,8 +238,10 @@ def main():
         for path in paths_dbs_to_copy:
             try:
                 read_database = ReadableDatabase(path)
+                log('Opening {}'.format(path))
                 DatabasesMerger(writeable_db, read_database).merge()
                 read_database.close()
+                log('Closing {}'.format(path))
             except ValueError as e:
                 log(e)
         writeable_db.commit()
