@@ -3,7 +3,21 @@
 from sys import argv
 from os.path import isfile
 from shutil import copyfile
+from time import gmtime, strftime
 import sqlite3
+
+class Logger:
+    LOG_FILE = 'dbmerger.log'
+
+    def __init__(self):
+        self.file = open(Logger.LOG_FILE, 'a')
+
+    def log(self, message):
+        time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+        self.file.write("[{}] {}\n".format(time, message))
+
+    def close(self):
+        self.file.close()
 
 class AbstractDatabase:
     def __init__(self, path):
@@ -55,6 +69,20 @@ class ReadableDatabase(AbstractDatabase):
             ret[plan[0]] = plan[1:]
         return ret
 
+    def get_all_nodes(self):
+        """returns a dictionary mapping an id to a tuple containing:
+        + PlanId
+        + X
+        + Y"""
+        query = \
+            """
+            SELECT * FROM Node;
+            """
+        ret = dict()
+        for node in self.connection.execute(query):
+            ret[node[0]] = node[1:]
+        return ret
+
 class WritableDatabase(ReadableDatabase):
     def __init__(self, path):
         super().__init__(path)
@@ -64,7 +92,7 @@ class WritableDatabase(ReadableDatabase):
 
     ##### queries
     def insert_plan(self, data):
-        """insert a plan and returns its id"""
+        """insert a plan and return its id"""
         query = \
             """
             INSERT INTO Plan(CampusId, Name, Ppm, ImageDirectory, XOnParent,
@@ -73,14 +101,35 @@ class WritableDatabase(ReadableDatabase):
             """
         return self.connection.execute(query, data).lastrowid
 
+    def insert_node(self, x, y, plan_id):
+        """insert a plan and return its id"""
+        query = \
+            """
+            INSERT INTO Node(PlanId, X, Y)
+                VALUES(?, ?, ?)
+            """
+        return self.connection.execute(query, (plan_id, x, y)).lastrowid
+
 class DatabasesMerger:
     def __init__(self, write, read):
         self.write_db = write
         self.read_db = read
 
-    def convert_plan_id(self, read_id):
-        """returns the new id of the plan having given id"""
-        return self.plans_id_map[read_id]
+    def convert_plan_id(self, plan_id):
+        """return the new id of the plan having given id"""
+        return self.plans_id_map[plan_id]
+
+    def has_read_plan_id(self, plan_id):
+        """return True if plan_id has been copied"""
+        return self.convert_plan_id(plan_id) is not None
+
+    def convert_node_id(self, node_id):
+        """return the new id of the node having given id"""
+        return self.nodes_id_map[node_id]
+
+    def has_read_node_id(self, node_id):
+        """return True if node_id has been copied"""
+        return self.convert_node_id(node_id) is not None
 
     def merge_plans(self):
         """copy all plans from read into write and returns a dictionary mapping ids read -> write"""
@@ -88,21 +137,42 @@ class DatabasesMerger:
         existing_plans = self.write_db.get_plans_name()
         for plan_id in read_plans:
             if read_plans[plan_id][1] in existing_plans:
-                print('WARNING: Plan "{}" already exists in "{}". Plan is ignored!' \
-                      .format(read_plans[plan_id][1], self.write_db.get_db_path()))
+                log('WARNING: Plan "{}" already exists in "{}". Plan is ignored!' \
+                    .format(read_plans[plan_id][1], self.write_db.get_db_path()))
+                read_plans[plan_id] = None
             else:
                 read_plans[plan_id] = self.write_db.insert_plan(read_plans[plan_id])
         self.plans_id_map = read_plans
+
+    def merge_nodes(self):
+        """copy all nodes from plans which have been copied"""
+        read_nodes = self.read_db.get_all_nodes()
+        for node_id in read_nodes:
+            plan_id = read_nodes[node_id][0]
+            if self.has_read_plan_id(plan_id):
+                read_nodes[node_id] = self.write_db.insert_node(
+                    *read_nodes[node_id][1:],
+                    self.convert_plan_id(plan_id))
+            else:
+                read_nodes[node_id] = None
+        self.nodes_id_map = read_nodes
 
     def merge(self):
         # copy all plans and retrieve a dictionary mapping id in read -> id in write
         self.merge_plans()
         # copy all nodes and retrieve a dictionary mapping id in read -> id in write
+        self.merge_nodes()
         # copy all edges from nodes ids
         # copy all aliases if not existing
         # copy then all aliases links
         # copy all wifis (unconditionally)
         pass
+
+logger = Logger()
+
+def log(message):
+    print(message)
+    logger.log(message)
 
 def usage():
     print('Usage:   ./dbmerger.py [-r] <database (1) to keep> <database(s) to insert in (1)>\n' +
@@ -123,7 +193,7 @@ def main():
 
     try:
         writeable_db = WritableDatabase(path_db_to_keep)
-        print('Creating backup of {}'.format(path_db_to_keep))
+        log('Creating backup of {}'.format(path_db_to_keep))
         copyfile(path_db_to_keep, 'BACKUP-'+path_db_to_keep)
         for path in paths_dbs_to_copy:
             try:
@@ -131,12 +201,13 @@ def main():
                 DatabasesMerger(writeable_db, read_database).merge()
                 read_database.close()
             except ValueError as e:
-                print(e)
+                log(e)
         writeable_db.commit()
         writeable_db.close()
-        print('database {} has been copied in {}'.format(path, path_db_to_keep))
+        log('database {} has been copied in {}'.format(path, path_db_to_keep))
     except ValueError as e:
-        print(e)
+        log(e)
+    logger.close()
 
 if __name__ == '__main__':
     main()
