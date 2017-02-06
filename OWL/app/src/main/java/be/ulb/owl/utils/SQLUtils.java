@@ -567,6 +567,8 @@ public class SQLUtils extends SQLiteOpenHelper {
                 idOne = getInt(cursor, EdgeTable.NODE_1_ID.getCol());
                 idTwo = getInt(cursor, EdgeTable.NODE_2_ID.getCol());
 
+                Log.i(SQLUtils.class.getName(), "Chargement du node: " + idOne + " - " + idTwo);
+
                 // All the time nodeOne will be the node in param
                 // so if idTwo equals searched node, we switch the two ;)
                 if(idTwo == nodeID) {
@@ -581,6 +583,8 @@ public class SQLUtils extends SQLiteOpenHelper {
                 }
 
                 nodeOne = node;
+
+                Log.d(SQLUtils.class.getName(), "Info plan: " + plan.getName());
 
                 // Now we search the second id:
                 nodeTwo = plan.getNode(idTwo);

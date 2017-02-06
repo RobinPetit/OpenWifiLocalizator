@@ -6,6 +6,7 @@
 package be.ulb.owl.graph;
 
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +43,7 @@ public class Plan {
     private final String _name;
     private final Campus _parentPlan;
     private HashSet<String> _allAlias; // Cache
-    private ArrayList<Node> _listNode;
+    protected ArrayList<Node> _listNode;
     private HashSet<String> _allBssWifi;
     private InputStream _image;
     private final String _directoryImage;
@@ -80,8 +81,10 @@ public class Plan {
         this._relativeAngle = relativeAngle;
         this._ppm = distance;
         this._directoryImage = directoryImage;
+        this._listNode = new ArrayList<Node>();
 
         _listNode = SQLUtils.loadNodes(this, id);
+        Log.i(getClass().getName(), "List node (" + name + "): " + _listNode);
 
         _allBssWifi = new HashSet<String>();
         _allAlias = new HashSet<String>();
@@ -143,8 +146,12 @@ public class Plan {
      */
     private void loadImage() throws IOException {
         try {
-            _image = main.getAssets().open("IMGMap" + File.separator + _directoryImage +
-                    File.separator + _name +".png");
+            String imagePath = "IMGMap" + File.separator;
+            if(!_directoryImage.equalsIgnoreCase("")) {
+                imagePath += _directoryImage + File.separator;
+            }
+            imagePath += _name + ".png";
+            _image = main.getAssets().open(imagePath);
         } catch (IOException e) {
             throw new IOException("Impossible to load the image of this plan (" + _name + ")");
         }
