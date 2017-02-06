@@ -216,7 +216,6 @@ class WritableDatabase(ReadableDatabase):
             INSERT INTO Wifi(BSS, NodeId, Avg, Variance, ScanningDate)
                 VALUES(?, ?, ?, ?, ?)
             """
-        print('wifi: {}'.format(wifi))
         self.connection.execute(query, tuple(wifi))
 
 class DatabasesMerger:
@@ -284,7 +283,6 @@ class DatabasesMerger:
         """copy all aliases that are linked to copied nodes"""
         for old_node_id in self.nodes_id_map:
             if self.nodes_id_map[old_node_id] is not None:
-                # print('Node {} has aliases:\n\t{}'.format(old_node_id, self.read_db.get_node_aliases(old_node_id)))
                 for alias in self.read_db.get_node_aliases(old_node_id):
                     self.write_db.add_alias_to_node(self.convert_node_id(old_node_id), alias)
 
@@ -294,7 +292,6 @@ class DatabasesMerger:
             if self.nodes_id_map[old_node_id] is not None:
                 # TODO copy wifis
                 wifis = self.read_db.get_wifis_by_node(old_node_id)
-                print('Node {:3d}\'s wifis: {}'.format(old_node_id, wifis))
                 for wifi in wifis:
                     self.write_db.add_wifi_to_node(wifi)
 
