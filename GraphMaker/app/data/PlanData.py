@@ -1,13 +1,14 @@
 # OWL
 from app.general.constants import *
 from app.general.functions import *
+from app.Config import Config
 
 class Node:
     def __init__(self, nb, coords, access_points, aliases=tuple()):
         self.nb = nb
         self.coords = coords
         self.access_points_ = access_points
-        self.color = 'green' if access_points is not None else 'red'
+        self.color = Config.COLOR_VALID if access_points is not None else 'red'
         self.aliases_ = list(aliases)
 
     def coord(self, c=None):
