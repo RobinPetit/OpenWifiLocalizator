@@ -96,6 +96,42 @@ class ReadableDatabase(AbstractDatabase):
             ret[edge[0]] = edge[1:]
         return ret
 
+    def has_node_alias(self, node_id, alias):
+        """return True if given node has given alias"""
+        query = \
+            """
+            SELECT COUNT(id)
+                FROM AliasesLink
+                WHERE NodeId=?
+                    AND AliasId=(
+                        SELECT Id
+                            FROM Aliases
+                            WHERE Name=?)
+            """
+        return self.connection.execute(query, (node_id, alias)).fetchone()[0] > 0
+
+    def get_node_aliases(self, node_id):
+        """return a list of aliases attached to given node"""
+        query = \
+            """
+            SELECT A.Name
+                From Aliases A
+                JOIN AliasesLink L
+                    ON L.AliasId=A.Id
+                WHERE L.NodeId=?
+            """
+        return [r[0] for r in self.connection.execute(query, (node_id,))]
+
+    def contains_alias(self, alias):
+        """return True if given alias already exists in db"""
+        query = \
+            """
+            SELECT COUNT(id)
+                FROM Aliases
+                WHERE Name=?
+            """
+        return self.connection.execute(query, (alias,)).fetchone()[0]
+
 class WritableDatabase(ReadableDatabase):
     def __init__(self, path):
         super().__init__(path)
@@ -131,6 +167,31 @@ class WritableDatabase(ReadableDatabase):
                 VALUES(?, ?)
             """
         return self.connection.execute(query, (node1_id, node2_id)).lastrowid
+
+    def add_alias(self, alias):
+        """add an alias to db and return its id"""
+        query = \
+            """
+            INSERT INTO Aliases(Name)
+                VALUES(?)
+            """
+        return self.connection.execute(query, (alias)).lastrowid
+
+    def add_alias_to_node(self, node_id, alias):
+        """link given alias to given node.
+        If alias doesn't exist yet in db, then it is created"""
+        if not self.contains_alias(alias):
+            self.add_alias(alias)
+        query = \
+            """
+            INSERT INTO AliasesLink(NodeId, AliasId)
+                Values(?, (
+                    SELECT Id
+                        FROM Aliases
+                        WHERE Name=?)
+                )
+            """
+        self.connection.execute(query, (node_id, alias))
 
 class DatabasesMerger:
     def __init__(self, write, read):
@@ -193,6 +254,14 @@ class DatabasesMerger:
                 read_edges[edge_id] = None
         self.edges_id_map = read_edges
 
+    def merge_aliases(self):
+        """copy all aliases that are linked to copied nodes"""
+        for old_node_id in self.nodes_id_map:
+            if self.nodes_id_map[old_node_id] is not None:
+                # print('Node {} has aliases:\n\t{}'.format(old_node_id, self.read_db.get_node_aliases(old_node_id)))
+                for alias in self.read_db.get_node_aliases(old_node_id):
+                    self.write_db.add_alias_to_node(old_node_id, alias)
+
     def merge(self):
         # copy all plans and retrieve a dictionary mapping id in read -> id in write
         log('\tMerging plans')
@@ -203,8 +272,9 @@ class DatabasesMerger:
         # copy all edges from nodes ids
         log('\tMerging edges')
         self.merge_edges()
-        # copy all aliases if not existing
-        # copy then all aliases links
+        # copy all aliases and aliases links if not existing
+        log('\tMerging aliases')
+        self.merge_aliases()
         # copy all wifis (unconditionally)
         pass
 
