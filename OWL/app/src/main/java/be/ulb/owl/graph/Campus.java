@@ -41,7 +41,7 @@ public class Campus extends Plan {
     */
     @Override
     public ArrayList<Node> getAllNodes() {
-        ArrayList<Node> allNodes = new ArrayList<>();
+        ArrayList<Node> allNodes = (ArrayList<Node>) _listNode.clone();
 
         for(Plan plan : _allPlan) {
             allNodes.addAll(plan.getAllNodes());
