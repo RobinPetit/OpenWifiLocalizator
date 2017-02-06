@@ -55,10 +55,7 @@ public class ClickListener implements View.OnClickListener {
             campusName.add(campus.getName());
         }
 
-        /// TODO DEBUG (remove)
-        campusName.add("P.F");
-
-        final String[] items = (String[]) campusName.toArray();
+        final String[] items = campusName.toArray(new String[0]);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(main);
         builder.setTitle(R.string.select_map);

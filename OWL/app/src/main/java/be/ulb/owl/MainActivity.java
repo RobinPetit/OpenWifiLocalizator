@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity  {
     // static attributes
     private static MainActivity instance;
     private static final boolean DEBUG = true; // view info message in log (maybe more after)
-    private static final boolean TEST = true;   // active to call test
+    private static final boolean TEST = false;   // active to call test
     private static final boolean DEMO = false; // active to active
     private static final String[] NOT_SUGGESTED = {"Mystery"};
     // TODO supprimé pour remplacer par une req sql
