@@ -65,7 +65,7 @@ public class SQLUtils extends SQLiteOpenHelper {
         new File(DB_PATH).mkdir();
         Log.d(getClass().getName(), "DB_Path: " + DB_PATH);
 
-        if (!checkdatabase()) {
+        if (!checkDatabase() || !checkDateDatabase()) {
             Log.i(getClass().getName(), "Database doesn't exist -> creation");
             createDataBase();
         }
@@ -82,11 +82,11 @@ public class SQLUtils extends SQLiteOpenHelper {
      *
      * @return True if database already exist
      */
-    private boolean checkdatabase() {
+    private boolean checkDatabase() {
         boolean checkDbExists = false;
 
         try {
-            String myPath = DB_PATH + DB_NAME;
+            String myPath = getPathLocalDatabase();
             File dbFile = new File(myPath);
             checkDbExists  = dbFile.exists();
 
@@ -96,6 +96,37 @@ public class SQLUtils extends SQLiteOpenHelper {
 
         return checkDbExists ;
     }
+
+    /**
+     * Check if database on the phone is up to date
+     *
+     * @return True if database is up to date
+     */
+    private boolean checkDateDatabase() {
+        boolean res = false;
+        String[] assetDBStr = null;
+        try {
+            assetDBStr = _context.getAssets().list(DB_NAME);
+        } catch (IOException e) {
+            Log.e(getClass().getName(), DB_NAME + " not found in asset folder");
+        }
+
+        if(assetDBStr != null && assetDBStr.length == 1) {
+            File assetDBFile = new File(assetDBStr[0]);
+            File localDBFile = new File(getPathLocalDatabase());
+
+            if(assetDBFile.exists() && localDBFile.exists() &&
+                // if assetDB have been modified before or is equal
+                // to the local database
+                assetDBFile.lastModified() <= localDBFile.lastModified()) {
+
+                res = true;
+            }
+        }
+
+        return res;
+    }
+
 
     private void createDataBase() {
         //If the database does not exist, copy it from the assets.
@@ -120,13 +151,12 @@ public class SQLUtils extends SQLiteOpenHelper {
             Log.w(getClass().getName(), "Error open " + e.getMessage());
         }
 
-        // Path to the just created empty db
-        String outfilename = DB_PATH + DB_NAME;
 
         //Open the empty db as the output stream
         OutputStream myOutput = null;
         try {
-            myOutput = new FileOutputStream(outfilename);
+            // Path to the just created empty db
+            myOutput = new FileOutputStream(getPathLocalDatabase());
         } catch (FileNotFoundException e) {
             Log.w(getClass().getName(), "Error not found " + e.getMessage());
         }
@@ -158,12 +188,21 @@ public class SQLUtils extends SQLiteOpenHelper {
     /**
      * Open the database which was copied from assets
      */
-    public void opendatabase() {
+    private void opendatabase() {
         //Open the database
-        String myPath = DB_PATH + DB_NAME;
-        _db = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
+        _db = SQLiteDatabase.openDatabase(getPathLocalDatabase(), null,
+                SQLiteDatabase.OPEN_READONLY);
     }
 
+
+    /**
+     * Path to the local database
+     *
+     * @return the path
+     */
+    private String getPathLocalDatabase() {
+        return DB_PATH + DB_NAME;
+    }
 
 
 
