@@ -2,6 +2,7 @@
 
 from sys import argv
 from os.path import isfile
+from os import remove
 from shutil import copyfile
 from time import gmtime, strftime
 import sqlite3
@@ -333,7 +334,8 @@ def main():
     if len(argv) < 3 or (argv[1] == '-r' and len(argv) < 4):
         usage()
         return
-    db_to_keep_idx = 1 if argv[1] != '-r' else 2
+    need_to_remove = (argv[1] == '-r')
+    db_to_keep_idx = 2 if need_to_remove else 1
     path_db_to_keep = argv[db_to_keep_idx]
     paths_dbs_to_copy = argv[db_to_keep_idx+1:]
 
@@ -348,11 +350,13 @@ def main():
                 DatabasesMerger(writeable_db, read_database).merge()
                 read_database.close()
                 log('Closing {}'.format(path))
+                log('database {} has been copied in {}'.format(path, path_db_to_keep))
+                if need_to_remove:
+                    remove(path)
             except ValueError as e:
                 log(e)
         writeable_db.commit()
         writeable_db.close()
-        log('database {} has been copied in {}'.format(path, path_db_to_keep))
     except ValueError as e:
         log(e)
     logger.close()
