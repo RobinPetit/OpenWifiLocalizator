@@ -132,6 +132,21 @@ class ReadableDatabase(AbstractDatabase):
             """
         return self.connection.execute(query, (alias,)).fetchone()[0]
 
+    def get_wifis_by_node(self, node_id):
+        """return a list of tuples containing:
+        + BSS
+        + NodeId
+        + Avg
+        + Variance
+        + ScanningDate"""
+        query = \
+            """
+            SELECT BSS, NodeId, Avg, Variance, ScanningDate
+                FROM Wifi
+                WHERE NodeId=?;
+            """
+        return [r for r in self.connection.execute(query, (node_id,))]
+
 class WritableDatabase(ReadableDatabase):
     def __init__(self, path):
         super().__init__(path)
@@ -175,7 +190,7 @@ class WritableDatabase(ReadableDatabase):
             INSERT INTO Aliases(Name)
                 VALUES(?)
             """
-        return self.connection.execute(query, (alias)).lastrowid
+        return self.connection.execute(query, (alias,)).lastrowid
 
     def add_alias_to_node(self, node_id, alias):
         """link given alias to given node.
@@ -192,6 +207,16 @@ class WritableDatabase(ReadableDatabase):
                 )
             """
         self.connection.execute(query, (node_id, alias))
+
+    def add_wifi_to_node(self, wifi):
+        """..."""
+        query = \
+            """
+            INSERT INTO Wifi(BSS, NodeId, Avg, Variance, ScanningDate)
+                VALUES(?, ?, ?, ?, ?)
+            """
+        print('wifi: {}'.format(wifi))
+        self.connection.execute(query, tuple(wifi))
 
 class DatabasesMerger:
     def __init__(self, write, read):
@@ -260,7 +285,17 @@ class DatabasesMerger:
             if self.nodes_id_map[old_node_id] is not None:
                 # print('Node {} has aliases:\n\t{}'.format(old_node_id, self.read_db.get_node_aliases(old_node_id)))
                 for alias in self.read_db.get_node_aliases(old_node_id):
-                    self.write_db.add_alias_to_node(old_node_id, alias)
+                    self.write_db.add_alias_to_node(self.convert_node_id(old_node_id), alias)
+
+    def merge_wifis(self):
+        """copy all wifis attached to copied nodes"""
+        for old_node_id in self.nodes_id_map:
+            if self.nodes_id_map[old_node_id] is not None:
+                # TODO copy wifis
+                wifis = self.read_db.get_wifis_by_node(old_node_id)
+                print('Node {:3d}\'s wifis: {}'.format(old_node_id, wifis))
+                for wifi in wifis:
+                    self.write_db.add_wifi_to_node(wifi)
 
     def merge(self):
         # copy all plans and retrieve a dictionary mapping id in read -> id in write
@@ -276,7 +311,8 @@ class DatabasesMerger:
         log('\tMerging aliases')
         self.merge_aliases()
         # copy all wifis (unconditionally)
-        pass
+        log('\tMerging wifis')
+        self.merge_wifis()
 
 logger = Logger()
 
