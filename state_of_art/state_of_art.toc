@@ -1,0 +1,20 @@
+\select@language {french}
+\contentsline {section}{\numberline {1}Introduction}{4}{section.1}
+\contentsline {section}{\numberline {2}Mod\IeC {\'e}lisation}{5}{section.2}
+\contentsline {subsection}{\numberline {2.1}Graphe}{5}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Recherche du plus court chemin}{5}{subsection.2.2}
+\contentsline {subsubsection}{\numberline {2.2.1}A*}{5}{subsubsection.2.2.1}
+\contentsline {subsubsection}{\numberline {2.2.2}Dijkstra}{5}{subsubsection.2.2.2}
+\contentsline {subsection}{\numberline {2.3}R\IeC {\'e}sultats}{5}{subsection.2.3}
+\contentsline {section}{\numberline {3}Localisation}{5}{section.3}
+\contentsline {subsection}{\numberline {3.1}Introduction aux Wifi}{5}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Probl\IeC {\`e}me rencontrer par l'utilisation des Wifi}{5}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}M\IeC {\'e}thodes}{5}{subsection.3.3}
+\contentsline {subsubsection}{\numberline {3.3.1}Trilateration}{5}{subsubsection.3.3.1}
+\contentsline {subsubsection}{\numberline {3.3.2}Localisation via une Signal strength map}{5}{subsubsection.3.3.2}
+\contentsline {paragraph}{\numberline {3.3.2.1}Stanford}{5}{paragraph.3.3.2.1}
+\contentsline {paragraph}{\numberline {3.3.2.2}ETH Zurich}{5}{paragraph.3.3.2.2}
+\contentsline {paragraph}{\numberline {3.3.2.3}Monte carlo}{5}{paragraph.3.3.2.3}
+\contentsline {subsection}{\numberline {3.4}R\IeC {\'e}sultats}{5}{subsection.3.4}
+\contentsline {section}{\numberline {4}Discussion et limitations}{5}{section.4}
+\contentsline {section}{\numberline {5}Conclusion}{6}{section.5}

@@ -1,0 +1,164 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel} % Global stuff set to french
+\usepackage[margin=2.5cm]{geometry} % The margin of the page
+\usepackage{graphicx} % to include pictures
+\usepackage[hidelinks]{hyperref} % To include hyperlinks in a PDF
+\usepackage{appendix} % To make appendixes
+\usepackage{color} % For text colors
+\usepackage{palatino} % Change font
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{changepage}
+\usepackage{imakeidx}
+\usepackage{rotating}
+\usepackage{tcolorbox}
+\usepackage{amsmath, amssymb,  commath}
+\usepackage{tcolorbox}
+\usepackage{hyperref}
+%\usepackage{titlesec}
+
+\makeatletter
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+            {-2.5ex\@plus -1ex \@minus -.25ex}%
+            {1.25ex \@plus .25ex}%
+            {\normalfont\normalsize\bfseries}}
+\makeatother
+\setcounter{secnumdepth}{4} % how many sectioning levels to assign numbers to
+\setcounter{tocdepth}{4}
+
+\graphicspath{{./images/}}
+
+%% Fancy layout
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead[L]{Projet d'année}
+\fancyhead[C]{\includegraphics[scale=0.2]{logo.jpg}}
+\fancyhead[R]{OpenWifiLocalizator}
+% Footer
+\fancyfoot[C]{}
+\fancyfoot[R]{page \thepage}
+% Line
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+%opening
+\title{}
+\author{}
+
+\begin{document}
+
+\topskip0pt
+\begin{center}
+    \vspace*{\fill}
+        \hrule
+        \vspace*{2pt}
+        \hrule
+        \vspace*{15pt}
+        \textsc{\Huge{INFO-F308 : Projet d'année \\\vspace*{8pt}
+            OWL\\\vspace*{12pt}
+            OpenWifiLocalizator}}
+        \vspace*{15pt}
+        \hrule
+        \vspace*{2pt}
+        \hrule
+  \vspace*{\fill}
+\end{center}
+\null
+\vfill
+
+\large
+\hfill Rémy Detobel - \emph{000408013}
+
+\hfill Denis Hoornaert - \emph{000413326}
+
+\hfill Nathan Licardo - \emph{000408278}
+
+25 octobre 2016 \hfill Robin Petit - \emph{000408282}
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\begin{abstract}
+  
+\end{abstract}
+
+\newpage
+
+\section{Introduction}
+
+\newpage
+
+\section{Modélisation}
+  \subsection{Graphe}
+  \subsection{Recherche du plus court chemin}
+    \subsubsection{A*}
+    \subsubsection{Dijkstra}
+  \subsection{Résultats}
+\section{Localisation}
+  \subsection{Introduction aux Wifi}
+  \subsection{Problème rencontrer par l'utilisation des Wifi}
+  \subsection{Méthodes}
+    \subsubsection{Trilateration}
+    \subsubsection{Localisation via une Signal strength map}
+      \paragraph{Stanford}
+      \paragraph{ETH Zurich}
+      \paragraph{Monte carlo}
+  \subsection{Résultats}
+\section{Discussion et limitations}
+
+\newpage
+
+\section{Conclusion}
+
+\newpage
+
+\begin{thebibliography}{9}
+  \bibitem{ssm}
+    Matteo Cypriani, Frédéric Lassabe, Philippe Canalda, François Spies,
+    \emph{Wi-Fi-Based Indoor Positioning: Basic Techniques, Hybrid Algorithms and Open Software Platform}.
+    2010.
+  \bibitem{Roumanie}
+    Bianca BOBESCU, Marian ALEXANDRU
+    \emph{Mobile indoor positioning using Wi-fi localisation}.
+    Transilvania University, Brasov, Romania,
+    2015.
+  \bibitem{trilateration}
+    OnkarPathak, Pratik Palaskar, Rajesh Palkar, Mayur Tawari,
+    \emph{Wi-Fi Indoor Positioning System based on RSSI Measurements from Wi-Fi Access Points A Trilateration Approach}.
+    International Journal of Scientific \& Engineering Research,
+    2014.
+  \bibitem{GaussianProcessesFerris}
+    Brian Ferris, Dirk Hähnel, Dieter Fox,
+    \emph{Gaussian Processes for Signal Strength-Based Location Estimation}.
+    University of Washington, Department of Computer Science \& Engineering, Seattle, WA Intel Research Seattle, Seattle, WA.
+\end{thebibliography}
+
+%---------- SCANNING ----------
+%# www.mdpi.com/1424-8220/15/9/21824/pdf
+%https://www.researchgate.net/publication/224198838_Wi-Fi-based_indoor_positioning_Basic_techniques_hybrid_algorithms_and_open_software_platform
+%x https://fruct.org/publications/abstract16/files/Shc1.pdf
+%http://www.afahc.ro/ro/revista/2015_1/119.pdf
+%x http://file.scirp.org/pdf/CN_2013071010352139.pdf
+%http://www.ijser.org/researchpaper%5CWi-Fi-Indoor-Positioning-System-Based-on-RSSI-Measurements.pdf
+%https://www.researchgate.net/profile/Suhailan_Safei/publication/230771403_INDOOR_POSITION_DETECTION_USING_WIFI_AND_TRILATERATION_TECHNIQUE/links/5513e9120cf2eda0df3031f0.pdf
+%http://www.ee.ucl.ac.uk/lcs/previous/LCS2005/12.pdf
+%http://www.int-arch-photogramm-remote-sens-spatial-inf-sci.net/XXXVIII-4-C26/1/2012/isprsarchives-XXXVIII-4-C26-1-2012.pdf
+%---------- LOCALISATION ----------
+%http://www.roboticsproceedings.org/rss02/p39.pdf
+%https://venturi.fbk.eu/wp-content/uploads/2011/10/AraMes_WIMOB_2014.pdf
+%http://www.tik.ee.ethz.ch/file/2490a7adb6a163b9c5be1510d033870a/sawn05.pdf
+%https://felixduvallet.github.io/pubs/2008-WiFi-IROS.pdf
+%http://www.cs.cmu.edu/~mmv/papers/10icra-joydeep.pdf
+%https://papers.nips.cc/paper/2541-gpps-a-gaussian-process-positioning-system-for-cellular-networks.pdf
+%http://www-cs.stanford.edu/people/dstavens/icra11/huang_etal_icra11.pdf
+%https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5017359/
+%http://www.robot.t.u-tokyo.ac.jp/~yamashita/paper/E/E293Final.pdf
+
+\section*{Annexes}
+
+\end{document}
