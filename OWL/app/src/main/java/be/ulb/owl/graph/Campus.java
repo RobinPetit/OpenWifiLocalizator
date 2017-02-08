@@ -15,7 +15,8 @@ import be.ulb.owl.utils.SQLUtils;
 
 public class Campus extends Plan {
 
-    private ArrayList<Plan> _allPlan;
+    private ArrayList<Plan> _allPlan = new ArrayList<Plan>();
+    private final Integer _id;
 
     /**
      * Constructor<br />
@@ -31,7 +32,11 @@ public class Campus extends Plan {
     public Campus(String name, int id, String directoryImage, float bgCoordX, float bgCoordY, float distance) {
         super(name, id, null, directoryImage, -1, -1, bgCoordX, bgCoordY, 0, distance);
 
-        _allPlan = SQLUtils.loadAllPlan(this, id);
+        _id = id;
+    }
+
+    public void loadAllPlan() {
+        _allPlan = SQLUtils.loadAllPlan(this, _id);
     }
 
     /**

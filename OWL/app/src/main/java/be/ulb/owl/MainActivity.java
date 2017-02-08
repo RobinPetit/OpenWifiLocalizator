@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity  {
     private static final boolean DEMO = false; // active to active
     private static final String[] NOT_SUGGESTED = {"Mystery"};
     // TODO supprimé pour remplacer par une req sql
-    private static final String PLAINE_PLAN = "Plaine";
     private static final String SOLBOSCH_PLAN = "Solbosch";
 
     // android widgets
@@ -113,15 +112,15 @@ public class MainActivity extends AppCompatActivity  {
         if(_graph == null) {
             _graph = new Graph();
         }
-        _graph.startScanTask();
+
+        Log.i(getClass().getName(), "Name: " + _graph.getAllCampus().get(0).getName());
+
 
         // Set default plan
         setCurrentPlan(Graph.getCampus(SOLBOSCH_PLAN));
         this.setUpCanvas();
         _drawer = new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor());
 
-        Log.i(getClass().getName(), "Scanner.scan");
-        localize();
         if(TEST) {
             setCurrentPlan(_graph.getPlanByName("P.F"));
             testWifi();

@@ -16,6 +16,7 @@ import be.ulb.owl.Scanner;
 import be.ulb.owl.Wifi;
 import be.ulb.owl.graph.shortestpath.ShortestPathAStar;
 import be.ulb.owl.graph.shortestpath.ShortestPathEvaluator;
+import be.ulb.owl.task.LoadMapTask;
 import be.ulb.owl.utils.SQLUtils;
 
 /**
@@ -222,6 +223,9 @@ public class Graph {
      */
     public void startScanTask() {
         _scanner.startScanTask();
+
+        Log.i(getClass().getName(), "Scanner.scan");
+        main.localize();
     }
 
 
@@ -246,6 +250,7 @@ public class Graph {
      */
     private static void loadAllPlan() {
         _allCampus = SQLUtils.loadAllCampus();
+        new LoadMapTask().execute(_allCampus);
         // TODO get all plan ?
 //        _allPlan = SQLUtils.loadAllPlan();
     }
