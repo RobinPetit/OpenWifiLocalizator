@@ -29,7 +29,6 @@ public class Graph {
 
     MainActivity main = MainActivity.getInstance();
     private static final String IGNOREPLAN = "Example";
-//    private static ArrayList<Plan> _allPlan;
     private static ArrayList<Campus> _allCampus;
 
     private Scanner _scanner;
@@ -45,7 +44,6 @@ public class Graph {
      * Init scanner
      */
     public Graph () {
-//        _allPlan = new ArrayList<Plan>();
         _allCampus = new ArrayList<Campus>();
         loadAllPlan();
 

@@ -145,15 +145,17 @@ public class Plan {
      * @throws IOException error with file
      */
     private void loadImage() throws IOException {
+        String imagePath = "";
         try {
-            String imagePath = "IMGMap" + File.separator;
-            if(!_directoryImage.equalsIgnoreCase("")) {
+            imagePath = "IMGMap" + File.separator;
+            if(!_directoryImage.equalsIgnoreCase("") && !_directoryImage.equalsIgnoreCase("./")) {
                 imagePath += _directoryImage + File.separator;
             }
             imagePath += _name + ".png";
             _image = main.getAssets().open(imagePath);
         } catch (IOException e) {
-            throw new IOException("Impossible to load the image of this plan (" + _name + ")");
+            throw new IOException("Impossible to load the image of this plan (" + _name +
+                    " (path: " + imagePath + "))");
         }
     }
 
