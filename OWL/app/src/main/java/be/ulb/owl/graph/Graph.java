@@ -27,9 +27,11 @@ import be.ulb.owl.utils.SQLUtils;
  */
 public class Graph {
 
-    MainActivity main = MainActivity.getInstance();
-    private static final String IGNOREPLAN = "Example";
+    private static final MainActivity main = MainActivity.getInstance();
+
     private static ArrayList<Campus> _allCampus;
+    private static final String SOLBOSCH_PLAN = "Solbosch";
+
 
     private Scanner _scanner;
 
@@ -73,43 +75,64 @@ public class Graph {
     }
 
 
-    public void findPath(String destination) throws NoPathException {
-        ArrayList<Node> destinations = searchNode(destination);
-        Node src = main.location();
+    /**
+     * Find path to the destination of the user will go (stock in main)
+     *
+     * @throws NoPathException
+     */
+    public void findPath() throws NoPathException {
+        Node src = main.getCurrentLcation();
 
         if(src != null) {
             double minHeuristic = Double.POSITIVE_INFINITY;
             Node closestDestination = null;
-            for (Node node : destinations) {
+            ArrayList<Node> listDestination = main.getDestinations();
+
+            for (Node node : listDestination) {
                 double currentHeuristic = ShortestPathAStar.heuristic(src, node);
                 if (currentHeuristic < minHeuristic) {
                     closestDestination = node;
                     minHeuristic = currentHeuristic;
                 }
             }
-            main.setDestination(destination);
+
+            // Draw source point on screen
             main.draw(src);
+
             ArrayList<Path> p = bestPath(src, closestDestination);
-            if(p.size() >= 2)
-                refinePath(p, destination);
+            if (p.size() >= 2) {
+                refinePath(p, listDestination);
+            }
+
             Log.d(getClass().getName(), "Path between " + src.getID() + " and " + closestDestination.getID());
             for (Path path : p) {
+                // Log path
                 Log.i(getClass().getName(), path.getNode().getID() + " - " + path.getOppositeNodeOf(path.getNode()).getID());
             }
+
+            // Draw path on screen
             main.drawPath(p);
+
         } else {
-            Node dest = destinations.get(0);
+            Node dest = main.getDestinations().get(0);
             main.setCurrentPlan(dest.getParentPlan());
             Log.d(getClass().getName(), "Set current and draw");
             main.draw(dest);
         }
+
     }
 
-    private void refinePath(ArrayList<Path> overallPath, String alias) {
+    /**
+     * TODO doc ?  Robin/Denis ?
+     *
+     * @param overallPath
+     * @param listDestination
+     */
+    private void refinePath(ArrayList<Path> overallPath, ArrayList<Node> listDestination) {
         int firstOccurrenceOfDestination = overallPath.size() - 1;
         Node commonNode = overallPath.get(firstOccurrenceOfDestination).getIntersectionWith(overallPath.get(firstOccurrenceOfDestination-1));
         Log.d(getClass().getName(), overallPath.size() + " nodes were found, and after refinment:");
-        while (overallPath.size() > 0 && commonNode.haveAlias(alias)) {
+        while (overallPath.size() > 0 && listDestination.contains(commonNode)) {
             firstOccurrenceOfDestination--;
             commonNode = overallPath.get(firstOccurrenceOfDestination).getOppositeNodeOf(commonNode);
             overallPath.remove(firstOccurrenceOfDestination+1);
@@ -117,8 +140,10 @@ public class Graph {
         Log.d(getClass().getName(), "only " + overallPath.size() + " are left");
     }
 
+
     /**
      * Implements a shortest path algorithm (A*) between two nodes
+     *
      * @param nodeFrom The node the user is located at
      * @param nodeTo The node the user wants to reach
      * @return An ordered list of nodes the user has to cross to reach the destination
@@ -128,6 +153,7 @@ public class Graph {
         ShortestPathEvaluator evaluator = new ShortestPathAStar(getAllNodes(), nodeFrom, nodeTo);
         return evaluator.find();
     }
+
 
     public void setPlan () {
         if (0 == _offset) {
@@ -157,14 +183,14 @@ public class Graph {
             setPlan();
             res = _demoMotions.get(_offset);
             _offset = (_offset+1)%_demoMotions.size();
-        }
-        else if(MainActivity.isDebug() && MainActivity.isTest()) {
+
+        } else if(MainActivity.isDebug() && MainActivity.isTest()) {
             res = getAllNodes().get(new Random().nextInt(getAllNodes().size()));
-        }
-        else {
-            ArrayList<Wifi> sensed = _scanner.scan();
-            Log.d(getClass().getName(), "wifi: (" + sensed.size() + ") " + sensed.toString());
-            res = whereAmI(sensed);
+
+        } else {
+//            ArrayList<Wifi> sensed = _scanner.scan();
+//            Log.d(getClass().getName(), "wifi: (" + sensed.size() + ") " + sensed.toString());
+//            res = whereAmI(sensed);
         }
         return res;
     }
@@ -260,7 +286,7 @@ public class Graph {
      * @param name the name (alias) of this nodes
      * @return an ArrayList of Node
      */
-    public static ArrayList<Node> searchNode(String name) {
+    public ArrayList<Node> searchNode(String name) {
         ArrayList<Node> listeNode = new ArrayList<Node>();
         for(Plan plan : getAllPlan()) {
             listeNode.addAll(plan.searchNode(name));
@@ -312,6 +338,18 @@ public class Graph {
     public static Campus getCampus(String name) {
         return getCampus(name, true);
     }
+
+    /**
+     * Get the default campus
+     *
+     * @return the default Campus
+     */
+    public Campus getDefaultCampus() {
+        // TODO change constant with magic number ? :P
+        // return getAllCampus().get(0);
+        return getCampus(SOLBOSCH_PLAN);
+    }
+
 
     /**
      * Get a specific campus

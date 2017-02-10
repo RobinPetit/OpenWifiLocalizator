@@ -9,10 +9,8 @@ import android.util.Log;
 import java.util.*;
 import java.lang.Object;
 
-import static java.lang.Thread.sleep;
-
 /**
- * Scan all wifi
+ * Scan all wifi and stock the last wifi status
  * 
  * @author denishoornaert
  */
@@ -25,12 +23,16 @@ public class Scanner {
     private boolean _taskInProgress = false;
 
     private boolean _defaultWifiEnable = true;
-    private WifiManager _wifiManager = null;
-    private HashMap<String, ArrayList<Integer>> _accesPoints;
-    private List<ScanResult> _lastRestult = null;
+    private static WifiManager _wifiManager = null;
+    private static HashMap<String, ArrayList<Integer>> _accesPoints; // last scanned point
+    private static List<ScanResult> _lastRestult = null; // two last scanned point (check if player move (debug))
 
-    public Scanner () {
+    /**
+     * Constructor (call when the app start)
+     */
+    public Scanner() {
         forceEnableWifi();
+
         if(!_wifiManager.isWifiEnabled()) {
             Log.d(getClass().getName(), "Wifi disable");
         }
@@ -55,13 +57,13 @@ public class Scanner {
     /**
      * Save all wifi in the _accessPoints attribute
      */
-    private void getData() {
+    public static void getData() {
         List<ScanResult> results = _wifiManager.getScanResults();
 
-        Log.d(getClass().getName(), "Get DATA: " + results.toArray().toString());
+        Log.d(Scanner.class.getName(), "Get DATA: " + results.toArray().toString());
 
         if(_lastRestult != null && _lastRestult.equals(results)) {
-            Log.w(getClass().getName(), "");
+            Log.w(Scanner.class.getName(), "");
         }
 
         _lastRestult = results;
@@ -73,14 +75,18 @@ public class Scanner {
                 ArrayList<Integer> listAcces = new ArrayList<Integer>();
                 listAcces.add(value);
                 _accesPoints.put(key, listAcces);
-                Log.d(getClass().getName(), "Get DATA: create " + key + " -> " + value);
+                Log.d(Scanner.class.getName(), "Get DATA: create " + key + " -> " + value);
 
             } else {
                 _accesPoints.get(key).add(value);
-                Log.d(getClass().getName(), "Get DATA: ajout " + key + " -> " + value + " (res: " +
-                        _accesPoints.get(key) + ")");
+                Log.d(Scanner.class.getName(), "Get DATA: add " + key + " -> " + value +
+                        " (res " + _accesPoints.get(key) + ")");
             }
         }
+    }
+
+    public static void resetAccesPoint() {
+        _accesPoints.clear();
     }
 
     /**
@@ -88,29 +94,24 @@ public class Scanner {
      *
      * @return the list of all wifi
      */
-    public ArrayList<Wifi> scan() {
-        _accesPoints.clear();
-        ArrayList<Wifi> temp = new ArrayList<Wifi>();
-        for (int i = 0; i < 3; i++) {
-            getData();
-            try {
-                sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        
-        for(String key : _accesPoints.keySet()) {
-            ArrayList<Integer> values = _accesPoints.get(key);
-            temp.add(new Wifi(key, avg(values), -1));
-        }
-
-        if(temp.isEmpty()) {
-            Log.i(getClass().getName(), "No wifi in this area");
-        }
-
-        return temp;
-    }
+//    public ArrayList<Wifi> scan() {
+//        _accesPoints.clear();
+//        ArrayList<Wifi> temp = new ArrayList<Wifi>();
+//        for (int i = 0; i < 3; i++) {
+//            getData();
+//        }
+//
+//        for(String key : _accesPoints.keySet()) {
+//            ArrayList<Integer> values = _accesPoints.get(key);
+//            temp.add(new Wifi(key, avg(values), -1));
+//        }
+//
+//        if(temp.isEmpty()) {
+//            Log.i(getClass().getName(), "No wifi in this area");
+//        }
+//
+//        return temp;
+//    }
 
 
     /**
