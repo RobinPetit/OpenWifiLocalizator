@@ -17,7 +17,7 @@ public class QueryTextListener implements MaterialSearchView.OnQueryTextListener
     public boolean onQueryTextSubmit(String query) {
         Log.i(getClass().getName(), "text sent: "+query);
         try {
-            MainActivity.getInstance().getGraph().findPath(query);
+            MainActivity.getInstance().setDestination(query);
         } catch (NoPathException e) {
             Log.e(getClass().getName(), "No path was found: " + e.toString());
         }

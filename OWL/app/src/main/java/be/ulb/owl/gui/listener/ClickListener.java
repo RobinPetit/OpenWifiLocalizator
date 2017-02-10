@@ -13,6 +13,7 @@ import be.ulb.owl.MainActivity;
 import be.ulb.owl.R;
 import be.ulb.owl.graph.Campus;
 import be.ulb.owl.graph.Graph;
+import be.ulb.owl.graph.NoPathException;
 import be.ulb.owl.graph.Plan;
 
 /**
@@ -94,7 +95,11 @@ public class ClickListener implements View.OnClickListener {
         builder.setTitle(R.string.select_local);
         builder.setItems(items, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-                main.setDestination(listFinal[item]);
+                try {
+                    main.setDestination(listFinal[item]);
+                } catch(NoPathException e) {
+                    Log.e(getClass().getName(), "No path was found: " + e.toString());
+                }
             }
         });
         AlertDialog alert = builder.create();
