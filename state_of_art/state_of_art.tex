@@ -1,115 +1,40 @@
-\documentclass[11pt,a4paper]{article}
+\documentclass[11pt,journal,compsoc]{IEEEtran}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[french]{babel} % Global stuff set to french
-\usepackage[margin=2.5cm]{geometry} % The margin of the page
-\usepackage{graphicx} % to include pictures
-\usepackage[hidelinks]{hyperref} % To include hyperlinks in a PDF
-\usepackage{appendix} % To make appendixes
-\usepackage{color} % For text colors
-\usepackage{palatino} % Change font
-\usepackage{subcaption}
-\usepackage{enumitem}
-\usepackage{changepage}
-\usepackage{imakeidx}
-\usepackage{rotating}
 \usepackage{tcolorbox}
-\usepackage{amsmath, amssymb,  commath}
-\usepackage{tcolorbox}
-\usepackage{hyperref}
-%\usepackage{titlesec}
-
-\makeatletter
-\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
-            {-2.5ex\@plus -1ex \@minus -.25ex}%
-            {1.25ex \@plus .25ex}%
-            {\normalfont\normalsize\bfseries}}
-\makeatother
-\setcounter{secnumdepth}{4} % how many sectioning levels to assign numbers to
-\setcounter{tocdepth}{4}
-
-\graphicspath{{./images/}}
-
-%% Fancy layout
-\usepackage{fancyhdr}
-\pagestyle{fancy}
-\fancyhead[L]{Projet d'année}
-\fancyhead[C]{\includegraphics[scale=0.2]{logo.jpg}}
-\fancyhead[R]{OpenWifiLocalizator}
-% Footer
-\fancyfoot[C]{}
-\fancyfoot[R]{page \thepage}
-% Line
-\renewcommand{\headrulewidth}{0.4pt}
-\renewcommand{\footrulewidth}{0.4pt}
-
-%opening
-\title{}
-\author{}
-
-% add space after an itemize
-\setlist{nosep,after=\vspace{\baselineskip}}
 
 \begin{document}
 
-\topskip0pt
-\begin{center}
-    \vspace*{\fill}
-        \hrule
-        \vspace*{2pt}
-        \hrule
-        \vspace*{15pt}
-        \textsc{\Huge{INFO-F308 : Projet d'année \\\vspace*{8pt}
-            OWL\\\vspace*{12pt}
-            OpenWifiLocalizator}}
-        \vspace*{15pt}
-        \hrule
-        \vspace*{2pt}
-        \hrule
-  \vspace*{\fill}
-\end{center}
-\null
-\vfill
 
-\large
-\hfill Rémy Detobel - \emph{000408013}
+\title{Open Wifi Localizator}
+\author{Rémy Detobel, Denis Hoornaert, Nathan Licardo, Robin Petit\\ Université libre de Bruxelles, Département des sciences informatiques, Bruxelles}
 
-\hfill Denis Hoornaert - \emph{000413326}
+\maketitle
 
-\hfill Nathan Licardo - \emph{000408278}
-
-25 octobre 2016 \hfill Robin Petit - \emph{000408282}
-\newpage
-
-\tableofcontents
-
-\newpage
+%\newpage
 
 \begin{abstract}
-  
+  blablabla...
 \end{abstract}
-
-\newpage
-
+\begin{IEEEkeywords}
+  Computer Society, IEEEtran, journal, \LaTeX, paper, template.
+\end{IEEEkeywords}
 \section{Introduction}
-
-\newpage
-
 \section{Modélisation}
   \subsection{Graphe}
   \subsection{Recherche du plus court chemin}
     \subsubsection{A*}
     \subsubsection{Dijkstra}
-  \subsection{Résultats}
 \section{Localisation}
   \subsection{Introduction aux Wifi}
   \subsection{Problème rencontrer par l'utilisation des Wifi}
   \subsection{Méthodes}
     \subsubsection{Trilateration}
     \subsubsection{Localisation via une Signal strength map}
-      \paragraph{Stanford}
-      \paragraph{ETH Zurich}
+      \paragraph{Méthode utilisant les processus Gaussiens}
+      \paragraph{Méthode utilisant les maximum de vraisemblabilité}
         Comme mentionné plus haut, on va faire un ensemble de mesures pour chaque point du graphe et ainsi construtuire la base de données sur laquelle se basera notre méthode de localisation. Pour la méthode présente, on notera une mesure comme suit :
         \[S^{(i)}=\{b_{1}, b_{2}, ..., b_{n}\} \hspace{1cm} \forall j \in [1, k]\]
         Où :
@@ -155,14 +80,10 @@
           Ce cas de figure survient pour des points d'accès situés à une distance telle qu'ils ne sont pas toujours percus mais qui, dans le cas contraire, présentent des qualités de signal in férieur à $-90 dBm$.
         \end{tcolorbox}
       \paragraph{Monte carlo}
-  \subsection{Résultats}
+      \paragraph{Amélioration par l'utilisation de filtres}
+      \paragraph{Amélioration par l'estimation de qualité de signal}
 \section{Discussion et limitations}
-
-\newpage
-
 \section{Conclusion}
-
-\newpage
 
 \begin{thebibliography}{9}
   \bibitem{ssm}

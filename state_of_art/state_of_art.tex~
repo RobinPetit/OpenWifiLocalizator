@@ -1,4 +1,4 @@
-\documentclass[11pt,a4paper]{article}
+\documentclass[11pt,a4paper]{IEEEtran}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -20,68 +20,71 @@
 \usepackage{hyperref}
 %\usepackage{titlesec}
 
-\makeatletter
-\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
-            {-2.5ex\@plus -1ex \@minus -.25ex}%
-            {1.25ex \@plus .25ex}%
-            {\normalfont\normalsize\bfseries}}
-\makeatother
-\setcounter{secnumdepth}{4} % how many sectioning levels to assign numbers to
-\setcounter{tocdepth}{4}
+%\makeatletter
+%\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+%            {-2.5ex\@plus -1ex \@minus -.25ex}%
+%            {1.25ex \@plus .25ex}%
+%            {\normalfont\normalsize\bfseries}}
+%\makeatother
+%\setcounter{secnumdepth}{4} % how many sectioning levels to assign numbers to
+%\setcounter{tocdepth}{4}
 
-\graphicspath{{./images/}}
+%\graphicspath{{./images/}}
 
 %% Fancy layout
-\usepackage{fancyhdr}
-\pagestyle{fancy}
-\fancyhead[L]{Projet d'année}
-\fancyhead[C]{\includegraphics[scale=0.2]{logo.jpg}}
-\fancyhead[R]{OpenWifiLocalizator}
-% Footer
-\fancyfoot[C]{}
-\fancyfoot[R]{page \thepage}
-% Line
-\renewcommand{\headrulewidth}{0.4pt}
-\renewcommand{\footrulewidth}{0.4pt}
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\fancyhead[L]{Projet d'année}
+%\fancyhead[C]{\includegraphics[scale=0.2]{logo.jpg}}
+%\fancyhead[R]{OpenWifiLocalizator}
+%% Footer
+%\fancyfoot[C]{}
+%\fancyfoot[R]{page \thepage}
+%% Line
+%\renewcommand{\headrulewidth}{0.4pt}
+%\renewcommand{\footrulewidth}{0.4pt}
 
 %opening
-\title{}
-\author{}
+%\title{}
+%\author{}
+
+% add space after an itemize
+%\setlist{nosep,after=\vspace{\baselineskip}}
 
 \begin{document}
 
-\topskip0pt
-\begin{center}
-    \vspace*{\fill}
-        \hrule
-        \vspace*{2pt}
-        \hrule
-        \vspace*{15pt}
-        \textsc{\Huge{INFO-F308 : Projet d'année \\\vspace*{8pt}
-            OWL\\\vspace*{12pt}
-            OpenWifiLocalizator}}
-        \vspace*{15pt}
-        \hrule
-        \vspace*{2pt}
-        \hrule
-  \vspace*{\fill}
-\end{center}
-\null
-\vfill
+%\topskip0pt
+%\begin{center}
+%    \vspace*{\fill}
+%        \hrule
+%        \vspace*{2pt}
+%        \hrule
+%        \vspace*{15pt}
+%        \textsc{\Huge{INFO-F308 : Projet d'année \\\vspace*{8pt}
+%            OWL\\\vspace*{12pt}
+%            OpenWifiLocalizator}}
+%        \vspace*{15pt}
+%        \hrule
+%        \vspace*{2pt}
+%        \hrule
+%  \vspace*{\fill}
+%\end{center}
+%\null
+%\vfill
 
-\large
-\hfill Rémy Detobel - \emph{000408013}
+%\large
+%\hfill Rémy Detobel - \emph{000408013}
+%
+%\hfill Denis Hoornaert - \emph{000413326}
 
-\hfill Denis Hoornaert - \emph{000413326}
+%\hfill Nathan Licardo - \emph{000408278}
 
-\hfill Nathan Licardo - \emph{000408278}
+%25 octobre 2016 \hfill Robin Petit - \emph{000408282}
+%\newpage
 
-25 octobre 2016 \hfill Robin Petit - \emph{000408282}
-\newpage
+%\tableofcontents
 
-\tableofcontents
-
-\newpage
+%\newpage
 
 \begin{abstract}
   
@@ -98,17 +101,61 @@
   \subsection{Recherche du plus court chemin}
     \subsubsection{A*}
     \subsubsection{Dijkstra}
-  \subsection{Résultats}
 \section{Localisation}
   \subsection{Introduction aux Wifi}
   \subsection{Problème rencontrer par l'utilisation des Wifi}
   \subsection{Méthodes}
     \subsubsection{Trilateration}
     \subsubsection{Localisation via une Signal strength map}
-      \paragraph{Stanford}
-      \paragraph{ETH Zurich}
+      \paragraph{Méthode utilisant les processus Gaussiens}
+      \paragraph{Méthode utilisant les maximum de vraisemblabilité}
+        Comme mentionné plus haut, on va faire un ensemble de mesures pour chaque point du graphe et ainsi construtuire la base de données sur laquelle se basera notre méthode de localisation. Pour la méthode présente, on notera une mesure comme suit :
+        \[S^{(i)}=\{b_{1}, b_{2}, ..., b_{n}\} \hspace{1cm} \forall j \in [1, k]\]
+        Où :
+        \begin{itemize}
+          \item $n$ est le nombre de points d'accès détectés lors de la mesure.
+          \item $b_{i}$, le $i^{eme}$ point d'accès detécté, est défini comme un tuple $(a_{i}, S_{i})$ décrivant respectivement l'identifiant d'un point d'accès et la qualité de signal perçue.
+        \end{itemize}
+        
+        On prend plusieurs mesures pour un même point car il existe des variations de qualité de signal au cour du temps. En faisant de la sorte, on se donne une idée de la qualité d'un signal à un point du graphe. On notera ces "mesures moyennes" comme suit :
+        \[\bar{S} = \{(a_{1}, \bar{S}_{1}), ..., (a_{n}, \bar{S}_{n})\}\]
+        Où :
+        \begin{itemize}
+          \item $\bar{S}_{i} = \frac{1}{k}\sum\limits_{j = 1}^{k} S_{i}^{i} \hspace{1cm} \forall i \in [1, n]$
+        \end{itemize}
+        Cependant, considérer seulement la moyenne comme util statistique n'est pas suffisant due aux bruits et interférences pouvant survenir (voir section précédente). Pour pallier à ce problème, on cacule aussi la variance (noté $v$) pour chaque point du graphe. Ainsi, on obtiendra une nouvelle forme appellée ensemble charactéristique qui est définit comme suit :
+        \[S^{*} = \{(a_{1}, \bar{S}_{1}, v_{1}), ..., (a_{n}, \bar{S}_{n}, v_{n})\}\]
+        Où :
+        \begin{itemize}
+          \item $v{i} = \frac{1}{k-1}\sum\limits_{j = 1}^{k}(S_{i}^{(j)}-\bar{S}_{i}) \hspace{1cm} \forall i \in [1,n]$
+        \end{itemize}
+        On peut donc définir notre base de données (notée $\mathcal{D}$) comme l'ensemble des points du graphe (noté $L$) pour lequel il existe un ensemble charactéristique. Soit : 
+        \[\mathcal{D} = \{L_{1}, L_{2}, ..., L_{3}\}\]
+        Où :
+        \begin{itemize}
+          \item $\dim(L_{i})$, le nombre de points d'accès à cette position, est noté $n_{i}$
+          \item $S_{i}^{*}$ est l'ensemble charactéristique de $L_{i}$ 
+        \end{itemize}
+        
+        Une fois la base de données remplie, on peut passer à l'étape dites d'exploitation. Il s'aggit du processus qui sera utilisé par une personne pour pouvoir se localiser.\\
+        Le processus va déduire la position de l'utilisateur sur base de la base de données préalablement crée (notée $\mathcal{D}$) et sur base d'une mesure qu'il aura effectuée (notée $S'$). La nature de cette mesure pouvant soit être de la forme (1) ou (2).\\
+        Le processus va déterminer une position $\hat{L}$ appartenant $\mathcal{D}$ pour laquelle la probabilité que l'utilisateur se trouve proche de ce point est la plus grande. Pour se faire, on va calculer, pour chaque élément appartenant à $\mathcal{D}$, un score noté $Z$ et considérer, comme solution à notre problème, le point conrespondant au score $Z$ minimal car le score $Z$ minimal représent la vraisemblabilité maximale comme prouvé dans l'article (Mettre référence). Le score $Z$ est définit comme suit :
+        \[Z_{i} = \sum\limits_{j = 1}^{n_{i}}\bigg(\frac{(\bar{S}_{ij}-S'_{j})^{2}}{v_{ij}}\bigg)\]
+        Où :
+        \begin{itemize}
+          \item $\bar{S}_{ij}$ est la moyenne de la qualité de signal du $j^{eme}$ point d'accès
+          \item $v_{ij}$ est la variance de la qualité de signal du $j^{eme}$ point d'accès
+          \item $S'_{j}$ est la qualité de signal du $j^{eme}$ point d'accès de la mesure effectué par l'utilisateur
+        \end{itemize}
+        
+        \begin{tcolorbox}[title = Mesures parasites]
+          Dans cette article, on défini une mesure parasite comme la détection d'un point d'accès qui n'apparaitrait que très rarement lors de la prise de mesures. On qualifira un point d'accès comme tel si le nombre de fois qu'il a été détecté est inférieur à un seuil fixé.
+          \\
+          Ce cas de figure survient pour des points d'accès situés à une distance telle qu'ils ne sont pas toujours percus mais qui, dans le cas contraire, présentent des qualités de signal in férieur à $-90 dBm$.
+        \end{tcolorbox}
       \paragraph{Monte carlo}
-  \subsection{Résultats}
+      \paragraph{Amélioration par l'utilisation de filtres}
+      \paragraph{Amélioration par l'estimation de qualité de signal}
 \section{Discussion et limitations}
 
 \newpage
