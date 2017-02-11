@@ -1,5 +1,5 @@
 # Fdb version 3
-["pdflatex"] 1486818560 "state_of_art.tex" "state_of_art.pdf" "state_of_art" 1486818561
+["pdflatex"] 1486819068 "state_of_art.tex" "state_of_art.pdf" "state_of_art" 1486819068
   "/etc/texmf/web2c/texmf.cnf" 1484993148 1101 af7716885e081ab43982cab7b4672c1a ""
   "/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1272929888 3287 e6b82fe08f5336d4d5ebc73fb1152e87 ""
@@ -153,10 +153,11 @@
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1484993194 1863403 f3ff9a4253bcb5fb9a9baaf0c572cb01 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1484993254 3853897 e29e74100368f58c8813f055cfb895fc ""
   "IEEEtran.cls" 1356643156 220413 8baab577f34760640e27918fe5178519 ""
-  "state_of_art.aux" 1486818561 2244 3f72ef8078912c3437e51683bf181c25 ""
-  "state_of_art.tex" 1486818560 8470 4b64061812d831473606647532878647 ""
+  "images/signal-propagation.jpg" 1486818992 67432 f1f746fdfa9677ec221b5cdef411dda3 ""
+  "state_of_art.aux" 1486819068 2244 3f72ef8078912c3437e51683bf181c25 ""
+  "state_of_art.tex" 1486819068 8533 91e626baf52f800ee18941039d1dd83b ""
   (generated)
   "state_of_art.log"
-  "state_of_art.toc"
   "state_of_art.aux"
+  "state_of_art.toc"
   "state_of_art.pdf"
