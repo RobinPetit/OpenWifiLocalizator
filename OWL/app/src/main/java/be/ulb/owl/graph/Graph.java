@@ -9,14 +9,15 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Random;
 
 import be.ulb.owl.MainActivity;
+import be.ulb.owl.R;
 import be.ulb.owl.Scanner;
 import be.ulb.owl.Wifi;
 import be.ulb.owl.graph.shortestpath.ShortestPathAStar;
 import be.ulb.owl.graph.shortestpath.ShortestPathEvaluator;
 import be.ulb.owl.task.LoadMapTask;
+import be.ulb.owl.utils.DialogUtils;
 import be.ulb.owl.utils.SQLUtils;
 
 /**
@@ -35,9 +36,6 @@ public class Graph {
 
     private Scanner _scanner;
 
-    // dedicated to the démonstration
-    private int _offset;
-    private ArrayList<Node> _demoMotions = new ArrayList<Node>();
 
     /**
      * Constructor<br />
@@ -49,16 +47,16 @@ public class Graph {
         _allCampus = new ArrayList<Campus>();
         loadAllPlan();
 
-        if (MainActivity.isDemo()) {
-            _offset = 0;
-        }
-
         if(_allCampus.isEmpty()) {
             Log.w(getClass().getName(), "No campus has been loaded");
         }
 
         _scanner = new Scanner();
     }
+
+
+
+    ////////////////////////////////////// GETTER AND SETTER //////////////////////////////////////
 
     /**
      * Return all node of the graph
@@ -75,13 +73,118 @@ public class Graph {
     }
 
 
+
+    /////////////////////////////////////////// LOCALIZE ///////////////////////////////////////////
+
+    /**
+     * Find the node where the user is.  This method call
+     *
+     * @return
+     */
+    protected Node whereAmI() {
+        Node res = null;
+        // TODO Detobel36 add async scan
+//        ArrayList<Wifi> sensed = _scanner.scan();
+//        Log.d(getClass().getName(), "wifi: (" + sensed.size() + ") " + sensed.toString());
+//        res = whereAmI(sensed);
+        return res;
+    }
+
+    /**
+     * Find the node where the user is
+     *
+     * @param sensed all detected arround wifi
+     * @return The node or null if not found
+     */
+    protected Node whereAmI(ArrayList<Wifi> sensed) {
+        ArrayList<String> sensedStr = new ArrayList<String>();
+        for (Wifi wifi : sensed) {
+            sensedStr.add(wifi.getBSS());
+        }
+
+        ArrayList<Plan> res = new ArrayList<Plan>();
+        int biggestSetSize = 0;
+
+        for (Plan plan : getAllPlan()) {
+            HashSet<String> tmp = plan.getListWifiBSS();
+            tmp.retainAll(sensedStr); // set-theoretical and operation
+
+            if (biggestSetSize == tmp.size()) {
+                res.add(plan);
+
+            } else if (biggestSetSize < tmp.size()) {
+                res = new ArrayList<Plan>();
+                res.add(plan);
+                biggestSetSize = tmp.size();
+            }
+
+        }
+
+        if (res.size() == 0) {
+            Log.i(getClass().getName(), "You are not at ULB.");
+            return null;
+        }
+
+        Node node = res.get(0).getNode(sensed); // @TODO manage case where two plans could contain the solution.
+        if(node != null) {
+            Log.d(getClass().getName(), "Node found: " + node.getID() + "(alias: " + node.getAlias() + ")");
+        }
+        return node;
+    }
+
+
+    /**
+     * localizes the user
+     */
+    public void localize() {
+        localize(true);
+    }
+
+
+    /**
+     * localizes the user
+     *
+     * @param displayNotFound Boolean telling whether or not to signal if user is unable to localize
+     */
+    public void localize(boolean displayNotFound) {
+        Node current = whereAmI();
+
+        boolean haveChange = main.setCurrentLocation(current);
+
+        if(current != null) {
+            main.setCurrentPlan(current.getParentPlan());
+            if(haveChange) {
+                main.cleanCanvas();
+
+                ArrayList<Node> distinationNodes = main.getDestinations();
+                if(!distinationNodes.isEmpty()) {
+                    try {
+                        findPath();
+                    } catch (NoPathException e) {
+                        Log.e(getClass().getName(), "Error: should have found an alternative for a " +
+                                "path between " + current.getID() + " and " +
+                                distinationNodes.get(0).getAlias().toString());
+                    }
+                } else
+                    main.draw(current);
+            }
+
+        } else if (displayNotFound) {
+            DialogUtils.infoBox(main, R.string.not_found, R.string.not_in_ULB);
+        }
+    }
+
+
+
+    ///////////////////////////////////////////// PATH /////////////////////////////////////////////
+
     /**
      * Find path to the destination of the user will go (stock in main)
      *
      * @throws NoPathException
      */
     public void findPath() throws NoPathException {
-        Node src = main.getCurrentLcation();
+        Node src = main.getCurrentLocation();
 
         if(src != null) {
             double minHeuristic = Double.POSITIVE_INFINITY;
@@ -122,6 +225,7 @@ public class Graph {
 
     }
 
+
     /**
      * TODO doc ?  Robin/Denis ?
      *
@@ -155,81 +259,10 @@ public class Graph {
     }
 
 
-    public void setPlan () {
-        if (0 == _offset) {
-            Campus campus = getCampus("Solbosh");
-            Plan currentPlan = campus.getPlan("P.F");
-            _demoMotions.add(currentPlan.getNode(64));
-            _demoMotions.add(currentPlan.getNode(63));
-            _demoMotions.add(currentPlan.getNode(9));
-            _demoMotions.add(currentPlan.getNode(13));
-            _demoMotions.add(currentPlan.getNode(20));
-            _demoMotions.add(currentPlan.getNode(21));
-            _demoMotions.add(currentPlan.getNode(27));
-            _demoMotions.add(currentPlan.getNode(29));
-            _demoMotions.add(currentPlan.getNode(31));
-            _demoMotions.add(currentPlan.getNode(32));
-            _demoMotions.add(currentPlan.getNode(34));
-            _demoMotions.add(currentPlan.getNode(35));
-            _demoMotions.add(currentPlan.getNode(23));
-            _demoMotions.add(currentPlan.getNode(16));
-            _demoMotions.add(currentPlan.getNode(42));
-        }
-    }
 
-    public Node whereAmI () {
-        Node res = null;
-        if (MainActivity.isDemo()) {
-            setPlan();
-            res = _demoMotions.get(_offset);
-            _offset = (_offset+1)%_demoMotions.size();
+    /////////////////////////////////////// MUST BE CLASSED ///////////////////////////////////////
 
-        } else if(MainActivity.isDebug() && MainActivity.isTest()) {
-            res = getAllNodes().get(new Random().nextInt(getAllNodes().size()));
 
-        } else {
-//            ArrayList<Wifi> sensed = _scanner.scan();
-//            Log.d(getClass().getName(), "wifi: (" + sensed.size() + ") " + sensed.toString());
-//            res = whereAmI(sensed);
-        }
-        return res;
-    }
-
-    public Node whereAmI (ArrayList<Wifi> sensed) {
-        ArrayList<String> sensedStr = new ArrayList<String>();
-        for (Wifi wifi : sensed) {
-            sensedStr.add(wifi.getBSS());
-        }
-
-        ArrayList<Plan> res = new ArrayList<Plan>();
-        int biggestSetSize = 0;
-
-        for (Plan plan : getAllPlan()) {
-            HashSet<String> tmp = plan.getListWifiBSS();
-            tmp.retainAll(sensedStr); // set-theoretical and operation
-
-            if (biggestSetSize == tmp.size()) {
-                res.add(plan);
-
-            } else if (biggestSetSize < tmp.size()) {
-                res = new ArrayList<Plan>();
-                res.add(plan);
-                biggestSetSize = tmp.size();
-            }
-
-        }
-
-        if (res.size() == 0) {
-            Log.i(getClass().getName(), "You are not at ULB.");
-            return null;
-        }
-
-        Node node = res.get(0).getNode(sensed); // @TODO manage case where two plans could contain the solution.
-        if(node != null) {
-            Log.d(getClass().getName(), "Node found: " + node.getID() + "(alias: " + node.getAlias() + ")");
-        }
-        return node;
-    }
 
 
     /**
@@ -249,7 +282,7 @@ public class Graph {
         _scanner.startScanTask();
 
         Log.i(getClass().getName(), "Scanner.scan");
-        main.localize();
+        localize();
     }
 
 

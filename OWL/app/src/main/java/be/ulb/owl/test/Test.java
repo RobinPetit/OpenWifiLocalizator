@@ -20,6 +20,7 @@ public class Test {
     private static final MainActivity main = MainActivity.getInstance();
 
 
+
     public static void testBestPath() {
         if(!MainActivity.isTest()) {
             Log.w(Test.class.getName(), "Test mode is disabled !");
@@ -62,13 +63,14 @@ public class Test {
 
 
     public static void testWifi() {
-        if(!MainActivity.isTest()) {
+        Graph mainGraph = main.getGraph();
+
+        if(!(mainGraph instanceof GraphTest) || !MainActivity.isTest()) {
             Log.w(Test.class.getName(), "Test mode is disabled !");
             return;
         }
 
-        Graph graph = main.getGraph();
-
+        GraphTest graph = (GraphTest) mainGraph;
         // ---- test ----
 
         ArrayList<Wifi> tmp = new ArrayList<Wifi>();
@@ -94,7 +96,7 @@ public class Test {
         tmp.add(new Wifi("00:26:cb:4e:07:f1", 78.7f, 0f));
         tmp.add(new Wifi("00:37:b7:64:c3:66", 90.0f, 0f));
 
-        Node position = graph.whereAmI(tmp);
+        Node position = graph.forceWhereAmI(tmp);
         main.draw(position);
         System.out.print("Test 1.\n res = ");
         System.out.println(position.getID());
@@ -122,7 +124,7 @@ public class Test {
         tmp.add(new Wifi("00:26:cb:4d:d9:40", 77.0f, 0f));
         tmp.add(new Wifi("00:26:cb:a0:aa:c0", 70.3f, 0f));
 
-        position = graph.whereAmI(tmp);
+        position = graph.forceWhereAmI(tmp);
         main.draw(position);
         System.out.print("Test 2.\n res = ");
         System.out.println(position.getID());
@@ -136,7 +138,7 @@ public class Test {
         tmp.add(new Wifi("00:26:cb:4e:0e:e0", 33.2f, 0f));
         tmp.add(new Wifi("00:0c:e6:00:d1:0c", 88.0f, 0f));
 
-        position = graph.whereAmI(tmp);
+        position = graph.forceWhereAmI(tmp);
         main.draw(position);
         System.out.print("Test 3.\n res = ");
         System.out.println(position.getID());
@@ -157,7 +159,7 @@ public class Test {
         tmp.add(new Wifi("00:26:cb:4e:04:51", 67.8f, 0f));
         tmp.add(new Wifi("00:26:cb:a0:aa:c0", 71.2f, 0f));
 
-        position = graph.whereAmI(tmp);
+        position = graph.forceWhereAmI(tmp);
         main.draw(position);
         System.out.print("Test 4.\n res = ");
         System.out.println(position.getID());
@@ -181,7 +183,7 @@ public class Test {
         tmp.add(new Wifi("00:0c:e6:00:d1:2d", 84.0f, 0f));
         tmp.add(new Wifi("d4:6d:50:f2:c7:73", 86.0f, 0f));
 
-        position = graph.whereAmI(tmp);
+        position = graph.forceWhereAmI(tmp);
         main.draw(position);
         System.out.print("Test 5.\n res = ");
         System.out.println(position.getID());
@@ -200,7 +202,7 @@ public class Test {
         tmp.add(new Wifi("d4:6d:50:f2:c7:74", 87.0f, 0f));
         tmp.add(new Wifi("d4:6d:50:f2:c7:73", 87.5f, 0f));
 
-        position = graph.whereAmI(tmp);
+        position = graph.forceWhereAmI(tmp);
         main.draw(position);
         System.out.print("Test 6.\n res = ");
         System.out.println(position.getID());

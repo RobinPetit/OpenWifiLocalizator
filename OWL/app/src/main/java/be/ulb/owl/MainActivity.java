@@ -17,6 +17,7 @@ import android.graphics.Canvas;
 import java.util.ArrayList;
 import java.util.List;
 
+import be.ulb.owl.demo.GraphDemo;
 import be.ulb.owl.graph.Graph;
 import be.ulb.owl.graph.NoPathException;
 import be.ulb.owl.graph.Node;
@@ -26,6 +27,7 @@ import be.ulb.owl.gui.DrawView;
 import be.ulb.owl.gui.listener.ClickListener;
 import be.ulb.owl.gui.listener.QueryTextListener;
 import be.ulb.owl.gui.listener.TouchListener;
+import be.ulb.owl.test.GraphTest;
 import be.ulb.owl.test.Test;
 import be.ulb.owl.utils.DialogUtils;
 import be.ulb.owl.utils.LogUtils;
@@ -45,9 +47,9 @@ public class MainActivity extends AppCompatActivity  {
     // static attributes
     private static MainActivity instance;
 
-    private static final boolean DEBUG = true; // view info message in log (maybe more after)
-    private static final boolean TEST = false; // active to call test
-    private static final boolean DEMO = false; // active to active
+    private static final boolean DEBUG = true;          // view info message in log (maybe more after)
+    private static final boolean TEST = DEBUG && false; // active to call test (active also DEBUG)
+    private static final boolean DEMO = false;          // active to active
 
     private static final String[] NOT_SUGGESTED = {"Mystery"};
 
@@ -109,7 +111,17 @@ public class MainActivity extends AppCompatActivity  {
         // Load sql
         SQLUtils.initSQLUtils(this);
 
-        _graph = new Graph();
+        if(isDemo()) {
+            _graph = new GraphDemo();
+
+        } else if(isTest()) {
+            _graph = new GraphTest();
+
+        } else {
+            _graph = new Graph();
+
+        }
+
         _currentPlan = _graph.getDefaultCampus();
 
     }
@@ -272,7 +284,7 @@ public class MainActivity extends AppCompatActivity  {
     /**
      * Removes anything being on the canvas
      */
-    private void cleanCanvas() {
+    public void cleanCanvas() {
         if(_canvas != null) {
             _canvas.drawColor(0, PorterDuff.Mode.CLEAR);
         }
@@ -391,52 +403,23 @@ public class MainActivity extends AppCompatActivity  {
      *
      * @return the Node where is currently the user
      */
-    public final Node getCurrentLcation() {
+    public final Node getCurrentLocation() {
         return _currentPosition;
     }
 
 
-
-    /////////////////////////////////////// WTF stuff ///////////////////////////////////////
-
-    
     /**
-     * localizes the user
-     */
-    public void localize() {
-        localize(true);
-    }
-
-    /**
-     * localizes the user
+     * Change the current location/position Node
      *
-     * @param displayNotFound Boolean telling whether or not to signal if user is unable to localize
+     * @param newLocation the new position
+     * @return True if the location havec change
      */
-    public void localize(boolean displayNotFound) {
-        Node current = _graph.whereAmI();
-
-        if(current != null) {
-            setCurrentPlan(current.getParentPlan());
-            if(_currentPosition != current) {
-                _currentPosition = current;
-                cleanCanvas();
-
-                if(!_destinationNodes.isEmpty()) {
-                    try {
-                        _graph.findPath();
-                    } catch (NoPathException e) {
-                        Log.e(getClass().getName(), "Error: should have found an alternative for a path between "
-                                + _currentPosition.getID() + " and " + getDestinations().get(0).getAlias().toString());
-                    }
-                } else
-                    this.draw(current);
-            }
-
-        } else if (displayNotFound){
-            _currentPosition = null;
-            DialogUtils.infoBox(this, R.string.not_found, R.string.not_in_ULB);
-        }
+    public boolean setCurrentLocation(Node newLocation) {
+        Node oldLocation = _currentPosition;
+        _currentPosition = newLocation;
+        return (oldLocation != newLocation);
     }
+
 
 
     /////////////////////////////////////////// STATIC ///////////////////////////////////////////
