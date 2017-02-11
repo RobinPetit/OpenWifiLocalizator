@@ -24,12 +24,13 @@ import be.ulb.owl.graph.Node;
 import be.ulb.owl.graph.Path;
 import be.ulb.owl.graph.Plan;
 import be.ulb.owl.gui.DrawView;
-import be.ulb.owl.gui.listener.ClickListener;
+import be.ulb.owl.gui.listener.ClickListenerChoseLocal;
+import be.ulb.owl.gui.listener.ClickListenerLocalize;
+import be.ulb.owl.gui.listener.ClickListenerSwitchButton;
 import be.ulb.owl.gui.listener.QueryTextListener;
 import be.ulb.owl.gui.listener.TouchListener;
 import be.ulb.owl.test.GraphTest;
 import be.ulb.owl.test.Test;
-import be.ulb.owl.utils.DialogUtils;
 import be.ulb.owl.utils.LogUtils;
 import be.ulb.owl.utils.SQLUtils;
 import br.com.mauker.materialsearchview.MaterialSearchView;
@@ -71,7 +72,6 @@ public class MainActivity extends AppCompatActivity  {
     //////////////////////////////////////////// EVENTS ////////////////////////////////////////////
     // Event called by Android
 
-
     /**
      * Call when the application is created the first time
      *
@@ -83,6 +83,8 @@ public class MainActivity extends AppCompatActivity  {
         instance = this;
 
         LogUtils.initLogSystem();
+        Log.i(getClass().getName(), "Log loaded !");
+
         setContentView(R.layout.activity_main);
 
         setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
@@ -91,26 +93,12 @@ public class MainActivity extends AppCompatActivity  {
         _imageDraw = (ImageView)findViewById(R.id.draw);
         _imageDraw.setOnTouchListener(new TouchListener());
 
-        Button changePlan;
-        Button local;
-        Button localizeButton;
-
-        // Define click listener
-        ClickListener clickListener = new ClickListener();
-
-        // init buttons
-        changePlan = (Button)findViewById(R.id.changePlan);
-        changePlan.setOnClickListener(clickListener);
-
-        local = (Button)findViewById(R.id.local);
-        local.setOnClickListener(clickListener);
-
-        localizeButton = (Button)findViewById(R.id.localizeButton);
-        localizeButton.setOnClickListener(clickListener);
 
         // Load sql
         SQLUtils.initSQLUtils(this);
+        Log.i(getClass().getName(), "SQL Loaded !");
 
+        // Load graph
         if(isDemo()) {
             _graph = new GraphDemo();
 
@@ -121,9 +109,16 @@ public class MainActivity extends AppCompatActivity  {
             _graph = new Graph();
 
         }
+        Log.i(getClass().getName(), "Graph loaded !");
 
         _currentPlan = _graph.getDefaultCampus();
 
+
+        // Init buttons listener
+        initSwitchPlanButton();
+        initChoseLocalButton();
+        initLocalizeButton();
+        Log.i(getClass().getName(), "Button loaded !");
     }
 
 
@@ -237,6 +232,35 @@ public class MainActivity extends AppCompatActivity  {
 
 
     ///////////////////////////////////// INIT ANDROID VIEW /////////////////////////////////////
+
+    /**
+     * Initialize the "switch plan" button<br />
+     * To switch between the campus
+     */
+    private void initSwitchPlanButton() {
+        Button changePlan = (Button)findViewById(R.id.changePlan);
+        changePlan.setOnClickListener(new ClickListenerSwitchButton(this, _graph));
+    }
+
+    /**
+     * Initialize the "chose local" button<br />
+     * To choose a specific local in the current plan
+     */
+    private void initChoseLocalButton() {
+        Button local = (Button)findViewById(R.id.local);
+        local.setOnClickListener(new ClickListenerChoseLocal(this));
+    }
+
+    /**
+     * Initialize the "localize" button<br />
+     * To force the localization
+     */
+    private void initLocalizeButton() {
+        Button localizeButton = (Button)findViewById(R.id.localizeButton);
+        localizeButton.setOnClickListener(new ClickListenerLocalize(_graph));
+    }
+
+
 
     /**
      * Set up the main screen (where we see the plan)

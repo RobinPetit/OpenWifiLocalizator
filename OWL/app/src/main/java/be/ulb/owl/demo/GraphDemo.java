@@ -33,7 +33,7 @@ public class GraphDemo extends Graph {
      */
     private static void setPlan () {
         if (0 == _offset) {
-            Campus campus = Graph.getCampus("Solbosh");
+            Campus campus = getCampus("Solbosh");
             Plan currentPlan = campus.getPlan("P.F");
             _demoMotions.add(currentPlan.getNode(64));
             _demoMotions.add(currentPlan.getNode(63));

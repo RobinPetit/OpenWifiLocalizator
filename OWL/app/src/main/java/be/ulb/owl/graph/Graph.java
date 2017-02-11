@@ -33,8 +33,8 @@ public class Graph {
     private static ArrayList<Campus> _allCampus;
     private static final String SOLBOSCH_PLAN = "Solbosch";
 
-
     private Scanner _scanner;
+
 
 
     /**
@@ -55,6 +55,42 @@ public class Graph {
     }
 
 
+    /**
+     * Load all plan in the default folder
+     */
+    private void loadAllPlan() {
+        _allCampus = SQLUtils.loadAllCampus();
+        new LoadMapTask().execute(_allCampus);
+        // TODO get all plan ?
+//        _allPlan = SQLUtils.loadAllPlan();
+    }
+
+
+    //////////////////////////////////////////// EVENTS ////////////////////////////////////////////
+    // Call when an action begin, stop, ect...
+
+    /**
+     * Call when application is hide
+     *
+     * @see MainActivity#onStop()
+     */
+    public void hidden() {
+        _scanner.resetWifiStatus();
+        _scanner.stopScanTask();
+    }
+
+
+    /**
+     * Start the scan scheduller
+     */
+    public void startScanTask() {
+        _scanner.startScanTask();
+
+        Log.i(getClass().getName(), "Scanner.scan");
+        localize();
+    }
+
+
 
     ////////////////////////////////////// GETTER AND SETTER //////////////////////////////////////
 
@@ -70,6 +106,71 @@ public class Graph {
         }
 
         return allNodes;
+    }
+
+
+    /**
+     * Search all node which contain a specific alias (no search in name)
+     *
+     * @param name the name (alias) of this nodes
+     * @return an ArrayList of Node
+     */
+    public ArrayList<Node> searchNode(String name) {
+        ArrayList<Node> listeNode = new ArrayList<Node>();
+        for(Plan plan : getAllPlan()) {
+            listeNode.addAll(plan.searchNode(name));
+        }
+        return listeNode;
+    }
+
+
+    /**
+     * Get a plan
+     *
+     * @param name of the plan
+     * @return the Plan object
+     */
+    public Plan getPlanByName(String name) {
+        for(Plan plan: getAllPlan()) {
+            if (plan.getName().equals(name)) {
+                return plan;
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Get the default campus
+     *
+     * @return the default Campus
+     */
+    public Campus getDefaultCampus() {
+        // TODO change constant with magic number ? :P
+        // return getAllCampus().get(0);
+        return getCampus(SOLBOSCH_PLAN);
+    }
+
+
+    /**
+     * Get all campus of the graph
+     *
+     * @return all Campus
+     */
+    public ArrayList<Campus> getAllCampus() {
+        return _allCampus;
+    }
+
+
+    /**
+     * Get a specific campus or <b>create</b> if not exist
+     *
+     * @param name the name of the specific campus
+     * @return the campus (or null if not found)
+     */
+    public Campus getCampus(String name) {
+        return getCampus(name, true);
     }
 
 
@@ -140,7 +241,6 @@ public class Graph {
         localize(true);
     }
 
-
     /**
      * localizes the user
      *
@@ -165,8 +265,11 @@ public class Graph {
                                 "path between " + current.getID() + " and " +
                                 distinationNodes.get(0).getAlias().toString());
                     }
-                } else
+
+                } else {
                     main.draw(current);
+                }
+
             }
 
         } else if (displayNotFound) {
@@ -260,72 +363,9 @@ public class Graph {
 
 
 
-    /////////////////////////////////////// MUST BE CLASSED ///////////////////////////////////////
-
-
-
-
-    /**
-     * Call when application is hide
-     *
-     * @see MainActivity#onStop()
-     */
-    public void hidden() {
-        _scanner.resetWifiStatus();
-        _scanner.stopScanTask();
-    }
-
-    /**
-     * Start the scan scheduller
-     */
-    public void startScanTask() {
-        _scanner.startScanTask();
-
-        Log.i(getClass().getName(), "Scanner.scan");
-        localize();
-    }
-
-
-    /**
-     * Get a plan
-     *
-     * @param name of the plan
-     * @return the Plan object
-     */
-    public Plan getPlanByName(String name) {
-        for(Plan plan: getAllPlan())
-            if(plan.getName().equals(name))
-                return plan;
-        return null;
-    }
-
-
     /////////////////////////// STATIC ///////////////////////////
 
-    /**
-     * Load all plan in the default folder
-     */
-    private static void loadAllPlan() {
-        _allCampus = SQLUtils.loadAllCampus();
-        new LoadMapTask().execute(_allCampus);
-        // TODO get all plan ?
-//        _allPlan = SQLUtils.loadAllPlan();
-    }
 
-
-    /**
-     * Search all node which contain a specific alias (no search in name)
-     *
-     * @param name the name (alias) of this nodes
-     * @return an ArrayList of Node
-     */
-    public ArrayList<Node> searchNode(String name) {
-        ArrayList<Node> listeNode = new ArrayList<Node>();
-        for(Plan plan : getAllPlan()) {
-            listeNode.addAll(plan.searchNode(name));
-        }
-        return listeNode;
-    }
 
     /**
      * Get a specific node
@@ -350,37 +390,6 @@ public class Graph {
             allPlan.addAll(campus.getAllPlans());
         }
         return allPlan;
-    }
-
-
-    /**
-     * Get all campus of the graph
-     *
-     * @return all Campus
-     */
-    public static ArrayList<Campus> getAllCampus() {
-        return _allCampus;
-    }
-
-    /**
-     * Get a specific campus or <b>create</b> if not exist
-     *
-     * @param name the name of the specific campus
-     * @return the campus (or null if not found)
-     */
-    public static Campus getCampus(String name) {
-        return getCampus(name, true);
-    }
-
-    /**
-     * Get the default campus
-     *
-     * @return the default Campus
-     */
-    public Campus getDefaultCampus() {
-        // TODO change constant with magic number ? :P
-        // return getAllCampus().get(0);
-        return getCampus(SOLBOSCH_PLAN);
     }
 
 
