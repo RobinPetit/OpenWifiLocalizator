@@ -63,14 +63,14 @@ public class SQLUtils extends SQLiteOpenHelper {
         DB_PATH = context.getApplicationInfo().dataDir + "/databases";
 
         new File(DB_PATH).mkdir();
-        Log.d(getClass().getName(), "DB_Path: " + DB_PATH);
+        // Log.d(getClass().getName(), "DB_Path: " + DB_PATH);
 
         if (!checkDatabase() || !checkDateDatabase()) {
             Log.i(getClass().getName(), "Database doesn't exist -> creation");
             createDataBase();
         }
 
-        Log.d(getClass().getName(), "Open existing database");
+        // Log.d(getClass().getName(), "Open existing database");
         opendatabase();
 
     }
@@ -285,7 +285,7 @@ public class SQLUtils extends SQLiteOpenHelper {
         }
 
         // TODO remove DEBUG
-        Log.d(SQLUtils.class.getName(), "Timer loadAllCampus miliSec: " + ((System.nanoTime()-startTime)/1000000));
+        // Log.d(SQLUtils.class.getName(), "Timer loadAllCampus miliSec: " + ((System.nanoTime()-startTime)/1000000));
         return res;
     }
 
@@ -334,7 +334,7 @@ public class SQLUtils extends SQLiteOpenHelper {
         }
 
         // TODO remove DEBUG
-        Log.d(SQLUtils.class.getName(), "Timer loadCampus miliSec: " + ((System.nanoTime()-startTime)/1000000));
+        // Log.d(SQLUtils.class.getName(), "Timer loadCampus miliSec: " + ((System.nanoTime()-startTime)/1000000));
         return res;
     }
 
@@ -397,7 +397,7 @@ public class SQLUtils extends SQLiteOpenHelper {
         cursor.close(); // end of the request
 
         // TODO remove DEBUG
-        Log.d(SQLUtils.class.getName(), "Timer loadAllPlan miliSec: " + ((System.nanoTime()-startTime)/1000000));
+        // Log.d(SQLUtils.class.getName(), "Timer loadAllPlan miliSec: " + ((System.nanoTime()-startTime)/1000000));
 
         return res;
     }
@@ -457,7 +457,7 @@ public class SQLUtils extends SQLiteOpenHelper {
         }
 
         // TODO remove DEBUG
-        Log.d(SQLUtils.class.getName(), "Timer loadPlan miliSec: " + ((System.nanoTime()-startTime)/1000000));
+        // Log.d(SQLUtils.class.getName(), "Timer loadPlan miliSec: " + ((System.nanoTime()-startTime)/1000000));
         return new Plan(planName, id, campus, directoryImage, xOnParent, yOnParent, bgCoordX, bgCoordY,
                     relativeAngle, distance);
     }
@@ -473,7 +473,7 @@ public class SQLUtils extends SQLiteOpenHelper {
      */
     public static ArrayList<Node> loadNodes(Plan plan, int planID) {
         long startTime = System.nanoTime(); // TODO remove DEBUG
-        Log.d(SQLUtils.class.getName(), "LoadNodes: " + planID);
+        // Log.d(SQLUtils.class.getName(), "LoadNodes: " + planID);
         ArrayList<Node> res = new ArrayList<Node>();
 
         Cursor cursor = getDatabase().query(NodeTable.getName(),
@@ -500,8 +500,8 @@ public class SQLUtils extends SQLiteOpenHelper {
         cursor.close(); // end of the request
 
         // TODO remove DEBUG
-        Log.d(SQLUtils.class.getName(), "Timer loadNodes (" + planID + ") miliSec: " +
-                ((System.nanoTime()-startTime)/1000000));
+        // Log.d(SQLUtils.class.getName(), "Timer loadNodes (" + planID + ") miliSec: " +
+        //         ((System.nanoTime()-startTime)/1000000));
         return res;
     }
 
@@ -536,8 +536,8 @@ public class SQLUtils extends SQLiteOpenHelper {
         cursor.close();
 
         // TODO remove DEBUG
-        Log.d(SQLUtils.class.getName(), "Timer loadAlias (NodeID: " + nodeID + ") miliSec: " +
-                ((System.nanoTime()-startTime)/1000000));
+        // Log.d(SQLUtils.class.getName(), "Timer loadAlias (NodeID: " + nodeID + ") miliSec: " +
+        //        ((System.nanoTime()-startTime)/1000000));
         return res;
     }
 
@@ -580,8 +580,8 @@ public class SQLUtils extends SQLiteOpenHelper {
         cursor.close();
 
         // TODO remove DEBUG
-        Log.d(SQLUtils.class.getName(), "Timer loadWifi (" + nodeID + ") miliSec: " +
-                ((System.nanoTime()-startTime)/1000000));
+        // Log.d(SQLUtils.class.getName(), "Timer loadWifi (" + nodeID + ") miliSec: " +
+        //        ((System.nanoTime()-startTime)/1000000));
         return res;
     }
 
@@ -667,8 +667,8 @@ public class SQLUtils extends SQLiteOpenHelper {
 
         res.addAll(loadSpecialPath(nodeID, node, plan));
         // TODO remove DEBUG
-        Log.d(SQLUtils.class.getName(), "Timer loadPath (nodeID: " + nodeID + ") miliSec: " +
-                ((System.nanoTime()-startTime)/1000000));
+        // Log.d(SQLUtils.class.getName(), "Timer loadPath (nodeID: " + nodeID + ") miliSec: " +
+        //        ((System.nanoTime()-startTime)/1000000));
         return res;
     }
 

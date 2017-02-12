@@ -21,7 +21,7 @@ import be.ulb.owl.event.ScanWifiUpdateEvent;
  */
 public class Scanner {
 
-    private static final MainActivity main = MainActivity.getInstance();
+    private final MainActivity _main;
 
     private static HashMap<ScanWifiUpdateEvent, EventPriority> _eventScanWifiUpdate =
             new HashMap<ScanWifiUpdateEvent, EventPriority>();
@@ -29,7 +29,6 @@ public class Scanner {
 
     private final int SCAN_TIME_INTERVAL = 10;  // in seconds
 
-//    private Thread _scanTask = null;
     private ScanTask _scanTask = null;
 
     private boolean _defaultWifiEnable = true;
@@ -41,19 +40,25 @@ public class Scanner {
     /**
      * Constructor (call when the app start)
      */
-    public Scanner() {
+    public Scanner(MainActivity main) {
+        _main = main;
+
         forceEnableWifi();
 
         if(!_wifiManager.isWifiEnabled()) {
             Log.d(getClass().getName(), "Wifi disable");
         }
 
-        _wifiManager.startScan(); // TODO use return value
+
+        if(!_wifiManager.startScan()) {
+            Log.e(getClass().getName(), "WifiManager could not start a scan :/");
+        }
+
     }
 
 
 
-
+    ////////////////////////////////////////// MAKE SCAN //////////////////////////////////////////
 
     /**
      * Calcul the average of a test
@@ -104,6 +109,7 @@ public class Scanner {
         return res;
     }
 
+
     /**
      * Check if current result of wifi manager equals to the new scan.  If it's different, update
      * this values
@@ -118,7 +124,10 @@ public class Scanner {
         }
         return res;
     }
-    
+
+
+
+    ///////////////////////////////////// INFO FROM SCAN-TASK /////////////////////////////////////
 
     /**
      * ScanTask have finish and give the new scan result
@@ -153,37 +162,12 @@ public class Scanner {
             }
         }
 
+        _scanTask = null;
         startScanTask();
     }
 
 
-
-
-
-    /**
-     * Scan all around wifi
-     *
-     * @return the list of all wifi
-     */
-//    public ArrayList<Wifi> scan() {
-//        _accesPoints.clear();
-//        ArrayList<Wifi> temp = new ArrayList<Wifi>();
-//        for (int i = 0; i < 3; i++) {
-//            getData();
-//        }
-//
-//        for(String key : _accesPoints.keySet()) {
-//            ArrayList<Integer> values = _accesPoints.get(key);
-//            temp.add(new Wifi(key, avg(values), -1));
-//        }
-//
-//        if(temp.isEmpty()) {
-//            Log.i(getClass().getName(), "No wifi in this area");
-//        }
-//
-//        return temp;
-//    }
-
+    /////////////////////// ACTIVE/DESACTIVE WIFI ////////////:
 
     /**
      * Init the wifiManager
@@ -192,7 +176,7 @@ public class Scanner {
      */
     public boolean initWifiManager() {
         if(_wifiManager == null) {
-            Object service = main.getSystemService(Context.WIFI_SERVICE);
+            Object service = _main.getSystemService(Context.WIFI_SERVICE);
             if(service instanceof WifiManager) {
                 _wifiManager = (WifiManager) service;
                 return true;
@@ -239,62 +223,50 @@ public class Scanner {
         _scanTask = null;
     }
 
-    private void startScanTask() {
+
+    /**
+     * Start a scan task (but wait some second before the test)
+     */
+    public void startScanTask() {
+        startScanTask(false);
+    }
+
+    /**
+     * Start a scan task
+     *
+     * @param forceStart True to begin scan directly
+     */
+    public void startScanTask(boolean forceStart) {
         if(_scanTask == null) {
-            _scanTask = new ScanTask(this);
+            _scanTask = new ScanTask(this, forceStart ? 0 : SCAN_TIME_INTERVAL);
             _scanTask.execute();
 
         } else {
             Log.e(getClass().getName(), "ScanTask allready exist !");
         }
+
     }
 
     public void forceRestartScanTask() {
         stopScanTask();
-        startScanTask();
+        startScanTask(true);
     }
 
 
-    /**
-     * Start the scan task
-     */
-//    public void startScanTask() {
-//        if(!_taskInProgress && _scanTask == null) {
-//            _scanTask = new Thread() {
-//                @Override
-//                public void run() {
-//                    while(!isInterrupted() && _taskInProgress) {
-//                        try {
-//                            // sleep a given amount of time
-//                            Thread.sleep(1000 * SCAN_TIME_INTERVAL);
-//                            // and then try to localize user
-//                            main.runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    main.localize(false);
-//                                }
-//                            });
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                }
-//            };
-//            _taskInProgress = true;
-//            _scanTask.start();
-//
-//        }
-//    }
-//
-//    /**
-//     * Stop temporary the scan thread
-//     */
-//    public void stopScanTask() {
-//        _scanTask.interrupt();
-//        _taskInProgress = false;
-//        _scanTask = null;
-//    }
+    /////////////////////////////////////// GETTER & SETTER ///////////////////////////////////////
 
+    /**
+     * Get the last result of wifi access scan
+     *
+     * @return an ArrayList with all last scanned wifi
+     */
+    public ArrayList<Wifi> getLastWifiAccess() {
+        return _lastWifiAccess;
+    }
+
+
+
+    /////////////////////////////////////// LISTENER EVENT ///////////////////////////////////////
 
     public static void addEventUpdateWifi(ScanWifiUpdateEvent event) {
         addEventUpdateWifi(event, EventPriority.LAST);

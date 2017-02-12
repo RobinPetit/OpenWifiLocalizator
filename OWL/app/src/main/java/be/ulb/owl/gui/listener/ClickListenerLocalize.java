@@ -21,7 +21,8 @@ public class ClickListenerLocalize implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        _graph.localize();
+        // TODO detobel36 refresh localisation !
+//        _graph.localize();
     }
 
 }

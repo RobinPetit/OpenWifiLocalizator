@@ -29,6 +29,7 @@ import be.ulb.owl.gui.listener.ClickListenerLocalize;
 import be.ulb.owl.gui.listener.ClickListenerSwitchButton;
 import be.ulb.owl.gui.listener.QueryTextListener;
 import be.ulb.owl.gui.listener.TouchListener;
+import be.ulb.owl.scanner.Scanner;
 import be.ulb.owl.test.GraphTest;
 import be.ulb.owl.test.Test;
 import be.ulb.owl.utils.LogUtils;
@@ -62,6 +63,7 @@ public class MainActivity extends AppCompatActivity  {
 
     // private attributes
     private Graph _graph = null;
+    private Scanner _scanner = null;
     private Plan _currentPlan = null;
     private Node _currentPosition;
     private ArrayList<Node> _destinationNodes =  new ArrayList<Node>();
@@ -96,7 +98,7 @@ public class MainActivity extends AppCompatActivity  {
 
         // Load sql
         SQLUtils.initSQLUtils(this);
-        Log.i(getClass().getName(), "SQL Loaded !");
+        Log.i(getClass().getName(), "[V] SQL Loaded !");
 
         // Load graph
         if(isDemo()) {
@@ -109,16 +111,18 @@ public class MainActivity extends AppCompatActivity  {
             _graph = new Graph();
 
         }
-        Log.i(getClass().getName(), "Graph loaded !");
+        Log.i(getClass().getName(), "[V] Graph loaded !");
 
-        _currentPlan = _graph.getDefaultCampus();
+        setCurrentPlan(_graph.getDefaultCampus());
 
+        _scanner = new Scanner(this);
+        Log.i(getClass().getName(), "[V] Scanner loaded !");
 
         // Init buttons listener
         initSwitchPlanButton();
         initChoseLocalButton();
         initLocalizeButton();
-        Log.i(getClass().getName(), "Button loaded !");
+        Log.i(getClass().getName(), "[V] Button loaded !");
     }
 
 
@@ -127,21 +131,26 @@ public class MainActivity extends AppCompatActivity  {
         super.onStart();
 
         // Set default plan
-        setCurrentPlan(_currentPlan);
-        this.setUpCanvas();
-        _drawer = new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor());
+        if (DEMO) {
+            setCurrentPlan(_graph.getPlanByName("P.F"));
 
-        if(TEST) {
+        } else if(TEST) {
             // TODO change plan... if we make automatic test ? :/
             setCurrentPlan(_graph.getPlanByName("P.F"));
 
             Test.testBestPath();
             Test.testWifi();
+
+        } else {
+            setCurrentPlan(_currentPlan);
+
         }
 
-        if (DEMO) {
-            setCurrentPlan(_graph.getPlanByName("P.F"));
-        }
+        this.setUpCanvas();
+        _drawer = new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor());
+
+        // Start scan
+        _scanner.startScanTask(false);
 
     }
 
@@ -153,7 +162,11 @@ public class MainActivity extends AppCompatActivity  {
     @Override
     protected void onStop() {
         super.onStop();
-        _graph.hidden(); // (also) Reset wifi settings
+
+        Log.i(getClass().getName(), "Stop scanner and reset wifi configuration");
+        _scanner.stopScanTask();
+        _scanner.resetWifiStatus();
+
     }
 
 
@@ -261,7 +274,6 @@ public class MainActivity extends AppCompatActivity  {
     }
 
 
-
     /**
      * Set up the main screen (where we see the plan)
      */
@@ -281,15 +293,23 @@ public class MainActivity extends AppCompatActivity  {
 
 
     private float getWidthShrinkageFactor() {
-        float trueWidth = (float)((BitmapDrawable)_imageView.getDrawable()).getBitmap().getWidth();
-        float effectiveWidth = _imageView.getDrawable().getIntrinsicWidth();
-        return trueWidth / effectiveWidth;
+        float res = 0;
+        if(_imageView.getDrawable() != null) {
+            float trueWidth = (float) ((BitmapDrawable) _imageView.getDrawable()).getBitmap().getWidth();
+            float effectiveWidth = _imageView.getDrawable().getIntrinsicWidth();
+            res = trueWidth / effectiveWidth;
+        }
+        return res;
     }
 
     private float getHeightShrinkageFactor() {
-        float trueHeight = (float)((BitmapDrawable)_imageView.getDrawable()).getBitmap().getHeight();
-        float effectiveHeight = _imageView.getDrawable().getIntrinsicHeight();
-        return trueHeight / effectiveHeight;
+        float res = 0;
+        if(_imageView.getDrawable() != null) {
+            float trueHeight = (float) ((BitmapDrawable) _imageView.getDrawable()).getBitmap().getHeight();
+            float effectiveHeight = _imageView.getDrawable().getIntrinsicHeight();
+            res = trueHeight / effectiveHeight;
+        }
+        return res;
     }
 
 
@@ -399,8 +419,11 @@ public class MainActivity extends AppCompatActivity  {
      * @param newCurrentPlan new Plan object
      */
     public void setCurrentPlan(Plan newCurrentPlan) {
-        if(newCurrentPlan != null && (_currentPlan == null ||
-                !newCurrentPlan.getName().equalsIgnoreCase(_currentPlan.getName())) ) {
+        if(newCurrentPlan != null &&
+                (_currentPlan == null ||
+                        !newCurrentPlan.getName().equalsIgnoreCase(_currentPlan.getName())) ) {
+
+            Log.d(getClass().getName(), "New plan: " + newCurrentPlan.getName());
 
             _currentPlan = newCurrentPlan;
             cleanCanvas();

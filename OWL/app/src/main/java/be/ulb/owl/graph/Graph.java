@@ -13,10 +13,10 @@ import java.util.HashSet;
 import be.ulb.owl.MainActivity;
 import be.ulb.owl.R;
 import be.ulb.owl.event.ScanWifiUpdateEvent;
-import be.ulb.owl.scanner.Scanner;
-import be.ulb.owl.scanner.Wifi;
 import be.ulb.owl.graph.shortestpath.ShortestPathAStar;
 import be.ulb.owl.graph.shortestpath.ShortestPathEvaluator;
+import be.ulb.owl.scanner.Scanner;
+import be.ulb.owl.scanner.Wifi;
 import be.ulb.owl.task.LoadMapTask;
 import be.ulb.owl.utils.DialogUtils;
 import be.ulb.owl.utils.SQLUtils;
@@ -34,9 +34,6 @@ public class Graph implements ScanWifiUpdateEvent {
     private static ArrayList<Campus> _allCampus;
     private static final String SOLBOSCH_PLAN = "Solbosch";
 
-    private Scanner _scanner;
-
-
 
     /**
      * Constructor<br />
@@ -52,7 +49,7 @@ public class Graph implements ScanWifiUpdateEvent {
             Log.w(getClass().getName(), "No campus has been loaded");
         }
 
-        _scanner = new Scanner();
+        Scanner.addEventUpdateWifi(this);
     }
 
 
@@ -65,31 +62,6 @@ public class Graph implements ScanWifiUpdateEvent {
         // TODO get all plan ?
 //        _allPlan = SQLUtils.loadAllPlan();
     }
-
-
-    //////////////////////////////////////////// EVENTS ////////////////////////////////////////////
-    // Call when an action begin, stop, ect...
-
-    /**
-     * Call when application is hide
-     *
-     * @see MainActivity#onStop()
-     */
-    public void hidden() {
-        _scanner.resetWifiStatus();
-        _scanner.stopScanTask();
-    }
-
-
-    /**
-     * Start the scan scheduller
-     */
-//    public void startScanTask() {
-////        _scanner.startScanTask();
-//
-//        Log.i(getClass().getName(), "Scanner.scan");
-//        localize();
-//    }
 
 
 
@@ -185,6 +157,8 @@ public class Graph implements ScanWifiUpdateEvent {
      */
     protected Node whereAmI() {
         Node res = null;
+
+
         // TODO Detobel36 add async scan
 //        ArrayList<Wifi> sensed = _scanner.scan();
 //        Log.d(getClass().getName(), "wifi: (" + sensed.size() + ") " + sensed.toString());
@@ -237,18 +211,11 @@ public class Graph implements ScanWifiUpdateEvent {
 
     /**
      * localizes the user
-     */
-    public void localize() {
-        localize(true);
-    }
-
-    /**
-     * localizes the user
      *
      * @param displayNotFound Boolean telling whether or not to signal if user is unable to localize
      */
-    public void localize(boolean displayNotFound) {
-        Node current = whereAmI();
+    public void localize(boolean displayNotFound, ArrayList<Wifi> sensedWifi) {
+        Node current = whereAmI(sensedWifi);
 
         boolean haveChange = main.setCurrentLocation(current);
 
@@ -421,7 +388,7 @@ public class Graph implements ScanWifiUpdateEvent {
 
     @Override
     public void scanWifiUpdateEvent(ArrayList<Wifi> listWifi) {
-        localize(false);
+        localize(false, listWifi);
     }
 
 }
