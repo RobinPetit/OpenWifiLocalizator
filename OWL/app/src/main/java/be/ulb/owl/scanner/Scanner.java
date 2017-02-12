@@ -218,6 +218,9 @@ public class Scanner {
         }
     }
 
+    /**
+     * Stop scan task
+     */
     public void stopScanTask() {
         _scanTask.cancel(true);
         _scanTask = null;
@@ -246,6 +249,7 @@ public class Scanner {
         }
 
     }
+
 
     public void forceRestartScanTask() {
         stopScanTask();

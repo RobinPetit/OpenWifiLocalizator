@@ -387,8 +387,9 @@ public class Graph implements ScanWifiUpdateEvent {
     // TODO CLASSER (refactoring)
 
     @Override
-    public void scanWifiUpdateEvent(ArrayList<Wifi> listWifi) {
+    public boolean scanWifiUpdateEvent(ArrayList<Wifi> listWifi) {
         localize(false, listWifi);
+        return true;
     }
 
 }

@@ -1,5 +1,7 @@
 package be.ulb.owl;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -12,8 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +25,8 @@ import be.ulb.owl.graph.Node;
 import be.ulb.owl.graph.Path;
 import be.ulb.owl.graph.Plan;
 import be.ulb.owl.gui.DrawView;
+import be.ulb.owl.gui.LocalizeButton;
 import be.ulb.owl.gui.listener.ClickListenerChoseLocal;
-import be.ulb.owl.gui.listener.ClickListenerLocalize;
 import be.ulb.owl.gui.listener.ClickListenerSwitchButton;
 import be.ulb.owl.gui.listener.QueryTextListener;
 import be.ulb.owl.gui.listener.TouchListener;
@@ -121,7 +122,7 @@ public class MainActivity extends AppCompatActivity  {
         // Init buttons listener
         initSwitchPlanButton();
         initChoseLocalButton();
-        initLocalizeButton();
+        new LocalizeButton(this, _scanner);
         Log.i(getClass().getName(), "[V] Button loaded !");
     }
 
@@ -262,15 +263,6 @@ public class MainActivity extends AppCompatActivity  {
     private void initChoseLocalButton() {
         Button local = (Button)findViewById(R.id.local);
         local.setOnClickListener(new ClickListenerChoseLocal(this));
-    }
-
-    /**
-     * Initialize the "localize" button<br />
-     * To force the localization
-     */
-    private void initLocalizeButton() {
-        Button localizeButton = (Button)findViewById(R.id.localizeButton);
-        localizeButton.setOnClickListener(new ClickListenerLocalize(_graph));
     }
 
 

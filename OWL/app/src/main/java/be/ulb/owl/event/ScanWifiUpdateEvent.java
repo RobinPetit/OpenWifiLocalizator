@@ -12,6 +12,12 @@ import be.ulb.owl.scanner.Wifi;
 
 public interface ScanWifiUpdateEvent {
 
-    void scanWifiUpdateEvent(ArrayList<Wifi> listWifi);
+    /**
+     * Event call when the list of wifi have been updated
+     *
+     * @param listWifi list of the scanned wifi
+     * @return False to stop the event
+     */
+    boolean scanWifiUpdateEvent(ArrayList<Wifi> listWifi);
 
 }
