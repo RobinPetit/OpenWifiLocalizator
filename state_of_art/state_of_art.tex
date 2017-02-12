@@ -31,7 +31,7 @@
 \section{Localisation}
   \subsection{Introduction aux Wifi}
   \subsection{Problème rencontrer par l'utilisation des Wifi}
-    Ce qui distingue la localisation via \textit{Wifi} des autres types de localisation est le caratère imprévisible de la propagation des ondes. En effet, bien que la propagation dans un espace ouvert suit une fonction donnée, la propagation des ondes au seins d'un batiment est plus complexe à cause de la reflexion de l'atténuantion des ondes survenant au contacte des murs. De plus, l'environement n'est pas la seule source d'altération du signal. En effet, un signal peut subir une déterioration de sa qualité de l'ordre de $-3.5 dBm$ si une personne se trouve entre l'émetteur et le recepteur(Mettre référence). Le signal peut aussi est déterioré par des interférences dont les sources peuvent être multiple. La difficulté repose dans ces deux derniers points car ceux-ci surviennent le plus souvent de manière inopinée.\\\\
+    Ce qui distingue la localisation via \textit{Wifi} des autres types de localisation est le caratère imprévisible de la propagation des ondes. En effet, bien que la propagation dans un espace ouvert suit une fonction donnée, la propagation des ondes au seins d'un batiment est plus complexe à cause de la reflexion de l'atténuantion des ondes survenant au contacte des murs. De plus, l'environement n'est pas la seule source d'altération du signal. En effet, un signal peut subir une déterioration de sa qualité de l'ordre de $-3.5 dBm$ si une personne se trouve entre l'émetteur et le recepteur \cite{ETH}. Le signal peut aussi est déterioré par des interférences dont les sources peuvent être multiple. La difficulté repose dans ces deux derniers points car ceux-ci surviennent le plus souvent de manière inopinée.\\\\
     Pour avoir un moyen efficace de se localiser sur base des \textit{Wifi}, il faut pouvoir résoudre ces différents problèmes ou trouver un moyen de les rendre moins significatifs.
     \begin{center}
       \includegraphics[scale=0.3]{images/wifi-propagation.png}
@@ -79,7 +79,7 @@
         \includegraphics[scale=0.4]{images/signal-propagation.jpg}
         \textit{Répartition de la qualité de signal en fonction de la distance.}
       \end{center}
-      L'utilisation d'une telle fonction donne de bon résultats dans un environement ouvert ou les obstacles sont rares. comme démontré par (Mettre référence) la précison de la localisation est situé entre x et y mètre. Néanmoins, dans le cas contraire, la fonction d'évaluation de la distance ne prenant pas en compte les obstacles, les estimations de distance s'en retrouvent biaisées et les coordonnées supposées de l'utilisateur aussi. De manière à résoudre ce problème, il est possible de remplacer la constante dans la formule (3) par une formule prenant en compte les éléments composant l'environement. Cette formule est définit comme suit :
+      L'utilisation d'une telle fonction donne de bon résultats dans un environement ouvert ou les obstacles sont rares. comme démontré par \cite{Roumanie} la précison de la localisation est situé entre $2$ et $2.5$ mètre. Néanmoins, dans le cas contraire, la fonction d'évaluation de la distance ne prenant pas en compte les obstacles, les estimations de distance s'en retrouvent biaisées et les coordonnées supposées de l'utilisateur aussi. De manière à résoudre ce problème, il est possible de remplacer la constante dans la formule (3) par une formule prenant en compte les éléments composant l'environement. Cette formule est définit comme suit :
       \begin{equation}
         \text{PLACER QQCH ICI}
       \end{equation}
@@ -167,6 +167,10 @@
     Brian Ferris, Dirk Hähnel, Dieter Fox,
     \emph{Gaussian Processes for Signal Strength-Based Location Estimation}.
     University of Washington, Department of Computer Science \& Engineering, Seattle, WA Intel Research Seattle, Seattle, WA.
+  \bibitem{ETH}
+    Thomas Locher, Roger Wattenhofer, Aaron Zollinger,
+    \emph{Received-Signal-Strength-Based Logical Positioning Resilient to Signal Fluctuation}.
+    Computer Engineering and networks Laboratory, ETH zurich, Switzerland.
 \end{thebibliography}
 
 %---------- SCANNING ----------

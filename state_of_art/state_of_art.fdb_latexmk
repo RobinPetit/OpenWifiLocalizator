@@ -1,5 +1,5 @@
 # Fdb version 3
-["pdflatex"] 1486850597 "state_of_art.tex" "state_of_art.pdf" "state_of_art" 1486850597
+["pdflatex"] 1486897944 "state_of_art.tex" "state_of_art.pdf" "state_of_art" 1486897944
   "/etc/texmf/web2c/texmf.cnf" 1484993148 1101 af7716885e081ab43982cab7b4672c1a ""
   "/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1272929888 3287 e6b82fe08f5336d4d5ebc73fb1152e87 ""
@@ -177,10 +177,10 @@
   "images/signal-propagation.jpg" 1486818992 67432 f1f746fdfa9677ec221b5cdef411dda3 ""
   "images/trilateration.png" 1486835335 60007 d9308dcb9d88372b551df5362c075fe4 ""
   "images/wifi-propagation.png" 1486823930 457182 b86c2d716020ff57d2dda98ad7993adb ""
-  "state_of_art.aux" 1486850597 2244 1c349b8af51fe39bcac0137a66e56aa4 ""
-  "state_of_art.tex" 1486850595 14224 f4e5fdbba84b23f5ef64514c8064ddd0 ""
+  "state_of_art.aux" 1486897944 2296 defe6a8ed1d2f3bc3424f403e3d5c5d9 ""
+  "state_of_art.tex" 1486897943 14457 aeedc0428a79b1b99bebec42cfc225f7 ""
   (generated)
   "state_of_art.log"
   "state_of_art.toc"
-  "state_of_art.pdf"
   "state_of_art.aux"
+  "state_of_art.pdf"
