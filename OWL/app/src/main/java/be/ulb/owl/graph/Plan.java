@@ -98,13 +98,13 @@ public class Plan {
 
 
     /**
-     * TODO add documentation @denis ?
+     * Convert a quality signal in dBm into a values in mW
      *
-     * @param level
-     * @return
+     * @param dBm
+     * @return Signal quality in mW
      */
-    private double getScore(Float level) {
-        return Math.pow((-level+100)/50, 0.6);
+    private double toMWatt(Float dBm) {
+        return Math.pow(10, dBm/10);
     }
 
 
