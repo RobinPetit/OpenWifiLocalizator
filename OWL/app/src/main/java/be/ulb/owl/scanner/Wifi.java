@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package be.ulb.owl;
+package be.ulb.owl.scanner;
 
 /**
  * Information about a wifi scan
@@ -13,10 +13,9 @@ package be.ulb.owl;
 public class Wifi {
     
     private final String _BSS;
-    private final float _max;
-    private final float _min;
     private final float _avg;
-    
+    private final float _variance;
+
     
     /**
      * Init a wifi signal
@@ -25,22 +24,20 @@ public class Wifi {
      * @param value signal of this wifi
      */
     public Wifi(String BSS, float value) {
-        this(BSS, value, value, value);
+        this(BSS, value, -1);
     }
     
     /**
      * Init a wifi signal
      * 
      * @param BSS the BSSID
-     * @param max max signal
-     * @param min min signal
      * @param avg average of the signal
+     * @param variance variance of all signal
      */
-    public Wifi(String BSS, float max, float min, float avg) {
+    public Wifi(String BSS, float avg, float variance) {
         _BSS = BSS;
-        _max = max;
-        _min = min;
         _avg = avg;
+        _variance = variance;
     }
     
     /**
@@ -61,9 +58,8 @@ public class Wifi {
         return _avg;
     }
 
-    public float getMax() { return _max; }
-
-    public float getMin() { return _min; }
-    
+    public float getVariance() {
+        return _variance;
+    }
     
 }

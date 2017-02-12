@@ -5,34 +5,47 @@ from time import sleep
 from app.general.constants import *
 
 class AP:
-    def __init__(self, key):
-        self.key = key
+    def __init__(self, bss, variance=.0, avg=None):
+        self.key = bss
         self.values = list()
+        self.variance = variance
+        self.avg = avg
 
-    def avg (self):
-        return sum(self.values)/len(self.values)
+    def __len__(self):
+        return len(self.values)
+
+    def get_avg(self):
+        if self.avg == None:
+            self.avg = sum(self.values)/len(self)
+        return self.avg
 
     def add(self, dbm):
         self.values.append(dbm)
 
-    def text(self):
-        return '<wifi BSS="{}" max="{:2.1f}" min="{:2.1f}" avg="{:2.1f}" />' \
-               .format(self.key, -min(self.values), -max(self.values), -self.avg())
+    def get_bss(self):
+        return self.key
+
+    def get_variance(self):
+        if (self.variance == .0):
+            for i in range(len(self)):
+                self.variance += (self.values[i]-self.get_avg())**2
+            self.variance /= (len(self)-1)
+        return self.variance
 
 class AccessPointList:
-    def __init__(self, tmpfile = "temp.txt", iterations = 5, wait = 2):
+    def __init__(self, tmpfile = "temp.txt", iterations = 5, wait = 2, threshold = 1):
+        self.threshold = threshold
         self.network = Config.NETWORK_INTERFACE
         self.tmpfile = tmpfile
         self.iters = iterations
         self.wait = wait
         self.elements = []
-
-    def text(self, nb_tab=0):
-        output = (TAB * nb_tab) + '<listWifi>\n'
-        for elem in self.elements:
-            output += (TAB * (nb_tab+1)) + elem.text()+'\n'
-        output += (TAB * nb_tab) + '</listWifi>\n'
-        return output
+        
+    def __iter__(self):
+        """iterates over wifis, checking on a threshold to avoir irrelevant access points"""
+        for e in self.elements:
+            if len(e) > self.threshold:
+                yield e
 
     def findAP(self, key):
         for elem in self.elements:
@@ -64,20 +77,4 @@ class AccessPointList:
                 self.extractData(file.readlines())
             sleep(self.wait)
         remove(self.tmpfile)
-
-
-class StaticAccessPointList:
-    def fromXml(self, xml_tree):
-        self.elements = list()
-        for wifi in xml_tree.iter('wifi'):
-            self.elements.append(wifi)
-
-    def text(self, nb_tab=0):
-        output = (TAB * nb_tab) + '<listWifi>\n'
-        for elem in self.elements:
-            _ = '<wifi BSS="{}" max="{}" min="{}" avg="{}" />' \
-                .format(elem.get('BSS'), elem.get('max'), elem.get('min'), elem.get('avg'))
-            output += (TAB * (nb_tab+1)) + _ + '\n'
-        output += (TAB * nb_tab) + '</listWifi>\n'
-        return output
 

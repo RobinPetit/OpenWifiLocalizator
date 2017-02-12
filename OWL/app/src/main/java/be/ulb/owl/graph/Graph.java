@@ -7,13 +7,19 @@ package be.ulb.owl.graph;
 
 import android.util.Log;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.HashSet;
 
 import be.ulb.owl.MainActivity;
-import be.ulb.owl.Scanner;
-import be.ulb.owl.Wifi;
+import be.ulb.owl.R;
+import be.ulb.owl.event.ScanWifiUpdateEvent;
+import be.ulb.owl.scanner.Scanner;
+import be.ulb.owl.scanner.Wifi;
+import be.ulb.owl.graph.shortestpath.ShortestPathAStar;
+import be.ulb.owl.graph.shortestpath.ShortestPathEvaluator;
+import be.ulb.owl.task.LoadMapTask;
+import be.ulb.owl.utils.DialogUtils;
+import be.ulb.owl.utils.SQLUtils;
 
 /**
  * Represent all Plan<br/>
@@ -21,162 +27,48 @@ import be.ulb.owl.Wifi;
  *
  * @author Detobel36
  */
-public class Graph {
-    MainActivity main = MainActivity.getInstance();
-    private static final String IGNOREPLAN = "Example";
-    private static ArrayList<Plan> _allPlan;
+public class Graph implements ScanWifiUpdateEvent {
+
+    private static final MainActivity main = MainActivity.getInstance();
+
+    private static ArrayList<Campus> _allCampus;
+    private static final String SOLBOSCH_PLAN = "Solbosch";
 
     private Scanner _scanner;
 
-    // dedicated to the démonstration
-    private int _offset;
-    private ArrayList<Node> _demoMotions = new ArrayList<Node>();
 
+
+    /**
+     * Constructor<br />
+     * Load all campus and plan<br />
+     * <br />
+     * Init scanner
+     */
     public Graph () {
-        _allPlan = new ArrayList<Plan>();
+        _allCampus = new ArrayList<Campus>();
         loadAllPlan();
-        if (MainActivity.isDemo()) {
-            _offset = 0;
-        }
 
-        if(_allPlan.isEmpty()) {
-            Log.w(getClass().getName(), "No plan has been loaded");
+        if(_allCampus.isEmpty()) {
+            Log.w(getClass().getName(), "No campus has been loaded");
         }
 
         _scanner = new Scanner();
     }
 
-    /**
-     *
-     * @return A list containing every node of the graph
-     */
-    public ArrayList<Node> getAllNodes() {
-        ArrayList<Node> allNodes = new ArrayList<>();
-        for(Plan plan : _allPlan)
-            allNodes.addAll(plan.getAllNodes());
-        return allNodes;
-    }
-
-    public void findPath(String destination) throws NoPathException {
-        ArrayList<Node> destinations = searchNode(destination);
-        Node src = main.location();
-
-        if(src != null) {
-            double minHeuristic = Double.POSITIVE_INFINITY;
-            Node closestDestination = null;
-            for (Node node : destinations) {
-                double currentHeuristic = ShortestPathEvaluator.heuristic(src, node);
-                if (currentHeuristic < minHeuristic) {
-                    closestDestination = node;
-                    minHeuristic = currentHeuristic;
-                }
-            }
-            main.setDestination(destination);
-            main.draw(src);
-            ArrayList<Path> p = bestPath(src, closestDestination);
-            if(p.size() >= 2)
-                refinePath(p, destination);
-            Log.d(getClass().getName(), "Path between " + src.getName() + " and " + closestDestination.getName());
-            for (Path path : p)
-                Log.i(getClass().getName(), path.getNode().getName() + " - " + path.getOppositeNodeOf(path.getNode()).getName());
-            main.drawPath(p);
-        } else {
-            Node dest = destinations.get(0);
-            main.setCurrentPlan(dest.getParentPlan());
-            Log.d(getClass().getName(), "Set current and draw");
-            main.draw(dest);
-        }
-    }
-
-    private void refinePath(ArrayList<Path> overallPath, String alias) {
-        int firstOccurrenceOfDestination = overallPath.size() - 1;
-        Node commonNode = overallPath.get(firstOccurrenceOfDestination).getIntersectionWith(overallPath.get(firstOccurrenceOfDestination-1));
-        Log.d(getClass().getName(), overallPath.size() + " nodes were found, and after refinment:");
-        while (overallPath.size() > 0 && commonNode.haveAlias(alias)) {
-            firstOccurrenceOfDestination--;
-            commonNode = overallPath.get(firstOccurrenceOfDestination).getOppositeNodeOf(commonNode);
-            overallPath.remove(firstOccurrenceOfDestination+1);
-        }
-        Log.d(getClass().getName(), "only " + overallPath.size() + " are left");
-    }
 
     /**
-     * Implements a shortest path algorithm (A*) between two nodes
-     * @param nodeFrom The node the user is located at
-     * @param nodeTo The node the user wants to reach
-     * @return An ordered list of nodes the user has to cross to reach the destination
+     * Load all plan in the default folder
      */
-    public ArrayList<Path> bestPath(Node nodeFrom, Node nodeTo) throws NoPathException {
-        Log.d(getClass().getName(), "Searching path between: " + nodeFrom.getName() + " and " + nodeTo.getName());
-        ShortestPathEvaluator evaluator = new ShortestPathEvaluator(getAllNodes(), nodeFrom, nodeTo);
-        return evaluator.find();
+    private void loadAllPlan() {
+        _allCampus = SQLUtils.loadAllCampus();
+        new LoadMapTask().execute(_allCampus);
+        // TODO get all plan ?
+//        _allPlan = SQLUtils.loadAllPlan();
     }
 
-    public void setPlan () {
-        if (0 == _offset) {
-            Plan currentPlan = getPlan("P.F");
-            _demoMotions.add(currentPlan.getNode("64"));
-            _demoMotions.add(currentPlan.getNode("63"));
-            _demoMotions.add(currentPlan.getNode("9"));
-            _demoMotions.add(currentPlan.getNode("13"));
-            _demoMotions.add(currentPlan.getNode("20"));
-            _demoMotions.add(currentPlan.getNode("21"));
-            _demoMotions.add(currentPlan.getNode("27"));
-            _demoMotions.add(currentPlan.getNode("29"));
-            _demoMotions.add(currentPlan.getNode("31"));
-            _demoMotions.add(currentPlan.getNode("32"));
-            _demoMotions.add(currentPlan.getNode("34"));
-            _demoMotions.add(currentPlan.getNode("35"));
-            _demoMotions.add(currentPlan.getNode("23"));
-            _demoMotions.add(currentPlan.getNode("16"));
-            _demoMotions.add(currentPlan.getNode("42"));
-        }
-    }
 
-    public Node whereAmI () {
-        Node res = null;
-        if (MainActivity.isDemo()) {
-            setPlan();
-            res = _demoMotions.get(_offset);
-            _offset = (_offset+1)%_demoMotions.size();
-        }
-        else if(MainActivity.isDebug() && MainActivity.isTest()) {
-            res = getAllNodes().get(new Random().nextInt(getAllNodes().size()));
-        }
-        else {
-            ArrayList<Wifi> sensed = _scanner.scan();
-            res = whereAmI(sensed);
-        }
-        return res;
-    }
-
-    public Node whereAmI (ArrayList<Wifi> sensed) {
-        ArrayList<String> sensedStr = new ArrayList<String>();
-        for (Wifi wifi : sensed) {
-            sensedStr.add(wifi.getBSS());
-        }
-        ArrayList<Plan> res = new ArrayList<Plan>();
-        int biggestSetSize = 0;
-        for (Plan plan : _allPlan) {
-            ArrayList<String> tmp = plan.getListWifiBSS();
-            tmp.retainAll(sensedStr); // set-theoretical and operation
-            if (biggestSetSize == tmp.size()) {
-                res.add(plan);
-            }
-            else if (biggestSetSize < tmp.size()) {
-                res = new ArrayList<Plan>();
-                res.add(plan);
-                biggestSetSize = tmp.size();
-            }
-        }
-
-        if (res.size() == 0) {
-            Log.i(getClass().getName(), "You are not at ULB.");
-            return null;
-        }
-        return res.get(0).getNode(sensed);
-    }
-
+    //////////////////////////////////////////// EVENTS ////////////////////////////////////////////
+    // Call when an action begin, stop, ect...
 
     /**
      * Call when application is hide
@@ -188,11 +80,48 @@ public class Graph {
         _scanner.stopScanTask();
     }
 
+
     /**
      * Start the scan scheduller
      */
-    public void startScanTask() {
-        _scanner.startScanTask();
+//    public void startScanTask() {
+////        _scanner.startScanTask();
+//
+//        Log.i(getClass().getName(), "Scanner.scan");
+//        localize();
+//    }
+
+
+
+    ////////////////////////////////////// GETTER AND SETTER //////////////////////////////////////
+
+    /**
+     * Return all node of the graph
+     *
+     * @return A list containing every node of the graph
+     */
+    public ArrayList<Node> getAllNodes() {
+        ArrayList<Node> allNodes = new ArrayList<>();
+        for(Campus campus : _allCampus) {
+            allNodes.addAll(campus.getAllNodes());
+        }
+
+        return allNodes;
+    }
+
+
+    /**
+     * Search all node which contain a specific alias (no search in name)
+     *
+     * @param name the name (alias) of this nodes
+     * @return an ArrayList of Node
+     */
+    public ArrayList<Node> searchNode(String name) {
+        ArrayList<Node> listeNode = new ArrayList<Node>();
+        for(Plan plan : getAllPlan()) {
+            listeNode.addAll(plan.searchNode(name));
+        }
+        return listeNode;
     }
 
 
@@ -203,96 +132,296 @@ public class Graph {
      * @return the Plan object
      */
     public Plan getPlanByName(String name) {
-        for(Plan plan: _allPlan)
-            if(plan.getName().equals(name))
+        for(Plan plan: getAllPlan()) {
+            if (plan.getName().equals(name)) {
                 return plan;
+            }
+        }
+
         return null;
     }
 
 
+    /**
+     * Get the default campus
+     *
+     * @return the default Campus
+     */
+    public Campus getDefaultCampus() {
+        // TODO change constant with magic number ? :P
+        // return getAllCampus().get(0);
+        return getCampus(SOLBOSCH_PLAN);
+    }
+
+
+    /**
+     * Get all campus of the graph
+     *
+     * @return all Campus
+     */
+    public ArrayList<Campus> getAllCampus() {
+        return _allCampus;
+    }
+
+
+    /**
+     * Get a specific campus or <b>create</b> if not exist
+     *
+     * @param name the name of the specific campus
+     * @return the campus (or null if not found)
+     */
+    public Campus getCampus(String name) {
+        return getCampus(name, true);
+    }
+
+
+
+    /////////////////////////////////////////// LOCALIZE ///////////////////////////////////////////
+
+    /**
+     * Find the node where the user is.  This method call
+     *
+     * @return the node or null if not found
+     */
+    protected Node whereAmI() {
+        Node res = null;
+        // TODO Detobel36 add async scan
+//        ArrayList<Wifi> sensed = _scanner.scan();
+//        Log.d(getClass().getName(), "wifi: (" + sensed.size() + ") " + sensed.toString());
+//        res = whereAmI(sensed);
+        return res;
+    }
+
+    /**
+     * Find the node where the user is
+     *
+     * @param sensed all detected arround wifi
+     * @return The node or null if not found
+     */
+    protected Node whereAmI(ArrayList<Wifi> sensed) {
+        ArrayList<String> sensedStr = new ArrayList<String>();
+        for (Wifi wifi : sensed) {
+            sensedStr.add(wifi.getBSS());
+        }
+
+        ArrayList<Plan> res = new ArrayList<Plan>();
+        int biggestSetSize = 0;
+
+        for (Plan plan : getAllPlan()) {
+            HashSet<String> tmp = plan.getListWifiBSS();
+            tmp.retainAll(sensedStr); // set-theoretical and operation
+
+            if (biggestSetSize == tmp.size()) {
+                res.add(plan);
+
+            } else if (biggestSetSize < tmp.size()) {
+                res = new ArrayList<Plan>();
+                res.add(plan);
+                biggestSetSize = tmp.size();
+            }
+
+        }
+
+        if (res.size() == 0) {
+            Log.i(getClass().getName(), "You are not at ULB.");
+            return null;
+        }
+
+        Node node = res.get(0).getNode(sensed); // @TODO manage case where two plans could contain the solution.
+        if(node != null) {
+            Log.d(getClass().getName(), "Node found: " + node.getID() + "(alias: " + node.getAlias() + ")");
+        }
+        return node;
+    }
+
+
+    /**
+     * localizes the user
+     */
+    public void localize() {
+        localize(true);
+    }
+
+    /**
+     * localizes the user
+     *
+     * @param displayNotFound Boolean telling whether or not to signal if user is unable to localize
+     */
+    public void localize(boolean displayNotFound) {
+        Node current = whereAmI();
+
+        boolean haveChange = main.setCurrentLocation(current);
+
+        if(current != null) {
+            main.setCurrentPlan(current.getParentPlan());
+            if(haveChange) {
+                main.cleanCanvas();
+
+                ArrayList<Node> distinationNodes = main.getDestinations();
+                if(!distinationNodes.isEmpty()) {
+                    try {
+                        findPath();
+                    } catch (NoPathException e) {
+                        Log.e(getClass().getName(), "Error: should have found an alternative for a " +
+                                "path between " + current.getID() + " and " +
+                                distinationNodes.get(0).getAlias().toString());
+                    }
+
+                } else {
+                    main.draw(current);
+                }
+
+            }
+
+        } else if (displayNotFound) {
+            DialogUtils.infoBox(main, R.string.not_found, R.string.not_in_ULB);
+        }
+    }
+
+
+
+    ///////////////////////////////////////////// PATH /////////////////////////////////////////////
+
+    /**
+     * Find path to the destination of the user will go (stock in main)
+     *
+     * @throws NoPathException
+     */
+    public void findPath() throws NoPathException {
+        Node src = main.getCurrentLocation();
+
+        if(src != null) {
+            double minHeuristic = Double.POSITIVE_INFINITY;
+            Node closestDestination = null;
+            ArrayList<Node> listDestination = main.getDestinations();
+
+            for (Node node : listDestination) {
+                double currentHeuristic = ShortestPathAStar.heuristic(src, node);
+                if (currentHeuristic < minHeuristic) {
+                    closestDestination = node;
+                    minHeuristic = currentHeuristic;
+                }
+            }
+
+            // Draw source point on screen
+            main.draw(src);
+
+            ArrayList<Path> p = bestPath(src, closestDestination);
+            if (p.size() >= 2) {
+                refinePath(p, listDestination);
+            }
+
+            Log.d(getClass().getName(), "Path between " + src.getID() + " and " + closestDestination.getID());
+            for (Path path : p) {
+                // Log path
+                Log.i(getClass().getName(), path.getNode().getID() + " - " + path.getOppositeNodeOf(path.getNode()).getID());
+            }
+
+            // Draw path on screen
+            main.drawPath(p);
+
+        } else {
+            Node dest = main.getDestinations().get(0);
+            main.setCurrentPlan(dest.getParentPlan());
+            Log.d(getClass().getName(), "Set current and draw");
+            main.draw(dest);
+        }
+
+    }
+
+
+    /**
+     * TODO doc ?  Robin/Denis ?
+     *
+     * @param overallPath
+     * @param listDestination
+     */
+    private void refinePath(ArrayList<Path> overallPath, ArrayList<Node> listDestination) {
+        int firstOccurrenceOfDestination = overallPath.size() - 1;
+        Node commonNode = overallPath.get(firstOccurrenceOfDestination).getIntersectionWith(overallPath.get(firstOccurrenceOfDestination-1));
+        Log.d(getClass().getName(), overallPath.size() + " nodes were found, and after refinment:");
+        while (overallPath.size() > 0 && listDestination.contains(commonNode)) {
+            firstOccurrenceOfDestination--;
+            commonNode = overallPath.get(firstOccurrenceOfDestination).getOppositeNodeOf(commonNode);
+            overallPath.remove(firstOccurrenceOfDestination+1);
+        }
+        Log.d(getClass().getName(), "only " + overallPath.size() + " are left");
+    }
+
+
+    /**
+     * Implements a shortest path algorithm (A*) between two nodes
+     *
+     * @param nodeFrom The node the user is located at
+     * @param nodeTo The node the user wants to reach
+     * @return An ordered list of nodes the user has to cross to reach the destination
+     */
+    public ArrayList<Path> bestPath(Node nodeFrom, Node nodeTo) throws NoPathException {
+        Log.d(getClass().getName(), "Searching path between: " + nodeFrom.getID() + " and " + nodeTo.getID());
+        ShortestPathEvaluator evaluator = new ShortestPathAStar(getAllNodes(), nodeFrom, nodeTo);
+        return evaluator.find();
+    }
+
+
+
     /////////////////////////// STATIC ///////////////////////////
 
+
+
     /**
-     * Load all plan in the default folder
+     * Get a specific node
+     *
+     * @param nodeId the id of the node
+     * @return the Node or null if not found
      */
-    private static void loadAllPlan() {
-        String[] strFile = null;
-        try {
-            strFile = MainActivity.getInstance().getAssets().list("XMLMap");
-        } catch(IOException exception) {
-
+    public static Node getNode(int nodeId) {
+        for(Plan plan : getAllPlan()) {
+            Node node = plan.getNode(nodeId);
+            if(node != null) {
+                return node;
+            }
         }
+        return null;
+    }
 
-        if(strFile != null && strFile.length > 0) {
 
-            for (String filePlan : strFile) {
+    private static ArrayList<Plan> getAllPlan() {
+        ArrayList<Plan> allPlan = new ArrayList<Plan>();
+        for(Campus campus : _allCampus) {
+            allPlan.addAll(campus.getAllPlans());
+        }
+        return allPlan;
+    }
 
-                if(filePlan == null || filePlan.equalsIgnoreCase("")) {
-                    continue;
-                }
 
-                String namePlan = filePlan.replaceFirst("[.][^.]+$", "");
-
-                // Check if plan is not empty and not an ignored file
-                if(namePlan != null && !namePlan.equalsIgnoreCase("") && !namePlan.contains(IGNOREPLAN)) {
-                    getPlan(namePlan);
-                }
+    /**
+     * Get a specific campus
+     *
+     * @param name of the campus
+     * @param loadIfNotExist True to load if Campus not found
+     * @return Campus or null if not found
+     */
+    public static Campus getCampus(String name, boolean loadIfNotExist) {
+        for(Campus campus : _allCampus) {
+            if(campus.isName(name)) {
+                return campus;
             }
         }
 
-    }
-
-
-    /**
-     * Search all node which contain a specific alias (no search in name)
-     *
-     * @param name the name (alias) of this nodes
-     * @return an ArrayList of Node
-     */
-    public static ArrayList<Node> searchNode(String name) {
-        ArrayList<Node> listeNode = new ArrayList<Node>();
-        for(Plan plan : _allPlan) {
-            listeNode.addAll(plan.searchNode(name));
-        }
-        return listeNode;
-    }
-
-
-    /**
-     * Get a specific plan or <b>create</b> if not exist
-     *
-     * @param name the name of the specific plan
-     * @return The plan (or null if not found)
-     */
-    public static Plan getPlan(String name) {
-        return getPlan(name, true);
-    }
-
-    /**
-     * Get a specific plan or <b>create</b> if not exist
-     *
-     * @param name the name of the specific plan
-     * @param loadIfNotExist try to load if the plan is not found
-     * @return The plan (or null if not found)
-     */
-    public static Plan getPlan(String name, boolean loadIfNotExist) {
-        Plan resPlan = null;
-        for(Plan plan : _allPlan) {
-            if(plan.isName(name)) {
-                return plan;
-            }
+        Campus resCampus = null;
+        if(loadIfNotExist) {
+            resCampus = SQLUtils.loadCampus(name);
         }
 
-        if(resPlan == null && loadIfNotExist) {
-            try {
-                resPlan = new Plan(name);
-                _allPlan.add(resPlan);
-            } catch (IOException exception) {
-                Log.e(Graph.class.getName(), "Can not load the plan: " + name +
-                        " (err: " + exception.getMessage()+")");
-            }
-        }
-
-        return resPlan;
+        return resCampus;
     }
+
+    /////////////////////////////////////////////
+    // TODO CLASSER (refactoring)
+
+    @Override
+    public void scanWifiUpdateEvent(ArrayList<Wifi> listWifi) {
+        localize(false);
+    }
+
 }

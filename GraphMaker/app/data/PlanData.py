@@ -1,11 +1,14 @@
+# OWL
 from app.general.constants import *
+from app.general.functions import *
+from app.Config import Config
 
 class Node:
     def __init__(self, nb, coords, access_points, aliases=tuple()):
         self.nb = nb
         self.coords = coords
         self.access_points_ = access_points
-        self.color = 'green' if access_points is not None else 'red'
+        self.color = Config.COLOR_VALID if access_points is not None else 'red'
         self.aliases_ = list(aliases)
 
     def coord(self, c=None):
@@ -14,8 +17,11 @@ class Node:
         else:
             self.coords = c
 
-    def id(self):
-        return self.nb
+    def id(self, nb=None):
+        if nb is None:
+            return self.nb
+        else:
+            self.nb = nb
 
     def access_points(self, ap=None):
         if ap is None:
@@ -29,42 +35,31 @@ class Node:
         else:
             self.aliases_ = list(a)
 
-    def text(self, nb_tab=0):
-        text = (TAB * (nb_tab+1)) + '<coord x="{}" y="{}" />\n'.format(*self.coord())
-        if self.access_points() is not None:
-            text += self.access_points().text(nb_tab+1)
-        if self.aliases() and len(self.aliases()) > 0:
-            text += (TAB*(nb_tab+1)) + '<aliases>\n'
-            for alias in self.aliases():
-                text += (TAB*(nb_tab+2)) + '<alias>{}</alias>\n'.format(alias)
-            text += (TAB*(nb_tab+1)) + '</aliases>\n'
-        return '{0}<node id="{1}">\n{2}{0}</node>\n'.format(TAB*nb_tab, self.id(), text)
-
 class Edge:
-    def __init__(self, weight, coords, extremity_ids):
-        self.weight_ = weight
+    def __init__(self, coords, extremity_ids, nb=0):
         self.coords = coords
         self.extremity_ids = extremity_ids
+        self.nb = nb
 
     def coord(self, c=None):
         if c is None:
             return self.coords
         else:
             self.coords = c
-
-    def weight(self, w=None):
-        if w is None:
-            return self.weight_
+    
+    def id(self, nb=None):
+        if nb is None:
+            return self.nb
         else:
-            self.weight_ = w
-
-    def text(self, nb_tab=0):
-        return (TAB*nb_tab) + '<edge beg="{}" end="{}" weight="{}" />\n' \
-                              .format(*self.extremity_ids, self.weight())
+            self.nb = nb
+            
+    def get_extremity_ids(self):
+        return self.extremity_ids
 
 class ExternalEdge(Edge):
-    def __init__(self, weight, extremity_ids, plan):
-        super().__init__(weight, [0, 0], extremity_ids)
+
+    def __init__(self, extremity_ids, plan):
+        super().__init__([0, 0], extremity_ids)
         self.plan = plan
 
     def extremities(self, ext=None):
@@ -72,10 +67,6 @@ class ExternalEdge(Edge):
             self.extremity_ids = ext[:]
         else:
             return self.extremity_ids
-
-    def text(self, nb_tab=0):
-        return (TAB*(nb_tab)) + '<edge beg="{}" end="{}" weight="{}" plan="{}" />' \
-                                .format(*self.extremity_ids, self.weight(), self.plan)
 
 class PlanData:
     def __init__(self):
@@ -91,8 +82,7 @@ class PlanData:
         self.internal_edges[edge_id] = edge
 
     def add_external_edge(self, edge):
-        # internal_node, plan_name, external_node, weight):
-        self.external_edges.append(edge)  #ExternalEdge(weight, [internal_node, external_node], plan_name))
+        self.external_edges.append(edge)
 
     def set_bg_image(self, bg_image):
         self.bg_image = bg_image
@@ -108,4 +98,3 @@ class PlanData:
 
     def remove_external_edges_from(self, name):
         self.external_edges = [edge for edge in self.external_edges if name not in edge.extremities()]
-

@@ -17,17 +17,22 @@ import android.graphics.Canvas;
 import java.util.ArrayList;
 import java.util.List;
 
+import be.ulb.owl.demo.GraphDemo;
 import be.ulb.owl.graph.Graph;
 import be.ulb.owl.graph.NoPathException;
 import be.ulb.owl.graph.Node;
 import be.ulb.owl.graph.Path;
 import be.ulb.owl.graph.Plan;
 import be.ulb.owl.gui.DrawView;
-import be.ulb.owl.gui.listener.ClickListener;
+import be.ulb.owl.gui.listener.ClickListenerChoseLocal;
+import be.ulb.owl.gui.listener.ClickListenerLocalize;
+import be.ulb.owl.gui.listener.ClickListenerSwitchButton;
 import be.ulb.owl.gui.listener.QueryTextListener;
 import be.ulb.owl.gui.listener.TouchListener;
-import be.ulb.owl.utils.DialogUtils;
+import be.ulb.owl.test.GraphTest;
+import be.ulb.owl.test.Test;
 import be.ulb.owl.utils.LogUtils;
+import be.ulb.owl.utils.SQLUtils;
 import br.com.mauker.materialsearchview.MaterialSearchView;
 
 /**
@@ -42,12 +47,12 @@ public class MainActivity extends AppCompatActivity  {
 
     // static attributes
     private static MainActivity instance;
-    private static final boolean DEBUG = true; // view info message in log (maybe more after)
-    private static final boolean TEST = true;   // active to call test
-    private static final boolean DEMO = false; // active to active
+
+    private static final boolean DEBUG = true;          // view info message in log (maybe more after)
+    private static final boolean TEST = DEBUG && false; // active to call test (active also DEBUG)
+    private static final boolean DEMO = false;          // active to active
+
     private static final String[] NOT_SUGGESTED = {"Mystery"};
-    private static final String PLAINE_PLAN = "Plaine";
-    private static final String SOLBOSCH_PLAN = "Solbosch";
 
     // android widgets
     private ImageView _imageView;
@@ -59,9 +64,13 @@ public class MainActivity extends AppCompatActivity  {
     private Graph _graph = null;
     private Plan _currentPlan = null;
     private Node _currentPosition;
-    private String _destinationName;  // null if none
+    private ArrayList<Node> _destinationNodes =  new ArrayList<Node>();
     private DrawView _drawer;
 
+
+
+    //////////////////////////////////////////// EVENTS ////////////////////////////////////////////
+    // Event called by Android
 
     /**
      * Call when the application is created the first time
@@ -74,6 +83,8 @@ public class MainActivity extends AppCompatActivity  {
         instance = this;
 
         LogUtils.initLogSystem();
+        Log.i(getClass().getName(), "Log loaded !");
+
         setContentView(R.layout.activity_main);
 
         setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
@@ -82,88 +93,58 @@ public class MainActivity extends AppCompatActivity  {
         _imageDraw = (ImageView)findViewById(R.id.draw);
         _imageDraw.setOnTouchListener(new TouchListener());
 
-        Button changePlan;
-        Button local;
-        Button localizeButton;
 
-        // Define click listener
-        ClickListener clickListener = new ClickListener();
+        // Load sql
+        SQLUtils.initSQLUtils(this);
+        Log.i(getClass().getName(), "SQL Loaded !");
 
-        // init buttons
-        changePlan = (Button)findViewById(R.id.changePlan);
-        changePlan.setOnClickListener(clickListener);
+        // Load graph
+        if(isDemo()) {
+            _graph = new GraphDemo();
 
-        local = (Button)findViewById(R.id.local);
-        local.setOnClickListener(clickListener);
+        } else if(isTest()) {
+            _graph = new GraphTest();
 
-        localizeButton = (Button)findViewById(R.id.localizeButton);
-        localizeButton.setOnClickListener(clickListener);
+        } else {
+            _graph = new Graph();
+
+        }
+        Log.i(getClass().getName(), "Graph loaded !");
+
+        _currentPlan = _graph.getDefaultCampus();
+
+
+        // Init buttons listener
+        initSwitchPlanButton();
+        initChoseLocalButton();
+        initLocalizeButton();
+        Log.i(getClass().getName(), "Button loaded !");
     }
+
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        if(_graph == null) {
-            _graph = new Graph();
-        }
-        _graph.startScanTask();
-
         // Set default plan
-        setCurrentPlan(Graph.getPlan(SOLBOSCH_PLAN));
+        setCurrentPlan(_currentPlan);
         this.setUpCanvas();
         _drawer = new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor());
 
-        Log.i(getClass().getName(), "Scanner.scan");
-        localize();
         if(TEST) {
+            // TODO change plan... if we make automatic test ? :/
             setCurrentPlan(_graph.getPlanByName("P.F"));
-            testWifi();
-            testBestPath();
+
+            Test.testBestPath();
+            Test.testWifi();
         }
 
         if (DEMO) {
             setCurrentPlan(_graph.getPlanByName("P.F"));
         }
+
     }
 
-
-    private void setUpCanvas() {
-        if(_imageView.getDrawable() != null) {
-            Integer height = _imageView.getDrawable().getIntrinsicWidth();
-            Integer width = _imageView.getDrawable().getIntrinsicHeight();
-            Bitmap bitmap;
-            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            bitmap = bitmap.copy(bitmap.getConfig(), true);
-            _canvas = new Canvas(bitmap);
-            _imageDraw.setImageBitmap(bitmap);
-        } else {
-            Log.w(getClass().getName(), "_imageView have no drawable");
-        }
-    }
-
-    /**
-     * Returns the campus plan of a given plan
-     *
-     * @param plan The plan to determine the campus of
-     * @return The campus plan containing plan
-     */
-    public static Plan getRootParentOfPlan(Plan plan) {
-        return plan.getName().charAt(0) == 'S' ? Graph.getPlan(SOLBOSCH_PLAN, false) : Graph.getPlan(PLAINE_PLAN, false);
-    }
-
-    public final Graph getGraph() {
-        return _graph;
-    }
-
-    /**
-     * Tell the application what node has ben chosen to be reached
-     *
-     * @param dest Name of the destination
-     */
-    public void setDestination(String dest) {
-        _destinationName = dest;
-    }
 
     /**
      * When we hide the application
@@ -175,172 +156,6 @@ public class MainActivity extends AppCompatActivity  {
         _graph.hidden(); // (also) Reset wifi settings
     }
 
-    private void testBestPath() {
-        // 57 & 3
-        int[] startingEnd = {21, 57};
-        int[] arrivalEnd = {14, 3};
-        assert(startingEnd.length == arrivalEnd.length);
-        ArrayList<Node> allNodes = _graph.getAllNodes();
-        for(int i = 0; i < startingEnd.length; ++i) {
-            Node src = allNodes.get(startingEnd[i]);
-            Node dest = allNodes.get(arrivalEnd[i]);
-            Log.i(getClass().getName(), "Testing best path between nodes " + src.getName() + " and " + dest.getName());
-            try {
-                ArrayList<Path> overallPath = _graph.bestPath(src, dest);
-                String pathString = src.getName();
-                Node current = src;
-                int k = 0;
-                while(!current.equals(dest)) {
-                    current = overallPath.get(k++).getOppositeNodeOf(current);
-                    pathString += " --> " + current.getName();
-                }
-                Log.i(getClass().getName(), "Found path is given by: " + pathString);
-                if(i == 1)
-                    drawPath(overallPath);
-            } catch (NoPathException e) {
-                Log.e(getClass().getName(), "No path has been found between nodes " + startingEnd[i]
-                        + " and " + arrivalEnd[i] + " even though it was supposed to!");
-            }
-        }
-    }
-
-    private void testWifi() {
-        // ---- test ----
-
-        ArrayList<Wifi> tmp = new ArrayList<Wifi>();
-        tmp.add(new Wifi("00:26:cb:a0:aa:c1", 72.0f, 71.0f, 71.2f));
-        tmp.add(new Wifi("c8:b3:73:4b:01:c9", 85.0f, 83.0f, 84.2f));
-        tmp.add(new Wifi("00:26:cb:4d:d9:41", 79.0f, 71.0f, 75.4f));
-        tmp.add(new Wifi("00:0c:e6:00:cf:b3", 75.0f, 69.0f, 70.8f));
-        tmp.add(new Wifi("00:0c:e6:00:d2:a4", 57.0f, 47.0f, 52.0f));
-        tmp.add(new Wifi("00:0c:e6:00:d1:3c", 73.0f, 56.0f, 61.2f));
-        tmp.add(new Wifi("00:0c:e6:00:d1:36", 82.0f, 81.0f, 81.2f));
-        tmp.add(new Wifi("d0:57:4c:cb:4a:71", 77.0f, 77.0f, 77.0f));
-        tmp.add(new Wifi("fe:52:8d:c6:63:5a", 86.0f, 86.0f, 86.0f));
-        tmp.add(new Wifi("00:26:cb:a0:aa:c0", 71.0f, 71.0f, 71.0f));
-        tmp.add(new Wifi("00:0c:e6:00:d1:2d", 79.0f, 78.0f, 78.8f));
-        tmp.add(new Wifi("00:26:cb:4e:04:50", 65.0f, 63.0f, 64.5f));
-        tmp.add(new Wifi("00:26:cb:4d:d9:40", 79.0f, 73.0f, 74.5f));
-        tmp.add(new Wifi("00:0c:e6:00:d1:0c", 71.0f, 66.0f, 67.5f));
-        tmp.add(new Wifi("00:26:cb:4e:04:51", 65.0f, 64.0f, 64.7f));
-        tmp.add(new Wifi("c8:b3:73:4b:01:ca", 85.0f, 84.0f, 84.7f));
-        tmp.add(new Wifi("30:b5:c2:df:fd:60", 88.0f, 81.0f, 84.3f));
-        tmp.add(new Wifi("d4:6d:50:f2:c7:72", 89.0f, 89.0f, 89.0f));
-        tmp.add(new Wifi("00:26:cb:4e:07:f0", 79.0f, 79.0f, 79.0f));
-        tmp.add(new Wifi("00:26:cb:4e:07:f1", 79.0f, 78.0f, 78.7f));
-        tmp.add(new Wifi("00:37:b7:64:c3:66", 90.0f, 90.0f, 90.0f));
-
-        Node position = _graph.whereAmI(tmp);
-        draw(position);
-        System.out.print("Test 1.\n res = ");
-        System.out.println(position.getName());
-
-        // ---- test ----
-
-        tmp = new ArrayList<Wifi>();
-        tmp.add(new Wifi("00:26:cb:a0:aa:c1", 69.0f, 65.0f, 66.8f));
-        tmp.add(new Wifi("00:0c:e6:00:cf:b3", 85.0f, 79.0f, 81.6f));
-        tmp.add(new Wifi("00:0c:e6:00:d2:a4", 64.0f, 51.0f, 58.6f));
-        tmp.add(new Wifi("00:0c:e6:00:d1:3c", 82.0f, 69.0f, 76.8f));
-        tmp.add(new Wifi("00:0c:e6:00:d1:0c", 64.0f, 64.0f, 64.0f));
-        tmp.add(new Wifi("d4:6d:50:f2:c7:70", 87.0f, 74.0f, 79.8f));
-        tmp.add(new Wifi("d4:6d:50:f2:c7:71", 89.0f, 72.0f, 82.0f));
-        tmp.add(new Wifi("c8:b3:73:4b:01:c9", 92.0f, 92.0f, 92.0f));
-        tmp.add(new Wifi("10:9a:dd:b5:2a:3f", 88.0f, 85.0f, 86.6f));
-        tmp.add(new Wifi("00:26:cb:4d:d9:41", 79.0f, 75.0f, 76.6f));
-        tmp.add(new Wifi("00:0c:e6:00:d1:2d", 86.0f, 85.0f, 85.2f));
-        tmp.add(new Wifi("d4:6d:50:f2:c7:72", 87.0f, 74.0f, 79.4f));
-        tmp.add(new Wifi("d4:6d:50:f2:c7:73", 80.0f, 80.0f, 80.0f));
-        tmp.add(new Wifi("00:26:cb:4e:07:f0", 73.0f, 71.0f, 71.4f));
-        tmp.add(new Wifi("00:26:cb:4e:04:50", 79.0f, 69.0f, 74.4f));
-        tmp.add(new Wifi("00:26:cb:4e:07:f1", 81.0f, 71.0f, 77.8f));
-        tmp.add(new Wifi("00:26:cb:4e:04:51", 79.0f, 69.0f, 73.8f));
-        tmp.add(new Wifi("00:26:cb:4d:d9:40", 77.0f, 77.0f, 77.0f));
-        tmp.add(new Wifi("00:26:cb:a0:aa:c0", 77.0f, 67.0f, 70.3f));
-
-        position = _graph.whereAmI(tmp);
-        draw(position);
-        System.out.print("Test 2.\n res = ");
-        System.out.println(position.getName());
-
-        // ---- test ----
-
-        tmp = new ArrayList<Wifi>();
-        tmp.add(new Wifi("00:26:cb:4e:0e:e1", 53.0f, 33.0f, 37.8f));
-        tmp.add(new Wifi("00:0c:e6:00:d2:a4", 82.0f, 82.0f, 82.0f));
-        tmp.add(new Wifi("00:26:cb:a0:aa:c1", 85.0f, 81.0f, 83.2f));
-        tmp.add(new Wifi("00:26:cb:4e:0e:e0", 35.0f, 32.0f, 33.2f));
-        tmp.add(new Wifi("00:0c:e6:00:d1:0c", 88.0f, 88.0f, 88.0f));
-
-        position = _graph.whereAmI(tmp);
-        draw(position);
-        System.out.print("Test 3.\n res = ");
-        System.out.println(position.getName());
-
-        // ---- test ----
-
-        tmp = new ArrayList<Wifi>();
-        tmp.add(new Wifi("00:26:cb:4e:0e:e1", 64.0f, 54.0f, 57.0f));
-        tmp.add(new Wifi("00:26:cb:a0:aa:c1", 84.0f, 63.0f, 71.4f));
-        tmp.add(new Wifi("00:26:cb:4e:0e:e0", 61.0f, 32.0f, 52.4f));
-        tmp.add(new Wifi("00:0c:e6:00:d1:0c", 79.0f, 78.0f, 78.6f));
-        tmp.add(new Wifi("00:0c:e6:00:d1:3c", 81.0f, 80.0f, 80.2f));
-        tmp.add(new Wifi("d4:6d:50:f2:c7:70", 88.0f, 88.0f, 88.0f));
-        tmp.add(new Wifi("d4:6d:50:f2:c7:72", 91.0f, 91.0f, 91.0f));
-        tmp.add(new Wifi("d4:6d:50:f2:c7:71", 91.0f, 91.0f, 91.0f));
-        tmp.add(new Wifi("24:b6:57:8d:34:41", 81.0f, 79.0f, 80.6f));
-        tmp.add(new Wifi("00:26:cb:4e:04:50", 69.0f, 69.0f, 69.0f));
-        tmp.add(new Wifi("00:26:cb:4e:04:51", 69.0f, 66.0f, 67.8f));
-        tmp.add(new Wifi("00:26:cb:a0:aa:c0", 75.0f, 62.0f, 71.2f));
-
-        position = _graph.whereAmI(tmp);
-        draw(position);
-        System.out.print("Test 4.\n res = ");
-        System.out.println(position.getName());
-
-        // ---- test ----
-
-        tmp = new ArrayList<Wifi>();
-        tmp.add(new Wifi("00:26:cb:a0:aa:c1", 86.0f, 86.0f, 86.0f));
-        tmp.add(new Wifi("00:0c:e6:00:d1:3c", 84.0f, 80.0f, 82.4f));
-        tmp.add(new Wifi("00:26:cb:a0:aa:c0", 69.0f, 69.0f, 69.0f));
-        tmp.add(new Wifi("00:26:cb:4e:0c:a1", 76.0f, 68.0f, 71.0f));
-        tmp.add(new Wifi("00:26:cb:4e:0c:a0", 76.0f, 69.0f, 71.2f));
-        tmp.add(new Wifi("10:9a:dd:b5:2a:3f", 90.0f, 88.0f, 88.4f));
-        tmp.add(new Wifi("d4:6d:50:f2:c7:70", 87.0f, 85.0f, 85.8f));
-        tmp.add(new Wifi("d4:6d:50:f2:c7:72", 89.0f, 87.0f, 87.8f));
-        tmp.add(new Wifi("d4:6d:50:f2:c7:71", 85.0f, 84.0f, 84.4f));
-        tmp.add(new Wifi("00:0c:e6:00:d1:0c", 84.0f, 80.0f, 82.4f));
-        tmp.add(new Wifi("00:0c:e6:00:d2:a4", 78.0f, 70.0f, 76.0f));
-        tmp.add(new Wifi("00:26:cb:4e:0e:e0", 77.0f, 76.0f, 76.3f));
-        tmp.add(new Wifi("00:26:cb:4e:0e:e1", 77.0f, 76.0f, 76.7f));
-        tmp.add(new Wifi("00:0c:e6:00:d1:2d", 84.0f, 84.0f, 84.0f));
-        tmp.add(new Wifi("d4:6d:50:f2:c7:73", 86.0f, 86.0f, 86.0f));
-
-        position = _graph.whereAmI(tmp);
-        draw(position);
-        System.out.print("Test 5.\n res = ");
-        System.out.println(position.getName());
-
-        // ---- test ----
-
-        tmp = new ArrayList<Wifi>();
-        tmp.add(new Wifi("00:26:cb:4e:0c:a1", 85.0f, 77.0f, 81.8f));
-        tmp.add(new Wifi("00:26:cb:4e:0e:e1", 60.0f, 52.0f, 54.8f));
-        tmp.add(new Wifi("00:0c:e6:00:d2:a4", 80.0f, 62.0f, 73.0f));
-        tmp.add(new Wifi("00:0c:e6:00:cf:b3", 89.0f, 81.0f, 83.6f));
-        tmp.add(new Wifi("00:0c:e6:00:d1:2d", 82.0f, 74.0f, 78.8f));
-        tmp.add(new Wifi("00:26:cb:4e:0e:e0", 61.0f, 55.0f, 58.8f));
-        tmp.add(new Wifi("30:b5:c2:df:fd:60", 87.0f, 84.0f, 86.0f));
-        tmp.add(new Wifi("f8:e9:03:cb:00:a0", 87.0f, 87.0f, 87.0f));
-        tmp.add(new Wifi("d4:6d:50:f2:c7:74", 87.0f, 87.0f, 87.0f));
-        tmp.add(new Wifi("d4:6d:50:f2:c7:73", 90.0f, 85.0f, 87.5f));
-
-        position = _graph.whereAmI(tmp);
-        draw(position);
-        System.out.print("Test 6.\n res = ");
-        System.out.println(position.getName());
-    }
 
     /**
      * TODO @NathanLiccardo quand est appellé cet event précisément ? :/
@@ -369,31 +184,39 @@ public class MainActivity extends AppCompatActivity  {
                 _searchView.setQuery(_searchView.getSuggestionAtPosition(position), true);
             }
         });
+
         // give all of the nodes from the graph as available suggestions  (may bbe refined)
-        for(Node node: _graph.getAllNodes())
+        for(Node node: _graph.getAllNodes()) {
             _searchView.addSuggestions(node.getAlias());
-        for(String suggestion : NOT_SUGGESTED)
+        }
+
+        for(String suggestion : NOT_SUGGESTED) {
             _searchView.removeSuggestion(suggestion);
+        }
 
         return true;
     }
 
+
     /**
-     * method called when the `back` button is pressed
+     * Method called when the `back` button is pressed
      */
     @Override
     public void onBackPressed() {
-        // if back is pressed while the searchbar is being used, then close it and kep going
-        if(_searchView != null && _searchView.isOpen())
+        // If back is pressed while the searchbar is being used, then close it and kep going
+        if(_searchView != null && _searchView.isOpen()) {
             _searchView.closeSearch();
-        else
+        } else {
             super.onBackPressed();
+        }
     }
 
+
     /**
-     * method called when any element of the application is selected
+     * Method called when any element of the application is selected
+     *
      * @param item The selected item
-     * @return True
+     * @return True or default onOptionItemSelected
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -402,28 +225,59 @@ public class MainActivity extends AppCompatActivity  {
             _searchView.openSearch();
             return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
 
+
+    ///////////////////////////////////// INIT ANDROID VIEW /////////////////////////////////////
+
     /**
-     * Get the name of the application
-     *
-     * @return String with the app name
+     * Initialize the "switch plan" button<br />
+     * To switch between the campus
      */
-    public String getAppName() {
-        return getResources().getString(R.string.app_name);
+    private void initSwitchPlanButton() {
+        Button changePlan = (Button)findViewById(R.id.changePlan);
+        changePlan.setOnClickListener(new ClickListenerSwitchButton(this, _graph));
     }
 
     /**
-     * Get the current plan which is show
-     *
-     * @return the current plan
+     * Initialize the "chose local" button<br />
+     * To choose a specific local in the current plan
      */
-    public Plan getCurrentPlan() {
-        return _currentPlan;
+    private void initChoseLocalButton() {
+        Button local = (Button)findViewById(R.id.local);
+        local.setOnClickListener(new ClickListenerChoseLocal(this));
     }
 
+    /**
+     * Initialize the "localize" button<br />
+     * To force the localization
+     */
+    private void initLocalizeButton() {
+        Button localizeButton = (Button)findViewById(R.id.localizeButton);
+        localizeButton.setOnClickListener(new ClickListenerLocalize(_graph));
+    }
+
+
+
+    /**
+     * Set up the main screen (where we see the plan)
+     */
+    private void setUpCanvas() {
+        if(_imageView.getDrawable() != null) {
+            Integer height = _imageView.getDrawable().getIntrinsicWidth();
+            Integer width = _imageView.getDrawable().getIntrinsicHeight();
+            Bitmap bitmap;
+            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            bitmap = bitmap.copy(bitmap.getConfig(), true);
+            _canvas = new Canvas(bitmap);
+            _imageDraw.setImageBitmap(bitmap);
+        } else {
+            Log.w(getClass().getName(), "_imageView have no drawable");
+        }
+    }
 
 
     private float getWidthShrinkageFactor() {
@@ -438,8 +292,10 @@ public class MainActivity extends AppCompatActivity  {
         return trueHeight / effectiveHeight;
     }
 
+
     /**
      * Draws the given path on the plan on the screen
+     *
      * @param pathList An ArrayList of Path representing the nodes to pass by
      */
     public void drawPath(List<Path> pathList) {
@@ -447,6 +303,95 @@ public class MainActivity extends AppCompatActivity  {
         draw(_currentPosition);
         _drawer.draw(pathList);
     }
+
+
+    /**
+     * Removes anything being on the canvas
+     */
+    public void cleanCanvas() {
+        if(_canvas != null) {
+            _canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+        }
+    }
+
+
+    /**
+     * Draw a node on the current plan
+     *
+     * @param node the position of the point
+     */
+    public void draw(Node node) {
+        draw(node, false);
+    }
+
+
+    /**
+     * Draw a node on the current plan
+     *
+     * @param node the node which must be draw
+     * @param cleanBefore True if the plan must be clean before
+     */
+    public void draw(Node node, boolean cleanBefore) {
+        if(cleanBefore) {
+            cleanCanvas();
+        }
+        _drawer.draw(node);
+        _imageDraw.invalidate();
+        _imageView.invalidate();
+    }
+
+
+
+    ///////////////////////////////////// GETTER AND SETTER /////////////////////////////////////
+
+    /**
+     * Get the graph object
+     *
+     * @return Graph
+     */
+    public final Graph getGraph() {
+        return _graph;
+    }
+
+    /**
+     * Tell the application the word that we search AND find/draw the new path
+     *
+     * @param dest Name of the destination
+     */
+    public void setDestination(String dest) throws NoPathException {
+        _destinationNodes = _graph.searchNode(dest);
+        _graph.findPath();
+    }
+
+    /**
+     * Get all node where the user will go
+     *
+     * @return an ArrayList with all nodes
+     */
+    public final ArrayList<Node> getDestinations() {
+        return _destinationNodes;
+    }
+
+
+    /**
+     * Get the name of the application
+     *
+     * @return String with the app name
+     */
+    public final String getAppName() {
+        return getResources().getString(R.string.app_name);
+    }
+
+
+    /**
+     * Get the current plan which is show
+     *
+     * @return the current plan
+     */
+    public final Plan getCurrentPlan() {
+        return _currentPlan;
+    }
+
 
     /**
      * Change the current plan which is show on the user
@@ -467,89 +412,42 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
 
-    /**
-     * Removes anything being on the canvas
-     */
-    private void cleanCanvas() {
-        if(_canvas != null)
-            _canvas.drawColor(0, PorterDuff.Mode.CLEAR);
-    }
-
-
-    /**
-     * Draw a node on the current plan
-     *
-     * @param node the position of the point
-     */
-    public void draw(Node node) {
-        draw(node, false);
-    }
-
-    /**
-     * Draw a node on the current plan
-     *
-     * @param node the node which must be draw
-     * @param cleanBefore True if the plan must be clean before
-     */
-    public void draw(Node node, boolean cleanBefore) {
-        if(cleanBefore)
-            cleanCanvas();
-        _drawer.draw(node);
-        _imageDraw.invalidate();
-        _imageView.invalidate();
-    }
-
-
 
     /**
      * Get the image which is currently show
      *
      * @return the ImageView
      */
-    public ImageView getImageView() {
+    public final ImageView getImageView() {
         return _imageView;
     }
 
     /**
-     * localizes the user
+     * Get the current location
+     *
+     * @return the Node where is currently the user
      */
-    public void localize() {
-        localize(true);
-    }
-
-    /**
-     * localizes the user
-     * @param displayNotFound Boolean telling whether or not to signal if user is unable to localize
-     */
-    public void localize(boolean displayNotFound) {
-        Node current = _graph.whereAmI();
-        if(current != null) {
-            setCurrentPlan(current.getParentPlan());
-            if(_currentPosition != current) {
-                _currentPosition = current;
-                cleanCanvas();
-
-                if(_destinationName != null) {
-                    try {
-                        _graph.findPath(_destinationName);
-                    } catch (NoPathException e) {
-                        Log.e(getClass().getName(), "Error: should have found an alternative for a path between "
-                                + _currentPosition.getName() + " and " + _destinationName);
-                    }
-                } else
-                    this.draw(current);
-            }
-        } else if (displayNotFound){
-            _currentPosition = null;
-            DialogUtils.infoBox(this, R.string.not_found, R.string.not_in_ULB);
-        }
-    }
-
-    public final Node location() {
+    public final Node getCurrentLocation() {
         return _currentPosition;
     }
 
-    //////////////////////// STATIC ////////////////////////
+
+    /**
+     * Change the current location/position Node
+     *
+     * @param newLocation the new position
+     * @return True if the location havec change
+     */
+    public boolean setCurrentLocation(Node newLocation) {
+        Node oldLocation = _currentPosition;
+        _currentPosition = newLocation;
+        return (oldLocation != newLocation);
+    }
+
+
+
+    /////////////////////////////////////////// STATIC ///////////////////////////////////////////
+
     /**
      * Get the main instance
      *
@@ -559,14 +457,30 @@ public class MainActivity extends AppCompatActivity  {
         return instance;
     }
 
+    /**
+     * Check if app is in DEBUG mode
+     *
+     * @return True if the app is in Debug mode
+     */
     public static boolean isDebug() {
         return DEBUG;
     }
 
+    /**
+     * Check if app is in TEST mode
+     *
+     * @return True if we test application
+     */
     public static boolean isTest() {
         return TEST;
     }
 
+    /**
+     * Check if the app is in DEMO test
+     *
+     * @return True if we make a demo of the application
+     */
     public static boolean isDemo() { return DEMO; }
+
 
 }

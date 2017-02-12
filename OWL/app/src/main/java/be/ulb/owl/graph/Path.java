@@ -12,43 +12,47 @@ package be.ulb.owl.graph;
  */
 public class Path {
     
-    private final float _distance;
+    private final double _distance;
     private final Node _nodeOne;
     private final Node _nodeTwo;
-    
+
     /**
      * Create a path between two node
-     * 
+     *
      * @param nodeOne the first node
      * @param nodeTwo the second node
-     * @param distance between the two node
      */
-    public Path(Node nodeOne, Node nodeTwo, float distance) {
+    public Path(Node nodeOne, Node nodeTwo) {
+        this(nodeOne, nodeTwo, -1., false);
+    }
+
+    /* SHOULD ONLY BE USED FOR SPECIAL EDGES
+    * */
+    public Path(Node nodeOne, Node nodeTwo, double distance) {
         this(nodeOne, nodeTwo, distance, false);
     }
-    
+
     /**
      * Create a path between two node
-     * 
+     *
      * @param nodeOne the first node
      * @param nodeTwo the second node
-     * @param distance between the two node
      * @param addPathToNode True to add this path in the PathList of the Node
      */
-    public Path(Node nodeOne, Node nodeTwo, float distance, boolean addPathToNode) {
+    public Path(Node nodeOne, Node nodeTwo, double distance, boolean addPathToNode) {
         this._nodeOne = nodeOne;
         this._nodeTwo = nodeTwo;
-        this._distance = distance;
-        
+        this._distance = distance > 0 ? distance : Plan.euclidianDistance(nodeOne, nodeTwo);
+
         if(addPathToNode) {
             nodeOne.addPath(this);
             nodeTwo.addPath(this);
         }
     }
-    
+
     /**
      * Check if this path contain a specific node
-     * 
+     *
      * @param node the node who must be tested
      * @return True if the node is on the path
      */
@@ -61,10 +65,10 @@ public class Path {
     }
 
     /**
-     * Get the node on the opostif of the current node
-     * 
+     * Get the other node of the path
+     *
      * @param node the start node
-     * @return the oposit node
+     * @return the opposite node
      */
     public Node getOppositeNodeOf(Node node) {
         // return _nodeOne.equals(node) ? _nodeTwo : _nodeOne;
@@ -73,24 +77,24 @@ public class Path {
         }
         return _nodeOne;
     }
-    
+
     /**
      * Get distance
      *
      * @return the distance between two point
      */
-    public float getDistance() {
+    public double getDistance() {
         return _distance;
     }
 
     @Override
     public String toString() {
-        return "Path of length " + _distance + " between " + _nodeOne.getName() + " and " + _nodeTwo.getName();
+        return "Path of length " + _distance + " between " + _nodeOne.getID() + " and " + _nodeTwo.getID();
     }
 
     /**
      *
-     * @param p
+     * @param p the path to test an intersection with
      * @return The intersection node between this path if one exists
      * @throws IllegalArgumentException
      */

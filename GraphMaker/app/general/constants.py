@@ -16,3 +16,7 @@ RIGHT_RELEASE = '<ButtonRelease-3>'
 LEFT_CLICK_MOTION = '<B1-Motion>'
 WHEEL_CLICK_MOTION = '<B2-Motion>'
 RIGHT_CLICK_MOTION = '<B3-Motion>'
+
+# canvas constants
+NODE_SIZE = 10
+EDGE_WIDTH = 2.5
