@@ -329,15 +329,11 @@ public class Plan {
      * @return The nearest Node based on the given array of Wifi
      */
     public Node getNode(ArrayList<Wifi> wifis) {
-        ArrayList<String> wifisStr = new ArrayList<String>();
-        for (Wifi wifi : wifis) {
-            wifisStr.add(wifi.getBSS());
-        }
         ArrayList<Node> res = new ArrayList<Node>();
         for (Node node : _listNode) {
-            ArrayList<String> tmp = node.getListWifiBSS();
-            tmp.retainAll(wifisStr);
-            if (3 < tmp.size()){
+            ArrayList<Wifi> tmp = node.getWifi();
+            tmp.retainAll(wifis);
+            if (2 < tmp.size()){
                 res.add(node);
             }
         }
