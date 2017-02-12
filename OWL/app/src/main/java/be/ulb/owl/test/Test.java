@@ -5,7 +5,7 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import be.ulb.owl.MainActivity;
-import be.ulb.owl.Wifi;
+import be.ulb.owl.scanner.Wifi;
 import be.ulb.owl.graph.Graph;
 import be.ulb.owl.graph.NoPathException;
 import be.ulb.owl.graph.Node;

@@ -12,8 +12,9 @@ import java.util.HashSet;
 
 import be.ulb.owl.MainActivity;
 import be.ulb.owl.R;
-import be.ulb.owl.Scanner;
-import be.ulb.owl.Wifi;
+import be.ulb.owl.event.ScanWifiUpdateEvent;
+import be.ulb.owl.scanner.Scanner;
+import be.ulb.owl.scanner.Wifi;
 import be.ulb.owl.graph.shortestpath.ShortestPathAStar;
 import be.ulb.owl.graph.shortestpath.ShortestPathEvaluator;
 import be.ulb.owl.task.LoadMapTask;
@@ -26,7 +27,7 @@ import be.ulb.owl.utils.SQLUtils;
  *
  * @author Detobel36
  */
-public class Graph {
+public class Graph implements ScanWifiUpdateEvent {
 
     private static final MainActivity main = MainActivity.getInstance();
 
@@ -83,12 +84,12 @@ public class Graph {
     /**
      * Start the scan scheduller
      */
-    public void startScanTask() {
-        _scanner.startScanTask();
-
-        Log.i(getClass().getName(), "Scanner.scan");
-        localize();
-    }
+//    public void startScanTask() {
+////        _scanner.startScanTask();
+//
+//        Log.i(getClass().getName(), "Scanner.scan");
+//        localize();
+//    }
 
 
 
@@ -180,7 +181,7 @@ public class Graph {
     /**
      * Find the node where the user is.  This method call
      *
-     * @return
+     * @return the node or null if not found
      */
     protected Node whereAmI() {
         Node res = null;
@@ -415,5 +416,12 @@ public class Graph {
         return resCampus;
     }
 
+    /////////////////////////////////////////////
+    // TODO CLASSER (refactoring)
+
+    @Override
+    public void scanWifiUpdateEvent(ArrayList<Wifi> listWifi) {
+        localize(false);
+    }
 
 }

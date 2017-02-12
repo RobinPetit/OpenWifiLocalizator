@@ -7,7 +7,7 @@ package be.ulb.owl.graph;
 
 import java.util.ArrayList;
 
-import be.ulb.owl.Wifi;
+import be.ulb.owl.scanner.Wifi;
 import be.ulb.owl.utils.SQLUtils;
 
 /**

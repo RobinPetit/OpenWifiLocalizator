@@ -31,7 +31,7 @@ public class LoadMapTask extends AsyncTask<ArrayList<Campus>, Void, Void> {
     @Override
     protected void onPostExecute(Void v) {
         Log.d(getClass().getName(), "Post execute !");
-        MainActivity.getInstance().getGraph().startScanTask();
+//        MainActivity.getInstance().getGraph().startScanTask();
     }
 
 

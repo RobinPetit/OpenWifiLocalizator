@@ -3,7 +3,7 @@ package be.ulb.owl.test;
 import java.util.ArrayList;
 import java.util.Random;
 
-import be.ulb.owl.Wifi;
+import be.ulb.owl.scanner.Wifi;
 import be.ulb.owl.graph.Graph;
 import be.ulb.owl.graph.Node;
 

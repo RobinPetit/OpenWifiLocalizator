@@ -15,7 +15,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
-import be.ulb.owl.Wifi;
+import be.ulb.owl.scanner.Wifi;
 import be.ulb.owl.graph.Campus;
 import be.ulb.owl.graph.Graph;
 import be.ulb.owl.graph.Node;

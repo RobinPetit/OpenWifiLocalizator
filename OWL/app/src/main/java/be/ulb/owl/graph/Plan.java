@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.HashSet;
 
 import be.ulb.owl.MainActivity;
-import be.ulb.owl.Wifi;
+import be.ulb.owl.scanner.Wifi;
 import be.ulb.owl.utils.SQLUtils;
 
 /**

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package be.ulb.owl;
+package be.ulb.owl.scanner;
 
 /**
  * Information about a wifi scan

@@ -31,7 +31,7 @@ public class GraphDemo extends Graph {
      * Add manually point to a plan
      *
      */
-    private static void setPlan () {
+    private void setPlan () {
         if (0 == _offset) {
             Campus campus = getCampus("Solbosh");
             Plan currentPlan = campus.getPlan("P.F");
