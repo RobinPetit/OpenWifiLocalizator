@@ -361,7 +361,7 @@ public class Graph implements ScanWifiUpdateEvent {
 
 
     private static ArrayList<Plan> getAllPlan() {
-        ArrayList<Plan> allPlan = new ArrayList<Plan>();
+        ArrayList<Plan> allPlan = (ArrayList<Plan>) _allCampus.clone();
         for(Campus campus : _allCampus) {
             allPlan.addAll(campus.getAllPlans());
         }

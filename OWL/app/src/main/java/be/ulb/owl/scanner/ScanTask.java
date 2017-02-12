@@ -67,9 +67,11 @@ public class ScanTask extends AsyncTask<Void, Void, HashMap<String, ArrayList<In
     @Override
     protected void onPostExecute(HashMap<String, ArrayList<Integer>> listWifi) {
         if(!isCancelled()) {
+            Log.i(getClass().getName(), "Scan have finish :)");
             _scanner.newScanFinish(listWifi);
+        } else {
+            Log.i(getClass().getName(), "Scan task have been cancel !");
         }
-        Log.d(getClass().getName(), "Post execute !");
     }
 
 

@@ -372,7 +372,9 @@ public class MainActivity extends AppCompatActivity  {
      */
     public void setDestination(String dest) throws NoPathException {
         _destinationNodes = _graph.searchNode(dest);
-        _graph.findPath();
+        if(!_destinationNodes.isEmpty()) {
+            _graph.findPath();
+        }
     }
 
     /**
