@@ -14,7 +14,7 @@ import be.ulb.owl.graph.Node;
 public class GraphTest extends Graph {
 
     @Override
-    protected Node whereAmI() {
+    protected Node whereAmI(ArrayList<Wifi> sensed) {
         return getAllNodes().get(new Random().nextInt(getAllNodes().size()));
     }
 

@@ -53,9 +53,6 @@ public class Wifi {
         return _BSS.equals(wifi.getBSS());
     }
 
-    @Override
-    public int hashCode() { return this.hashCode(); } // @Remy Est ce que ça marche ca ? :p
-
     public float getAvg() {
         return _avg;
     }

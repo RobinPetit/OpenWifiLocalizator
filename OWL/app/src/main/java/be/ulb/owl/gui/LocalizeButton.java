@@ -12,6 +12,7 @@ import be.ulb.owl.event.EventPriority;
 import be.ulb.owl.event.ScanWifiUpdateEvent;
 import be.ulb.owl.scanner.Scanner;
 import be.ulb.owl.scanner.Wifi;
+import be.ulb.owl.utils.DialogUtils;
 
 /**
  * Created by Detobel36
@@ -52,7 +53,7 @@ public class LocalizeButton implements ScanWifiUpdateEvent {
                     _scanner.forceRestartScanTask();
 
                 } else {
-                    // TODO allready in progress
+                    DialogUtils.infoBox(_main, R.string.in_progress, R.string.in_progress_localize);
 
                 }
 
@@ -85,7 +86,7 @@ public class LocalizeButton implements ScanWifiUpdateEvent {
     public void scanWifiUpdateEvent(ArrayList<Wifi> listWifi) {
         _refreshInProgress = false;
         toggleLoaderAndButton();
-        // TODO
+        // TODO Detobel si wifi pas trouvé
     }
 
 }

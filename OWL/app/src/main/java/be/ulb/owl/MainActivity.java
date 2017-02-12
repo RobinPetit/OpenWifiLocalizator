@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity  {
 
 
         // Load sql
-        SQLUtils.initSQLUtils(this);
+        new SQLUtils(this);
         Log.i(getClass().getName(), "[V] SQL Loaded !");
 
         // Load graph

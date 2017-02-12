@@ -149,7 +149,7 @@ public class Scanner {
         _lastWifiAccess = temp;
 
 
-        // TODO optimiser
+        // TODO optimiser (deux boucles pour la même chose)
         for(ScanWifiUpdateEvent event : _eventScanWifiUpdate.keySet()) {
             if(_eventScanWifiUpdate.get(event) == EventPriority.FIRST) {
                 event.scanWifiUpdateEvent(temp);

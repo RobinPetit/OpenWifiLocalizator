@@ -7,6 +7,7 @@ import be.ulb.owl.graph.Campus;
 import be.ulb.owl.graph.Graph;
 import be.ulb.owl.graph.Node;
 import be.ulb.owl.graph.Plan;
+import be.ulb.owl.scanner.Wifi;
 
 /**
  * Make a demonstration (override some method)
@@ -55,7 +56,7 @@ public class GraphDemo extends Graph {
 
 
     @Override
-    protected Node whereAmI() {
+    protected Node whereAmI(ArrayList<Wifi> sensed) {
         Node res = null;
         if(MainActivity.isDemo()) {
             setPlan();

@@ -185,7 +185,7 @@ public class Graph implements ScanWifiUpdateEvent {
             return null;
         }
 
-        Node node = res.get(0).getNode(sensed); // @TODO manage case where two plans could contain the solution.
+        Node node = res.get(0).getNode(sensed); // TODO Denis manage case where two plans could contain the solution.
         if(node != null) {
             Log.d(getClass().getName(), "Node found: " + node.getID() + "(alias: " + node.getAlias() + ")");
         }
@@ -227,6 +227,12 @@ public class Graph implements ScanWifiUpdateEvent {
         } else if (displayNotFound) {
             DialogUtils.infoBox(main, R.string.not_found, R.string.not_in_ULB);
         }
+    }
+
+
+    @Override
+    public void scanWifiUpdateEvent(ArrayList<Wifi> listWifi) {
+        localize(false, listWifi);
     }
 
 
@@ -282,7 +288,7 @@ public class Graph implements ScanWifiUpdateEvent {
 
 
     /**
-     * TODO doc ?  Robin/Denis ?
+     * TODO Robin possible d'ajouter de la doc ?
      *
      * @param overallPath
      * @param listDestination
@@ -367,12 +373,5 @@ public class Graph implements ScanWifiUpdateEvent {
         return resCampus;
     }
 
-    /////////////////////////////////////////////
-    // TODO CLASSER (refactoring)
-
-    @Override
-    public void scanWifiUpdateEvent(ArrayList<Wifi> listWifi) {
-        localize(false, listWifi);
-    }
 
 }

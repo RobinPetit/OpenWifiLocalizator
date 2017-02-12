@@ -32,7 +32,7 @@ import be.ulb.owl.utils.sql.WifiTable;
 /**
  * Tool to manage SQL
  *
- * Created by Detobel36
+ * @author Detobel36
  */
 
 public class SQLUtils extends SQLiteOpenHelper {
@@ -40,40 +40,39 @@ public class SQLUtils extends SQLiteOpenHelper {
     private static SQLiteDatabase _db = null;
 
     private static final String DB_NAME = "OWL-DB.db";
-    private static String DB_PATH = "";
+    private static String DB_PATH;
 
     private Context _context;
 
 
-    // TODO add documentation
     /**
-     * Constructor
+     * Create SQLUtils object to manage SQL
      *
-     * @param context
+     * @param context context to get default method (main)
      */
     public SQLUtils(Context context) {
         super(context, DB_NAME, null, 1);
 
         if(_db != null) {
-            throw new IllegalArgumentException("Une instance de SQLUtils existe déjà");
+            throw new IllegalArgumentException("SQLUtils have already been created");
         }
-
         this._context = context;
 
+        // Location of the local database
         DB_PATH = context.getApplicationInfo().dataDir + "/databases";
 
+        // create folder if not exist
         new File(DB_PATH).mkdir();
-        // Log.d(getClass().getName(), "DB_Path: " + DB_PATH);
 
         if (!checkDatabase() || !checkDateDatabase()) {
-            Log.i(getClass().getName(), "Database doesn't exist -> creation");
             createDataBase();
         }
 
-        // Log.d(getClass().getName(), "Open existing database");
-        opendatabase();
+        openDatabase();
 
     }
+
+
 
     ////////////////////////// FUNCTION TO MOVE AND CHECK ASSETS DATABASE //////////////////////////
 
@@ -96,6 +95,7 @@ public class SQLUtils extends SQLiteOpenHelper {
 
         return checkDbExists ;
     }
+
 
     /**
      * Check if database on the phone is up to date
@@ -128,6 +128,9 @@ public class SQLUtils extends SQLiteOpenHelper {
     }
 
 
+    /**
+     * Create database if the don't exist
+     */
     private void createDataBase() {
         //If the database does not exist, copy it from the assets.
         this.getReadableDatabase();
@@ -135,12 +138,11 @@ public class SQLUtils extends SQLiteOpenHelper {
 
         copyDataBase();
         Log.i(getClass().getName(), "Database created");
-
     }
 
+
     /**
-     * Copy the database from the assets folder to
-     *
+     * Copy the database from the assets folder to the local folder
      */
     private void copyDataBase() {
         //Open your local db as the input stream
@@ -185,10 +187,11 @@ public class SQLUtils extends SQLiteOpenHelper {
 
     }
 
+
     /**
      * Open the database which was copied from assets
      */
-    private void opendatabase() {
+    private void openDatabase() {
         //Open the database
         _db = SQLiteDatabase.openDatabase(getPathLocalDatabase(), null,
                 SQLiteDatabase.OPEN_READONLY);
@@ -214,11 +217,7 @@ public class SQLUtils extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        // @detobel36 Quel est le sens de cette phrase ? :/
-        Log.i(getClass().getName(), "Database is directly updated when the file bd is override " +
-                "(in assets folder)");
-    }
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) { /* nothing */ }
 
 
 
@@ -233,19 +232,8 @@ public class SQLUtils extends SQLiteOpenHelper {
         return _db;
     }
 
-    /**
-     * TODO faire la doc
-     *
-     * @param context
-     */
-    public static void initSQLUtils(Context context) {
-        new SQLUtils(context);
-
-    }
-
 
     public static ArrayList<Campus> loadAllCampus() {
-        long startTime = System.nanoTime(); // TODO remove DEBUG
         ArrayList<Campus> res = new ArrayList<Campus>();
 
         Cursor cursor = getDatabase().query(PlanTable.getName(),
@@ -284,8 +272,6 @@ public class SQLUtils extends SQLiteOpenHelper {
             }
         }
 
-        // TODO remove DEBUG
-        // Log.d(SQLUtils.class.getName(), "Timer loadAllCampus miliSec: " + ((System.nanoTime()-startTime)/1000000));
         return res;
     }
 
@@ -296,7 +282,6 @@ public class SQLUtils extends SQLiteOpenHelper {
      * @return the new campus or null if not found
      */
     public static Campus loadCampus(String name) {
-        long startTime = System.nanoTime(); // TODO remove DEBUG
         Campus res = null;
 
         Cursor cursor = getDatabase().query(PlanTable.getName(),
@@ -333,8 +318,6 @@ public class SQLUtils extends SQLiteOpenHelper {
 
         }
 
-        // TODO remove DEBUG
-        // Log.d(SQLUtils.class.getName(), "Timer loadCampus miliSec: " + ((System.nanoTime()-startTime)/1000000));
         return res;
     }
 
@@ -347,7 +330,6 @@ public class SQLUtils extends SQLiteOpenHelper {
      * @return an ArrayList with all plan
      */
     public static ArrayList<Plan> loadAllPlan(Campus campus, int campusID) {
-        long startTime = System.nanoTime(); // TODO remove DEBUG
         ArrayList<Plan> res = new ArrayList<Plan>();
 
         Cursor cursor = getDatabase().query(PlanTable.getName(),
@@ -396,9 +378,6 @@ public class SQLUtils extends SQLiteOpenHelper {
 
         cursor.close(); // end of the request
 
-        // TODO remove DEBUG
-        // Log.d(SQLUtils.class.getName(), "Timer loadAllPlan miliSec: " + ((System.nanoTime()-startTime)/1000000));
-
         return res;
     }
 
@@ -409,8 +388,6 @@ public class SQLUtils extends SQLiteOpenHelper {
      * @return the created plan object
      */
     public static Plan loadPlan(String planName) throws SQLiteException {
-        long startTime = System.nanoTime(); // TODO remove DEBUG
-
         Cursor cursor = getDatabase().rawQuery("SELECT bSource.*, " +
                     "bCampus." + PlanTable.NAME.getCol() + " AS campusName " +
                 "FROM " + PlanTable.getName() + " bSource " +
@@ -456,8 +433,6 @@ public class SQLUtils extends SQLiteOpenHelper {
             return null;
         }
 
-        // TODO remove DEBUG
-        // Log.d(SQLUtils.class.getName(), "Timer loadPlan miliSec: " + ((System.nanoTime()-startTime)/1000000));
         return new Plan(planName, id, campus, directoryImage, xOnParent, yOnParent, bgCoordX, bgCoordY,
                     relativeAngle, distance);
     }
@@ -472,8 +447,6 @@ public class SQLUtils extends SQLiteOpenHelper {
      * @return an arraylist with all created nodes
      */
     public static ArrayList<Node> loadNodes(Plan plan, int planID) {
-        long startTime = System.nanoTime(); // TODO remove DEBUG
-        // Log.d(SQLUtils.class.getName(), "LoadNodes: " + planID);
         ArrayList<Node> res = new ArrayList<Node>();
 
         Cursor cursor = getDatabase().query(NodeTable.getName(),
@@ -499,9 +472,6 @@ public class SQLUtils extends SQLiteOpenHelper {
 
         cursor.close(); // end of the request
 
-        // TODO remove DEBUG
-        // Log.d(SQLUtils.class.getName(), "Timer loadNodes (" + planID + ") miliSec: " +
-        //         ((System.nanoTime()-startTime)/1000000));
         return res;
     }
 
@@ -512,7 +482,6 @@ public class SQLUtils extends SQLiteOpenHelper {
      * @return ArrayList with all alias
      */
     public static ArrayList<String> loadAlias(int nodeID) {
-        long startTime = System.nanoTime(); // TODO remove DEBUG
         ArrayList<String> res = new ArrayList<String>();
 
         String reqStr = "SELECT " + AliasesTable.NAME.getFullCol() + " " +
@@ -535,9 +504,6 @@ public class SQLUtils extends SQLiteOpenHelper {
         }
         cursor.close();
 
-        // TODO remove DEBUG
-        // Log.d(SQLUtils.class.getName(), "Timer loadAlias (NodeID: " + nodeID + ") miliSec: " +
-        //        ((System.nanoTime()-startTime)/1000000));
         return res;
     }
 
@@ -549,7 +515,6 @@ public class SQLUtils extends SQLiteOpenHelper {
      * @return ArrayList with all wifi
      */
     public static ArrayList<Wifi> loadWifi(int nodeID) {
-        long startTime = System.nanoTime(); // TODO remove DEBUG
         ArrayList<Wifi> res = new ArrayList<Wifi>();
 
         Cursor cursor = getDatabase().query(WifiTable.getName(),
@@ -579,9 +544,6 @@ public class SQLUtils extends SQLiteOpenHelper {
         }
         cursor.close();
 
-        // TODO remove DEBUG
-        // Log.d(SQLUtils.class.getName(), "Timer loadWifi (" + nodeID + ") miliSec: " +
-        //        ((System.nanoTime()-startTime)/1000000));
         return res;
     }
 
@@ -608,8 +570,6 @@ public class SQLUtils extends SQLiteOpenHelper {
      * @return ArrayList with all path
      */
     public static ArrayList<Path> loadPath(int nodeID, Node node, Plan plan) {
-        long startTime = System.nanoTime(); // TODO remove DEBUG
-
         ArrayList<Path> res = new ArrayList<Path>();
 
         Cursor cursor = getDatabase().query(EdgeTable.getName(),
@@ -666,9 +626,7 @@ public class SQLUtils extends SQLiteOpenHelper {
         cursor.close();
 
         res.addAll(loadSpecialPath(nodeID, node, plan));
-        // TODO remove DEBUG
-        // Log.d(SQLUtils.class.getName(), "Timer loadPath (nodeID: " + nodeID + ") miliSec: " +
-        //        ((System.nanoTime()-startTime)/1000000));
+
         return res;
     }
 
