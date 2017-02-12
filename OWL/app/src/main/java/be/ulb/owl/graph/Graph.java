@@ -64,6 +64,24 @@ public class Graph implements ScanWifiUpdateEvent {
     }
 
 
+    /**
+     * Awful method which aims to return the common elements of two arrays of Wifi
+     *
+     * @param set1 arrayList of Wifi
+     * @param set2 arrayList of Wifi
+     * @return an ArrayList which contains the common Wifi objects between the two arrayList given in param
+     */
+    private ArrayList<Wifi> common (ArrayList<Wifi> set1, ArrayList<Wifi> set2) {
+        ArrayList<Wifi> res = new ArrayList<Wifi>();
+        for (Wifi elem1:set1) {
+            for (Wifi elem2:set2) {
+                if (elem1.equals(elem2)) {
+                    res.add(elem1);
+                }
+            }
+        }
+        return res;
+    }
 
     ////////////////////////////////////// GETTER AND SETTER //////////////////////////////////////
 
