@@ -59,7 +59,6 @@ public class LocalizeButton implements ScanWifiUpdateEvent {
             }
         });
 
-
     }
 
     private void initLoadBar() {
@@ -83,10 +82,10 @@ public class LocalizeButton implements ScanWifiUpdateEvent {
 
 
     @Override
-    public boolean scanWifiUpdateEvent(ArrayList<Wifi> listWifi) {
+    public void scanWifiUpdateEvent(ArrayList<Wifi> listWifi) {
         _refreshInProgress = false;
         toggleLoaderAndButton();
         // TODO
-        return false;
     }
+
 }

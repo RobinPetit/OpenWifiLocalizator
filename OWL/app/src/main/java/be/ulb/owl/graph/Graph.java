@@ -151,22 +151,6 @@ public class Graph implements ScanWifiUpdateEvent {
     /////////////////////////////////////////// LOCALIZE ///////////////////////////////////////////
 
     /**
-     * Find the node where the user is.  This method call
-     *
-     * @return the node or null if not found
-     */
-    protected Node whereAmI() {
-        Node res = null;
-
-
-        // TODO Detobel36 add async scan
-//        ArrayList<Wifi> sensed = _scanner.scan();
-//        Log.d(getClass().getName(), "wifi: (" + sensed.size() + ") " + sensed.toString());
-//        res = whereAmI(sensed);
-        return res;
-    }
-
-    /**
      * Find the node where the user is
      *
      * @param sensed all detected arround wifi
@@ -387,9 +371,8 @@ public class Graph implements ScanWifiUpdateEvent {
     // TODO CLASSER (refactoring)
 
     @Override
-    public boolean scanWifiUpdateEvent(ArrayList<Wifi> listWifi) {
+    public void scanWifiUpdateEvent(ArrayList<Wifi> listWifi) {
         localize(false, listWifi);
-        return true;
     }
 
 }
