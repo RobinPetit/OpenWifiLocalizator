@@ -44,7 +44,7 @@ public class ScanTask extends AsyncTask<Void, Void, HashMap<String, ArrayList<In
         }
 
         for (int i = 0; i < 3; i++) {
-            accessPoints.putAll(_scanner.getData());
+            accessPoints = mergeAccePoint(accessPoints, _scanner.getData());
 
             try {
                 Thread.sleep(1000);
@@ -60,8 +60,33 @@ public class ScanTask extends AsyncTask<Void, Void, HashMap<String, ArrayList<In
             }
         }
 
+        Log.i(getClass().getName(), "-------------------------------");
+        Log.i(getClass().getName(), "Scan wifi: ");
+        for(String bss : accessPoints.keySet()) {
+            Log.i(getClass().getName(), bss + ": " + accessPoints.get(bss));
+        }
+        Log.i(getClass().getName(), "-------------------------------");
+
+
         return accessPoints;
     }
+
+    private HashMap<String, ArrayList<Integer>> mergeAccePoint(HashMap<String, ArrayList<Integer>> res,
+                                                               HashMap<String, Integer> lastScan) {
+        for(String bss : lastScan.keySet()) {
+            if(res.containsKey(bss)) {
+                ArrayList<Integer> listScan = res.get(bss);
+                listScan.add(lastScan.get(bss));
+            } else {
+                ArrayList<Integer> listScan = new ArrayList<Integer>();
+                listScan.add(lastScan.get(bss));
+                res.put(bss, listScan);
+            }
+        }
+
+        return res;
+    }
+
 
 
     @Override

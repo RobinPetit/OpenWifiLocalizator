@@ -80,8 +80,8 @@ public class Scanner {
      *
      * @return HashMap with bss and avg of signal OR null if same that the last request
      */
-    protected HashMap<String, ArrayList<Integer>> getData() {
-        HashMap<String, ArrayList<Integer>> res = new HashMap<String, ArrayList<Integer>>();
+    protected HashMap<String, Integer> getData() {
+        HashMap<String, Integer> res = new HashMap<String, Integer>();
         List<ScanResult> results = _wifiManager.getScanResults();
 
         if(updateLastResult(results)) {
@@ -94,13 +94,10 @@ public class Scanner {
             Integer value = scanRes.level;
 
             if (!res.containsKey(key)) {
-                // Create and add new arrayList
-                ArrayList<Integer> listAccess = new ArrayList<Integer>();
-                listAccess.add(value);
-                res.put(key, listAccess);
+                res.put(key, value);
 
             } else {
-                res.get(key).add(value);
+                Log.w(getClass().getName(), "Scan detect two same bss !!!");
 
             }
 
