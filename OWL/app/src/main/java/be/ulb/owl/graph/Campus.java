@@ -103,6 +103,11 @@ public class Campus extends Plan {
         return resPlan;
     }
 
+    protected boolean haveId(int id) {
+        return id == _id;
+    }
+
+
     @Override
     public double getAbsoluteX(float x) {
         return 0;

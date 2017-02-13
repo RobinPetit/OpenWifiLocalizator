@@ -404,5 +404,14 @@ public class Graph implements ScanWifiUpdateEvent {
         return resCampus;
     }
 
+    public static Campus getCampus(int id) {
+        for(Campus campus : _allCampus) {
+            if(campus.haveId(id)) {
+                return campus;
+            }
+        }
+        return null;
+    }
+
 
 }

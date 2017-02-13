@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.File;
@@ -15,19 +17,20 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
-import be.ulb.owl.scanner.Wifi;
 import be.ulb.owl.graph.Campus;
 import be.ulb.owl.graph.Graph;
 import be.ulb.owl.graph.Node;
 import be.ulb.owl.graph.Path;
 import be.ulb.owl.graph.Plan;
+import be.ulb.owl.scanner.Wifi;
 import be.ulb.owl.utils.sql.AliasesLinkTable;
 import be.ulb.owl.utils.sql.AliasesTable;
-import be.ulb.owl.utils.sql.PlanTable;
 import be.ulb.owl.utils.sql.EdgeTable;
 import be.ulb.owl.utils.sql.NodeTable;
+import be.ulb.owl.utils.sql.PlanTable;
 import be.ulb.owl.utils.sql.SpecialEdgeTable;
 import be.ulb.owl.utils.sql.WifiTable;
+
 
 /**
  * Tool to manage SQL
@@ -233,6 +236,13 @@ public class SQLUtils extends SQLiteOpenHelper {
     }
 
 
+    /////////////// CAMPUS ///////////////
+
+    /**
+     * Load all campus but not linked map
+     *
+     * @return ArrayList with all campus
+     */
     public static ArrayList<Campus> loadAllCampus() {
         ArrayList<Campus> res = new ArrayList<Campus>();
 
@@ -322,6 +332,8 @@ public class SQLUtils extends SQLiteOpenHelper {
     }
 
 
+    /////////////// PLANS ///////////////
+
     /**
      * Load all plan contains in the database from a specific campus
      *
@@ -330,8 +342,6 @@ public class SQLUtils extends SQLiteOpenHelper {
      * @return an ArrayList with all plan
      */
     public static ArrayList<Plan> loadAllPlan(Campus campus, int campusID) {
-        ArrayList<Plan> res = new ArrayList<Plan>();
-
         Cursor cursor = getDatabase().query(PlanTable.getName(),
                 new String[] {
                         PlanTable.NAME.getCol(),
@@ -345,7 +355,56 @@ public class SQLUtils extends SQLiteOpenHelper {
                         PlanTable.PPM.getCol()},
                 PlanTable.CAMPUS_ID.getCol() + " = ?", new String[]{""+campusID}, null, null, null);
 
+        return loadAllPlan(cursor, campus);
+    }
+
+    /**
+     * Get all plan which contains a specific BSS
+     *
+     * @param listBSS list of all linked bss
+     * @return an ArrayList with all plan
+     */
+    public static ArrayList<Plan> getPlanWithWifi(ArrayList<String> listBSS) {
+
+        String param = TextUtils.join("', '", listBSS);
+
+        String req = "SELECT DISTINCT " + PlanTable.getName() + ".*" +
+                        "FROM " + PlanTable.getName() + " " +
+                            "JOIN " + NodeTable.getName() + " " +
+                                "ON " + NodeTable.PLAN_ID.getFullCol() + " " +
+                                    "= " + PlanTable.ID.getFullCol() + " " +
+                            "JOIN " + WifiTable.getName() + " "+
+                                "ON " + WifiTable.NODE_ID.getFullCol() + " " +
+                                    "= " + NodeTable.ID.getFullCol() + " "+
+                        "WHERE " + WifiTable.BSS.getFullCol() + " IN (?)";
+
+        Cursor cursor = getDatabase().rawQuery(req, new String[]{"'"+param+"'"});
+
+        return loadAllPlan(cursor);
+    }
+
+    /**
+     * Load all specific plan
+     *
+     * @param cursor cursor of sql request
+     * @return
+     */
+    private static ArrayList<Plan> loadAllPlan(Cursor cursor) {
+        return loadAllPlan(cursor, null);
+    }
+
+    /**
+     * Load all specific plan
+     *
+     * @param cursor cursor of sql request
+     * @param campus campus object in link with all plan (null if not define)
+     * @return an ArrayList with all plan object
+     */
+    private static ArrayList<Plan> loadAllPlan(Cursor cursor, Campus campus) {
+        ArrayList<Plan> res = new ArrayList<Plan>();
+
         int id;
+        int campusID;
         String planName;
         String directoryImage;
         float xOnParent;
@@ -361,6 +420,7 @@ public class SQLUtils extends SQLiteOpenHelper {
             while (!cursor.isAfterLast()) {
                 planName = getString(cursor, PlanTable.NAME.getCol());;
                 id = getInt(cursor, PlanTable.ID.getCol());
+                campusID = getInt(cursor, PlanTable.CAMPUS_ID.getCol());
                 directoryImage = getString(cursor, PlanTable.IMAGE_DIRECTORY.getCol());
                 xOnParent = getFloat(cursor, PlanTable.X_ON_PARENT.getCol());
                 yOnParent = getFloat(cursor, PlanTable.Y_ON_PARENT.getCol());
@@ -368,6 +428,10 @@ public class SQLUtils extends SQLiteOpenHelper {
                 bgCoordY = getFloat(cursor, PlanTable.BG_COORD_Y.getCol());
                 relativeAngle = getFloat(cursor, PlanTable.RELATIVE_ANGLE.getCol());
                 distance = getFloat(cursor, PlanTable.PPM.getCol());
+
+                if(campus == null) {
+                    campus = Graph.getCampus(campusID);
+                }
 
                 res.add(new Plan(planName, id, campus, directoryImage, xOnParent, yOnParent, bgCoordX,
                         bgCoordY, relativeAngle, distance));
@@ -381,26 +445,61 @@ public class SQLUtils extends SQLiteOpenHelper {
         return res;
     }
 
+
+
     /**
      * Load all information about a plan
      *
      * @param planName the name of the plan
      * @return the created plan object
      */
+    @Nullable
     public static Plan loadPlan(String planName) throws SQLiteException {
         Cursor cursor = getDatabase().rawQuery("SELECT bSource.*, " +
-                    "bCampus." + PlanTable.NAME.getCol() + " AS campusName " +
-                "FROM " + PlanTable.getName() + " bSource " +
-                    "JOIN " + PlanTable.getName() + " bCampus " +
-                    "ON bCampus." + PlanTable.ID.getCol() + " = bSource." + PlanTable.CAMPUS_ID.getCol() +" " +
-                "WHERE bSource." + PlanTable.NAME.getCol() + " = ?",
-                new String[] {planName});
+                            "bCampus." + PlanTable.NAME.getCol() + " AS campusName " +
+                        "FROM " + PlanTable.getName() + " bSource " +
+                            "JOIN " + PlanTable.getName() + " bCampus " +
+                                "ON bCampus." + PlanTable.ID.getCol() +
+                                    " = bSource." + PlanTable.CAMPUS_ID.getCol() + " " +
+                        "WHERE bSource." + PlanTable.NAME.getCol() + " = ?",
+                new String[]{planName});
 
+        return loadPlan(cursor);
+    }
 
+    /**
+     * Load all informations about a plan
+     *
+     * @param IdPlan id of the plan
+     * @return the created plan object
+     */
+    @Nullable
+    public static Plan loadPlan(int IdPlan) {
+        Cursor cursor = getDatabase().rawQuery("SELECT bSource.*, " +
+                            "bCampus." + PlanTable.NAME.getCol() + " AS campusName " +
+                        "FROM " + PlanTable.getName() + " bSource " +
+                            "JOIN " + PlanTable.getName() + " bCampus " +
+                                "ON bCampus." + PlanTable.ID.getCol() +
+                                    " = bSource." + PlanTable.CAMPUS_ID.getCol() + " " +
+                        "WHERE bSource." + PlanTable.ID.getCol() + " = ?",
+                new String[]{"" + IdPlan});
+
+        return loadPlan(cursor);
+    }
+
+    /**
+     * Load all informations about  plan
+     *
+     * @param cursor result of sql request
+     * @return the created plan object
+     */
+    @Nullable
+    private static Plan loadPlan(Cursor cursor) {
         int id;
         String campusName;
 
         String directoryImage;
+        String planName;
         float xOnParent;
         float yOnParent;
         float bgCoordX;
@@ -414,6 +513,7 @@ public class SQLUtils extends SQLiteOpenHelper {
             campusName = getString(cursor, "campusName");
 
             directoryImage = getString(cursor, PlanTable.IMAGE_DIRECTORY.getCol());
+            planName = getString(cursor, PlanTable.NAME.getCol());
             xOnParent = getFloat(cursor, PlanTable.X_ON_PARENT.getCol());
             yOnParent = getFloat(cursor, PlanTable.Y_ON_PARENT.getCol());
             bgCoordX = getFloat(cursor, PlanTable.BG_COORD_X.getCol());
@@ -422,7 +522,7 @@ public class SQLUtils extends SQLiteOpenHelper {
             distance = getFloat(cursor, PlanTable.PPM.getCol());
 
         } else {
-            throw new SQLiteException("Multiple building have the same name: " + planName);
+            throw new SQLiteException("Multiple building have the same name (or id)");
         }
 
         cursor.close(); // end of the request
@@ -437,7 +537,33 @@ public class SQLUtils extends SQLiteOpenHelper {
                     relativeAngle, distance);
     }
 
+    /**
+     * Get all plan ID
+     *
+     * @return an ArrayList with all id
+     */
+    public static ArrayList<Integer> getAllPlanID() {
+        ArrayList<Integer> res = new ArrayList<Integer>();
 
+        Cursor cursor = getDatabase().rawQuery("SELECT " + PlanTable.ID.getCol() + " " +
+                "FROM " + PlanTable.getName(), null);
+
+        if(cursor.getCount() > 0) {
+            cursor.moveToFirst();
+
+            while (!cursor.isAfterLast()) {
+                res.add(getInt(cursor, PlanTable.ID.getCol()));
+                cursor.moveToNext();
+            }
+        }
+
+        cursor.close();
+
+        return res;
+    }
+
+
+    /////////////// NODES ///////////////
 
     /**
      * Load all node of a specific plan
@@ -475,6 +601,9 @@ public class SQLUtils extends SQLiteOpenHelper {
         return res;
     }
 
+
+    /////////////// ALIAS ///////////////
+
     /**
      * Load all aliases of a specific node
      *
@@ -507,6 +636,8 @@ public class SQLUtils extends SQLiteOpenHelper {
         return res;
     }
 
+
+    /////////////// WIFI ///////////////
 
     /**
      * Load all wifis of a specific node
@@ -547,6 +678,8 @@ public class SQLUtils extends SQLiteOpenHelper {
         return res;
     }
 
+
+    /////////////// PATH ///////////////
 
     /**
      * Load all paths on a specific node<br />
