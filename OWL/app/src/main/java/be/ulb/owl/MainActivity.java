@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         instance = this;
 
-        LogUtils.initLogSystem();
+        LogUtils.initLogSystem(this);
         Log.i(getClass().getName(), "Log loaded !");
 
         setContentView(R.layout.activity_main);
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity  {
 
         _imageView = (ImageView)findViewById(R.id.plan);
         _imageDraw = (ImageView)findViewById(R.id.draw);
-        _imageDraw.setOnTouchListener(new TouchListener());
+        _imageDraw.setOnTouchListener(new TouchListener(this));
 
 
         // Load sql
@@ -103,13 +103,13 @@ public class MainActivity extends AppCompatActivity  {
 
         // Load graph
         if(isDemo()) {
-            _graph = new GraphDemo();
+            _graph = new GraphDemo(this);
 
         } else if(isTest()) {
-            _graph = new GraphTest();
+            _graph = new GraphTest(this);
 
         } else {
-            _graph = new Graph();
+            _graph = new Graph(this);
 
         }
         Log.i(getClass().getName(), "[V] Graph loaded !");
@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity  {
         // Init buttons listener
         initSwitchPlanButton();
         initChoseLocalButton();
-        new LocalizeButton(this, _scanner);
+        new LocalizeButton(this, _scanner, _graph);
         Log.i(getClass().getName(), "[V] Button loaded !");
     }
 
@@ -151,6 +151,7 @@ public class MainActivity extends AppCompatActivity  {
         _drawer = new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor());
 
         // Start scan
+        _graph.setDisplayNotFound(true);
         _scanner.startScanTask(false);
 
     }
@@ -182,7 +183,7 @@ public class MainActivity extends AppCompatActivity  {
         getMenuInflater().inflate(R.menu.menu, menu);
         _searchView = (MaterialSearchView)findViewById(R.id.search_view);
         // QueryListener is used to detect when the user starts a query for a local
-        _searchView.setOnQueryTextListener(new QueryTextListener());
+        _searchView.setOnQueryTextListener(new QueryTextListener(this));
         // OnItemClickListener is used to detect when the user selects a suggestion from the list
         _searchView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             /**

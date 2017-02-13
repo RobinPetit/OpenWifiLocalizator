@@ -3,6 +3,7 @@ package be.ulb.owl.test;
 import java.util.ArrayList;
 import java.util.Random;
 
+import be.ulb.owl.MainActivity;
 import be.ulb.owl.scanner.Wifi;
 import be.ulb.owl.graph.Graph;
 import be.ulb.owl.graph.Node;
@@ -12,6 +13,10 @@ import be.ulb.owl.graph.Node;
  */
 
 public class GraphTest extends Graph {
+
+    public GraphTest(MainActivity main) {
+        super(main);
+    }
 
     @Override
     protected Node whereAmI(ArrayList<Wifi> sensed) {

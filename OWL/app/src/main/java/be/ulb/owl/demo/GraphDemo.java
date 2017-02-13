@@ -22,8 +22,8 @@ public class GraphDemo extends Graph {
     private static ArrayList<Node> _demoMotions = new ArrayList<Node>();
 
 
-    public GraphDemo() {
-        super();
+    public GraphDemo(MainActivity main) {
+        super(main);
         _offset = 0;
     }
 

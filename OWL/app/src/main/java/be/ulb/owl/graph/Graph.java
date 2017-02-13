@@ -17,7 +17,6 @@ import be.ulb.owl.graph.shortestpath.ShortestPathAStar;
 import be.ulb.owl.graph.shortestpath.ShortestPathEvaluator;
 import be.ulb.owl.scanner.Scanner;
 import be.ulb.owl.scanner.Wifi;
-import be.ulb.owl.task.LoadMapTask;
 import be.ulb.owl.utils.DialogUtils;
 import be.ulb.owl.utils.SQLUtils;
 
@@ -29,7 +28,9 @@ import be.ulb.owl.utils.SQLUtils;
  */
 public class Graph implements ScanWifiUpdateEvent {
 
-    private static final MainActivity main = MainActivity.getInstance();
+    private final MainActivity _main;
+
+    private boolean _displayNotFound = false;
 
     private static ArrayList<Campus> _allCampus;
     private static final String SOLBOSCH_PLAN = "Solbosch";
@@ -41,7 +42,9 @@ public class Graph implements ScanWifiUpdateEvent {
      * <br />
      * Init scanner
      */
-    public Graph () {
+    public Graph(MainActivity main) {
+        _main = main;
+
         _allCampus = new ArrayList<Campus>();
         loadAllPlan();
 
@@ -58,7 +61,7 @@ public class Graph implements ScanWifiUpdateEvent {
      */
     private void loadAllPlan() {
         _allCampus = SQLUtils.loadAllCampus();
-        new LoadMapTask().execute(_allCampus);
+//        new LoadMapTask().execute(_allCampus);
         // TODO get all plan ?
 //        _allPlan = SQLUtils.loadAllPlan();
     }
@@ -219,14 +222,14 @@ public class Graph implements ScanWifiUpdateEvent {
     public void localize(boolean displayNotFound, ArrayList<Wifi> sensedWifi) {
         Node current = whereAmI(sensedWifi);
 
-        boolean haveChange = main.setCurrentLocation(current);
+        boolean haveChange = _main.setCurrentLocation(current);
 
         if(current != null) {
-            main.setCurrentPlan(current.getParentPlan());
+            _main.setCurrentPlan(current.getParentPlan());
             if(haveChange) {
-                main.cleanCanvas();
+                _main.cleanCanvas();
 
-                ArrayList<Node> distinationNodes = main.getDestinations();
+                ArrayList<Node> distinationNodes = _main.getDestinations();
                 if(!distinationNodes.isEmpty()) {
                     try {
                         findPath();
@@ -237,22 +240,31 @@ public class Graph implements ScanWifiUpdateEvent {
                     }
 
                 } else {
-                    main.draw(current);
+                    _main.draw(current);
                 }
 
             }
 
         } else if (displayNotFound) {
-            DialogUtils.infoBox(main, R.string.not_found, R.string.not_in_ULB);
+            DialogUtils.infoBox(_main, R.string.not_found, R.string.not_in_ULB);
         }
     }
 
 
     @Override
     public void scanWifiUpdateEvent(ArrayList<Wifi> listWifi) {
-        localize(false, listWifi);
+        localize(_displayNotFound, listWifi);
+        _displayNotFound = false;
     }
 
+    /**
+     * Define if there is a message if the location is not found
+     *
+     * @param display True if we must display the message
+     */
+    public void setDisplayNotFound(boolean display) {
+        _displayNotFound = display;
+    }
 
 
     ///////////////////////////////////////////// PATH /////////////////////////////////////////////
@@ -263,12 +275,12 @@ public class Graph implements ScanWifiUpdateEvent {
      * @throws NoPathException
      */
     public void findPath() throws NoPathException {
-        Node src = main.getCurrentLocation();
+        Node src = _main.getCurrentLocation();
 
         if(src != null) {
             double minHeuristic = Double.POSITIVE_INFINITY;
             Node closestDestination = null;
-            ArrayList<Node> listDestination = main.getDestinations();
+            ArrayList<Node> listDestination = _main.getDestinations();
 
             for (Node node : listDestination) {
                 double currentHeuristic = ShortestPathAStar.heuristic(src, node);
@@ -279,7 +291,7 @@ public class Graph implements ScanWifiUpdateEvent {
             }
 
             // Draw source point on screen
-            main.draw(src);
+            _main.draw(src);
 
             ArrayList<Path> p = bestPath(src, closestDestination);
             if (p.size() >= 2) {
@@ -293,13 +305,14 @@ public class Graph implements ScanWifiUpdateEvent {
             }
 
             // Draw path on screen
-            main.drawPath(p);
+            _main.drawPath(p);
 
         } else {
-            Node dest = main.getDestinations().get(0);
-            main.setCurrentPlan(dest.getParentPlan());
+            Node dest = _main.getDestinations().get(0);
+            _main.setCurrentPlan(dest.getParentPlan());
             Log.d(getClass().getName(), "Set current and draw");
-            main.draw(dest);
+            _main.cleanCanvas();
+            _main.draw(dest);
         }
 
     }

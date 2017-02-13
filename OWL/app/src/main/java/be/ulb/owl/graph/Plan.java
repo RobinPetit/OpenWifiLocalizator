@@ -26,7 +26,7 @@ import be.ulb.owl.utils.SQLUtils;
  */
 public class Plan {
 
-    private final MainActivity main = MainActivity.getInstance();
+    private static final MainActivity main = MainActivity.getInstance();
 
 
     /**

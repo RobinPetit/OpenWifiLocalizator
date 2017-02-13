@@ -13,11 +13,20 @@ import br.com.mauker.materialsearchview.MaterialSearchView;
  */
 public class QueryTextListener implements MaterialSearchView.OnQueryTextListener {
 
+    private final MainActivity _main;
+
+    public QueryTextListener(MainActivity main) {
+        super();
+        _main = main;
+    }
+
+
     @Override
     public boolean onQueryTextSubmit(String query) {
         Log.i(getClass().getName(), "text sent: "+query);
         try {
-            MainActivity.getInstance().setDestination(query);
+            _main.setDestination(query);
+
         } catch (NoPathException e) {
             Log.e(getClass().getName(), "No path was found: " + e.toString());
         }

@@ -10,6 +10,7 @@ import be.ulb.owl.MainActivity;
 import be.ulb.owl.R;
 import be.ulb.owl.event.EventPriority;
 import be.ulb.owl.event.ScanWifiUpdateEvent;
+import be.ulb.owl.graph.Graph;
 import be.ulb.owl.scanner.Scanner;
 import be.ulb.owl.scanner.Wifi;
 import be.ulb.owl.utils.DialogUtils;
@@ -22,6 +23,7 @@ public class LocalizeButton implements ScanWifiUpdateEvent {
 
     private final MainActivity _main;
     private final Scanner _scanner;
+    private final Graph _graph;
 
     private ProgressBar _loadBar;
     private Button _localizeButton;
@@ -30,15 +32,17 @@ public class LocalizeButton implements ScanWifiUpdateEvent {
 
 
 
-    public LocalizeButton(MainActivity main, Scanner scanner) {
+    public LocalizeButton(MainActivity main, Scanner scanner, Graph graph) {
         _main = main;
         _scanner = scanner;
+        _graph = graph;
 
         Scanner.addEventUpdateWifi(this, EventPriority.FIRST);
 
         initButton();
         initLoadBar();
     }
+
 
     private void initButton() {
         _localizeButton = (Button)_main.findViewById(R.id.localizeButton);
@@ -49,6 +53,9 @@ public class LocalizeButton implements ScanWifiUpdateEvent {
 
                 if(!_refreshInProgress) {
                     _refreshInProgress = true;
+
+                    _graph.setDisplayNotFound(true);
+
                     toggleLoaderAndButton();
                     _scanner.forceRestartScanTask();
 
@@ -61,6 +68,7 @@ public class LocalizeButton implements ScanWifiUpdateEvent {
         });
 
     }
+
 
     private void initLoadBar() {
         _loadBar = (ProgressBar)_main.findViewById(R.id.progressBar);

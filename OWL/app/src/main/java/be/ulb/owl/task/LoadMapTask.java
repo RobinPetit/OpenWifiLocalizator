@@ -13,6 +13,9 @@ import be.ulb.owl.graph.Campus;
 
 public class LoadMapTask extends AsyncTask<ArrayList<Campus>, Void, Void> {
 
+
+
+
     @Override
     protected Void doInBackground(ArrayList<Campus>... allCampus) {
         for(ArrayList<Campus> listCampus : allCampus) {
@@ -31,6 +34,10 @@ public class LoadMapTask extends AsyncTask<ArrayList<Campus>, Void, Void> {
     protected void onPostExecute(Void v) {
         Log.d(getClass().getName(), "Post execute !");
     }
+
+
+    ////////////////////////////////////////// STATIC //////////////////////////////////////////
+
 
 
 }

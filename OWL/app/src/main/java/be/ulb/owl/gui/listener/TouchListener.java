@@ -12,10 +12,11 @@ import be.ulb.owl.gui.Zoom;
 
 public class TouchListener implements View.OnTouchListener {
 
-    private static final MainActivity main = MainActivity.getInstance();
+    private final MainActivity _main;
     private final Zoom _zoom;
 
-    public TouchListener() {
+    public TouchListener(MainActivity main) {
+        _main = main;
         _zoom = new Zoom();
     }
 
@@ -23,7 +24,7 @@ public class TouchListener implements View.OnTouchListener {
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         _zoom.start(view, motionEvent);
-        _zoom.start(main.getImageView(), motionEvent);
+        _zoom.start(_main.getImageView(), motionEvent);
 
         return true;
     }
