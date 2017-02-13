@@ -29,17 +29,6 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 
-        <ImageView
-            android:id="@+id/draw"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_gravity="center"
-            android:adjustViewBounds="false"
-            android:scaleType="matrix"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
         <ProgressBar
             style="?android:attr/progressBarStyle"
             android:layout_width="wrap_content"
@@ -48,6 +37,17 @@
             android:progressDrawable="@drawable/circular_progress_bar"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true" />
+
+        <ImageView
+            android:id="@+id/draw"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="center"
+            android:adjustViewBounds="false"
+            android:scaleType="matrix"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
     </RelativeLayout>
 
@@ -82,10 +82,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         style="@style/MaterialSearchViewStyle"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="27dp"
-        android:layout_marginStart="27dp" />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true" />
 
 </RelativeLayout>
