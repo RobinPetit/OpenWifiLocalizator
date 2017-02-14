@@ -8,6 +8,9 @@
 *.swp
 *.swo
 
+# general temporary files
+*.*~
+
 # Hidden directories
 plans/
 plan_de_travail/
