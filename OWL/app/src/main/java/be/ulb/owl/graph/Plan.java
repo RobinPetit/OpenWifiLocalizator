@@ -224,6 +224,13 @@ public class Plan {
 
 
     /**
+     * Get the campus of the plan
+     *
+     * @return the campus of the plan
+     */
+    public Campus getCampus() {return _parentPlan;}
+
+    /**
      * Get the x coordinate of the plan on his parent plan
      *
      * @return the x coordinate
@@ -433,4 +440,6 @@ public class Plan {
         double yOffset = a.getY() - b.getY();
         return Math.sqrt(xOffset*xOffset + yOffset*yOffset);
     }
+
+    public boolean isPlan() { return true;}
 }

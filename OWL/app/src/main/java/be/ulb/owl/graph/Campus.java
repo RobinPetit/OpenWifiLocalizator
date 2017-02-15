@@ -17,6 +17,7 @@ public class Campus extends Plan {
 
     private ArrayList<Plan> _allPlan = new ArrayList<Plan>();
     private final Integer _id;
+    private final String _directoryImage;
 
     /**
      * Constructor<br />
@@ -33,7 +34,15 @@ public class Campus extends Plan {
         super(name, id, null, directoryImage, -1, -1, bgCoordX, bgCoordY, 0, distance);
 
         _id = id;
+        _directoryImage = directoryImage;
     }
+
+    /**
+     * Get the path to the image
+     *
+     * @return the path to the image
+     */
+    public String getDirectoryImage() {return _directoryImage;}
 
     public void loadAllPlan() {
         _allPlan = SQLUtils.loadAllPlan(this, _id);
@@ -107,6 +116,8 @@ public class Campus extends Plan {
         return id == _id;
     }
 
+    @Override
+    public boolean isPlan() {return false;}
 
     @Override
     public double getAbsoluteX(float x) {
