@@ -70,7 +70,8 @@ public class Node {
         this._parentPlan = parentPlan;
 
         this._listAlias = SQLUtils.loadAlias(id);
-        this._listWifi = SQLUtils.loadWifi(id);
+//        this._listWifi = SQLUtils.loadWifi(id);
+        this._listWifi = new ArrayList<Wifi>();
         this._listPath = SQLUtils.loadPath(id, this, parentPlan);
 
     }
@@ -191,6 +192,11 @@ public class Node {
     public ArrayList<Wifi> getWifi() {
         return _listWifi;
     }
+
+    protected void loadWifi() {
+        _listWifi = SQLUtils.loadWifi(_id);
+    }
+
 
     /**
      * Get the list of all BSS accessible at this node

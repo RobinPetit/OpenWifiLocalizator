@@ -364,24 +364,51 @@ public class SQLUtils extends SQLiteOpenHelper {
      * @param listBSS list of all linked bss
      * @return an ArrayList with all plan
      */
-    public static ArrayList<Plan> getPlanWithWifi(ArrayList<String> listBSS) {
+//    public static ArrayList<Plan> getPlanWithWifi(ArrayList<String> listBSS) {
+//
+//        String param = TextUtils.join("', '", listBSS);
+//
+//        String req = "SELECT DISTINCT " + PlanTable.getName() + ".*" +
+//                        "FROM " + PlanTable.getName() + " " +
+//                            "JOIN " + NodeTable.getName() + " " +
+//                                "ON " + NodeTable.PLAN_ID.getFullCol() + " " +
+//                                    "= " + PlanTable.ID.getFullCol() + " " +
+//                            "JOIN " + WifiTable.getName() + " "+
+//                                "ON " + WifiTable.NODE_ID.getFullCol() + " " +
+//                                    "= " + NodeTable.ID.getFullCol() + " "+
+//                        "WHERE " + WifiTable.BSS.getFullCol() + " IN (?)";
+//
+//        Cursor cursor = getDatabase().rawQuery(req, new String[]{"'"+param+"'"});
+//
+//        return loadAllPlan(cursor);
+//    }
+
+
+    /**
+     * Get all plan which contains a specific BSS
+     *
+     * @param listBSS list of all linked bss
+     * @return an ArrayList with all plan ID
+     */
+    public static ArrayList<Integer> getPlanWithWifi(ArrayList<String> listBSS) {
 
         String param = TextUtils.join("', '", listBSS);
 
-        String req = "SELECT DISTINCT " + PlanTable.getName() + ".*" +
-                        "FROM " + PlanTable.getName() + " " +
-                            "JOIN " + NodeTable.getName() + " " +
-                                "ON " + NodeTable.PLAN_ID.getFullCol() + " " +
-                                    "= " + PlanTable.ID.getFullCol() + " " +
-                            "JOIN " + WifiTable.getName() + " "+
-                                "ON " + WifiTable.NODE_ID.getFullCol() + " " +
-                                    "= " + NodeTable.ID.getFullCol() + " "+
-                        "WHERE " + WifiTable.BSS.getFullCol() + " IN (?)";
+        String req = "SELECT DISTINCT " + NodeTable.PLAN_ID.getFullCol() + " " +
+                "FROM " + NodeTable.getName() + " " +
+                    "JOIN " + WifiTable.getName() + " "+
+                        "ON " + WifiTable.NODE_ID.getFullCol() + " " +
+                            "= " + NodeTable.ID.getFullCol() + " "+
+                "WHERE " + WifiTable.BSS.getFullCol() + " IN (?)";
 
         Cursor cursor = getDatabase().rawQuery(req, new String[]{"'"+param+"'"});
 
+
+        // TODO read data
         return loadAllPlan(cursor);
     }
+
+
 
     /**
      * Load all specific plan

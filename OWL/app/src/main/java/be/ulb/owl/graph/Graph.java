@@ -61,6 +61,11 @@ public class Graph implements ScanWifiUpdateEvent {
      */
     private void loadAllPlan() {
         _allCampus = SQLUtils.loadAllCampus();
+
+        for(Campus campus : _allCampus) {
+            campus.loadAllPlan();
+        }
+
 //        new LoadMapTask().execute(_allCampus);
         // TODO get all plan ?
 //        _allPlan = SQLUtils.loadAllPlan();
@@ -74,7 +79,7 @@ public class Graph implements ScanWifiUpdateEvent {
      * @param set2 arrayList of Wifi
      * @return an ArrayList which contains the common Wifi objects between the two arrayList given in param
      */
-    private ArrayList<Wifi> common (ArrayList<Wifi> set1, ArrayList<Wifi> set2) {
+    private ArrayList<Wifi> common(ArrayList<Wifi> set1, ArrayList<Wifi> set2) {
         ArrayList<Wifi> res = new ArrayList<Wifi>();
         for (Wifi elem1:set1) {
             for (Wifi elem2:set2) {
@@ -85,6 +90,19 @@ public class Graph implements ScanWifiUpdateEvent {
         }
         return res;
     }
+
+    // TODO DEBUG
+    public void loadAllWifi() {
+        for(Campus campus : _allCampus) {
+            campus.loadWifi();
+
+            for(Plan plan : campus.getAllPlans()) {
+                plan.loadWifi();
+            }
+
+        }
+    }
+
 
     ////////////////////////////////////// GETTER AND SETTER //////////////////////////////////////
 

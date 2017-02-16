@@ -81,7 +81,7 @@ public class Scanner {
      * @return HashMap with bss and avg of signal OR null if same that the last request
      */
     protected HashMap<String, Integer> getData() {
-        HashMap<String, Integer> res = new HashMap<String, Integer>();
+        _wifiManager.startScan(); // TODO Test débug
         List<ScanResult> results = _wifiManager.getScanResults();
 
         if(updateLastResult(results)) {
@@ -89,6 +89,7 @@ public class Scanner {
             return null;
         }
 
+        HashMap<String, Integer> res = new HashMap<String, Integer>();
         for (ScanResult scanRes :results) {
             String key = scanRes.BSSID;
             Integer value = scanRes.level;

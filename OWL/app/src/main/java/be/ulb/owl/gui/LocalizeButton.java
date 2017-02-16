@@ -55,6 +55,7 @@ public class LocalizeButton implements ScanWifiUpdateEvent {
                     _refreshInProgress = true;
 
                     _graph.setDisplayNotFound(true);
+                    _graph.loadAllWifi();
 
                     toggleLoaderAndButton();
                     _scanner.forceRestartScanTask();

@@ -32,8 +32,6 @@ public class ScanTask extends AsyncTask<Void, Void, HashMap<String, ArrayList<In
 
     @Override
     protected HashMap<String, ArrayList<Integer>> doInBackground(Void... nothing) {
-        HashMap<String, ArrayList<Integer>> accessPoints = new HashMap<String, ArrayList<Integer>>();
-
         if(_timeBeforeTest > 0) {
             try {
                 Thread.sleep(_timeBeforeTest*1000);
@@ -43,6 +41,7 @@ public class ScanTask extends AsyncTask<Void, Void, HashMap<String, ArrayList<In
             }
         }
 
+        HashMap<String, ArrayList<Integer>> accessPoints = new HashMap<String, ArrayList<Integer>>();
         for (int i = 0; i < 3; i++) {
             accessPoints = mergeAccePoint(accessPoints, _scanner.getData());
 

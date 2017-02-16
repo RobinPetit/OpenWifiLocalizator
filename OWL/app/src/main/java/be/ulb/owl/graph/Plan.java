@@ -392,6 +392,13 @@ public class Plan {
     }
 
 
+    public void loadWifi() {
+        for(Node node : _listNode) {
+            node.loadWifi();
+        }
+    }
+
+
     /**
      * Get the image of this map
      *
