@@ -400,6 +400,8 @@ public class MainActivity extends AppCompatActivity  {
      */
     public void setDestination(String dest) throws NoPathException {
         _destinationNodes = _graph.searchNode(dest);
+        Log.i(getClass().getName(), "Set destination: " + dest +
+                " (nbr node: " + _destinationNodes.size() + ")");
         if(!_destinationNodes.isEmpty()) {
             _graph.findPath();
         }
@@ -451,7 +453,8 @@ public class MainActivity extends AppCompatActivity  {
             cleanCanvas();
             _imageView.setImageDrawable(_currentPlan.getDrawableImage());
             _imageView.setScaleType(ImageView.ScaleType.MATRIX);
-            this.setSwitchPlanButton();
+            // TODO Bug ici ( @Denis )
+//            this.setSwitchPlanButton();
 
         } else if(newCurrentPlan == null) {
             Log.w(this.getClass().getName(), "New plan is null");
