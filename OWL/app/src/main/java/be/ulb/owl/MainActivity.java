@@ -76,8 +76,6 @@ public class MainActivity extends AppCompatActivity  {
     private ArrayList<Node> _destinationNodes =  new ArrayList<Node>();
     private DrawView _drawer;
 
-
-
     //////////////////////////////////////////// EVENTS ////////////////////////////////////////////
     // Event called by Android
 
@@ -105,37 +103,40 @@ public class MainActivity extends AppCompatActivity  {
         _imageDraw = (ImageView)findViewById(R.id.draw);
         _imageDraw.setOnTouchListener(new TouchListener(this));
 
+        try {
+            // Load sql
+            new SQLUtils(this);
+            Log.i(getClass().getName(), "[V] SQL Loaded !");
 
-        // Load sql
-        new SQLUtils(this);
-        Log.i(getClass().getName(), "[V] SQL Loaded !");
+            // Load graph
+            if(isDemo()) {
+                _graph = new GraphDemo(this);
 
-        // Load graph
-        if(isDemo()) {
-            _graph = new GraphDemo(this);
+            } else if(isTest()) {
+                _graph = new GraphTest(this);
 
-        } else if(isTest()) {
-            _graph = new GraphTest(this);
+            } else {
+                _graph = new Graph(this);
 
-        } else {
-            _graph = new Graph(this);
+            }
+            Log.i(getClass().getName(), "[V] Graph loaded !");
 
+            // Set default campus
+            setCurrentPlan(_graph.getDefaultCampus());
+
+            // Begin wifi scan
+            _scanner = new Scanner(this);
+            Log.i(getClass().getName(), "[V] Scanner loaded !");
+
+            // Init buttons listener
+            initSwitchPlanButton();
+            initChoseLocalButton();
+            new LocalizeButton(this, _scanner, _graph);
+            Log.i(getClass().getName(), "[V] Button loaded !");
+        } catch(IllegalArgumentException e) {
+            Log.e(getClass().getName(), "SQLUtils has already been created once... " +
+                    "So if shit gets wrong it's probably somewhere here <3");
         }
-        Log.i(getClass().getName(), "[V] Graph loaded !");
-
-        // Set default campus
-        setCurrentPlan(_graph.getDefaultCampus());
-
-        // Begin wifi scan
-        _scanner = new Scanner(this);
-        Log.i(getClass().getName(), "[V] Scanner loaded !");
-
-
-        // Init buttons listener
-        initSwitchPlanButton();
-        initChoseLocalButton();
-        new LocalizeButton(this, _scanner, _graph);
-        Log.i(getClass().getName(), "[V] Button loaded !");
     }
 
 
@@ -255,7 +256,6 @@ public class MainActivity extends AppCompatActivity  {
 
         return super.onOptionsItemSelected(item);
     }
-
 
 
     ///////////////////////////////////// INIT ANDROID VIEW /////////////////////////////////////
