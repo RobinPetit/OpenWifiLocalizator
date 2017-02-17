@@ -398,6 +398,10 @@ public class Plan {
         }
     }
 
+    protected void loadAllPath() {
+        // TODO ICI
+    }
+
 
     /**
      * Get the image of this map

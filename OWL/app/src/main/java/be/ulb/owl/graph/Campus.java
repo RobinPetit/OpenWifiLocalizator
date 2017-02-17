@@ -37,6 +37,7 @@ public class Campus extends Plan {
         _directoryImage = directoryImage;
     }
 
+
     /**
      * Get the path to the image
      *
@@ -44,9 +45,17 @@ public class Campus extends Plan {
      */
     public String getDirectoryImage() {return _directoryImage;}
 
+
+    /**
+     * Load all plan and then all Path
+     */
     public void loadAllPlan() {
         _allPlan = SQLUtils.loadAllPlan(this, _id);
+        for(Plan plan : _allPlan) {
+            plan.loadAllPath();
+        }
     }
+
 
     /**
     * Return all node of the Campus

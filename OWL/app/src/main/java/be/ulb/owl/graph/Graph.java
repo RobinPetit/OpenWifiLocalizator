@@ -33,7 +33,7 @@ public class Graph implements ScanWifiUpdateEvent {
     private boolean _displayNotFound = false;
 
     private static ArrayList<Campus> _allCampus;
-    private static final String SOLBOSCH_PLAN = "Solbosch";
+    private static final int SOLBOSCH_ID = 1;
 
 
     /**
@@ -159,9 +159,7 @@ public class Graph implements ScanWifiUpdateEvent {
      * @return the default Campus
      */
     public Campus getDefaultCampus() {
-        // TODO change constant with magic number ? :P
-        // return getAllCampus().get(0);
-        return getCampus(SOLBOSCH_PLAN);
+        return getAllCampus().get(SOLBOSCH_ID);
     }
 
 
