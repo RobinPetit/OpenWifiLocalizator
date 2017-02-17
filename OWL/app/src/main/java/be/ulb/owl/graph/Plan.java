@@ -153,8 +153,13 @@ public class Plan {
         try {
             imagePath = "IMGMap" + File.separator;
             if(!_directoryImage.equalsIgnoreCase("") && !_directoryImage.equalsIgnoreCase("./")) {
-                imagePath += _directoryImage + File.separator;
+                imagePath += _directoryImage;
             }
+            
+            if(!(File.separator.equalsIgnoreCase(imagePath.substring(imagePath.length()-1)))) {
+                imagePath += File.separator;
+            }
+
             imagePath += _name + ".png";
             _image = main.getAssets().open(imagePath);
         } catch (IOException e) {
@@ -399,7 +404,9 @@ public class Plan {
     }
 
     protected void loadAllPath() {
-        // TODO ICI
+        for(Node node : _listNode) {
+            node.loadPath();
+        }
     }
 
 
