@@ -346,6 +346,7 @@ public class SQLUtils extends SQLiteOpenHelper {
                 new String[] {
                         PlanTable.NAME.getCol(),
                         PlanTable.ID.getCol(),
+                        PlanTable.CAMPUS_ID.getCol(),
                         PlanTable.IMAGE_DIRECTORY.getCol(),
                         PlanTable.X_ON_PARENT.getCol(),
                         PlanTable.Y_ON_PARENT.getCol(),
@@ -390,7 +391,7 @@ public class SQLUtils extends SQLiteOpenHelper {
      * @param listBSS list of all linked bss
      * @return an ArrayList with all plan ID
      */
-    public static ArrayList<Integer> getPlanWithWifi(ArrayList<String> listBSS) {
+    public static ArrayList<Plan> getPlanWithWifi(ArrayList<String> listBSS) {
 
         String param = TextUtils.join("', '", listBSS);
 
@@ -737,8 +738,7 @@ public class SQLUtils extends SQLiteOpenHelper {
                     EdgeTable.NODE_1_ID.getCol(),
                     EdgeTable.NODE_2_ID.getCol()
                 },
-                EdgeTable.NODE_1_ID.getCol() + " = ?" +
-                " OR " + EdgeTable.NODE_2_ID.getCol() + " = ?", new String[]{""+nodeID,""+nodeID}, null, null, null);
+                EdgeTable.NODE_1_ID.getCol() + " = ?", new String[]{""+nodeID}, null, null, null);
 
 
         if(cursor.getCount() > 0) {
@@ -754,18 +754,15 @@ public class SQLUtils extends SQLiteOpenHelper {
                 idOne = getInt(cursor, EdgeTable.NODE_1_ID.getCol());
                 idTwo = getInt(cursor, EdgeTable.NODE_2_ID.getCol());
 
-                // All the time nodeOne will be the node in param
-                // so if idTwo equals searched node, we switch the two ;)
-                if(idTwo == nodeID) {
-                    idTwo = idOne;
-
-                } else if(idOne != nodeID) { // We check that node one has the good id
+                if(idOne != nodeID) { // We check that node one has the good id
                     // If not, create an error !
                     Log.e(SQLUtils.class.getName(), "The SQL response is not valide (Search edge with " +
                             "node: " + nodeID + " and return: " + idOne + " & " + idTwo + ")");
                     cursor.moveToNext();
                     continue; // next !
                 }
+
+//                Log.i(SQLUtils.class.getName(), "Edge: idTwo: " + idTwo + " -> " + nodeID);
 
                 nodeOne = node;
 
@@ -777,6 +774,8 @@ public class SQLUtils extends SQLiteOpenHelper {
 
                 if(nodeTwo != null) { // If found :)
                     res.add(new Path(nodeOne, nodeTwo));
+                } else {
+                    Log.w(SQLUtils.class.getName(), "Paht not created " + nodeID + " & " + idTwo);
                 }
 
                 cursor.moveToNext();

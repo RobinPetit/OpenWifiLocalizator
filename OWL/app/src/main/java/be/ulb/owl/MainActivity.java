@@ -67,7 +67,6 @@ public class MainActivity extends AppCompatActivity  {
     private ImageView _imageDraw;
     private Canvas _canvas = null;
     private MaterialSearchView _searchView = null;  // the widget with the searchbar and autocompletion
-    private Drawable _drawCampus;
 
     // private attributes
     private Graph _graph = null;
@@ -92,13 +91,16 @@ public class MainActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         instance = this;
 
+        // Init log
         LogUtils.initLogSystem(this);
         Log.i(getClass().getName(), "Log loaded !");
 
+        // Define view
         setContentView(R.layout.activity_main);
-
+        // Define action bar
         setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
 
+        // Define image view and draw
         _imageView = (ImageView)findViewById(R.id.plan);
         _imageDraw = (ImageView)findViewById(R.id.draw);
         _imageDraw.setOnTouchListener(new TouchListener(this));
@@ -121,10 +123,13 @@ public class MainActivity extends AppCompatActivity  {
         }
         Log.i(getClass().getName(), "[V] Graph loaded !");
 
+        // Set default campus
         setCurrentPlan(_graph.getDefaultCampus());
 
+        // Begin wifi scan
         _scanner = new Scanner(this);
         Log.i(getClass().getName(), "[V] Scanner loaded !");
+
 
         // Init buttons listener
         initSwitchPlanButton();
@@ -270,7 +275,7 @@ public class MainActivity extends AppCompatActivity  {
         if(_currentPlan.isPlan()) {
             changePlan.setVisibility(VISIBLE);
             Campus currentCampus = _currentPlan.getCampus();
-            _drawCampus = currentCampus.getDrawableImage();
+            Drawable _drawCampus = currentCampus.getDrawableImage();
             _drawCampus.setBounds(0, 0, 50, 50);
             changePlan.setImageDrawable(_drawCampus);
         }

@@ -5,6 +5,8 @@
  */
 package be.ulb.owl.graph;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 import be.ulb.owl.scanner.Wifi;
@@ -70,9 +72,9 @@ public class Node {
         this._parentPlan = parentPlan;
 
         this._listAlias = SQLUtils.loadAlias(id);
-//        this._listWifi = SQLUtils.loadWifi(id);
         this._listWifi = new ArrayList<Wifi>();
-        this._listPath = SQLUtils.loadPath(id, this, parentPlan);
+        this._listPath = new ArrayList<Path>();
+        Log.i(getClass().getName(), "Liste des path: " + _listPath.toString());
 
     }
 
@@ -195,6 +197,10 @@ public class Node {
 
     protected void loadWifi() {
         _listWifi = SQLUtils.loadWifi(_id);
+    }
+
+    protected void loadPath() {
+        _listPath = SQLUtils.loadPath(getID(), this, getParentPlan());
     }
 
 
