@@ -133,6 +133,7 @@ public class MainActivity extends AppCompatActivity  {
             initChoseLocalButton();
             new LocalizeButton(this, _scanner, _graph);
             Log.i(getClass().getName(), "[V] Button loaded !");
+
         } catch(IllegalArgumentException e) {
             Log.e(getClass().getName(), "SQLUtils has already been created once... " +
                     "So if shit gets wrong it's probably somewhere here <3");

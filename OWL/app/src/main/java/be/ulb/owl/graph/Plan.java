@@ -131,7 +131,9 @@ public class Plan {
                 if (wifisStr.contains(wifi.getBSS())) { // has a Wifi with the same BSS
                     Integer offset = wifisStr.indexOf(wifi.getBSS());
                     // z += Math.pow((wifis.get(offset)).getAvg()-wifi.getAvg(), 2)/(wifis.get(offset)).getVariance();
-                    z *= (1/(Math.sqrt(2*Math.PI*(wifis.get(offset)).getVariance())))*Math.pow(Math.E, Math.pow((wifis.get(offset)).getAvg()-wifi.getAvg(), 2)/2*(wifis.get(offset)).getVariance());
+                    z *= (1/(Math.sqrt(2*Math.PI*(wifis.get(offset)).getVariance())))*Math.pow(Math.E,
+                            Math.pow((wifis.get(offset)).getAvg()-wifi.getAvg(), 2)/2*(wifis.get(offset))
+                                    .getVariance());
                 }
             }
             // scores.set(i, z);

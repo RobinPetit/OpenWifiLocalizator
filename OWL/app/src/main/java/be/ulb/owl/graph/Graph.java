@@ -31,6 +31,7 @@ public class Graph implements ScanWifiUpdateEvent {
     private final MainActivity _main;
 
     private boolean _displayNotFound = false;
+    private boolean _allWifiLoaded = false;
 
     private static ArrayList<Campus> _allCampus;
     private static final int SOLBOSCH_ID = 1;
@@ -65,6 +66,11 @@ public class Graph implements ScanWifiUpdateEvent {
         for(Campus campus : _allCampus) {
             campus.loadAllPlan();
         }
+
+        // TODO DEBUG load wifi
+//        for(Campus campus : _allCampus) {
+//            campus.loadWifi();
+//        }
 
 //        new LoadMapTask().execute(_allCampus);
         // TODO get all plan ?
@@ -184,6 +190,13 @@ public class Graph implements ScanWifiUpdateEvent {
     }
 
 
+    /**
+     * Indicate that all wifi are loaded
+     */
+    public void setAllWifiLoaded() {
+        _allWifiLoaded = true;
+    }
+
 
     /////////////////////////////////////////// LOCALIZE ///////////////////////////////////////////
 
@@ -202,7 +215,14 @@ public class Graph implements ScanWifiUpdateEvent {
         ArrayList<Plan> res = new ArrayList<Plan>();
         int biggestSetSize = 0;
 
-        for (Plan plan : getAllPlan()) {
+        ArrayList<Plan> searchPlan;
+        if(!_allWifiLoaded) {
+            searchPlan = getWifiPlan(sensedStr);
+        } else {
+            searchPlan = getAllPlan();
+        }
+
+        for (Plan plan : searchPlan) {
             HashSet<String> tmp = plan.getListWifiBSS();
             tmp.retainAll(sensedStr); // set-theoretical and operation
 
@@ -228,6 +248,17 @@ public class Graph implements ScanWifiUpdateEvent {
         }
         return node;
     }
+
+    /**
+     * Get all plan that contains a specific wifi if all plan aren't loaded
+     *
+     * @param sensedWifi detected wifi
+     * @return an ArrayList with all plan
+     */
+    private ArrayList<Plan> getWifiPlan(ArrayList<String> sensedWifi) {
+        return SQLUtils.getPlanWithWifi(sensedWifi);
+    }
+
 
 
     /**

@@ -386,7 +386,7 @@ public class SQLUtils extends SQLiteOpenHelper {
 
 
     /**
-     * Get all plan which contains a specific BSS
+     * Get all plan which contains a specific BSS and load all wifi of specific nodes
      *
      * @param listBSS list of all linked bss
      * @return an ArrayList with all plan ID
@@ -395,7 +395,7 @@ public class SQLUtils extends SQLiteOpenHelper {
 
         String param = TextUtils.join("', '", listBSS);
 
-        String req = "SELECT DISTINCT " + NodeTable.PLAN_ID.getFullCol() + " " +
+        String req = "SELECT DISTINCT " + NodeTable.getName() + ".* " +
                 "FROM " + NodeTable.getName() + " " +
                     "JOIN " + WifiTable.getName() + " "+
                         "ON " + WifiTable.NODE_ID.getFullCol() + " " +
@@ -705,6 +705,43 @@ public class SQLUtils extends SQLiteOpenHelper {
 
         return res;
     }
+
+    public static void loadSpecificWifi(ArrayList<String> listBSS) {
+        String param = TextUtils.join("', '", listBSS);
+
+        String reqStr = "SELECT " + WifiTable.getName() + ".*, " + NodeTable.ID.getFullCol() + " planID " +
+                "FROM " + WifiTable.getName() + " " +
+                    "JOIN " + NodeTable.getName() + " " +
+                        "ON " + NodeTable.ID.getFullCol() + " = " + WifiTable.NODE_ID.getFullCol() + " " +
+                "WHERE " + WifiTable.BSS.getCol() + " IN (?)";
+
+        Cursor cursor = getDatabase().rawQuery(reqStr, new String[]{"'"+param+"'"});
+
+        if(cursor.getCount() > 0) {
+            cursor.moveToFirst();
+
+            String bss;
+            float avg;
+            float variance;
+            int planId;
+
+            while (!cursor.isAfterLast()) {
+                bss = getString(cursor, WifiTable.BSS.getCol());
+                avg = getFloat(cursor, WifiTable.AVG.getCol());
+                variance = getFloat(cursor, WifiTable.VARIANCE.getCol());
+                planId = getInt(cursor, "planID");
+
+                res.add(new Wifi(bss, avg, variance));
+
+                cursor.moveToNext();
+            }
+
+        }
+        cursor.close();
+
+    }
+
+
 
 
     /////////////// PATH ///////////////
