@@ -256,7 +256,7 @@ public class Graph implements ScanWifiUpdateEvent {
      * @return an ArrayList with all plan
      */
     private ArrayList<Plan> getWifiPlan(ArrayList<String> sensedWifi) {
-        return SQLUtils.getPlanWithWifi(sensedWifi);
+        return new ArrayList<Plan>(SQLUtils.loadSpecificWifi(sensedWifi));
     }
 
 
