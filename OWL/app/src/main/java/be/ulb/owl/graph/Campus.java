@@ -51,6 +51,7 @@ public class Campus extends Plan {
      */
     public void loadAllPlan() {
         _allPlan = SQLUtils.loadAllPlan(this, _id);
+
         for(Plan plan : _allPlan) {
             plan.loadAllPath();
         }
