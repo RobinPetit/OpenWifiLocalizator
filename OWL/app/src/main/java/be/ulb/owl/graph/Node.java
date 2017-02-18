@@ -5,8 +5,6 @@
  */
 package be.ulb.owl.graph;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 
 import be.ulb.owl.scanner.Wifi;
@@ -27,43 +25,6 @@ public class Node {
     private ArrayList<String> _listAlias;
     private ArrayList<Wifi> _listWifi;
     
-    
-//    /**
-//     * Init a node
-//     *
-//     * @param parentPlan plan containing the ndoe
-//     * @param x x position of the node
-//     * @param y y position of the node
-//     * @param name of the node
-//     * @param listWifi list of all wifi signals received at this point
-//     */
-//    public Node(Plan parentPlan, float x, float y, String name,
-//            ArrayList<Wifi> listWifi) {
-//        this(parentPlan, x, y, name, listWifi, new ArrayList<String>());
-//    }
-
-//    /**
-//     * Init a node
-//     *
-//     * @param parentPlan plan containing
-//     * @param x x position of the node
-//     * @param y y position of the node
-//     * @param name of the node
-//     * @param listWifi list of all wifi signals received on this point
-//     * @param listAlias list of all aliases of the node
-//     */
-//    public Node(Plan parentPlan, float x, float y, String name,
-//                ArrayList<Wifi> listWifi, ArrayList<String> listAlias) {
-//        this._listPath = new ArrayList<Path>();
-//        this._listWifi = listWifi;
-//        this._listAlias = listAlias;
-//
-//        this._x = x-parentPlan.getBgCoordX();
-//        this._y = y-parentPlan.getBgCoordY();
-//        this._name = name;
-//        this._parentPlan = parentPlan;
-//    }
-
 
     public Node(Plan parentPlan, float x, float y, int id) {
         this._x = x-parentPlan.getBgCoordX();
@@ -74,7 +35,6 @@ public class Node {
         this._listAlias = SQLUtils.loadAlias(id);
         this._listWifi = new ArrayList<Wifi>();
         this._listPath = new ArrayList<Path>();
-        Log.i(getClass().getName(), "Liste des path: " + _listPath.toString());
 
     }
 
