@@ -50,7 +50,6 @@
             android:layout_alignParentStart="true" />
 
         <ImageButton
-            android:text="@string/maps_btn_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -69,10 +68,10 @@
         android:layout_alignParentStart="true"
         android:id="@+id/local" />
 
-    <Button
-        android:text="@string/localize_btn_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageButton
+        android:background="@drawable/boussole"
+        android:layout_width="120px"
+        android:layout_height="120px"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:id="@+id/localizeButton" />

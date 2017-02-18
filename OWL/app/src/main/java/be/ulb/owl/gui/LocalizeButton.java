@@ -2,6 +2,7 @@ package be.ulb.owl.gui;
 
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class LocalizeButton implements ScanWifiUpdateEvent {
     private final Graph _graph;
 
     private ProgressBar _loadBar;
-    private Button _localizeButton;
+    private ImageButton _localizeButton;
 
     private boolean _refreshInProgress = false;
 
@@ -45,7 +46,7 @@ public class LocalizeButton implements ScanWifiUpdateEvent {
 
 
     private void initButton() {
-        _localizeButton = (Button)_main.findViewById(R.id.localizeButton);
+        _localizeButton = (ImageButton)_main.findViewById(R.id.localizeButton);
 
         _localizeButton.setOnClickListener(new View.OnClickListener() {
             @Override
