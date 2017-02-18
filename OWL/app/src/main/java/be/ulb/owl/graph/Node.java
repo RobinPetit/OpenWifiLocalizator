@@ -205,6 +205,16 @@ public class Node {
 
 
     /**
+     * Add a wifi on the capted wifi list
+     *
+     * @param wifi which is capted on this node
+     */
+    public void addWifi(Wifi wifi) {
+        _listWifi.add(wifi);
+    }
+
+
+    /**
      * Get the list of all BSS accessible at this node
      *
      * @return ArrayList with all BSS (String)

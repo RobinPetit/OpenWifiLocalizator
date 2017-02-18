@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import be.ulb.owl.graph.Campus;
 import be.ulb.owl.graph.Graph;
@@ -706,16 +708,28 @@ public class SQLUtils extends SQLiteOpenHelper {
         return res;
     }
 
-    public static void loadSpecificWifi(ArrayList<String> listBSS) {
+
+    /**
+     * Load specific wifi (based on bss list) and return all concerned plan
+     *
+     * @param listBSS the bss capt by network card
+     * @return HashSet with the concerned plan
+     */
+    public static HashSet<Plan> loadSpecificWifi(ArrayList<String> listBSS) {
+        HashSet<Plan> res = new HashSet<Plan>();
+
         String param = TextUtils.join("', '", listBSS);
 
-        String reqStr = "SELECT " + WifiTable.getName() + ".*, " + NodeTable.ID.getFullCol() + " planID " +
-                "FROM " + WifiTable.getName() + " " +
-                    "JOIN " + NodeTable.getName() + " " +
-                        "ON " + NodeTable.ID.getFullCol() + " = " + WifiTable.NODE_ID.getFullCol() + " " +
-                "WHERE " + WifiTable.BSS.getCol() + " IN (?)";
+        String reqStr = "SELECT DISTINCT " + WifiTable.getName() + ".* " + // TODO
+                "FROM " + WifiTable.getName() + " wifi "+
+                    "JOIN " + WifiTable.getName() + " joinWifi " +
+                        "ON joinWifi." + WifiTable.NODE_ID.getCol() + " = " +
+                                "wifi." + WifiTable.NODE_ID.getCol() + " " +
+                "WHERE joinWifi." + WifiTable.BSS.getCol() + " IN (?)";
 
         Cursor cursor = getDatabase().rawQuery(reqStr, new String[]{"'"+param+"'"});
+
+        HashMap<Integer, Node> cacheNode = new HashMap<Integer, Node>();
 
         if(cursor.getCount() > 0) {
             cursor.moveToFirst();
@@ -723,15 +737,23 @@ public class SQLUtils extends SQLiteOpenHelper {
             String bss;
             float avg;
             float variance;
-            int planId;
+            int nodeId;
 
             while (!cursor.isAfterLast()) {
                 bss = getString(cursor, WifiTable.BSS.getCol());
                 avg = getFloat(cursor, WifiTable.AVG.getCol());
                 variance = getFloat(cursor, WifiTable.VARIANCE.getCol());
-                planId = getInt(cursor, "planID");
+                nodeId = getInt(cursor, WifiTable.NODE_ID.getCol());
 
-                res.add(new Wifi(bss, avg, variance));
+                Node node;
+                if(cacheNode.containsKey(nodeId)) {
+                    node = cacheNode.get(nodeId);
+                } else {
+                    node = Graph.getNode(nodeId);
+                    cacheNode.put(nodeId, node);
+                }
+                node.addWifi(new Wifi(bss, avg, variance));
+                res.add(node.getParentPlan());
 
                 cursor.moveToNext();
             }
@@ -739,6 +761,9 @@ public class SQLUtils extends SQLiteOpenHelper {
         }
         cursor.close();
 
+        Log.d(SQLUtils.class.getName(), "Load wifi: " + res.size());
+
+        return res;
     }
 
 
