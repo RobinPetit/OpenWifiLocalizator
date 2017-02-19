@@ -5,6 +5,8 @@
  */
 package be.ulb.owl.graph;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 import be.ulb.owl.scanner.Wifi;
@@ -35,7 +37,6 @@ public class Node {
         this._listAlias = SQLUtils.loadAlias(id);
         this._listWifi = new ArrayList<Wifi>();
         this._listPath = new ArrayList<Path>();
-
     }
 
 
@@ -213,5 +214,10 @@ public class Node {
                 return path;
         }
         throw new NoPathException("No path between " + getID() + " and " + dest.getID());
+    }
+
+    @Override
+    public String toString() {
+        return getID().toString();
     }
 }
