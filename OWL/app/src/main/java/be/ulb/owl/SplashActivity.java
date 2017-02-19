@@ -15,7 +15,13 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Intent intent = new Intent(this, MainActivity.class);
+        // TODO NOT WORKING !
+//        intent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
         startActivity(intent);
         finish();
     }
+
+    @Override
+    public void onBackPressed() {}
+
 }

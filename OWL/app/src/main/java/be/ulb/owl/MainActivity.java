@@ -219,6 +219,13 @@ public class MainActivity extends AppCompatActivity  {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(getClass().getName(), "[DEBUG] onDestroy");
+
+    }
+
 
     /**
      * Call when all other event are loaded.  This is call to create menu when the main screen is
