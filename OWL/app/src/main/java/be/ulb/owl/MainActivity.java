@@ -54,7 +54,7 @@ import static android.view.View.VISIBLE;
 public class MainActivity extends AppCompatActivity  {
 
     // static attributes
-    private static MainActivity instance;
+    private static MainActivity instance = null;
 
     private static final boolean DEBUG = true;          // view info message in log (maybe more after)
     private static final boolean TEST = DEBUG && true; // active to call test (active also DEBUG)
@@ -86,7 +86,13 @@ public class MainActivity extends AppCompatActivity  {
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(getClass().getName(), "[DEBUG] OnCreate");
         super.onCreate(savedInstanceState);
+
+        if(instance != null) {
+            return;
+        }
+
         instance = this;
 
         // Init log
@@ -138,12 +144,14 @@ public class MainActivity extends AppCompatActivity  {
             Log.e(getClass().getName(), "SQLUtils has already been created once... " +
                     "So if shit gets wrong it's probably somewhere here <3");
         }
-
+        this.setUpCanvas();
+        _drawer = new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor());
     }
 
 
     @Override
     protected void onStart() {
+        Log.d(getClass().getName(), "[DEBUG] OnStart");
         super.onStart();
 
         // Set default plan
@@ -162,15 +170,28 @@ public class MainActivity extends AppCompatActivity  {
 
         }
 
-        this.setUpCanvas();
-        _drawer = new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor());
-
         // Start scan
         _graph.setDisplayNotFound(true);
-        _scanner.startScanTask(false);
-
     }
 
+
+    @Override
+    public void onResume() {
+        Log.d(getClass().getName(), "[DEBUG] onResume");
+        super.onResume();
+
+        Log.i(getClass().getName(), "Begin scanner task");
+        _scanner.startScanTask(false);
+    }
+
+    @Override
+    public void onPause() {
+        Log.d(getClass().getName(), "[DEBUG] onPause");
+        super.onPause();
+
+        Log.i(getClass().getName(), "Stop scanner task");
+        _scanner.stopScanTask();
+    }
 
     /**
      * When we hide the application
@@ -178,10 +199,10 @@ public class MainActivity extends AppCompatActivity  {
      */
     @Override
     protected void onStop() {
+        Log.d(getClass().getName(), "[DEBUG] OnStop");
         super.onStop();
 
-        Log.i(getClass().getName(), "Stop scanner and reset wifi configuration");
-        _scanner.stopScanTask();
+        Log.i(getClass().getName(), "Reset wifi configuration");
         _scanner.resetWifiStatus();
 
     }
@@ -233,6 +254,8 @@ public class MainActivity extends AppCompatActivity  {
      */
     @Override
     public void onBackPressed() {
+        Log.d(getClass().getName(), "[DEBUG] Back Pressed");
+
         // If back is pressed while the searchbar is being used, then close it and kep going
         if(_searchView != null && _searchView.isOpen()) {
             _searchView.closeSearch();
@@ -241,6 +264,11 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
 
+    @Override
+    public void onRestart() {
+        Log.d(getClass().getName(), "[DEBUG] onRestart");
+        super.onRestart();
+    }
 
     /**
      * Method called when any element of the application is selected

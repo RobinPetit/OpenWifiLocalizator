@@ -220,7 +220,9 @@ public class Scanner {
      * Stop scan task
      */
     public void stopScanTask() {
-        _scanTask.cancel(true);
+        if(_scanTask != null) {
+            _scanTask.cancel(true);
+        }
         _scanTask = null;
     }
 
