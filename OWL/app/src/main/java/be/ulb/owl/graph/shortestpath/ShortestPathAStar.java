@@ -1,11 +1,14 @@
 package be.ulb.owl.graph.shortestpath;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import be.ulb.owl.graph.NoPathException;
 import be.ulb.owl.graph.Node;
 import be.ulb.owl.graph.Path;
+import be.ulb.owl.graph.Plan;
 
 /**
  * Created by robin on 04/02/17.
@@ -83,7 +86,7 @@ public class ShortestPathAStar extends ShortestPathEvaluator {
         double newScore = _reachingScore.get(current) + neighbour.getParentPlan().getDistanceBetweenNodes(neighbour, current);
         if(!_toBeEvaluated.contains(neighbour))
             _toBeEvaluated.add(neighbour);
-        else if(newScore >= _reachingScore.get(neighbour))  // if there exists a better path, forget it
+        else if(newScore >= _reachingScore.get(neighbour))  // if there exists a better path, forget this one
             return;
 
         // if no better path is known for now, set this one
@@ -115,9 +118,11 @@ public class ShortestPathAStar extends ShortestPathEvaluator {
      * @return The euclidian distance between two nodes
      */
     static public double heuristic(Node a, Node b) {
-        double deltaX = a.getX() - b.getX();
-        double deltaY = a.getY() - b.getY();
-        return Math.sqrt(deltaX*deltaX + deltaY*deltaY);
+        return euclidianDistance(a, b);
+    }
+
+    static private double euclidianDistance(Node a, Node b) {
+        return Plan.euclidianDistance(a, b);
     }
 
 }

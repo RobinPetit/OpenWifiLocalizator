@@ -120,6 +120,7 @@ public class Graph implements ScanWifiUpdateEvent {
      */
     public List<String> getAllAlias() {
         HashSet<String> allAlias = new HashSet<String>();
+        Log.d(getClass().getName(), "all plans of graph: " + getAllPlan());
         for(Plan plan : getAllPlan()) {
             allAlias.addAll(plan.getAllAlias());
         }
@@ -289,14 +290,14 @@ public class Graph implements ScanWifiUpdateEvent {
             if(haveChange) {
                 _main.cleanCanvas();
 
-                ArrayList<Node> distinationNodes = _main.getDestinations();
-                if(!distinationNodes.isEmpty()) {
+                ArrayList<Node> destinationNodes = _main.getDestinations();
+                if(!destinationNodes.isEmpty()) {
                     try {
                         findPath();
                     } catch (NoPathException e) {
                         Log.e(getClass().getName(), "Error: should have found an alternative for a " +
                                 "path between " + current.getID() + " and " +
-                                distinationNodes.get(0).getAlias().toString());
+                                destinationNodes.get(0).getAlias().toString());
                     }
 
                 } else {
@@ -338,34 +339,25 @@ public class Graph implements ScanWifiUpdateEvent {
         Node src = _main.getCurrentLocation();
 
         if(src != null) {
-            double minHeuristic = Double.POSITIVE_INFINITY;
-            Node closestDestination = null;
-            ArrayList<Node> listDestination = _main.getDestinations();
+            Node closestDestination = getClosestDestination(src);
 
-            for (Node node : listDestination) {
-                double currentHeuristic = ShortestPathAStar.heuristic(src, node);
-                if (currentHeuristic < minHeuristic) {
-                    closestDestination = node;
-                    minHeuristic = currentHeuristic;
-                }
-            }
-
+            Log.d(getClass().getName(), "closest destination " + closestDestination);
             // Draw source point on screen
             _main.draw(src);
 
-            ArrayList<Path> p = bestPath(src, closestDestination);
-            if (p.size() >= 2) {
-                refinePath(p, listDestination);
+            ArrayList<Path> shortestPath = bestPath(src, closestDestination);
+            if (shortestPath.size() >= 2) {
+                refinePath(shortestPath, _main.getDestinations());
             }
 
             Log.d(getClass().getName(), "Path between " + src.getID() + " and " + closestDestination.getID());
-            for (Path path : p) {
+            for (Path path : shortestPath) {
                 // Log path
                 Log.i(getClass().getName(), path.getNode().getID() + " - " + path.getOppositeNodeOf(path.getNode()).getID());
             }
 
             // Draw path on screen
-            _main.drawPath(p);
+            _main.drawPath(shortestPath);
 
         } else {
             Node dest = _main.getDestinations().get(0);
@@ -375,6 +367,28 @@ public class Graph implements ScanWifiUpdateEvent {
             _main.draw(dest);
         }
 
+    }
+
+    private Node getClosestDestination(Node src) {
+        double minHeuristic = Double.POSITIVE_INFINITY;
+        Node closestDestination = null;
+        ArrayList<Node> listDestination = _main.getDestinations();
+
+        if(listDestination.isEmpty()) {
+            Log.e(getClass().getName(), "Unknown destination");
+        } else {
+            for (Node node : listDestination) {
+                double currentHeuristic = Plan.euclidianDistance(src, node);
+                if (currentHeuristic < minHeuristic) {
+                    closestDestination = node;
+                    minHeuristic = currentHeuristic;
+                }
+            }
+        }
+        if(closestDestination == null) {
+            throw new AssertionError("No closest destination");
+        }
+        return closestDestination;
     }
 
 
@@ -393,7 +407,7 @@ public class Graph implements ScanWifiUpdateEvent {
             commonNode = overallPath.get(firstOccurrenceOfDestination).getOppositeNodeOf(commonNode);
             overallPath.remove(firstOccurrenceOfDestination+1);
         }
-        Log.d(getClass().getName(), "only " + overallPath.size() + " are left");
+        Log.d(getClass().getName(), "only " + overallPath.size() + " are left: " + overallPath);
     }
 
 
@@ -405,7 +419,7 @@ public class Graph implements ScanWifiUpdateEvent {
      * @return An ordered list of nodes the user has to cross to reach the destination
      */
     public ArrayList<Path> bestPath(Node nodeFrom, Node nodeTo) throws NoPathException {
-        Log.d(getClass().getName(), "Searching path between: " + nodeFrom.getID() + " and " + nodeTo.getID());
+        Log.d(getClass().getName(), "Searching path between: " + nodeFrom + " and " + nodeTo);
         ShortestPathEvaluator evaluator = new ShortestPathAStar(getAllNodes(), nodeFrom, nodeTo);
         return evaluator.find();
     }
@@ -434,7 +448,7 @@ public class Graph implements ScanWifiUpdateEvent {
 
 
     private static ArrayList<Plan> getAllPlan() {
-        ArrayList<Plan> allPlan = (ArrayList<Plan>) _allCampus.clone();
+        ArrayList<Plan> allPlan = new ArrayList<>();
         for(Campus campus : _allCampus) {
             allPlan.addAll(campus.getAllPlans());
         }

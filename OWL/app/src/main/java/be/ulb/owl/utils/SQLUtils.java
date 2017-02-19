@@ -356,7 +356,8 @@ public class SQLUtils extends SQLiteOpenHelper {
                         PlanTable.BG_COORD_Y.getCol(),
                         PlanTable.RELATIVE_ANGLE.getCol(),
                         PlanTable.PPM.getCol()},
-                PlanTable.CAMPUS_ID.getCol() + " = ?", new String[]{""+campusID}, null, null, null);
+                PlanTable.CAMPUS_ID.getCol() + " = ?" +
+                    " OR " + PlanTable.NAME.getCol() + " = ?", new String[]{""+campusID, campus.getName()}, null, null, null);
 
         return loadAllPlan(cursor, campus);
     }
@@ -468,7 +469,8 @@ public class SQLUtils extends SQLiteOpenHelper {
 
                 cursor.moveToNext(); // next entry
             }
-        }
+        } else
+            Log.d("SQLUtils", "No plan on this campus");
 
         cursor.close(); // end of the request
 
@@ -834,10 +836,10 @@ public class SQLUtils extends SQLiteOpenHelper {
                     nodeTwo = Graph.getNode(idTwo); // Search in all plans
                 }
 
-                if(nodeTwo != null) { // If found :)
+                if(nodeTwo != null && !nodeOne.hasNeighbour(nodeTwo)) { // If found :)
                     res.add(new Path(nodeOne, nodeTwo));
                 } else {
-                    Log.w(SQLUtils.class.getName(), "Paht not created " + nodeID + " & " + idTwo);
+                    Log.w(SQLUtils.class.getName(), "Path not created " + nodeID + " & " + idTwo);
                 }
 
                 cursor.moveToNext();
@@ -889,10 +891,12 @@ public class SQLUtils extends SQLiteOpenHelper {
                 }
                 nodeOne = node;
                 nodeTwo = plan.getNode(idTwo);
-                if(nodeTwo == null)
+                if(nodeTwo == null) {
                     nodeTwo = Graph.getNode(idTwo);
-                if(nodeTwo != null)
+                }
+                if(nodeTwo != null) {
                     res.add(new Path(nodeOne, nodeTwo, weight));
+                }
 
                 cursor.moveToNext();
             }
