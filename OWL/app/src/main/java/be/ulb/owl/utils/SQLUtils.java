@@ -845,7 +845,8 @@ public class SQLUtils extends SQLiteOpenHelper {
                 cursor.moveToNext();
             }
 
-        }cursor.close();
+        }
+        cursor.close();
 
         res.addAll(loadSpecialPath(nodeID, node, plan));
 
