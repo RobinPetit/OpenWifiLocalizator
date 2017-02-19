@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity  {
     private ArrayList<Node> _destinationNodes =  new ArrayList<Node>();
     private DrawView _drawer;
 
+
     //////////////////////////////////////////// EVENTS ////////////////////////////////////////////
     // Event called by Android
 
@@ -150,6 +151,13 @@ public class MainActivity extends AppCompatActivity  {
         _drawer = new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor());
 
 
+        // Init suggestion to search bar
+        _searchView = (MaterialSearchView)findViewById(R.id.search_view);
+        _searchView.addSuggestions(_graph.getAllAlias());
+
+        for(String suggestion : NOT_SUGGESTED) {
+            _searchView.removeSuggestion(suggestion);
+        }
     }
 
 
@@ -213,15 +221,16 @@ public class MainActivity extends AppCompatActivity  {
 
 
     /**
-     * TODO @NathanLiccardo quand est appellé cet event précisément ? :/
+     * Call when all other event are loaded.  This is call to create menu when the main screen is
+     * allready visible
      *
-     * @param menu
-     * @return
+     * @param menu other menu
+     * @return True if all is ok
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
-        _searchView = (MaterialSearchView)findViewById(R.id.search_view);
+
         // QueryListener is used to detect when the user starts a query for a local
         _searchView.setOnQueryTextListener(new QueryTextListener(this));
         // OnItemClickListener is used to detect when the user selects a suggestion from the list
@@ -239,15 +248,6 @@ public class MainActivity extends AppCompatActivity  {
                 _searchView.setQuery(_searchView.getSuggestionAtPosition(position), true);
             }
         });
-
-        // give all of the nodes from the graph as available suggestions  (may bbe refined)
-        for(Node node: _graph.getAllNodes()) {
-            _searchView.addSuggestions(node.getAlias());
-        }
-
-        for(String suggestion : NOT_SUGGESTED) {
-            _searchView.removeSuggestion(suggestion);
-        }
 
         return true;
     }
