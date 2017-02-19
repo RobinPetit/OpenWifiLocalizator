@@ -16,6 +16,7 @@ import java.util.List;
 import be.ulb.owl.graph.Node;
 import be.ulb.owl.graph.Path;
 import be.ulb.owl.gui.pathdrawing.CubicNaturalFunctionalSplinePathDrawer;
+import be.ulb.owl.gui.pathdrawing.HermitianCubicSplinePathDrawer;
 import be.ulb.owl.gui.pathdrawing.PathDrawer;
 
 public class DrawView extends ImageView {
@@ -39,8 +40,9 @@ public class DrawView extends ImageView {
         _paint.setStyle(Paint.Style.FILL_AND_STROKE);
         _paint.setAntiAlias(true);
         _paint.setColor(DEFAULT_COLOR);
-        // _pathDrawer = new LinePathDrawer(DrawView.EDGE_COLOR, _canvas);
-        _pathDrawer = new CubicNaturalFunctionalSplinePathDrawer(DrawView.EDGE_COLOR, canvas);
+        // _pathDrawer = new LinePathDrawer(EDGE_COLOR, _canvas);
+        // _pathDrawer = new CubicNaturalFunctionalSplinePathDrawer(EDGE_COLOR, canvas);
+        _pathDrawer = new HermitianCubicSplinePathDrawer(EDGE_COLOR, canvas);
     }
 
     private Float projectOnY(Float y) {

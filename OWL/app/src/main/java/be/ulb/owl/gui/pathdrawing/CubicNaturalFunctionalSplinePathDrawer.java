@@ -36,13 +36,9 @@ public class CubicNaturalFunctionalSplinePathDrawer extends PathDrawer {
 
     @Override
     public void drawPath(List<FloatCouple> points) {
+        super.drawPath(points);
         _points = points;
         computeFunctions();
-        if(MainActivity.isDebug()) {
-            for(final FloatCouple point : points) {
-                _canvas.drawCircle(point.getX(), point.getY(), NODE_RADIUS, _pathColor);
-            }
-        }
         drawPoints(_splines);
     }
 
