@@ -61,9 +61,9 @@ public class Scanner {
     ////////////////////////////////////////// MAKE SCAN //////////////////////////////////////////
 
     /**
-     * Calcul the average of a test
+     * Computing of the average of a test
      *
-     * @param tmp list of the frequence
+     * @param tmp list of the frequency
      * @return the average
      */
     private int avg(ArrayList<Integer> tmp) {

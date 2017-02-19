@@ -83,6 +83,9 @@ public class Plan {
         this._directoryImage = directoryImage;
         this._listNode = new ArrayList<Node>();
 
+        if(!isPlan())
+            return;
+
         _listNode = SQLUtils.loadNodes(this, id);
         Log.i(getClass().getName(), "List node (" + name + "): " + _listNode);
 
@@ -93,7 +96,6 @@ public class Plan {
             _allBssWifi.addAll(selectNode.getListWifiBSS());
             _allAlias.addAll(selectNode.getAlias());
         }
-
     }
 
 
@@ -210,10 +212,10 @@ public class Plan {
 
 
     /**
-     * Check if the current plan have this name
+     * Check if the current plan has this name
      *
      * @param name the specific name
-     * @return True if this plan have this name
+     * @return True if this plan has this name
      */
     public boolean isName(String name) {
         return _name.equals(name);
@@ -221,7 +223,7 @@ public class Plan {
 
 
     /**
-     * Get the id of the plan
+     * Get the name of the plan
      *
      * @return the name of this plan
      */
@@ -415,7 +417,7 @@ public class Plan {
     /**
      * Get the image of this map
      *
-     * @return Drawable which represent the image or null if not found
+     * @return Drawable which represents the image or null if not found
      */
     public Drawable getDrawableImage() {
         Drawable res = null;
@@ -450,7 +452,7 @@ public class Plan {
                 distance = node.getDistanceFrom(b);
             }
         }
-        assert(distance > 0);
+        assert distance > 0 || a.isNode(b);
         return distance / _ppm;
     }
 

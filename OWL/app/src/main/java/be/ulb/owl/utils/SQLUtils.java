@@ -891,10 +891,12 @@ public class SQLUtils extends SQLiteOpenHelper {
                 }
                 nodeOne = node;
                 nodeTwo = plan.getNode(idTwo);
-                if(nodeTwo == null)
+                if(nodeTwo == null) {
                     nodeTwo = Graph.getNode(idTwo);
-                if(nodeTwo != null)
+                }
+                if(nodeTwo != null) {
                     res.add(new Path(nodeOne, nodeTwo, weight));
+                }
 
                 cursor.moveToNext();
             }

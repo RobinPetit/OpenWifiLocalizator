@@ -204,7 +204,6 @@ public class MainActivity extends AppCompatActivity  {
 
         Log.i(getClass().getName(), "Reset wifi configuration");
         _scanner.resetWifiStatus();
-
     }
 
 

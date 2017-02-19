@@ -43,7 +43,7 @@ public class ScanTask extends AsyncTask<Void, Void, HashMap<String, ArrayList<In
 
         HashMap<String, ArrayList<Integer>> accessPoints = new HashMap<String, ArrayList<Integer>>();
         for (int i = 0; i < 3; i++) {
-            accessPoints = mergeAccePoint(accessPoints, _scanner.getData());
+            accessPoints = mergeAccesPoint(accessPoints, _scanner.getData());
 
             try {
                 Thread.sleep(1000);
@@ -70,7 +70,7 @@ public class ScanTask extends AsyncTask<Void, Void, HashMap<String, ArrayList<In
         return accessPoints;
     }
 
-    private HashMap<String, ArrayList<Integer>> mergeAccePoint(HashMap<String, ArrayList<Integer>> res,
+    private HashMap<String, ArrayList<Integer>> mergeAccesPoint(HashMap<String, ArrayList<Integer>> res,
                                                                HashMap<String, Integer> lastScan) {
         for(String bss : lastScan.keySet()) {
             if(res.containsKey(bss)) {
@@ -91,10 +91,10 @@ public class ScanTask extends AsyncTask<Void, Void, HashMap<String, ArrayList<In
     @Override
     protected void onPostExecute(HashMap<String, ArrayList<Integer>> listWifi) {
         if(!isCancelled()) {
-            Log.i(getClass().getName(), "Scan have finish :)");
+            Log.i(getClass().getName(), "Scan has ended");
             _scanner.newScanFinish(listWifi);
         } else {
-            Log.i(getClass().getName(), "Scan task have been cancel !");
+            Log.i(getClass().getName(), "Scan task has been canceled!");
         }
     }
 

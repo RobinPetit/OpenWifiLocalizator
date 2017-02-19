@@ -29,11 +29,11 @@ public class LinePathDrawer extends PathDrawer {
     public void drawPath(List<FloatCouple> points) {
         FloatCouple previous = null;
         for(FloatCouple pos : points) {
-            if(previous == null) {
-                previous = pos;
-                continue;
+            if(previous != null) {
+                drawPath(previous.getX(), previous.getY(), pos.getX(), pos.getY());
             }
-            drawPath(previous.getX(), previous.getY(), pos.getX(), pos.getY());
+            previous = pos;
+
         }
     }
 }
