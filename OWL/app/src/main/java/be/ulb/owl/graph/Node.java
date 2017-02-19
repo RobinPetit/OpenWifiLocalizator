@@ -51,20 +51,20 @@ public class Node {
     
     
     /**
-     * Add a path to an other Node
+     * Add a path to another Node
      * 
      * @param newPath the Path between the two node
      */
     protected void addPath(Path newPath) {
         if(!newPath.containsNode(this)) {
-            throw new IllegalArgumentException("Path have no link with this node");
+            throw new IllegalArgumentException("Path has no link with this node");
         } else {
             _listPath.add(newPath);
         }
     }
     
     /**
-     * Check if the current Node have this id
+     * Check if the current Node has this id
      * 
      * @param id the id which must be tested
      * @return True if this node has this id
@@ -165,9 +165,9 @@ public class Node {
 
 
     /**
-     * Add a wifi on the capted wifi list
+     * Add a wifi on the sensed wifi list
      *
-     * @param wifi which is capted on this node
+     * @param wifi which is sensed on this node
      */
     public void addWifi(Wifi wifi) {
         _listWifi.add(wifi);
