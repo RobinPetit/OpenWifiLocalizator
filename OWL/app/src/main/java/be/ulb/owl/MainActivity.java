@@ -2,6 +2,7 @@ package be.ulb.owl;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -67,6 +69,7 @@ public class MainActivity extends AppCompatActivity  {
     private ImageView _imageDraw;
     private Canvas _canvas = null;
     private MaterialSearchView _searchView = null;  // the widget with the searchbar and autocompletion
+    private ImageButton _changePlan;
 
     // private attributes
     private Graph _graph = null;
@@ -128,12 +131,12 @@ public class MainActivity extends AppCompatActivity  {
             }
             Log.i(getClass().getName(), "[V] Graph loaded !");
 
-            // Set default campus
-            setCurrentPlan(_graph.getDefaultCampus());
-
             // Begin wifi scan
             _scanner = new Scanner(this);
             Log.i(getClass().getName(), "[V] Scanner loaded !");
+
+            // Set default campus
+            setCurrentPlan(_graph.getDefaultCampus());
 
             // Init buttons listener
             initSwitchPlanButton();
@@ -190,7 +193,7 @@ public class MainActivity extends AppCompatActivity  {
         super.onResume();
 
         Log.i(getClass().getName(), "Begin scanner task");
-        _scanner.startScanTask(false);
+        _scanner.startScanTask(true);
     }
 
     @Override
@@ -302,22 +305,29 @@ public class MainActivity extends AppCompatActivity  {
      * To switch between the campus
      */
     private void initSwitchPlanButton() {
-        ImageButton changePlan = (ImageButton)findViewById(R.id.changePlan);
-        changePlan.setOnClickListener(new ClickListenerSwitchButton(this, _graph));
+        _changePlan = (ImageButton)findViewById(R.id.changePlan);
+        _changePlan.setOnClickListener(new ClickListenerSwitchButton(this, _graph));
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        _changePlan.getLayoutParams().height = size.x/5;
+        _changePlan.getLayoutParams().width= size.x/5;
+        _changePlan.requestLayout();
+        setSwitchPlanButton();
     }
 
     private void setSwitchPlanButton() {
-        ImageButton changePlan = (ImageButton)findViewById(R.id.changePlan);
-        changePlan.setOnClickListener(new ClickListenerSwitchButton(this, _graph));
+        if(_changePlan == null) {
+            initSwitchPlanButton();
+        }
         if(_currentPlan.isPlan()) {
-            changePlan.setVisibility(VISIBLE);
+            _changePlan.setVisibility(VISIBLE);
             Campus currentCampus = _currentPlan.getCampus();
             Drawable _drawCampus = currentCampus.getDrawableImage();
-            _drawCampus.setBounds(0, 0, 50, 50);
-            changePlan.setImageDrawable(_drawCampus);
+            _changePlan.setImageDrawable(_drawCampus);
         }
         else {
-            changePlan.setVisibility(INVISIBLE);
+            _changePlan.setVisibility(INVISIBLE);
         }
     }
 
@@ -490,9 +500,9 @@ public class MainActivity extends AppCompatActivity  {
             cleanCanvas();
             _imageView.setImageDrawable(_currentPlan.getDrawableImage());
             _imageView.setScaleType(ImageView.ScaleType.MATRIX);
-            // TODO Bug ici ( @Denis )
-//            this.setSwitchPlanButton();
 
+            // TODO Bug ici ( @Denis )
+            this.setSwitchPlanButton();
         } else if(newCurrentPlan == null) {
             Log.w(this.getClass().getName(), "New plan is null");
         }
