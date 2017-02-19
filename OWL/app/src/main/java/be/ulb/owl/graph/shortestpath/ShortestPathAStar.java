@@ -1,5 +1,7 @@
 package be.ulb.owl.graph.shortestpath;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 

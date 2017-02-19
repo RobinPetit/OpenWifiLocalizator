@@ -254,4 +254,9 @@ public class Node {
         }
         throw new NoPathException("No path between " + getID() + " and " + dest.getID());
     }
+
+    @Override
+    public String toString() {
+        return getID().toString();
+    }
 }

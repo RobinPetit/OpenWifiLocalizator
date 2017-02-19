@@ -276,14 +276,14 @@ public class Graph implements ScanWifiUpdateEvent {
             if(haveChange) {
                 _main.cleanCanvas();
 
-                ArrayList<Node> distinationNodes = _main.getDestinations();
-                if(!distinationNodes.isEmpty()) {
+                ArrayList<Node> destinationNodes = _main.getDestinations();
+                if(!destinationNodes.isEmpty()) {
                     try {
                         findPath();
                     } catch (NoPathException e) {
                         Log.e(getClass().getName(), "Error: should have found an alternative for a " +
                                 "path between " + current.getID() + " and " +
-                                distinationNodes.get(0).getAlias().toString());
+                                destinationNodes.get(0).getAlias().toString());
                     }
 
                 } else {
@@ -329,6 +329,7 @@ public class Graph implements ScanWifiUpdateEvent {
             Node closestDestination = null;
             ArrayList<Node> listDestination = _main.getDestinations();
 
+            assert !listDestination.isEmpty();
             for (Node node : listDestination) {
                 double currentHeuristic = ShortestPathAStar.heuristic(src, node);
                 if (currentHeuristic < minHeuristic) {
@@ -336,7 +337,8 @@ public class Graph implements ScanWifiUpdateEvent {
                     minHeuristic = currentHeuristic;
                 }
             }
-
+            assert listDestination.isEmpty() || closestDestination != null;
+            Log.d(getClass().getName(), "closest destination " + closestDestination);
             // Draw source point on screen
             _main.draw(src);
 

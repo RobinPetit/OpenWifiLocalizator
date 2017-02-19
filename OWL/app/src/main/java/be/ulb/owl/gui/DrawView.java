@@ -40,8 +40,8 @@ public class DrawView extends ImageView {
         _paint.setStyle(Paint.Style.FILL_AND_STROKE);
         _paint.setAntiAlias(true);
         _paint.setColor(DEFAULT_COLOR);
-        // _pathDrawer = new LinePathDrawer(DrawView.EDGE_COLOR, _canvas);
-        _pathDrawer = new CubicNaturalSplinePathDrawer(DrawView.EDGE_COLOR, canvas);
+        _pathDrawer = new LinePathDrawer(DrawView.EDGE_COLOR, _canvas);
+        // _pathDrawer = new CubicNaturalSplinePathDrawer(DrawView.EDGE_COLOR, canvas);
     }
 
     private Float projectOnY(Float y) {
