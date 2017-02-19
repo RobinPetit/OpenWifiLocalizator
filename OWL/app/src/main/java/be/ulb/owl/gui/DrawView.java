@@ -40,7 +40,6 @@ public class DrawView extends ImageView {
         _paint.setAntiAlias(true);
         _paint.setColor(DEFAULT_COLOR);
         // _pathDrawer = new LinePathDrawer(EDGE_COLOR, _canvas);
-        // _pathDrawer = new CubicNaturalFunctionalSplinePathDrawer(EDGE_COLOR, canvas);
         _pathDrawer = new HermitianCubicSplinePathDrawer(EDGE_COLOR, canvas);
     }
 

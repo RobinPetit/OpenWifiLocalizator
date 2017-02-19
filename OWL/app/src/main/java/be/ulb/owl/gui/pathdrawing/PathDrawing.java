@@ -9,7 +9,6 @@ import be.ulb.owl.gui.FloatCouple;
  */
 
 public interface PathDrawing {
-    void drawPath(Float x1, Float y1, Float x3, Float y2);
 
     void drawPath(List<FloatCouple> paths);
 }

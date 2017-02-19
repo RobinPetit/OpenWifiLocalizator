@@ -20,8 +20,7 @@ public class LinePathDrawer extends PathDrawer {
         super(pathColor, canvas);
     }
 
-    @Override
-    public void drawPath(Float x1, Float y1, Float x2, Float y2) {
+    protected void drawPath(Float x1, Float y1, Float x2, Float y2) {
         _canvas.drawLine(x1, y1, x2, y2, _pathColor);
     }
 

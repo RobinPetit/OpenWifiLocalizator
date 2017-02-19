@@ -56,11 +56,6 @@ public class HermitianCubicSplinePathDrawer extends PathDrawer {
         super(pathColor, canvas);
     }
 
-    @Override
-    public void drawPath(Float x1, Float y1, Float x3, Float y2) {
-        // @TODO
-    }
-
     /**
      * draws a path interpolating all of the given points in the correct order
      * by piece-wise cubic curves
