@@ -15,7 +15,6 @@ import java.util.List;
 
 import be.ulb.owl.graph.Node;
 import be.ulb.owl.graph.Path;
-import be.ulb.owl.gui.pathdrawing.CubicNaturalFunctionalSplinePathDrawer;
 import be.ulb.owl.gui.pathdrawing.HermitianCubicSplinePathDrawer;
 import be.ulb.owl.gui.pathdrawing.PathDrawer;
 
