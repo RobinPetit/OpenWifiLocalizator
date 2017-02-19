@@ -1,4 +1,4 @@
-package be.ulb.owl.gui.listener.pathdrawing;
+package be.ulb.owl.gui.pathdrawing;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -14,6 +14,7 @@ public abstract class PathDrawer implements PathDrawing {
     protected Canvas _canvas;
 
     public PathDrawer(int pathColor, Canvas canvas) {
+        _pathColor.setAntiAlias(true);
         _pathColor.setColor(pathColor);
         _canvas = canvas;
     }

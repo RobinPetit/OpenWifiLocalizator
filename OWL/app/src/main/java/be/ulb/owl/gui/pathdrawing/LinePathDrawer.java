@@ -1,4 +1,4 @@
-package be.ulb.owl.gui.listener.pathdrawing;
+package be.ulb.owl.gui.pathdrawing;
 
 import android.graphics.Canvas;
 

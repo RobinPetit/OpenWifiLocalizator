@@ -836,7 +836,7 @@ public class SQLUtils extends SQLiteOpenHelper {
                     nodeTwo = Graph.getNode(idTwo); // Search in all plans
                 }
 
-                if(nodeTwo != null) { // If found :)
+                if(nodeTwo != null && !nodeOne.hasNeighbour(nodeTwo)) { // If found :)
                     res.add(new Path(nodeOne, nodeTwo));
                 } else {
                     Log.w(SQLUtils.class.getName(), "Path not created " + nodeID + " & " + idTwo);

@@ -1,28 +1,31 @@
-package be.ulb.owl.gui.listener.pathdrawing;
+package be.ulb.owl.gui.pathdrawing;
 
 import android.graphics.Canvas;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import be.ulb.owl.MainActivity;
 import be.ulb.owl.gui.FloatCouple;
 
 /**
  * Created by robin on 15/02/17.
  */
 
-public class CubicNaturalSplinePathDrawer extends PathDrawer {
-    static private int NB_POINTS_IN_CURVE = 10;
+public class CubicNaturalFunctionalSplinePathDrawer extends PathDrawer {
+    static private int NB_POINTS_IN_CURVE = 100;
+    static private int NODE_RADIUS = 3;
     private List<FloatCouple> _points;
     private float[] _lengths;  // length of each sub-interval
     private int _n;  // size of _points
     private float[] _slopes;  // sort of the temporary slope
+    private ArrayList<CubicSplineFunction> _splines;
 
-    public CubicNaturalSplinePathDrawer(int pathColor, Canvas canvas) {
+    public CubicNaturalFunctionalSplinePathDrawer(int pathColor, Canvas canvas) {
         super(pathColor, canvas);
     }
 
-    public CubicNaturalSplinePathDrawer(Canvas canvas) {
+    public CubicNaturalFunctionalSplinePathDrawer(Canvas canvas) {
         super(canvas);
     }
 
@@ -35,12 +38,18 @@ public class CubicNaturalSplinePathDrawer extends PathDrawer {
     public void drawPath(List<FloatCouple> points) {
         _points = points;
         computeFunctions();
+        if(MainActivity.isDebug()) {
+            for(final FloatCouple point : points) {
+                _canvas.drawCircle(point.getX(), point.getY(), NODE_RADIUS, _pathColor);
+            }
+        }
+        drawPoints(_splines);
     }
 
     private void computeLengths() {
         _lengths = new float[_n-1];
         for (int i = 0; i < _n - 1; ++i)
-            _lengths[i] = getXDifferenceBetweenIndices(i+1, i);
+            _lengths[i] = getXDifferenceBetweenIndices(i+1, i) + 1;  // use a pseudo-count here to avoid division by zero
     }
 
     private void computeSlopes() {
@@ -74,7 +83,7 @@ public class CubicNaturalSplinePathDrawer extends PathDrawer {
         z[_n - 2] = 0;
 
         boolean firstLoop = true;
-        for (int i = _n - 1; i >= 0; --i) {
+        for (int i = _n - 2; i >= 0; --i) {
             float h_i = _lengths[i];
             float c_j = firstLoop ? quadraticComponent[i + 1] : 0;
             float deltaY = getYDifferenceBetweenIndices(i+1, i);
@@ -86,12 +95,11 @@ public class CubicNaturalSplinePathDrawer extends PathDrawer {
             if (firstLoop)
                 firstLoop = false;
         }
-        ArrayList<CubicSplineFunction> splines = getSplinesFromCoefficients(
+        _splines = getSplinesFromCoefficients(
                 cubicComponent,
                 quadraticComponent,
                 linearComponent
         );
-        drawPoints(splines);
     }
 
     /**

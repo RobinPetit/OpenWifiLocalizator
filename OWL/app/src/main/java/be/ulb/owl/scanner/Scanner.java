@@ -27,7 +27,7 @@ public class Scanner {
             new HashMap<ScanWifiUpdateEvent, EventPriority>();
 
 
-    private final int SCAN_TIME_INTERVAL = 10;  // in seconds
+    private final int SCAN_TIME_INTERVAL = 100;  // in seconds
 
     private ScanTask _scanTask = null;
 
@@ -63,7 +63,7 @@ public class Scanner {
     /**
      * Computing of the average of a test
      *
-     * @param tmp list of the frequency
+     * @param tmp list of the frequence
      * @return the average
      */
     private int avg(ArrayList<Integer> tmp) {

@@ -120,6 +120,7 @@ public class Graph implements ScanWifiUpdateEvent {
      */
     public List<String> getAllAlias() {
         HashSet<String> allAlias = new HashSet<String>();
+        Log.d(getClass().getName(), "all plans of graph: " + getAllPlan());
         for(Plan plan : getAllPlan()) {
             allAlias.addAll(plan.getAllAlias());
         }
@@ -447,7 +448,7 @@ public class Graph implements ScanWifiUpdateEvent {
 
 
     private static ArrayList<Plan> getAllPlan() {
-        ArrayList<Plan> allPlan = (ArrayList<Plan>) _allCampus.clone();
+        ArrayList<Plan> allPlan = new ArrayList<>();
         for(Campus campus : _allCampus) {
             allPlan.addAll(campus.getAllPlans());
         }

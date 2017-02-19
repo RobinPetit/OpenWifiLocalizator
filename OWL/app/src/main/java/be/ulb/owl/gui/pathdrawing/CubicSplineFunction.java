@@ -1,4 +1,6 @@
-package be.ulb.owl.gui.listener.pathdrawing;
+package be.ulb.owl.gui.pathdrawing;
+
+import android.util.Log;
 
 /**
  * Created by robin on 16/02/17.
@@ -28,6 +30,7 @@ public class CubicSplineFunction {
         _d = d;
         _origin = _begDomain = begDomain;
         _endDomain = endDomain;
+        Log.d(getClass().getName(), "Creating a spline with (a, b, c, d) == (" + a + ", " + b + ", " + c + ", " + d + ")");
     }
 
     /**
