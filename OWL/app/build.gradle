@@ -22,6 +22,12 @@ android {
     }
 }
 
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
 dependencies {
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -31,4 +37,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.0.1'
     compile 'br.com.mauker.materialsearchview:materialsearchview:1.2.0'
     testCompile 'junit:junit:4.12'
+
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.+'
 }
