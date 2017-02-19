@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity  {
         super.onResume();
 
         Log.i(getClass().getName(), "Begin scanner task");
-        _scanner.startScanTask(false);
+        _scanner.startScanTask(true);
     }
 
     @Override
