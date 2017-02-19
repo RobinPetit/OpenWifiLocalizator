@@ -9,6 +9,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import be.ulb.owl.MainActivity;
 import be.ulb.owl.R;
@@ -113,6 +114,20 @@ public class Graph implements ScanWifiUpdateEvent {
     ////////////////////////////////////// GETTER AND SETTER //////////////////////////////////////
 
     /**
+     * Get all alias in this graph
+     *
+     * @return all alias name
+     */
+    public List<String> getAllAlias() {
+        HashSet<String> allAlias = new HashSet<String>();
+        for(Plan plan : getAllPlan()) {
+            allAlias.addAll(plan.getAllAlias());
+        }
+
+        return new ArrayList<String>(allAlias);
+    }
+
+    /**
      * Return all node of the graph
      *
      * @return A list containing every node of the graph
@@ -140,7 +155,6 @@ public class Graph implements ScanWifiUpdateEvent {
         }
         return listeNode;
     }
-
 
     /**
      * Get a plan
@@ -260,13 +274,12 @@ public class Graph implements ScanWifiUpdateEvent {
     }
 
 
-
     /**
      * localizes the user
      *
      * @param displayNotFound Boolean telling whether or not to signal if user is unable to localize
      */
-    public void localize(boolean displayNotFound, ArrayList<Wifi> sensedWifi) {
+    private void localize(boolean displayNotFound, ArrayList<Wifi> sensedWifi) {
         Node current = whereAmI(sensedWifi);
 
         boolean haveChange = _main.setCurrentLocation(current);

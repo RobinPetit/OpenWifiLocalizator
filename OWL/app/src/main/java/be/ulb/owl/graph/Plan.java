@@ -93,7 +93,6 @@ public class Plan {
         _allAlias = new HashSet<String>();
 
         for(Node selectNode : _listNode) {
-            _allBssWifi.addAll(selectNode.getListWifiBSS());
             _allAlias.addAll(selectNode.getAlias());
         }
     }
@@ -404,6 +403,7 @@ public class Plan {
     public void loadWifi() {
         for(Node node : _listNode) {
             node.loadWifi();
+            _allBssWifi.addAll(node.getListWifiBSS());
         }
     }
 
