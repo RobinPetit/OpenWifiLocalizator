@@ -59,8 +59,14 @@ public class Node {
     protected void addPath(Path newPath) {
         if(!newPath.containsNode(this)) {
             throw new IllegalArgumentException("Path has no link with this node");
+        }
+        Node otherNode = newPath.getOppositeNodeOf(this);
+        if(hasNeighbour(otherNode)) {
+            Log.d(getClass().getName(), this + " has already " + otherNode + " as neighbour");
         } else {
             _listPath.add(newPath);
+            if(!otherNode.hasNeighbour(this))
+                otherNode.addPath(newPath);
         }
     }
     
@@ -161,7 +167,8 @@ public class Node {
     }
 
     protected void loadPath() {
-        _listPath = SQLUtils.loadPath(getID(), this, getParentPlan());
+        for(Path path : SQLUtils.loadPath(getID(), this, getParentPlan()))
+            addPath(path);
     }
 
 
@@ -196,8 +203,16 @@ public class Node {
         return neighbours;
     }
 
+    public boolean hasNeighbour(Node node) {
+        for(final Node neighbour : getNeighbours())
+            if(neighbour.isNode(node))
+                return true;
+        return false;
+    }
+
     public double getDistanceFrom(Node neighbour) {
-        assert(getNeighbours().contains(neighbour));
+        if(!hasNeighbour(neighbour))
+            throw new IllegalArgumentException("Provided node " + neighbour + "is not neighbour to " + this);
         double ret = 0.;
         for(Path path: _listPath) {
             if(path.containsNode(neighbour)) {

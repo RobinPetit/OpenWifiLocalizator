@@ -83,6 +83,9 @@ public class Plan {
         this._directoryImage = directoryImage;
         this._listNode = new ArrayList<Node>();
 
+        if(!isPlan())
+            return;
+
         _listNode = SQLUtils.loadNodes(this, id);
         Log.i(getClass().getName(), "List node (" + name + "): " + _listNode);
 
@@ -93,7 +96,6 @@ public class Plan {
             _allBssWifi.addAll(selectNode.getListWifiBSS());
             _allAlias.addAll(selectNode.getAlias());
         }
-
     }
 
 
