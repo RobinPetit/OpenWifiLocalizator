@@ -81,7 +81,7 @@ public class DrawView extends ImageView {
             nodesList.add(nodeToFloatCouple(node));
             nodesList.add(nodeToFloatCouple(pathList.get(0).getOppositeNodeOf(node)));
         } else {
-            if(!pathList.get(1).containsNode(node))
+            if(pathList.get(1).containsNode(node))
                 node = pathList.get(0).getOppositeNodeOf(node);
             for (Path path : pathList) {
                 nodesList.add(nodeToFloatCouple(node));
