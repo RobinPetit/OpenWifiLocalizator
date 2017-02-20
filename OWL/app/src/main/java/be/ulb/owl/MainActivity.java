@@ -440,7 +440,11 @@ public class MainActivity extends AppCompatActivity  {
      * @param dest Name of the destination
      */
     public void setDestination(String dest) throws NoPathException {
-        _destinationNodes = _graph.searchNode(dest);
+        _destinationNodes = _currentPlan.searchNode(dest);
+        if(_destinationNodes.isEmpty()) {
+            _destinationNodes = _graph.searchNode(dest);
+        }
+
         Log.i(getClass().getName(), "Set destination: " + dest +
                 " (nbr node: " + _destinationNodes.size() + ")");
         if(!_destinationNodes.isEmpty()) {
