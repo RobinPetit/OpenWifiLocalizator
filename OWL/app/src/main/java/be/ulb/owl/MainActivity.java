@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity  {
     private Graph _graph = null;
     private Scanner _scanner = null;
     private Plan _currentPlan = null;
+    private Plan _switchButtonPlan = null;
     private Node _currentPosition;
     private ArrayList<Node> _destinationNodes =  new ArrayList<Node>();
     private DrawView _drawer;
@@ -317,22 +318,7 @@ public class MainActivity extends AppCompatActivity  {
         _changePlan.getLayoutParams().height = size.x/5;
         _changePlan.getLayoutParams().width= size.x/5;
         _changePlan.requestLayout();
-        setSwitchPlanButton();
-    }
-
-    private void setSwitchPlanButton() {
-        if(_changePlan == null) {
-            initSwitchPlanButton();
-        }
-        if(_currentPlan.isPlan()) {
-            _changePlan.setVisibility(VISIBLE);
-            Campus currentCampus = _currentPlan.getCampus();
-            Drawable _drawCampus = currentCampus.getDrawableImage();
-            _changePlan.setImageDrawable(_drawCampus);
-        }
-        else {
-            _changePlan.setVisibility(INVISIBLE);
-        }
+        _changePlan.setVisibility(INVISIBLE);
     }
 
     /**
@@ -383,6 +369,17 @@ public class MainActivity extends AppCompatActivity  {
         return res;
     }
 
+    public Plan getSwitchPlanButton() {
+        return _switchButtonPlan;
+    }
+
+    public void setSwitchPlanButtonImage(Plan plan) {
+        _switchButtonPlan = plan;
+        if(_changePlan != null) {
+            _changePlan.setVisibility(VISIBLE);
+            _changePlan.setImageDrawable(_switchButtonPlan.getDrawableImage());
+        }
+    }
 
     /**
      * Draws the given path on the plan on the screen
@@ -497,6 +494,9 @@ public class MainActivity extends AppCompatActivity  {
         if(newCurrentPlan != null &&
                 (_currentPlan == null ||
                         !newCurrentPlan.getName().equalsIgnoreCase(_currentPlan.getName())) ) {
+            if(_switchButtonPlan == null || _switchButtonPlan.isPlan()) {
+                setSwitchPlanButtonImage(newCurrentPlan.getCampus());
+            }
 
             Log.d(getClass().getName(), "New plan: " + newCurrentPlan.getName());
 
@@ -506,7 +506,7 @@ public class MainActivity extends AppCompatActivity  {
             _imageView.setScaleType(ImageView.ScaleType.MATRIX);
 
             // TODO Bug ici ( @Denis )
-            this.setSwitchPlanButton();
+            //this.setSwitchPlanButton();
         } else if(newCurrentPlan == null) {
             Log.w(this.getClass().getName(), "New plan is null");
         }

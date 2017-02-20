@@ -11,6 +11,7 @@ import be.ulb.owl.MainActivity;
 import be.ulb.owl.R;
 import be.ulb.owl.graph.Campus;
 import be.ulb.owl.graph.Graph;
+import be.ulb.owl.graph.Plan;
 
 /**
  * Created by Detobel36
@@ -20,6 +21,7 @@ public class ClickListenerSwitchButton implements View.OnClickListener {
 
     private final MainActivity _main;
     private final Graph _graph;
+    private boolean _currentIsShown = true;
 
     public ClickListenerSwitchButton(MainActivity main, Graph graph) {
         this._main = main;
@@ -35,26 +37,16 @@ public class ClickListenerSwitchButton implements View.OnClickListener {
      * Switch between the two different global plans
      */
     private void switchPlan() {
-        ArrayList<String> campusName = new ArrayList<String>();
-        for(Campus campus : _graph.getAllCampus()) {
-            campusName.add(campus.getName());
+        Plan current = _main.getCurrentPlan();
+        Plan button = _main.getSwitchPlanButton();
+        if(button == null) {
+            button = current.getCampus();
         }
-
-        final String[] items = campusName.toArray(new String[0]);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(_main);
-        builder.setTitle(R.string.select_map);
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int item) {
-
-                String name = items[item];
-                Log.d(getClass().getName(), "Name of the map: " + name);
-                _main.setCurrentPlan(_graph.getCampus(name));
-
-            }
-        });
-        AlertDialog alert = builder.create();
-        alert.show();
+        if(current.isPlan() && button.isPlan()) {
+            current = button.getCampus(); // current set as campus because switch
+        }
+        _main.setCurrentPlan(button);
+        _main.setSwitchPlanButtonImage(current);
     }
 
 }
