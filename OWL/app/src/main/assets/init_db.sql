@@ -88,4 +88,6 @@ CREATE TABLE "Aliases" (
 	`Name` TEXT NOT NULL
 );
 
+CREATE INDEX bss_index ON Wifi(BSS);
+
 COMMIT;
