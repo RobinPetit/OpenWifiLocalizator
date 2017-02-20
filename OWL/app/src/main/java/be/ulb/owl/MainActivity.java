@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -23,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import be.ulb.owl.demo.GraphDemo;
-import be.ulb.owl.graph.Campus;
 import be.ulb.owl.graph.Graph;
 import be.ulb.owl.graph.NoPathException;
 import be.ulb.owl.graph.Node;
@@ -37,7 +35,6 @@ import be.ulb.owl.gui.listener.QueryTextListener;
 import be.ulb.owl.gui.listener.TouchListener;
 import be.ulb.owl.scanner.Scanner;
 import be.ulb.owl.test.GraphTest;
-import be.ulb.owl.test.Test;
 import be.ulb.owl.utils.LogUtils;
 import be.ulb.owl.utils.SQLUtils;
 import br.com.mauker.materialsearchview.MaterialSearchView;
@@ -487,9 +484,9 @@ public class MainActivity extends AppCompatActivity  {
      * @param newCurrentPlan new Plan object
      */
     public void setCurrentPlan(Plan newCurrentPlan) {
-        if(newCurrentPlan != null &&
-                (_currentPlan == null ||
-                        !newCurrentPlan.getName().equalsIgnoreCase(_currentPlan.getName())) ) {
+        if(newCurrentPlan != null && (_currentPlan == null ||
+                !newCurrentPlan.getName().equalsIgnoreCase(_currentPlan.getName())) ) {
+
             if(_switchButtonPlan == null || _switchButtonPlan.isPlan()) {
                 setSwitchPlanButtonImage(newCurrentPlan.getCampus());
             }
@@ -501,8 +498,6 @@ public class MainActivity extends AppCompatActivity  {
             _imageView.setImageDrawable(_currentPlan.getDrawableImage());
             _imageView.setScaleType(ImageView.ScaleType.MATRIX);
 
-            // TODO Bug ici ( @Denis )
-            //this.setSwitchPlanButton();
         } else if(newCurrentPlan == null) {
             Log.w(this.getClass().getName(), "New plan is null");
         }
