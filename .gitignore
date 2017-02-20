@@ -3,6 +3,8 @@
 *.aux
 *.log
 *.out
+*.fls
+*.toc
 
 # Vim files
 *.swp

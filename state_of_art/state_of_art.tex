@@ -1,12 +1,16 @@
 \documentclass[11pt,journal,compsoc]{IEEEtran}
 
+\usepackage{commath}
+\usepackage[french]{babel} % Global stuff set to french
+\usepackage{eulervm}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage[french]{babel} % Global stuff set to french
 \usepackage{tcolorbox}
-\usepackage{amsmath, amssymb, commath}
+\usepackage{amsmath, amssymb}
 
 \newcommand{\dBm}{\text{dBm}}
+
+\newcommand{\R}{\mathbb R}
 
 %%% TODO: utiliser les blocs adaptés au figures afin de les numéroter correctement.
 
@@ -17,20 +21,52 @@
 
 \maketitle
 
-%\newpage
-
 \begin{abstract}
   blablabla...
 \end{abstract}
 \begin{IEEEkeywords}
   Computer Society, IEEEtran, journal, \LaTeX, paper, template.
 \end{IEEEkeywords}
+
+\tableofcontents
+
 \section{Introduction}
 \section{Modélisation}
   \subsection{Graphe}
+    Un graphe (non-dirigé) est un couple $\Gamma = (V, E)$ où $V$ est un ensemble de nœuds et $E \subset V \times V$ est un ensemble de couples de nœuds.
+	Un graphe non-dirigé peut être pondéré (chaque arête a un poids donné) et est alors déterminé par un triplet $\Gamma_w = (V, E, \omega)$, pour
+	$\omega \colon E \to \R$, une fonction de poids. Dans notre cas, cette fonction est assimilable à la métrique euclidienne car $V = \R^2$~:
+	\begin{equation}
+		\omega~: E \to \R^+ : (v_1, v_2) \mapsto \norm {v_1-v_2}_E.
+	\end{equation}
+
+	Les graphes ont été largement étudiés, et des algorithmes efficaces existent. En particulier, la recherche de plus court chemin.
   \subsection{Recherche du plus court chemin}
-    \subsubsection{A*}
+  	Selon les critères du graphe, il existe plusieurs algorithmes de recherche de plus court chemin. Les plus connus sont Dijkstra, son amélioration
+	en complexité A*, Bellman-Ford, Floyd-Warshall.
+
+	Bellman-Ford a été déterminé pour gérer un graphe ayant des arêtes de poids positives, et Floyd-Warshall a pour objectif de déterminer \textit{la valeur}
+	du plus court chemin entre chaque paire de nœuds.
     \subsubsection{Dijkstra}
+	  L'algorithme de Dijkstra est bien connu et a une complexité très intéressante, à savoir $O(\abs E~+~\abs V\log\abs V)$ et détermine un chemin minimisant
+	  le coût (somme des poids des arêtes).\footnote{Dans le cas où plusieurs chemins de même poids sont possibles, Dijkstra fournit toujours un des chemins de
+	  manière déterministe selon l'implémentation.}
+
+	  Le concept de cet algorithme est détaillé en annexe A.
+    \subsubsection{A*}
+	  L'algorithme A* est un descendant de l'algorithme de Dijkstra dans le sens où le concept dérive directement de Dijkstra à une différence près~:
+	  l'algorithme A* utilise une \textit{heuristique}, c-à-d une fonction $h : V \to \R$ donnant une estimation du coût entre chaque nœud et le nœud
+	  de destination, afin d'alléger la complexité de l'algorithme dans le pire des cas : l'algorithme A* est en $O(\abs E)$. L'utilisation de cette
+	  heuristique permet également d'adopter plusieurs fonctions de coût différente, et donc permet d'adapter la notion de \textit{plus court chemin} en fonction
+	  de ce qui est recherché.
+
+	  L'utilisation de l'heuristique se fait comme suit~: au moment de choisir le nœud à traiter dans une étape $i$, contrairement à l'algorithme de Dijkstra qui
+	  sélectionne le nœud ayant cumulé le plus petit coût dans les étapes $j < i$, l'algorithme A* sélectionne le nœud $v$ minimisant la quantité $g(v)$ définie
+	  par~:
+	  \begin{equation}
+	  	g(v) = \text{coût}(v) + h(v),
+	  \end{equation}
+	  avec $h$ la fonction heuristique.
 \section{Localisation}
   \subsection{Introduction aux Wifi}
   \subsection{Problème rencontrer par l'utilisation des Wifi}
@@ -192,9 +228,14 @@
 		  de signal inférieur à $-90 dBm$.
         \end{tcolorbox}
 
-      \paragraph{Monte carlo}
+      \paragraph{Monte Carlo}
       \paragraph{Amélioration par l'utilisation de filtres}
       \paragraph{Amélioration par l'estimation de qualité de signal}
+
+\section{Interpolation}
+  \subsection{Principe}
+  \subsection{Interpolation polynômiale}
+  \subsection{Interpolation par morceaux}  % piece-wise interpolation
 \section{Discussion et limitations}
 \section{Conclusion}
 
@@ -245,5 +286,27 @@
 %http://www.robot.t.u-tokyo.ac.jp/~yamashita/paper/E/E293Final.pdf
 
 \section*{Annexes}
+  \subsection*{A. Algorithme de Dijkstra}
+    L'idée de l'algorithme de Dijkstra est de conserver un vecteur des nœuds à traiter contenant initialement tous les nœuds, et duquel on enlève chaque nœud
+    lorsqu'il est traité. Afin de choisir le nœud à traiter à chaque étape, il faut regarder lequel de ces nœuds nécessite un coût minimal pour être atteint
+    depuis la source. C'est ainsi que l'algorithme de Dijkstra assure de déterminer un chemin optimal dans le graphe. L'algorithme peut être schématisé comme suit~:
+
+\begin{verbatim}
+set all distances to infty
+set src distance to 0
+Q <- priority queue
+Q.addAll(nodes)
+WHILE NOT Q.empty()
+  N <- Q.pop()
+  IF N == dest
+    RETURN the path from src to dest
+  ELSE
+    FOR EACH N' IN N.neighbours()
+      update distance to N'
+      update closest node leading to N'
+    END FOR EACH
+  END IF
+END WHILE
+\end{verbatim}
 
 \end{document}
