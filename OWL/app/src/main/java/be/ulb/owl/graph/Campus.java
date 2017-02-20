@@ -127,9 +127,6 @@ public class Campus extends Plan {
     }
 
     @Override
-    public boolean isPlan() {return false;}
-
-    @Override
     public double getAbsoluteX(float x) {
         return 0;
     }

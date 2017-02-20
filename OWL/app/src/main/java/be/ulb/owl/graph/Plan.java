@@ -83,15 +83,13 @@ public class Plan {
         this._directoryImage = directoryImage;
         this._listNode = new ArrayList<Node>();
 
-        if(!isPlan())
-            return;
 
         _listNode = SQLUtils.loadNodes(this, id);
         Log.i(getClass().getName(), "List node (" + name + "): " + _listNode);
 
         _allBssWifi = new HashSet<String>();
-        _allAlias = new HashSet<String>();
 
+        _allAlias = new HashSet<String>();
         for(Node selectNode : _listNode) {
             _allAlias.addAll(selectNode.getAlias());
         }
@@ -463,5 +461,4 @@ public class Plan {
         return Math.sqrt(xOffset*xOffset + yOffset*yOffset);
     }
 
-    public boolean isPlan() { return true;}
 }
