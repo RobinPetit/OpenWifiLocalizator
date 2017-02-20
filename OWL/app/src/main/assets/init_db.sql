@@ -22,6 +22,7 @@ CREATE TABLE "Edge" (
 	`Node2Id` INTEGER
 );
 
+-- abort insert operation if making an edge between two campuses
 CREATE TRIGGER CheckEdgeOnSameCampus
 	BEFORE INSERT
 	ON "Edge"
@@ -41,6 +42,7 @@ BEGIN
 	SELECT RAISE(ABORT, 'Nodes from an edge must be from the same campus');
 END;
 
+-- abort insert operation if making an edge joining a node to itself
 CREATE TRIGGER CheckEdgeGoingFromTwoSeparateNodes
 	BEFORE INSERT
 	ON "Edge"
@@ -64,7 +66,7 @@ CREATE TABLE "Plan" (
 	`Id`             INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 	`CampusId`       INTEGER,
 	`Name`           TEXT,
-	`Ppm`            REAL DEFAULT 0.0,
+	`Ppm`            REAL,
 	`ImageDirectory` TEXT,
 	`XOnParent`      REAL DEFAULT 0.0,
 	`YOnParent`      REAL DEFAULT 0.0,
@@ -73,8 +75,8 @@ CREATE TABLE "Plan" (
 	`RelativeAngle`  REAL DEFAULT 0.0
 );
 
-INSERT INTO Plan(CampusId, Name, ImageDirectory) VALUES (0, 'Plaine', '');
-INSERT INTO Plan(CampusId, Name, ImageDirectory) VALUES (0, 'Solbosch', '');
+INSERT INTO Plan(CampusId, Name, Ppm, ImageDirectory) VALUES (0, 'Plaine', 2.69, '');
+INSERT INTO Plan(CampusId, Name, Ppm, ImageDirectory) VALUES (0, 'Solbosch', 2.97, '');
 
 CREATE TABLE `AliasesLink` (
 	`NodeId`  INTEGER,

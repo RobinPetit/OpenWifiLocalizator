@@ -47,7 +47,7 @@ public class Campus extends Plan {
 
 
     /**
-     * Load all plan and then all Path
+     * Load all plans and then all paths
      */
     public void loadAllPlan() {
         _allPlan = SQLUtils.loadAllPlan(this, _id);
@@ -59,7 +59,7 @@ public class Campus extends Plan {
 
 
     /**
-    * Return all node of the Campus
+    * Return all nodes of the Campus
     *
     * @return A list containing every node of the campus
     */
@@ -74,7 +74,7 @@ public class Campus extends Plan {
     }
 
     /**
-     * Return all plan of this campus
+     * Return all plans of this campus
      *
      * @return all plan
      */

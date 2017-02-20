@@ -5,6 +5,8 @@
  */
 package be.ulb.owl.graph;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 import be.ulb.owl.scanner.Wifi;
@@ -35,7 +37,6 @@ public class Node {
         this._listAlias = SQLUtils.loadAlias(id);
         this._listWifi = new ArrayList<Wifi>();
         this._listPath = new ArrayList<Path>();
-
     }
 
 
@@ -51,20 +52,26 @@ public class Node {
     
     
     /**
-     * Add a path to an other Node
+     * Add a path to another Node
      * 
      * @param newPath the Path between the two node
      */
     protected void addPath(Path newPath) {
         if(!newPath.containsNode(this)) {
-            throw new IllegalArgumentException("Path have no link with this node");
+            throw new IllegalArgumentException("Path has no link with this node");
+        }
+        Node otherNode = newPath.getOppositeNodeOf(this);
+        if(hasNeighbour(otherNode)) {
+            Log.d(getClass().getName(), this + " has already " + otherNode + " as neighbour");
         } else {
             _listPath.add(newPath);
+            if(!otherNode.hasNeighbour(this))
+                otherNode.addPath(newPath);
         }
     }
     
     /**
-     * Check if the current Node have this id
+     * Check if the current Node has this id
      * 
      * @param id the id which must be tested
      * @return True if this node has this id
@@ -160,14 +167,15 @@ public class Node {
     }
 
     protected void loadPath() {
-        _listPath = SQLUtils.loadPath(getID(), this, getParentPlan());
+        for(Path path : SQLUtils.loadPath(getID(), this, getParentPlan()))
+            addPath(path);
     }
 
 
     /**
-     * Add a wifi on the capted wifi list
+     * Add a wifi on the sensed wifi list
      *
-     * @param wifi which is capted on this node
+     * @param wifi which is sensed on this node
      */
     public void addWifi(Wifi wifi) {
         _listWifi.add(wifi);
@@ -195,8 +203,16 @@ public class Node {
         return neighbours;
     }
 
+    public boolean hasNeighbour(Node node) {
+        for(final Node neighbour : getNeighbours())
+            if(neighbour.isNode(node))
+                return true;
+        return false;
+    }
+
     public double getDistanceFrom(Node neighbour) {
-        assert(getNeighbours().contains(neighbour));
+        if(!hasNeighbour(neighbour))
+            throw new IllegalArgumentException("Provided node " + neighbour + "is not neighbour to " + this);
         double ret = 0.;
         for(Path path: _listPath) {
             if(path.containsNode(neighbour)) {
@@ -213,5 +229,10 @@ public class Node {
                 return path;
         }
         throw new NoPathException("No path between " + getID() + " and " + dest.getID());
+    }
+
+    @Override
+    public String toString() {
+        return getID().toString();
     }
 }

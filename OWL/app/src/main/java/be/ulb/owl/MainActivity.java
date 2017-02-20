@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity  {
     private static MainActivity instance = null;
 
     private static final boolean DEBUG = true;          // view info message in log (maybe more after)
-    private static final boolean TEST = DEBUG && false; // active to call test (active also DEBUG)
+    private static final boolean TEST = DEBUG && true; // active to call test (active also DEBUG)
     private static final boolean DEMO = false;          // active to active
 
     private static final String[] NOT_SUGGESTED = {"Mystery"};
@@ -149,11 +149,8 @@ public class MainActivity extends AppCompatActivity  {
             Log.e(getClass().getName(), "SQLUtils has already been created once... " +
                     "So if shit gets wrong it's probably somewhere here <3");
         }
-
-
         this.setUpCanvas();
         _drawer = new DrawView(this, _canvas, getWidthShrinkageFactor(), getHeightShrinkageFactor());
-
 
         // Init suggestion to search bar
         _searchView = (MaterialSearchView)findViewById(R.id.search_view);
@@ -176,10 +173,10 @@ public class MainActivity extends AppCompatActivity  {
 
         } else if(TEST) {
             // TODO change plan... if we make automatic test ? :/
-            setCurrentPlan(_graph.getPlanByName("P.F"));
+            /*setCurrentPlan(_graph.getPlanByName("P.F"));
 
             Test.testBestPath();
-            Test.testWifi();
+            Test.testWifi();*/
 
         } else {
             setCurrentPlan(_currentPlan);
@@ -197,7 +194,7 @@ public class MainActivity extends AppCompatActivity  {
         super.onResume();
 
         Log.i(getClass().getName(), "Begin scanner task");
-        _scanner.startScanTask(false);
+        _scanner.startScanTask(true);
     }
 
     @Override
@@ -220,7 +217,6 @@ public class MainActivity extends AppCompatActivity  {
 
         Log.i(getClass().getName(), "Reset wifi configuration");
         _scanner.resetWifiStatus();
-
     }
 
     @Override

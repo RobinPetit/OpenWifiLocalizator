@@ -1,7 +1,6 @@
 package be.ulb.owl.gui;
 
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
@@ -56,7 +55,6 @@ public class LocalizeButton implements ScanWifiUpdateEvent {
                     _refreshInProgress = true;
 
                     _graph.setDisplayNotFound(true);
-                    _graph.loadAllWifi();
 
                     toggleLoaderAndButton();
                     _scanner.forceRestartScanTask();
