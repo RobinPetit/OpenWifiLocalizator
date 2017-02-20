@@ -356,8 +356,7 @@ public class SQLUtils extends SQLiteOpenHelper {
                         PlanTable.BG_COORD_Y.getCol(),
                         PlanTable.RELATIVE_ANGLE.getCol(),
                         PlanTable.PPM.getCol()},
-                PlanTable.CAMPUS_ID.getCol() + " = ?" +
-                    " OR " + PlanTable.NAME.getCol() + " = ?", new String[]{""+campusID, campus.getName()}, null, null, null);
+                PlanTable.CAMPUS_ID.getCol() + " = ?", new String[]{""+campusID}, null, null, null);
 
         return loadAllPlan(cursor, campus);
     }
@@ -720,16 +719,16 @@ public class SQLUtils extends SQLiteOpenHelper {
     public static HashSet<Plan> loadSpecificWifi(ArrayList<String> listBSS) {
         HashSet<Plan> res = new HashSet<Plan>();
 
-        String param = TextUtils.join("', '", listBSS);
+        String param = "'" + TextUtils.join("', '", listBSS) + "'";
 
-        String reqStr = "SELECT DISTINCT " + WifiTable.getName() + ".* " + // TODO
+        String reqStr = "SELECT DISTINCT " + WifiTable.getName() + ".* " +
                 "FROM " + WifiTable.getName() + " wifi "+
                     "JOIN " + WifiTable.getName() + " joinWifi " +
                         "ON joinWifi." + WifiTable.NODE_ID.getCol() + " = " +
                                 "wifi." + WifiTable.NODE_ID.getCol() + " " +
-                "WHERE joinWifi." + WifiTable.BSS.getCol() + " IN (?)";
+                "WHERE joinWifi." + WifiTable.BSS.getCol() + " IN (" + param + ")";
 
-        Cursor cursor = getDatabase().rawQuery(reqStr, new String[]{"'"+param+"'"});
+        Cursor cursor = getDatabase().rawQuery(reqStr, new String[]{});
 
         HashMap<Integer, Node> cacheNode = new HashMap<Integer, Node>();
 
@@ -787,7 +786,8 @@ public class SQLUtils extends SQLiteOpenHelper {
 
     /**
      * Load all paths on a specific node<br />
-     * A path is created only if the two nodes exist !
+     * A path is created only if the two nodes exist !<br />
+     * Path are automaticaly added on nodes
      *
      * @param nodeID the id of the node
      * @param node which contains the path
@@ -865,8 +865,7 @@ public class SQLUtils extends SQLiteOpenHelper {
                         SpecialEdgeTable.NODE_2_ID.getCol(),
                         SpecialEdgeTable.WEIGHT.getCol()
                 },
-                EdgeTable.NODE_1_ID.getCol() + " = ?" +
-                        " OR " + EdgeTable.NODE_2_ID.getCol() + " = ?", new String[]{""+nodeID,""+nodeID}, null, null, null);
+                EdgeTable.NODE_1_ID.getCol() + " = ?", new String[]{""+nodeID}, null, null, null);
 
         if(cursor.getCount() > 0) {
             cursor.moveToFirst();

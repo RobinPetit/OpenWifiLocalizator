@@ -62,11 +62,9 @@ public class Node {
         }
         Node otherNode = newPath.getOppositeNodeOf(this);
         if(hasNeighbour(otherNode)) {
-            Log.d(getClass().getName(), this + " has already " + otherNode + " as neighbour");
+            Log.w(getClass().getName(), this + " has already " + otherNode + " as neighbour");
         } else {
             _listPath.add(newPath);
-            if(!otherNode.hasNeighbour(this))
-                otherNode.addPath(newPath);
         }
     }
     
@@ -167,8 +165,7 @@ public class Node {
     }
 
     protected void loadPath() {
-        for(Path path : SQLUtils.loadPath(getID(), this, getParentPlan()))
-            addPath(path);
+        SQLUtils.loadPath(getID(), this, getParentPlan());
     }
 
 

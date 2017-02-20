@@ -45,6 +45,7 @@ public class Path {
         this._distance = distance > 0 ? distance : Plan.euclidianDistance(nodeOne, nodeTwo);
         if(addPathToNode) {
             nodeOne.addPath(this);
+            nodeTwo.addPath(this);
         }
     }
 
