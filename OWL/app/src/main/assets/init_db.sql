@@ -89,5 +89,6 @@ CREATE TABLE "Aliases" (
 );
 
 CREATE INDEX bss_index ON Wifi(BSS);
+CREATE INDEX nodeid_index ON Wifi(NodeId);
 
 COMMIT;
