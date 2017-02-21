@@ -525,7 +525,7 @@ public class MainActivity extends AppCompatActivity  {
         if(newCurrentPlan != null && (_currentPlan == null ||
                 !newCurrentPlan.getName().equalsIgnoreCase(_currentPlan.getName())) ) {
 
-            if(_switchButtonPlan == null || _switchButtonPlan.getCampus() != null) {
+            if(_switchButtonPlan == null || (_currentPosition != null &&_switchButtonPlan == _currentPosition.getParentPlan())) { // _switchButtonPlan.getCampus() != null
                 setSwitchPlanButtonImage(newCurrentPlan.getCampus());
             }
 
