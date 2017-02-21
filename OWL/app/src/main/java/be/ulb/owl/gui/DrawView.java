@@ -63,12 +63,15 @@ public class DrawView extends ImageView {
         _canvas = canvas;
     }
 
-    public void draw(Node node) {
+    public Float[] draw(Node node) {
         _paint.setColor(NODE_COLOR);
         Float x = projectOnX(node.getXOnPlan());
         Float y = projectOnY(node.getYOnPlan());
         _canvas.drawCircle(x, y, NODE_RADIUS, _paint);
+
         this.invalidate();
+
+        return new Float[] {x, y};
     }
 
     public void draw(List<Path> pathList) {
@@ -93,4 +96,11 @@ public class DrawView extends ImageView {
     public FloatCouple nodeToFloatCouple(Node node) {
         return new FloatCouple(projectOnX(node.getXOnPlan()), projectOnY(node.getYOnPlan()));
     }
+
+    @Override
+    public void scrollTo(int x, int y) {
+        super.scrollTo(x, y);
+
+    }
+
 }

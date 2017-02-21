@@ -415,13 +415,27 @@ public class MainActivity extends AppCompatActivity  {
         if(cleanBefore) {
             cleanCanvas();
         }
-        _drawer.draw(node);
+        Float[] coord = _drawer.draw(node);
         _imageDraw.invalidate();
         _imageView.invalidate();
 
-
+        moveToPoint(coord[0], coord[1]);
     }
 
+    /**
+     * Scroll to center the good point
+     *
+     * @param x position of the node
+     * @param y position of the node
+     */
+    private void moveToPoint(float x, float y) {
+        int xMove = ((int) x) - _imageView.getWidth()/2;
+        int yMove = ((int) y) - _imageView.getHeight()/2;
+
+        _imageView.scrollTo(xMove, yMove);
+        _imageDraw.scrollTo(xMove, yMove);
+
+    }
 
 
     ///////////////////////////////////// GETTER AND SETTER /////////////////////////////////////
