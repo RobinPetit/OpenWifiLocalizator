@@ -96,11 +96,4 @@ public class DrawView extends ImageView {
     public FloatCouple nodeToFloatCouple(Node node) {
         return new FloatCouple(projectOnX(node.getXOnPlan()), projectOnY(node.getYOnPlan()));
     }
-
-    @Override
-    public void scrollTo(int x, int y) {
-        super.scrollTo(x, y);
-
-    }
-
 }
