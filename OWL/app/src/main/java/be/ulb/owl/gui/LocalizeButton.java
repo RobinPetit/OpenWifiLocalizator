@@ -1,5 +1,7 @@
 package be.ulb.owl.gui;
 
+import android.graphics.Point;
+import android.view.Display;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
@@ -41,8 +43,20 @@ public class LocalizeButton implements ScanWifiUpdateEvent {
 
         initButton();
         initLoadBar();
+        setSize();
     }
 
+    private void setSize() {
+        Display display = _main.getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        _localizeButton.getLayoutParams().height = size.x/7;
+        _localizeButton.getLayoutParams().width = size.x/7;
+        _localizeButton.requestLayout();
+        _loadBar.getLayoutParams().height = size.x/7;
+        _loadBar.getLayoutParams().width = size.x/7;
+        _loadBar.requestLayout();
+    }
 
     private void initButton() {
         _localizeButton = (ImageButton)_main.findViewById(R.id.localizeButton);

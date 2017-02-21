@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity  {
     private static final boolean DEBUG = true;     // view info message in log (maybe more after)
     private static final boolean TEST = false;     // active to call test (active also DEBUG)
     private static final boolean DEMO = false;     // active to active
-
     private static final String[] NOT_SUGGESTED = {"Mystery"};
 
     // android widgets
