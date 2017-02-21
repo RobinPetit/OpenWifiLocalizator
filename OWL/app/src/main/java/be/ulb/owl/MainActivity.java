@@ -55,9 +55,9 @@ public class MainActivity extends AppCompatActivity  {
     // static attributes
     private static MainActivity instance = null;
 
-    private static final boolean DEBUG = true;          // view info message in log (maybe more after)
-    private static final boolean TEST = DEBUG && true; // active to call test (active also DEBUG)
-    private static final boolean DEMO = false;          // active to active
+    private static final boolean DEBUG = true;     // view info message in log (maybe more after)
+    private static final boolean TEST = false;     // active to call test (active also DEBUG)
+    private static final boolean DEMO = false;     // active to active
 
     private static final String[] NOT_SUGGESTED = {"Mystery"};
 
@@ -165,10 +165,10 @@ public class MainActivity extends AppCompatActivity  {
         super.onStart();
 
         // Set default plan
-        if (DEMO) {
+        if (isDemo()) {
             setCurrentPlan(_graph.getPlanByName("P.F"));
 
-        } else if(TEST) {
+        } else if(isTest()) {
             // TODO change plan... if we make automatic test ? :/
             /*setCurrentPlan(_graph.getPlanByName("P.F"));
 
@@ -331,8 +331,7 @@ public class MainActivity extends AppCompatActivity  {
         if(_imageView.getDrawable() != null) {
             Integer height = _imageView.getDrawable().getIntrinsicWidth();
             Integer width = _imageView.getDrawable().getIntrinsicHeight();
-            Bitmap bitmap;
-            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             bitmap = bitmap.copy(bitmap.getConfig(), true);
             _canvas = new Canvas(bitmap);
             _imageDraw.setImageBitmap(bitmap);
@@ -419,6 +418,8 @@ public class MainActivity extends AppCompatActivity  {
         _drawer.draw(node);
         _imageDraw.invalidate();
         _imageView.invalidate();
+
+
     }
 
 
@@ -562,12 +563,12 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     /**
-     * Check if app is in TEST mode
+     * Check if app is in TEST mode (and DEBUG mode on)
      *
      * @return True if we test application
      */
     public static boolean isTest() {
-        return TEST;
+        return TEST && DEBUG;
     }
 
     /**

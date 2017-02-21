@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.util.Log;
 import android.view.View;
 
+import java.util.Arrays;
 import java.util.HashSet;
 
 import be.ulb.owl.MainActivity;
@@ -63,6 +64,7 @@ public class ClickListenerChoseLocal implements View.OnClickListener {
         Plan currentPlan = _main.getCurrentPlan();
         if(currentPlan != null) {
             HashSet<String> allAlias = currentPlan.getAllAlias();
+
             Log.d(this.getClass().getName(), allAlias.toString());
 
             if(allAlias.size() > 0) {
@@ -70,6 +72,8 @@ public class ClickListenerChoseLocal implements View.OnClickListener {
                 items = allAlias.toArray(items);
             }
         }
+
+        Arrays.sort(items);
         return items;
     }
 
