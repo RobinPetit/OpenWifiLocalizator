@@ -19,9 +19,11 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import be.ulb.owl.demo.GraphDemo;
+import be.ulb.owl.graph.Campus;
 import be.ulb.owl.graph.Graph;
 import be.ulb.owl.graph.NoPathException;
 import be.ulb.owl.graph.Node;
@@ -59,6 +61,7 @@ public class MainActivity extends AppCompatActivity  {
     private static final boolean TEST = false;     // active to call test (active also DEBUG)
     private static final boolean DEMO = false;     // active to active
     private static final String[] NOT_SUGGESTED = {"Mystery"};
+    private static final String DEFAULT_SEARCH = "Campus";
 
     // android widgets
     private ImageView _imageView;
@@ -150,11 +153,7 @@ public class MainActivity extends AppCompatActivity  {
 
         // Init suggestion to search bar
         _searchView = (MaterialSearchView)findViewById(R.id.search_view);
-        _searchView.addSuggestions(_graph.getAllAlias());
-
-        for(String suggestion : NOT_SUGGESTED) {
-            _searchView.removeSuggestion(suggestion);
-        }
+        setSearchSuggestions();
     }
 
 
@@ -252,6 +251,14 @@ public class MainActivity extends AppCompatActivity  {
             }
         });
 
+        _searchView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                _searchView.openSearch();
+                _searchView.setQuery(DEFAULT_SEARCH, false);
+            }
+        });
+
         return true;
     }
 
@@ -339,7 +346,6 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
 
-
     private float getWidthShrinkageFactor() {
         float res = 0;
         if(_imageView.getDrawable() != null) {
@@ -369,6 +375,20 @@ public class MainActivity extends AppCompatActivity  {
         if(_changePlan != null) {
             _changePlan.setVisibility(VISIBLE);
             _changePlan.setImageDrawable(_switchButtonPlan.getDrawableImage());
+        }
+    }
+
+    private void setSearchSuggestions() {
+        _searchView.clearSuggestions();
+        for(final Campus campus : _graph.getAllCampus()) {
+            _searchView.addSuggestion("Campus " + campus.getName());
+        }
+        ArrayList<String> aliases = new ArrayList<>(_graph.getAllAlias());
+        Collections.sort(aliases);
+        _searchView.addSuggestions(aliases);
+
+        for (String suggestion : NOT_SUGGESTED) {
+            _searchView.removeSuggestion(suggestion);
         }
     }
 
@@ -545,7 +565,7 @@ public class MainActivity extends AppCompatActivity  {
      * Change the current location/position Node
      *
      * @param newLocation the new position
-     * @return True if the location havec change
+     * @return True if the location has changed
      */
     public boolean setCurrentLocation(Node newLocation) {
         Node oldLocation = _currentPosition;
