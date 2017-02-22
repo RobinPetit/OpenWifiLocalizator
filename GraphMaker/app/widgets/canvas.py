@@ -179,7 +179,7 @@ class GraphCanvas(t.Canvas):
         for node_id in self.nodes():
             self.coords(node_id, self.nodes()[node_id].coord()[0]+x_offset, self.nodes()[node_id].coord()[1]+y_offset,
                         self.nodes()[node_id].coord()[2]+x_offset, self.nodes()[node_id].coord()[3]+y_offset)
-    
+
     def load_plan(self, background_file_name):
         filename = path_to_plan_name(background_file_name)
         plan = self.database.load_plan(filename)
@@ -192,14 +192,14 @@ class GraphCanvas(t.Canvas):
             self.create_node_from_db(x, y, aliases, has_ap, node_id)
         for edge in self.database.load_edges_from_plan(filename):
             self.create_edge_from_db(*edge)
-            
+
     def create_node_from_db(self, x, y, aliases, has_ap, db_id):
         node_coord = (x-NODE_SIZE, y-NODE_SIZE,
                       x+NODE_SIZE, y+NODE_SIZE)
         # node_id = self.create_oval(*node_coord, fill='green' if has_ap else 'red')
         node_id = self.create_oval(*node_coord, fill=Config.COLOR_VALID if has_ap else 'red')
         self.add_node(node_id, [], aliases=aliases, node_name=db_id)
-        
+
     def create_edge_from_db(self, nb, id1, id2):
         n1 = n2 = None
         for n in self.nodes():
@@ -219,7 +219,7 @@ class GraphCanvas(t.Canvas):
         end_coord = [c + NODE_SIZE for c in self.nodes()[n2].coord()[:2]]
         edge_id = self.create_line(*beg_coord, *end_coord, width=EDGE_WIDTH)
         self.add_edge(edge_id, [id1, id2], nb=nb)
-        
+
     def update_nodes_position(self):
         nodes_list = [self.nodes()[n] for n in self.nodes()]
         self.database.update_all_nodes_position(nodes_list)
@@ -338,10 +338,13 @@ class EditableGraphCanvas(GraphCanvas):
             self.delete(selected)
             # remove node from db
             self.database.remove_node(self.nodes()[selected])
+            edges_to_remove = list()
             for edge_id in self.edges():
                 if self.nodes()[selected].id() in self.edges()[edge_id].get_extremity_ids():
                     self.delete(edge_id)
-                    del self.edges()[edge_id]
+                    edges_to_remove.append(edge_id)
+            for edge_id in edges_to_remve:
+                del self.edges()[edge_id]
             del self.nodes()[selected]
         elif selected in self.edges():
             self.delete(selected)
