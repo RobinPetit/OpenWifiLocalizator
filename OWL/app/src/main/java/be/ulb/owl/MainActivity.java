@@ -2,6 +2,7 @@ package be.ulb.owl;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
@@ -448,12 +449,13 @@ public class MainActivity extends AppCompatActivity  {
      * @param y position of the node
      */
     private void moveToPoint(float x, float y) {
-        int xMove = ((int) x) - _imageView.getWidth()/2;
-        int yMove = ((int) y) - _imageView.getHeight()/2;
+        int xMove = ((int) x) - _imageDraw.getWidth()/2;
+        int yMove = ((int) y) - _imageDraw.getHeight()/2;
 
-        _imageView.scrollTo(xMove, yMove);
-        _imageDraw.scrollTo(xMove, yMove);
+        Matrix matrixView = _imageDraw.getMatrix();
+        matrixView.setTranslate(-xMove, -yMove);
 
+        TouchListener.setNewCoordZoom(matrixView, _imageDraw, _imageView);
     }
 
 

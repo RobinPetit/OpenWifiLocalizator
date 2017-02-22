@@ -1,10 +1,9 @@
 package be.ulb.owl.gui;
+
 import android.graphics.Matrix;
 import android.graphics.PointF;
-import android.graphics.Rect;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.ImageView;
 
 public class Zoom {
@@ -27,8 +26,6 @@ public class Zoom {
     private PointF mid = new PointF();
     private float oldDist = 1f;
 
-    private ImageView view;
-    private MotionEvent event;
 
     /*
      * --------------------------------------------------------------------------
@@ -56,6 +53,93 @@ public class Zoom {
         point.set(x / 2, y / 2);
     }
 
+    public void start(MotionEvent event, ImageView... allView) {
+        if(allView == null || allView.length <= 0) {
+            return;
+        }
+
+
+        // Handle touch events here...
+//        dumpEvent(event);
+
+
+        switch (event.getAction() & MotionEvent.ACTION_MASK) {
+
+            // first finger down only
+            case MotionEvent.ACTION_DOWN:
+                Log.d(TAG, "mode=DRAG"); // write to LogCat
+                savedMatrix.set(matrix);
+                start.set(event.getX(), event.getY());
+                mode = DRAG;
+                break;
+
+            // first finger lifted
+            case MotionEvent.ACTION_UP:
+
+            // second finger lifted
+            case MotionEvent.ACTION_POINTER_UP:
+                mode = NONE;
+                Log.d(TAG, "mode=NONE");
+                break;
+
+            // first and second finger down
+            case MotionEvent.ACTION_POINTER_DOWN:
+                oldDist = spacing(event);
+                Log.d(TAG, "oldDist=" + oldDist);
+                if (oldDist > 5f) {
+                    savedMatrix.set(matrix);
+                    midPoint(mid, event);
+                    mode = ZOOM;
+                    Log.d(TAG, "mode=ZOOM");
+                }
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                if (mode == DRAG) {
+                    if(allView[0].getDrawable() != null) {
+                        float newX = event.getX() - start.x;
+                        float newY = event.getY() - start.y;
+
+                        // create the transformation in the matrix  of points
+                        matrix.set(savedMatrix);
+                        matrix.postTranslate(newX, newY);
+
+                        Log.i(getClass().getName(), "new: " + newX + " - " + newY);
+                    }
+
+                } else if (mode == ZOOM) {
+                    // pinch zooming
+                    float newDist = spacing(event);
+                    Log.d(TAG, "newDist=" + newDist);
+                    if (newDist > 5f) {
+                        matrix.set(savedMatrix);
+                        float scale = newDist / oldDist;
+                        matrix.postScale(scale, scale, mid.x, mid.y);
+                    }
+                }
+                break;
+        }
+
+        // display the transformation on screen
+        displayChange(allView);
+    }
+
+    private void displayChange(ImageView... allView) {
+        for(ImageView selectView : allView) {
+            selectView.setScaleType(ImageView.ScaleType.MATRIX);
+            selectView.setImageMatrix(matrix);
+        }
+    }
+
+
+    public void movePlan(Matrix newMatrix, ImageView... view) {
+        matrix.set(newMatrix);
+        displayChange(view);
+    }
+
+
+    //////////////////////// DEBUG ////////////////////////
+
     /** Show an event in the LogCat view, for debugging */
     private void dumpEvent(MotionEvent event) {
         String names[] = { "DOWN", "UP", "MOVE", "CANCEL", "OUTSIDE","POINTER_DOWN", "POINTER_UP", "7?", "8?", "9?" };
@@ -81,86 +165,6 @@ public class Zoom {
 
         sb.append("]");
         Log.d("Touch Events ---------", sb.toString());
-    }
-
-    public void start(View v, MotionEvent e) {
-        if(v == null) {
-            return;
-        }
-
-        view = (ImageView) v;
-        view.setScaleType(ImageView.ScaleType.MATRIX);
-        event = e;
-        float scale;
-
-        dumpEvent(event);
-        // Handle touch events here...
-
-        switch (event.getAction() & MotionEvent.ACTION_MASK) {
-
-            // first finger down only
-            case MotionEvent.ACTION_DOWN:
-                Log.d(TAG, "mode=DRAG"); // write to LogCat
-                savedMatrix.set(matrix);
-                start.set(event.getX(), event.getY());
-                mode = DRAG;
-                break;
-
-            // first finger lifted
-            case MotionEvent.ACTION_UP:
-
-                // second finger lifted
-            case MotionEvent.ACTION_POINTER_UP:
-                mode = NONE;
-                Log.d(TAG, "mode=NONE");
-                break;
-
-            // first and second finger down
-            case MotionEvent.ACTION_POINTER_DOWN:
-
-                oldDist = spacing(event);
-                Log.d(TAG, "oldDist=" + oldDist);
-                if (oldDist > 5f) {
-                    savedMatrix.set(matrix);
-                    midPoint(mid, event);
-                    mode = ZOOM;
-                    Log.d(TAG, "mode=ZOOM");
-                }
-                break;
-
-            case MotionEvent.ACTION_MOVE:
-
-                if (mode == DRAG) {
-                    if(view.getDrawable() != null) {
-                        Rect r = view.getDrawable().getBounds();
-
-                        float newX = event.getX() - start.x;
-                        float newY = event.getY() - start.y;
-
-                        // create the transformation in the matrix  of points
-
-                        matrix.set(savedMatrix);
-                        matrix.postTranslate(newX, newY);
-                    }
-
-                } else if (mode == ZOOM) {
-                    // pinch zooming
-                    float newDist = spacing(event);
-                    Log.d(TAG, "newDist=" + newDist);
-                    if (newDist > 5f) {
-                        matrix.set(savedMatrix);
-                        scale = newDist / oldDist;
-                        matrix.postScale(scale, scale, mid.x, mid.y);
-                    }
-                }
-                break;
-        }
-
-        view.setImageMatrix(matrix); // display the transformation on screen
-    }
-
-    public Zoom(){
-        Log.i(getClass().getName(), "Instantiate");
     }
 
 }
