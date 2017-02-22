@@ -1,4 +1,4 @@
-\documentclass[11pt,journal,compsoc]{IEEEtran}
+\documentclass[10pt,journal,compsoc]{IEEEtran}
 
 \usepackage{commath}
 \usepackage[french]{babel} % Global stuff set to french
@@ -7,12 +7,17 @@
 \usepackage[utf8]{inputenc}
 \usepackage{tcolorbox}
 \usepackage{amsmath, amssymb}
+\usepackage{mathtools}
 
 \newcommand{\dBm}{\text{dBm}}
+\newcommand{\tq}{\text{ t.q. }}
 
 \newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
 
 %%% TODO: utiliser les blocs adaptés au figures afin de les numéroter correctement.
+
+\setcounter{tocdepth}{2}
 
 \begin{document}
 
@@ -234,8 +239,53 @@
 
 \section{Interpolation}
   \subsection{Principe}
+    Si $X = \{(x_i, y_i) \tq 0 \leq i \leq N\} \subset \R^2$ est un ensemble de points du plan euclidien, l'interpolation a pour objectif de déterminer une courbe
+    passant par tous ces points. Il existe bien entendu une infinité de telles courbes. L'idée est donc de définir une forme générale et paramétrisée de la courbe,
+	et de déterminer la valeur de ces paramètres en fonction de $X$.
   \subsection{Interpolation polynômiale}
-  \subsection{Interpolation par morceaux}  % piece-wise interpolation
+    En supposant qu'il existe une fonction scalaire $F : \R \to \R$ telle que $\forall i \in \{0, \ldots, N\} : F(x_i) = y_i$, on peut chercher à déterminer une fonction
+	interpolante sous forme polynômiale. Étant donné qu'un polynôme de degré $n \in \N$ est entièrement caractérisé par $n+1$ coefficients, on peut chercher à interpoler
+	l'ensemble des couples $(x_i, y_i)$ par une fonction polynômiale $P : \R \to \R$ de degré $N$. Les $N+1$ coefficients sont alors déterminés selon les $N+1$ équations
+	$y_i = P(x_i)$. Pour ce faire, les méthodes des polynômes de Lagrange et de Newton peuvent être utilisées.
+
+	Cependant, un polynôme de degré élevé est soumis à de fortes oscillations entre les points de contrôle. De plus, pour $x \in \R \setminus [x_0, x_N]$, la valeur de
+	$P(x)$ tend vite vers $+\infty$ en valeur absolue. C'est la raison pour laquelle une interpolation par morceaux est préférable si le nombre de points de contrôle est
+	élevé, ou si de faibles variations sont attendues entre les points de contrôle.
+  \subsection{Interpolation par morceaux}
+    L'interpolation par morceaux (\textit{piece-wise interpolation} en anglais) est un moyen d'interpoler les $N+1$ points de contrôle par une courbe étant déterminée
+	par une union de courbes définies chacune sur un segment $[x_j, x_{j+1}]$.
+    \subsubsection{Interpolation par splines polynômiales}
+      Si $f : [x_0, x_N] \to \R$ est la fonction d'interpolation, et si on considère que $f(x) = f_i(x)$ pour $x \in [x_i, x_{i+1})$, alors on cherche les
+	  $f_i : [x_i, x_{i+1}] \to \R$ sous forme de polynôme. Il faut alors introduire un certain nombre de contraintes afin de pouvoir déterminer les coefficients de
+	  ces $N$ fonctions.
+
+	  Il est commun d'imposer que ces fonctions soient cubiques, et d'imposer une continuité en $C^2$, i.e. que les dérivées secondes des $f_i$ soient continues aux
+	  points de contrôle.
+    \subsubsection{Interpolation par une courbe paramétrique}
+	  La sous-section précédente ne concerne que le cas où tous les $x_i$ sont distincts deux à deux, et donc où il existe une fonction $F$ telle que pour tout $i$,
+	  on ait $y_i = f(x_i)$. Dans le cas où les points de contrôle représentent une trajectoire dans $\R^2$, cette supposition n'est plus correcte, et l'interpolation
+	  proposée ci-dessus ne peut fonctionner (par définition d'une fonction, $f : D \to I$, on a pour tout $x \in D$ que $f(x)$ donne une unique valeur $y \in I$).
+
+	  On choisit alors de considérer la courbe d'interpolation comme une courbe paramétrique~:
+	  \begin{equation}
+	  	\gamma : [0, N] \to \R^2 : t \mapsto (x(t), y(t)).
+      \end{equation}
+	  De tels problèmes ne se posent plus, et l'interpolation peut alors être faite de la sorte.
+	\subsubsection{Splines cubiques hermitiennes}\label{subsub:splines3herm}
+	  Les splines cubiques hermitiennes sont des splines polynômiales (de degré 3) d'interpolation par une courbe paramétrique. L'idée est de dire que l'on cherche
+	  $N$ fonctions $\gamma_i : [0, 1] \to \R^2 : t \mapsto (x_i(t), y_i(t))$ où $x_i, y_i : [0, 1] \to \R$ sont deux fonction polynômiales cubiques.
+
+	  $x_i$ et $y_i$ sont deux fonctions cubiques, donc chacune déterminées par 4 coefficients, et on cherche $N$ telles fonctions. Il faut alors $4N$ contraintes
+	  pour déterminer ces coefficients. On impose donc $\gamma_i(0) = (x_i, y_i)$ et $\gamma_i(1) = x_{i+1}, y_{i+1})$ pour $i = 0, \ldots, {N-1}$, ce qui donne $2(N-1)$
+	  contraintes. Il en reste $2(N+1)$ à déterminer. Pour cela, seule une continuité $C^1$ est demandée, et on impose~:
+	  \begin{equation}
+	  	\forall i \in \{1, \ldots, N-1\} : \od {\gamma_i}t(0) = \frac 12\left(x_{i+1}-x_{i-1}, y_{i+1}-y_{i-1}\right).
+	  \end{equation}
+	  Ainsi, il ne reste plus que deux contraintes qui sont données par $\od {\gamma_0}t(0)$ et $\od {\gamma_{N-1}}t(1)$ qui sont choisis arbitrairement. Par exemple
+	  en étant mis à 0. Selon ces contraintes, les courbes $\gamma_i$ sont définies de manière univoque (voir Annexe B).
+
+	  Les splines cubiques hermitiennes présentent également l'avantage suivant~: le déplacement d'un point de contrôle $(x_j, y_j)$ n'a d'influence que sur les courbes
+	  $\gamma_k$ pour $\abs {k-j} \leq 1$. Ainsi, modifier un point de contrôle ne donne qu'une modification locale de la courbe, ce qui n'est pas le cas en général.
 \section{Discussion et limitations}
 \section{Conclusion}
 
@@ -308,5 +358,67 @@ WHILE NOT Q.empty()
   END IF
 END WHILE
 \end{verbatim}
+
+  \subsection*{B. Splines cubiques hermitiennes}
+    Comme détaillé dans la sous-sous-section~\ref{subsub:splines3herm}, en posant~:
+	\begin{align}
+		x_i(t) &= \sum_{k=0}^3\alpha_{ik}t^k \\
+		y_i(t) &= \sum_{k=0}^3\beta_{ik}t^k \\
+		p_i &= (x_i, y_i)
+	\end{align}
+	pour $\R^2 \ni \eta_{ik} \coloneqq (\alpha_{ik}, \beta_{ik})$, on trouve de manière plus générale~:
+	\begin{equation}
+	  \gamma_i(t) = \sum_{k=0}^3\eta_{ik}t^k,
+	\end{equation}
+	ce qui donne~:
+	\begin{equation}
+	  \gamma_i(0) = \eta_{i0} \quad \text{ et } \quad \gamma_i(1) = \sum_{k=0}^3\eta_{ik}.
+	\end{equation}
+
+	Pour $\R^2 \ni \Delta_i \coloneqq \frac 12(x_{i+1}-x_{i-1}, y_{i+1}-y_{i-1})$ ($i = 1, \ldots, N-1$) et $\Delta_0 = 0 = \Delta_N$,
+	on a alors pour $0~\leq~i~\lneqq~N$~:
+	\begin{equation}
+	  \sum_{k=0}^2(k+1)\eta_{i(k+1)}t^k = \od {\gamma_i}t(t),
+	\end{equation}
+	et~:
+	\begin{align}
+	  \eta_{i1} &= \od {\gamma_i}t(0) = \Delta_i \\
+	  \sum_{k=0}^2(k+1)\eta_{i(k+1)} &= \od {\gamma_i}t(1) = \Delta_{i+1}.
+	\end{align}
+	Cela se réécrit sous forme de système matriciel qui donne~:
+	\begin{equation}
+	  \underbrace {\begin{bmatrix}
+	    1 & 0 & 0 & 0 \\
+		1 & 1 & 1 & 1 \\
+		0 & 1 & 1 & 1 \\
+		0 & 1 & 2 & 3
+	  \end{bmatrix}}_{\coloneqq M}
+	  \underbrace {\begin{bmatrix}
+	    \eta_{i0} \\ \eta_{i1} \\ \eta_{i2} \\ \eta_{i3}
+	  \end{bmatrix}}_{\coloneqq \eta}
+	  =
+	  \begin{bmatrix}
+	  p_i \\ p_{i+1} \\ \Delta_i \\ \Delta_{i+1}
+	  \end{bmatrix}.
+	\end{equation}
+
+	En inversant la matrice $M$, on trouve la solution~:
+	\begin{equation}
+	  \eta = M^{-1}\begin{bmatrix}p_i \\ p_{i+1} \\ \Delta_i \\ \Delta_{i+1} \end{bmatrix}
+	  =
+	  \begin{bmatrix}
+	    1 & 0 & 0 & 0 \\
+		0 & 0 & 1 & 0 \\
+		-3 & 3 & -2 & -1 \\
+		2 & -2 & 1 & 1
+	  \end{bmatrix}
+	  \begin{bmatrix}
+	    p_i \\ p_{i+1} \\ \Delta_i \\ \Delta_{i+1}
+	  \end{bmatrix}
+	  = \eta.
+	\end{equation}
+
+	On remarque en effet qu'en changeant un des points de contrôle $p_j$, la modification de la courbe d'interpolation sera locale étant donné
+	que les coefficients de la courbe $\gamma_i$ ne dépendent que des points de contrôles $p_{i-1}$, $ p_i$, et $p_{i+1}$.
 
 \end{document}
