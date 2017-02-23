@@ -18,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,6 +71,7 @@ public class MainActivity extends AppCompatActivity  {
     private Canvas _canvas = null;
     private MaterialSearchView _searchView = null;  // the widget with the searchbar and autocompletion
     private ImageButton _changePlan;
+    private RelativeLayout _layout;
 
     // private attributes
     private Graph _graph = null;
@@ -113,6 +115,7 @@ public class MainActivity extends AppCompatActivity  {
         _imageView = (ImageView)findViewById(R.id.plan);
         _imageDraw = (ImageView)findViewById(R.id.draw);
         _imageDraw.setOnTouchListener(new TouchListener(this));
+        _layout = (RelativeLayout)findViewById(R.id.frame_layout);
 
         try {
             // Load sql
@@ -249,14 +252,17 @@ public class MainActivity extends AppCompatActivity  {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 _searchView.setQuery(_searchView.getSuggestionAtPosition(position), true);
+                displayPlan();
             }
         });
 
         _searchView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                hidePlan();
                 _searchView.openSearch();
                 _searchView.setQuery(DEFAULT_SEARCH, false);
+                Log.d("Main", "onClick");
             }
         });
 
@@ -274,6 +280,7 @@ public class MainActivity extends AppCompatActivity  {
         // If back is pressed while the searchbar is being used, then close it and kep going
         if(_searchView != null && _searchView.isOpen()) {
             _searchView.closeSearch();
+            displayPlan();
         } else {
             super.onBackPressed();
         }
@@ -575,7 +582,13 @@ public class MainActivity extends AppCompatActivity  {
         return (oldLocation != newLocation);
     }
 
+    protected void displayPlan() {
+        _layout.setVisibility(VISIBLE);
+    }
 
+    protected void hidePlan() {
+        _layout.setVisibility(View.GONE);
+    }
 
     /////////////////////////////////////////// STATIC ///////////////////////////////////////////
 

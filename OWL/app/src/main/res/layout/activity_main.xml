@@ -13,6 +13,14 @@
         android:background="#303F9F"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
+    <br.com.mauker.materialsearchview.MaterialSearchView
+        android:id="@+id/search_view"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        style="@style/MaterialSearchViewStyle"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true" />
+
     <RelativeLayout android:id="@+id/frame_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -49,24 +57,24 @@
             android:layout_alignParentLeft="false"
             android:scaleType="fitXY" />
 
+        <Button
+            android:text="@string/rooms_btn_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/local" />
+
+        <ImageButton
+            android:background="@drawable/boussole2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/localizeButton"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true" />
+
     </RelativeLayout>
-
-    <Button
-        android:text="@string/rooms_btn_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/local" />
-
-    <ImageButton
-        android:background="@drawable/boussole2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/localizeButton"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true" />
 
     <ProgressBar
         style="?android:attr/progressBarStyle"
@@ -76,13 +84,5 @@
         android:progressDrawable="@drawable/circular_progress_bar"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true" />
-
-    <br.com.mauker.materialsearchview.MaterialSearchView
-        android:id="@+id/search_view"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        style="@style/MaterialSearchViewStyle"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentTop="true" />
 
 </RelativeLayout>
