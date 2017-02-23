@@ -17,13 +17,14 @@ public class TouchListener implements View.OnTouchListener {
 
     private final MainActivity _main;
     private static Zoom _zoom = null;
+    private final Matrix matrix = null;
 
     public TouchListener(MainActivity main) {
         _main = main;
         if(_zoom != null) {
             Log.e(getClass().getName(), "Zomm already initialized !");
         }
-        _zoom = new Zoom();
+        _zoom = new Zoom(_main);
     }
 
 

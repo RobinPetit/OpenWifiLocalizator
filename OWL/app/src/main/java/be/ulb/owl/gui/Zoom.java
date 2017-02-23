@@ -2,18 +2,24 @@ package be.ulb.owl.gui;
 
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
+import be.ulb.owl.MainActivity;
+
 public class Zoom {
 
     private static final String TAG = "Touch";
-    private static final float MIN_ZOOM = 1f,MAX_ZOOM = 1f;
 
     // These matrices will be used to scale points of the image
+    private Matrix save;
     private Matrix matrix = new Matrix();
     private Matrix savedMatrix = new Matrix();
+    private MainActivity _main;
+    private float width;
+    private float widthN;
 
     // The 3 states (events) which the user is trying to perform
     private static final int NONE = 0;
@@ -25,6 +31,14 @@ public class Zoom {
     private PointF start = new PointF();
     private PointF mid = new PointF();
     private float oldDist = 1f;
+
+    public Zoom(MainActivity main) {
+        _main = main;
+        DisplayMetrics metrics = new DisplayMetrics();
+        _main.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        save = _main.getImageView().getImageMatrix();
+        width = metrics.widthPixels;
+    }
 
 
     /*
@@ -54,6 +68,7 @@ public class Zoom {
     }
 
     public void start(MotionEvent event, ImageView... allView) {
+
         if(allView == null || allView.length <= 0) {
             return;
         }
@@ -108,13 +123,20 @@ public class Zoom {
                     }
 
                 } else if (mode == ZOOM) {
-                    // pinch zooming
                     float newDist = spacing(event);
                     Log.d(TAG, "newDist=" + newDist);
                     if (newDist > 5f) {
                         matrix.set(savedMatrix);
                         float scale = newDist / oldDist;
+
                         matrix.postScale(scale, scale, mid.x, mid.y);
+                        float[] values = new float[9];
+                        matrix.getValues(values);
+
+                        widthN = values[Matrix.MSCALE_X]*_main.getImageView().getWidth();
+                        if (widthN < width){
+                            matrix.set(save);
+                        }
                     }
                 }
                 break;
@@ -126,8 +148,11 @@ public class Zoom {
 
     private void displayChange(ImageView... allView) {
         for(ImageView selectView : allView) {
-            selectView.setScaleType(ImageView.ScaleType.MATRIX);
-            selectView.setImageMatrix(matrix);
+            Log.d(TAG, "Mode = "+mode+" WidthN : "+widthN+" Width : "+width);
+            if ((widthN >= width && mode == ZOOM) || mode == 1) {
+                selectView.setScaleType(ImageView.ScaleType.MATRIX);
+                selectView.setImageMatrix(matrix);
+            }
         }
     }
 
@@ -166,5 +191,7 @@ public class Zoom {
         sb.append("]");
         Log.d("Touch Events ---------", sb.toString());
     }
+
+
 
 }
