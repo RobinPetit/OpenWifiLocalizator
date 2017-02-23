@@ -1,9 +1,11 @@
 package be.ulb.owl.gui;
 
 import android.graphics.Matrix;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
@@ -18,6 +20,8 @@ public class Zoom {
     private Matrix matrix = new Matrix();
     private Matrix savedMatrix = new Matrix();
     private MainActivity _main;
+    private float height;
+    private float heightN;
     private float width;
     private float widthN;
 
@@ -34,10 +38,17 @@ public class Zoom {
 
     public Zoom(MainActivity main) {
         _main = main;
+        Display display = _main.getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        width = size.x;
+        height = size.y;
+        /*
         DisplayMetrics metrics = new DisplayMetrics();
         _main.getWindowManager().getDefaultDisplay().getMetrics(metrics);
         save = _main.getImageView().getImageMatrix();
         width = metrics.widthPixels;
+        */
     }
 
 
@@ -126,16 +137,21 @@ public class Zoom {
                     float newDist = spacing(event);
                     Log.d(TAG, "newDist=" + newDist);
                     if (newDist > 5f) {
+                        Matrix save1 = new Matrix();
                         matrix.set(savedMatrix);
                         float scale = newDist / oldDist;
 
+                        save1.set(matrix);
                         matrix.postScale(scale, scale, mid.x, mid.y);
                         float[] values = new float[9];
                         matrix.getValues(values);
 
+                        heightN = values[Matrix.MSCALE_Y]*_main.getImageView().getHeight();
                         widthN = values[Matrix.MSCALE_X]*_main.getImageView().getWidth();
                         if (widthN < width){
                             matrix.set(save);
+                        } else if (heightN > height) {
+                            matrix.set(save1);
                         }
                     }
                 }
@@ -149,7 +165,7 @@ public class Zoom {
     private void displayChange(ImageView... allView) {
         for(ImageView selectView : allView) {
             Log.d(TAG, "Mode = "+mode+" WidthN : "+widthN+" Width : "+width);
-            if ((widthN >= width && mode == ZOOM) || mode == 1) {
+            if ((widthN >= width && mode == ZOOM && heightN <= height) || mode == 1) {
                 selectView.setScaleType(ImageView.ScaleType.MATRIX);
                 selectView.setImageMatrix(matrix);
             }
