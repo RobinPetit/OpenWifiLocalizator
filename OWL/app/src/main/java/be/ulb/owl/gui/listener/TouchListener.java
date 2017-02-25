@@ -17,7 +17,6 @@ public class TouchListener implements View.OnTouchListener {
 
     private final MainActivity _main;
     private static Zoom _zoom = null;
-    private final Matrix matrix = null;
 
     public TouchListener(MainActivity main) {
         _main = main;
