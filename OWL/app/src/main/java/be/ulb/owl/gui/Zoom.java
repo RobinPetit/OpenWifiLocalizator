@@ -116,7 +116,7 @@ public class Zoom {
                 actionDown(event);
                 break;
             case MotionEvent.ACTION_UP:
-                break;
+
             case MotionEvent.ACTION_POINTER_UP:
                 actionPointerUp();
                 break;
