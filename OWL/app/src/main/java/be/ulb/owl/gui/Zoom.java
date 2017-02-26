@@ -12,147 +12,254 @@ import be.ulb.owl.MainActivity;
 
 public class Zoom {
 
-    private static final String TAG = "Touch";
+    // Constants
+    private static final double MAX_ZOOM = 2.5;   // Maximum zomm
+    private static final double MAX_DEZOOM = 1.5; // Maximum dezoom
+    private static final float MIN_SPACE = 5f;    // Minimum space between finger to detect move
 
-    // Matrix used to modify image
-    private Matrix save;
-    private Matrix matrix = new Matrix();
-    private Matrix savedMatrix = new Matrix();
-    private MainActivity _main;
-    // Screen dimentions
-    private float height;
-    private float width;
-    private float heightN;
-    private float widthN;
     // Action type
     private static final int NONE = 0;
     private static final int DRAG = 1;
     private static final int ZOOM = 2;
-    private int mode = NONE;
 
-    private PointF start = new PointF();
-    private PointF mid = new PointF();
-    private float oldDist = 1f;
 
+    // Matrix used to modify image
+    private Matrix _matrix = new Matrix();
+    private Matrix _savedMatrix = new Matrix();
+    private Matrix _savedMatrixZoom = new Matrix();
+    private Matrix _saveMatrixMove = new Matrix();
+
+    // Screen dimensions
+    private float _width;
+    private float _zoomWidth;
+
+    // Variable for mouvement
+    private int _mode = NONE;
+    private PointF _start = new PointF();
+    private PointF _mid = new PointF();
+    private float _oldDist = 1f;
+    private MainActivity _main;
+
+
+    /**
+     * Constructor
+     *
+     * @param main instance of main
+     */
     public Zoom(MainActivity main) {
-        _main = main;
-        Display display = _main.getWindowManager().getDefaultDisplay();
+        Display display = main.getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        width = size.x;
-        height = size.y;
+
+        _width = size.x;
+        _zoomWidth = _width;
+
+        _main = main;
     }
 
     // Calculate new positions on the screen
+
+    /**
+     * Space between two finger
+     *
+     * @param event all data of this event
+     * @return the space (in float)
+     */
     private float spacing(MotionEvent event) {
         float x = event.getX(0) - event.getX(1);
         float y = event.getY(0) - event.getY(1);
         return (float) Math.sqrt(x * x + y * y);
     }
+
+    /**
+     * Update the point center between you two fingers
+     *
+     * @param point which must be update
+     * @param event all data of this event
+     */
     private void midPoint(PointF point, MotionEvent event) {
         float x = event.getX(0) + event.getX(1);
         float y = event.getY(0) + event.getY(1);
         point.set(x / 2, y / 2);
     }
 
+
     //////////////////////// CALLED BY start EVENT ////////////////////////
-    /**
-     * Called when user touch the screen
-     */
-    private void actionDown(MotionEvent event) {
-        Log.d(TAG, "mode=DRAG");
-        savedMatrix.set(matrix);
-        start.set(event.getX(), event.getY());
-        mode = DRAG;
-    }
-
-    private void actionPointerUp() {
-        mode = NONE;
-        Log.d(TAG, "mode=NONE");
-    }
 
     /**
-     * Called when the user wants to move the plan
-     * @param event
-     * @param allView
+     * Created and called by TouchListener. Instantiate when the user touch the screen for
+     * the first time.
+     *
+     * @param event all data about this event
+     * @param allView all view who must be adapted
      */
-    private void actionMoveDrag(MotionEvent event,ImageView... allView) {
-        if(allView[0].getDrawable() != null) {
-            float newX = event.getX() - start.x;
-            float newY = event.getY() - start.y;
+    public void start(MotionEvent event, ImageView... allView) {
+        if(allView == null || allView.length <= 0) {
+            return;
+        }
 
-            // create the transformation in the matrix  of points
-            matrix.set(savedMatrix);
-            matrix.postTranslate(newX, newY);
-            Log.i(getClass().getName(), "new: " + newX + " - " + newY);
+        switch (event.getAction() & MotionEvent.ACTION_MASK) {
+
+            // When we detect one finger
+            case MotionEvent.ACTION_DOWN:
+                initDragEvent(event);
+                break;
+
+            // If we stop the current mouvement
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_POINTER_UP:
+                resetMode();
+                break;
+
+            case MotionEvent.ACTION_POINTER_DOWN:
+                initZoomEvent(event);
+                break;
+
+            case MotionEvent.ACTION_MOVE:
+                if (_mode == DRAG) {
+                    actionMoveDrag(event,allView);
+
+                } else if (_mode == ZOOM) {
+                    actionMoveZoom(event);
+                }
+
+                break;
+
+        }
+
+        displayChange(allView);
+    }
+
+    /**
+     * reset the mode (set to NONE)
+     */
+    private void resetMode() {
+        _mode = NONE;
+        Log.d(getClass().getName(), "mode=NONE");
+    }
+
+    /**
+     * Switch in DRAG mode.  Init var
+     *
+     * @param event all informations about the event
+     */
+    private void initDragEvent(MotionEvent event) {
+        Log.d(getClass().getName(), "mode=DRAG");
+        _savedMatrix.set(_matrix);
+        _start.set(event.getX(), event.getY());
+        _mode = DRAG;
+    }
+
+
+    /**
+     * Switch in ZOOM mode. Init var
+     *
+     * @param event all information about the event
+     */
+    private void initZoomEvent(MotionEvent event) {
+        _oldDist = spacing(event);
+
+        if (_oldDist > MIN_SPACE) { // Enought space
+            _savedMatrix.set(_matrix);
+            midPoint(_mid, event);
+            _mode = ZOOM;
+            Log.d(getClass().getName(), "mode=ZOOM");
         }
     }
 
     /**
-     * Second finger detected
-     * @param event
+     * Called when the user wants to move the plan
+     *
+     * @param event action of the user
+     * @param allView view which must move
      */
-    private void actionPointerDown(MotionEvent event) {
-        oldDist = spacing(event);
-        Log.d(TAG, "oldDist=" + oldDist);
-        if (oldDist > 5f) {
-            savedMatrix.set(matrix);
-            midPoint(mid, event);
-            mode = ZOOM;
-            Log.d(TAG, "mode=ZOOM");
+    private void actionMoveDrag(MotionEvent event,ImageView... allView) {
+        if(allView[0].getDrawable() != null) {
+            float newX = event.getX() - _start.x;
+            float newY = event.getY() - _start.y;
+
+            // TODO currently not working
+//            Matrix tmp = new Matrix();
+//            tmp.set(_matrix);
+//            tmp.postTranslate(newX, newY);
+//
+//            float[] values = new float[9];
+//            tmp.getValues(values);
+//            float valX = values[Matrix.MTRANS_X];
+//            float valY = values[Matrix.MTRANS_Y];
+//
+//
+//            if(valX >= 0 && newX >= 0) {
+//                newX = (newX - valX);
+//            }
+//
+//            if(valY >= 0 && newY >= 0) {
+//                newY = (newY - valY);
+//            }
+//
+//
+//            if(Math.abs(newX) >= 0.01 || Math.abs(newY) >= 0.01) {
+                _matrix.set(_savedMatrix);
+                _matrix.postTranslate(newX, newY);
+                _saveMatrixMove.set(_matrix);
+//            } else {
+//                _matrix.set(_saveMatrixMove);
+//            }
+
         }
     }
 
     /**
      * Zoom started
-     * @param event
+     *
+     * @param event variable with all data
      */
     private void actionMoveZoom(MotionEvent event) {
         float newDist = spacing(event);
-        Log.d(TAG, "newDist=" + newDist);
-        save = new Matrix();
-        if (newDist > 5f) {
-            matrix.set(savedMatrix);
-            save.set(matrix);
-            float scale = newDist / oldDist;
-            matrix.postScale(scale, scale, mid.x, mid.y);
+        float scale = newDist / _oldDist;
 
-            float[] values = new float[9];
-            matrix.getValues(values);
-            widthN = values[Matrix.MSCALE_X]*_main.getImageView().getWidth();
-            heightN = values[Matrix.MSCALE_Y]*_main.getImageView().getHeight();
+        boolean currentlyZoom = scale > 1;
+        boolean currentlyDezoom = scale < 1;
+
+        // If space is enought AND we can zomm or dezoom
+        if(newDist > MIN_SPACE &&
+                (currentlyDezoom || _zoomWidth > _width /MAX_DEZOOM) &&
+                (currentlyZoom || _zoomWidth < _width *MAX_ZOOM)) {
+
+            _matrix.set(_savedMatrix);
+
+            // Create temp _matrix to make calcul
+            Matrix temp = new Matrix();
+            temp.set(_matrix);
+            temp.postScale(scale, scale, _mid.x, _mid.y);
+            float newWidth = getWidthOfMatrix(temp);
+
+            if(newWidth > _width /MAX_DEZOOM && newWidth < _width *MAX_ZOOM) {
+
+                _matrix.postScale(scale, scale, _mid.x, _mid.y);
+                _savedMatrixZoom.set(_matrix);
+                _zoomWidth = newWidth;
+
+            } else {  // Is not good, last zoom update :)
+                _matrix.set(_savedMatrixZoom);
+            }
+
         }
-        if (widthN < width/2 || heightN > height*2)
-            matrix.set(save);
+
+
+
     }
 
     /**
-     * Created and called by TouchListener. Instantiate when the user touch the screen for
-     * the first time.
-     * @param event
-     * @param allView
+     * Get the _width of a specific _matrix zoom
+     *
+     * @param matrix the tested _matrix
+     * @return float with the size
      */
-    public void start(MotionEvent event, ImageView... allView) {
-        if(allView == null || allView.length <= 0) return;
-
-        switch (event.getAction() & MotionEvent.ACTION_MASK) {
-            case MotionEvent.ACTION_DOWN:
-                actionDown(event);
-                break;
-            case MotionEvent.ACTION_UP:
-
-            case MotionEvent.ACTION_POINTER_UP:
-                actionPointerUp();
-                break;
-            case MotionEvent.ACTION_POINTER_DOWN:
-                actionPointerDown(event);
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (mode == DRAG) actionMoveDrag(event,allView);
-                else if (mode == ZOOM) actionMoveZoom(event);
-                break;
-        }
-        displayChange(allView);
+    private float getWidthOfMatrix(Matrix matrix) {
+        float[] values = new float[9];
+        matrix.getValues(values);
+        return values[Matrix.MSCALE_X]* _main.getImageView().getWidth();
     }
 
     /**
@@ -162,13 +269,15 @@ public class Zoom {
     private void displayChange(ImageView... allView) {
         for(ImageView selectView : allView) {
             selectView.setScaleType(ImageView.ScaleType.MATRIX);
-            selectView.setImageMatrix(matrix);
+            selectView.setImageMatrix(_matrix);
         }
     }
 
 
+    //////////////////// EXTERNAL CALL /////////////////////
+
     public void movePlan(Matrix newMatrix, ImageView... view) {
-        matrix.set(newMatrix);
+        _matrix.set(newMatrix);
         displayChange(view);
     }
 
