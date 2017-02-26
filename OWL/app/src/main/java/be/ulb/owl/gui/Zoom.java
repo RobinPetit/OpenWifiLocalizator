@@ -173,7 +173,7 @@ public class Zoom {
      * @param event action of the user
      * @param allView view which must move
      */
-    private void actionMoveDrag(MotionEvent event,ImageView... allView) {
+    private void actionMoveDrag(MotionEvent event, ImageView... allView) {
         if(allView[0].getDrawable() != null) {
             float newX = event.getX() - _start.x;
             float newY = event.getY() - _start.y;
@@ -187,8 +187,7 @@ public class Zoom {
 //            tmp.getValues(values);
 //            float valX = values[Matrix.MTRANS_X];
 //            float valY = values[Matrix.MTRANS_Y];
-//
-//
+
 //            if(valX >= 0 && newX >= 0) {
 //                newX = (newX - valX);
 //            }

@@ -15,14 +15,18 @@ import be.ulb.owl.gui.FloatCouple;
  */
 
 public abstract class PathDrawer implements PathDrawing {
+
     private static int NODE_RADIUS = 3;
     private static int DEFAULT_PATH_COLOR = Color.BLUE;
+    private static int PATH_SIZE = 3;
+
     protected Paint _pathColor = new Paint();
     protected Canvas _canvas;
 
     public PathDrawer(int pathColor, Canvas canvas) {
         _pathColor.setAntiAlias(true);
         _pathColor.setColor(pathColor);
+        _pathColor.setStrokeWidth(PATH_SIZE);
         _canvas = canvas;
     }
 
