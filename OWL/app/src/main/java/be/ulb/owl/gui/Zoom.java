@@ -1,20 +1,17 @@
 package be.ulb.owl.gui;
 
 import android.graphics.Matrix;
-import android.graphics.Point;
 import android.graphics.PointF;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
-import android.view.Display;
 import android.view.MotionEvent;
 import android.widget.ImageView;
-
-import be.ulb.owl.MainActivity;
 
 public class Zoom {
 
     // Constants
-    private static final double MAX_ZOOM = 2.5;   // Maximum zomm
-    private static final double MAX_DEZOOM = 1.5; // Maximum dezoom
+    private static final float MAX_ZOOM = 2.5f;   // Maximum zomm
+    private static final float MAX_DEZOOM = 0.8f; // Maximum dezoom
     private static final float MIN_SPACE = 5f;    // Minimum space between finger to detect move
 
     // Action type
@@ -26,36 +23,15 @@ public class Zoom {
     // Matrix used to modify image
     private Matrix _matrix = new Matrix();
     private Matrix _savedMatrix = new Matrix();
-    private Matrix _savedMatrixZoom = new Matrix();
-    private Matrix _saveMatrixMove = new Matrix();
-
-    // Screen dimensions
-    private float _width;
-    private float _zoomWidth;
+    private Matrix _savedMatrix2 = new Matrix();
 
     // Variable for mouvement
     private int _mode = NONE;
     private PointF _start = new PointF();
     private PointF _mid = new PointF();
     private float _oldDist = 1f;
-    private MainActivity _main;
 
 
-    /**
-     * Constructor
-     *
-     * @param main instance of main
-     */
-    public Zoom(MainActivity main) {
-        Display display = main.getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-
-        _width = size.x;
-        _zoomWidth = _width;
-
-        _main = main;
-    }
 
     // Calculate new positions on the screen
 
@@ -90,11 +66,11 @@ public class Zoom {
      * Created and called by TouchListener. Instantiate when the user touch the screen for
      * the first time.
      *
-     * @param event all data about this event
+     * @param event   all data about this event
      * @param allView all view who must be adapted
      */
     public void start(MotionEvent event, ImageView... allView) {
-        if(allView == null || allView.length <= 0) {
+        if (allView == null || allView.length <= 0) {
             return;
         }
 
@@ -117,7 +93,7 @@ public class Zoom {
 
             case MotionEvent.ACTION_MOVE:
                 if (_mode == DRAG) {
-                    actionMoveDrag(event,allView);
+                    actionMoveDrag(event, allView);
 
                 } else if (_mode == ZOOM) {
                     actionMoveZoom(event);
@@ -128,6 +104,7 @@ public class Zoom {
         }
 
         displayChange(allView);
+
     }
 
     /**
@@ -170,41 +147,16 @@ public class Zoom {
     /**
      * Called when the user wants to move the plan
      *
-     * @param event action of the user
+     * @param event   action of the user
      * @param allView view which must move
      */
     private void actionMoveDrag(MotionEvent event, ImageView... allView) {
-        if(allView[0].getDrawable() != null) {
+        if (allView[0].getDrawable() != null) {
             float newX = event.getX() - _start.x;
             float newY = event.getY() - _start.y;
 
-            // TODO currently not working
-//            Matrix tmp = new Matrix();
-//            tmp.set(_matrix);
-//            tmp.postTranslate(newX, newY);
-//
-//            float[] values = new float[9];
-//            tmp.getValues(values);
-//            float valX = values[Matrix.MTRANS_X];
-//            float valY = values[Matrix.MTRANS_Y];
-
-//            if(valX >= 0 && newX >= 0) {
-//                newX = (newX - valX);
-//            }
-//
-//            if(valY >= 0 && newY >= 0) {
-//                newY = (newY - valY);
-//            }
-//
-//
-//            if(Math.abs(newX) >= 0.01 || Math.abs(newY) >= 0.01) {
-                _matrix.set(_savedMatrix);
-                _matrix.postTranslate(newX, newY);
-                _saveMatrixMove.set(_matrix);
-//            } else {
-//                _matrix.set(_saveMatrixMove);
-//            }
-
+            _matrix.set(_savedMatrix);
+            _matrix.postTranslate(newX, newY);
         }
     }
 
@@ -217,60 +169,100 @@ public class Zoom {
         float newDist = spacing(event);
         float scale = newDist / _oldDist;
 
-        boolean currentlyZoom = scale > 1;
-        boolean currentlyDezoom = scale < 1;
-
-        // If space is enought AND we can zomm or dezoom
-        if(newDist > MIN_SPACE &&
-                (currentlyDezoom || _zoomWidth > _width /MAX_DEZOOM) &&
-                (currentlyZoom || _zoomWidth < _width *MAX_ZOOM)) {
-
+        // If space is enought
+        if (newDist > MIN_SPACE ) {
             _matrix.set(_savedMatrix);
-
-            // Create temp _matrix to make calcul
-            Matrix temp = new Matrix();
-            temp.set(_matrix);
-            temp.postScale(scale, scale, _mid.x, _mid.y);
-            float newWidth = getWidthOfMatrix(temp);
-
-            if(newWidth > _width /MAX_DEZOOM && newWidth < _width *MAX_ZOOM) {
-
-                _matrix.postScale(scale, scale, _mid.x, _mid.y);
-                _savedMatrixZoom.set(_matrix);
-                _zoomWidth = newWidth;
-
-            } else {  // Is not good, last zoom update :)
-                _matrix.set(_savedMatrixZoom);
-            }
-
+            _matrix.postScale(scale, scale, _mid.x, _mid.y);
         }
 
 
-
     }
 
     /**
-     * Get the _width of a specific _matrix zoom
+     * Apply the matrix
      *
-     * @param matrix the tested _matrix
-     * @return float with the size
-     */
-    private float getWidthOfMatrix(Matrix matrix) {
-        float[] values = new float[9];
-        matrix.getValues(values);
-        return values[Matrix.MSCALE_X]* _main.getImageView().getWidth();
-    }
-
-    /**
-     * Refresh the screen
-     * @param allView
+     * @param allView which must be update
      */
     private void displayChange(ImageView... allView) {
-        for(ImageView selectView : allView) {
+        for (ImageView selectView : allView) {
             selectView.setScaleType(ImageView.ScaleType.MATRIX);
             selectView.setImageMatrix(_matrix);
+
+            fixing(selectView); // Fix mouvement
+            selectView.setImageMatrix(_savedMatrix2);
+
         }
     }
+
+    /**
+     * Fixe mouvement (carmera could not zoom too much or go outside)
+     *
+     * @param view the image view
+     */
+    private void fixing(ImageView view) {
+        float[] value = new float[9];
+        _matrix.getValues(value);
+
+        float[] savedValue = new float[9];
+        _savedMatrix2.getValues(savedValue);
+
+
+        // Fixed width and height (all the time the same (it's the position of top left corner)
+        int width = 10;  // view.getWidth();
+        int height = 10; // view.getHeight();
+
+        Drawable d = view.getDrawable();
+        if (d == null) {
+            return;
+        }
+
+        int imageWidth = d.getIntrinsicWidth();
+        int imageHeight = d.getIntrinsicHeight();
+        int scaleWidth = (int) (imageWidth * value[0]);
+        int scaleHeight = (int) (imageHeight * value[4]);
+
+        // don't let the image go outside
+        if (value[2] > width - 1) {
+            value[2] = width - 10;
+
+        } else if(value[2] < -(scaleWidth-1)) {
+            value[2]=-(scaleWidth-10);
+
+        }
+
+        if (value[5] > height - 1) {
+            value[5] = height - 10;
+
+        } else if (value[5] < -(scaleHeight-1-view.getHeight())) {
+            value[5] = -(scaleHeight - 10 - view.getHeight());
+
+        }
+
+        boolean cancelZoom = false;
+        // maximum zoom ratio: MAX
+        if (value[0] > MAX_ZOOM || value[4] > MAX_ZOOM){
+            value[0] = MAX_ZOOM;
+            value[4] = MAX_ZOOM;
+            cancelZoom = true;
+
+        // Maximum dezoom ratio: MIN
+        } else if(value[0] < MAX_DEZOOM || value[4] < MAX_DEZOOM) {
+            value[0] = MAX_DEZOOM;
+            value[4] = MAX_DEZOOM;
+            cancelZoom = true;
+
+        }
+
+        if(cancelZoom) {
+            value[2] = savedValue[2];
+            value[5] = savedValue[5];
+        }
+
+        _matrix.setValues(value);
+        _savedMatrix2.set(_matrix);
+    }
+
+
 
 
     //////////////////// EXTERNAL CALL /////////////////////

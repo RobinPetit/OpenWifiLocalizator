@@ -23,7 +23,7 @@ public class TouchListener implements View.OnTouchListener {
         if(_zoom != null) {
             Log.e(getClass().getName(), "Zomm already initialized !");
         }
-        _zoom = new Zoom(_main);
+        _zoom = new Zoom();
     }
 
 
