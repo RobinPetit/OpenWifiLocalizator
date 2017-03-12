@@ -4,8 +4,9 @@ class Config:
     NETWORK_INTERFACE = 'wlo1'
     # Debug Mode
     DEBUG = True
-    # MAPS location
+    # Path to the images map
     MAPS_PATH = '../OWL/app/src/main/assets/'
-    # XMLs location
-    XMLS_PATH = '../OWL/app/src/main/assets/XMLMap/'
+    # Path to the database
     DB_PATH = '../OWL/app/src/main/assets/OWL-DB.db'
+    # Color of valid Node
+    COLOR_VALID = 'green'

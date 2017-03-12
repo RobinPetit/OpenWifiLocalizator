@@ -45,8 +45,7 @@ class GraphCanvas(t.Canvas):
         self.plan_data.add_node(node_id, node)
         print('name: ' + str(node_name))
         if node_name == 0:
-            print('saving node in db')
-            node.id(self.database.save_node(node, path_to_building_name(self.master.file_name)))
+            node.id(self.database.save_node(node, path_to_plan_name(self.master.file_name)))
 
     def add_edge(self, edge_id, extremities, nb=0):
         edge = Edge(self.coords(edge_id), extremities, nb=nb)
@@ -180,41 +179,50 @@ class GraphCanvas(t.Canvas):
         for node_id in self.nodes():
             self.coords(node_id, self.nodes()[node_id].coord()[0]+x_offset, self.nodes()[node_id].coord()[1]+y_offset,
                         self.nodes()[node_id].coord()[2]+x_offset, self.nodes()[node_id].coord()[3]+y_offset)
-    
+
     def load_plan(self, background_file_name):
-        filename = path_to_building_name(background_file_name)
+        filename = path_to_plan_name(background_file_name)
         plan = self.database.load_plan(filename)
-        print(plan.bg_coord)
         self.set_pixels_per_metre(plan.ppm)
         self.set_angle_with_parent(plan.angle)
         self.set_position_on_parent(plan.on_parent)
         self.set_bg_image(App.App.ALPHA_INITIAL_VALUE, background_file_name)
         self.set_bg_coord(plan.bg_coord)
-        for node_id, x, y, aliases, has_ap in self.database.load_nodes_from_building(filename):
+        for node_id, x, y, aliases, has_ap in self.database.load_nodes_from_plan(filename):
             self.create_node_from_db(x, y, aliases, has_ap, node_id)
-        for edge in self.database.load_edges_from_building(filename):
+        for edge in self.database.load_edges_from_plan(filename):
             self.create_edge_from_db(*edge)
-            
+
     def create_node_from_db(self, x, y, aliases, has_ap, db_id):
-        node_coord = (x-NODE_SIZE, y-NODE_SIZE,
-                      x+NODE_SIZE, y+NODE_SIZE)
-        node_id = self.create_oval(*node_coord, fill='green' if has_ap else 'red')
+        node_coord = (x-App.App.NODE_SIZE, y-App.App.NODE_SIZE,
+                      x+App.App.NODE_SIZE, y+App.App.NODE_SIZE)
+        # node_id = self.create_oval(*node_coord, fill='green' if has_ap else 'red')
+        node_id = self.create_oval(*node_coord, fill=Config.COLOR_VALID if has_ap else 'red')
         self.add_node(node_id, [], aliases=aliases, node_name=db_id)
-        
+
     def create_edge_from_db(self, nb, id1, id2):
+        n1 = n2 = None
         for n in self.nodes():
             if self.nodes()[n].id() == id1:
                 n1 = n
             elif self.nodes()[n].id() == id2:
                 n2 = n
-        beg_coord = [c + NODE_SIZE for c in self.nodes()[n1].coord()[:2]]
-        end_coord = [c + NODE_SIZE for c in self.nodes()[n2].coord()[:2]]
+        if None in (n1, n2):
+            err = ''
+            if n1 is None:
+                err += ' {} does not exist'.format(id1)
+            if n2 is None:
+                err += ' {} does not exist'.format(id2)
+            print('unable to create an edge between nodes {} and {}. Reason is:{}' \
+                  .format(id1, id2, err))
+        beg_coord = [c + App.App.NODE_SIZE for c in self.nodes()[n1].coord()[:2]]
+        end_coord = [c + App.App.NODE_SIZE for c in self.nodes()[n2].coord()[:2]]
         edge_id = self.create_line(*beg_coord, *end_coord, width=EDGE_WIDTH)
         self.add_edge(edge_id, [id1, id2], nb=nb)
-        
+
     def update_nodes_position(self):
-        for node in self.nodes():
-            self.database.update_node_position(self.nodes()[node])
+        nodes_list = [self.nodes()[n] for n in self.nodes()]
+        self.database.update_all_nodes_position(nodes_list)
 
 class SelectableGraphCanvas(GraphCanvas):
     def __init__(self, master, database, **options):
@@ -266,10 +274,21 @@ class EditableGraphCanvas(GraphCanvas):
         for event in canvas_callbacks:
             self.bind(event, canvas_callbacks[event])
 
+    def update_node_size(self, new_radius):
+        """ resize all existing nodes with given radius """
+        nodes = self.nodes()
+        for node_id in nodes:
+            node = nodes[node_id]
+            center = center_of_rectangle(node.coord())
+            new_coord = [center[0]-new_radius, center[1]-new_radius,
+                         center[0]+new_radius, center[1]+new_radius]
+            node.coord(new_coord)
+            self.coords(node_id, *new_coord)
+
     def get_node_id(self):
-        _ = self.node_idx
+        node_id = self.node_idx
         self.node_idx += 1
-        return _
+        return node_id
 
     # events handling code
 
@@ -312,8 +331,8 @@ class EditableGraphCanvas(GraphCanvas):
     def handle_left_click(self, ev):
         self.left_src = self.get_selected_el(ev.x, ev.y)
         if self.left_src is not None:
-            self.initial_click_coord = [self.nodes()[self.left_src].coord()[0]+NODE_SIZE,
-                                        self.nodes()[self.left_src].coord()[1]+NODE_SIZE]
+            self.initial_click_coord = [self.nodes()[self.left_src].coord()[0]+App.App.NODE_SIZE,
+                                        self.nodes()[self.left_src].coord()[1]+App.App.NODE_SIZE]
             coords = self.initial_click_coord + self.initial_click_coord
             self.tmp_line_id = self.create_line(*coords, width=EDGE_WIDTH)
         else:
@@ -326,14 +345,17 @@ class EditableGraphCanvas(GraphCanvas):
             return
         if selected in self.nodes():
             node_center = self.nodes()[selected].coord()[:2]
-            node_center = [c+NODE_SIZE for c in node_center]
+            node_center = [c+App.App.NODE_SIZE for c in node_center]
             self.delete(selected)
             # remove node from db
             self.database.remove_node(self.nodes()[selected])
+            edges_to_remove = list()
             for edge_id in self.edges():
                 if self.nodes()[selected].id() in self.edges()[edge_id].get_extremity_ids():
                     self.delete(edge_id)
-                    del self.edges()[edge_id]
+                    edges_to_remove.append(edge_id)
+            for edge_id in edges_to_remove:
+                del self.edges()[edge_id]
             del self.nodes()[selected]
         elif selected in self.edges():
             self.delete(selected)
@@ -355,9 +377,9 @@ class EditableGraphCanvas(GraphCanvas):
         self.moving_edges_edit_idx = dict()
         for edge in self.edges():
             if self.nodes()[self.selected_node].id() in self.edges()[edge].extremity_ids:
-                if self.edges()[edge].coord()[0] == self.moving_node_original_coords[0] + NODE_SIZE:
+                if self.edges()[edge].coord()[0] == self.moving_node_original_coords[0] + App.App.NODE_SIZE:
                     self.moving_edges_edit_idx[edge] = [0]
-                elif self.edges()[edge].coord()[2] == self.moving_node_original_coords[0] + NODE_SIZE:
+                elif self.edges()[edge].coord()[2] == self.moving_node_original_coords[0] + App.App.NODE_SIZE:
                     self.moving_edges_edit_idx[edge] = [2]
                 else:
                     print('ERROR')
@@ -385,12 +407,13 @@ class EditableGraphCanvas(GraphCanvas):
                 self.tmp_line_id = None
                 if end is not None:
                     node_coord = self.nodes()[end].coord()
-                    final_point = [node_coord[i]+NODE_SIZE for i in range(2)]
+                    final_point = [node_coord[i]+App.App.NODE_SIZE for i in range(2)]
                     edge_id = self.create_line(*self.initial_click_coord,
-                        self.nodes()[end].coord()[0]+NODE_SIZE, self.nodes()[end].coord()[1]+NODE_SIZE,
+                        self.nodes()[end].coord()[0]+App.App.NODE_SIZE, self.nodes()[end].coord()[1]+App.App.NODE_SIZE,
                             width=2.5)
                     extremity_ids = (self.nodes()[self.get_selected_el(*self.initial_click_coord)].id(), self.nodes()[end].id())
-                    self.add_edge(edge_id, extremity_ids)
+                    if len(set(extremity_ids)) == 2:
+                        self.add_edge(edge_id, extremity_ids)
             else:
                 self.cv_image_coord = self.coords(self.cv_image_id)
                 for node_id in self.nodes():
@@ -427,8 +450,10 @@ class EditableGraphCanvas(GraphCanvas):
             if type(access_points) is AccessPointList:
                 self.nodes()[selected].access_points(access_points)
                 self.database.set_node_access_points(self.nodes()[selected], access_points)
-                self.color = 'green'
-                self.itemconfig(selected, fill='green')
+                # self.color = 'green'
+                self.color = Config.COLOR_VALID
+                # self.itemconfig(selected, fill='green')
+                self.itemconfig(selected, fill=Config.COLOR_VALID)
         self.right_clicked = self.right_moved = False
 
     def handle_wheel_release(self, ev):
@@ -444,9 +469,9 @@ class EditableGraphCanvas(GraphCanvas):
 
     def create_node(self, x, y):
         access_points, aliases = NodeConfigurationToplevel(self, self.background_file_name, self.database).configure()
-        node_coord = (x-NODE_SIZE, y-NODE_SIZE,
-                      x+NODE_SIZE, y+NODE_SIZE)
-        node_id = self.create_oval(*node_coord, fill='green' if type(access_points) is not list else 'red')
+        node_coord = (x-App.App.NODE_SIZE, y-App.App.NODE_SIZE,
+                      x+App.App.NODE_SIZE, y+App.App.NODE_SIZE)
+        node_id = self.create_oval(*node_coord, fill=Config.COLOR_VALID if type(access_points) is not list else 'red')
         self.add_node(node_id, access_points, aliases)
 
     def create_external_edge(self, internal_node, plan_name, external_node):

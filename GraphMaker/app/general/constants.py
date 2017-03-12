@@ -18,5 +18,6 @@ WHEEL_CLICK_MOTION = '<B2-Motion>'
 RIGHT_CLICK_MOTION = '<B3-Motion>'
 
 # canvas constants
-NODE_SIZE = 10
+NODE_SIZE_MIN = 2
+NODE_SIZE_MAX = 16
 EDGE_WIDTH = 2.5

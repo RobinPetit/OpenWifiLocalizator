@@ -7,7 +7,7 @@ def euclidian_distance(a, b):
 def purge_plan_name(plan, src):
     return relpath(splitext(plan)[0], src)
 
-def path_to_building_name(path):
+def path_to_plan_name(path):
     return splitext(basename(path))[0]
     
 def center_of_rectangle(rectangle):

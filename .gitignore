@@ -3,10 +3,15 @@
 *.aux
 *.log
 *.out
+*.fls
+*.toc
 
 # Vim files
 *.swp
 *.swo
+
+# general temporary files
+*.*~
 
 # Hidden directories
 plans/
@@ -21,6 +26,8 @@ GraphMaker/app/Config.py
 **/__pycache__/*
 **/__init__.pyc
 
+# Databases
+*.db
+
 ### OWL ###
 OWL/app/src/main/assets/IMGMap/
-OWL/app/src/main/assets/OWL-DB.db

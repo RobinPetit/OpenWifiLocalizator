@@ -25,12 +25,6 @@ class AP:
     def get_bss(self):
         return self.key
 
-    def get_min(self):
-        return min(self.values)
-
-    def get_max(self):
-        return max(self.values)
-
     def get_variance(self):
         if (self.variance == .0):
             for i in range(len(self)):

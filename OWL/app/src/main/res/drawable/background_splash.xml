@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_splash">
+
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#303F9F"></solid>
+        </shape>
+    </item>
+
+    <item>
+        <bitmap
+            android:gravity="center"
+            android:src="@drawable/logo"></bitmap>
+    </item>
+
+
+</layer-list>

@@ -12,4 +12,6 @@
     <string name="rooms_btn_text">Locaux</string>
     <string name="search_item_title">Rechercher</string>
     <string name="search_hint">Recherche...</string>
+    <string name="in_progress">Déjà en cours</string>
+    <string name="in_progress_localize">La location est déjà en cours</string>
 </resources>

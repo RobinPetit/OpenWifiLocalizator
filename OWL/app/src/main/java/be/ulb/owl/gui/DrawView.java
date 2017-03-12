@@ -10,10 +10,13 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.widget.ImageView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import be.ulb.owl.graph.Node;
 import be.ulb.owl.graph.Path;
+import be.ulb.owl.gui.pathdrawing.HermitianCubicSplinePathDrawer;
+import be.ulb.owl.gui.pathdrawing.PathDrawer;
 
 public class DrawView extends ImageView {
     private static final Integer NODE_RADIUS = 10;  // in pixels
@@ -23,6 +26,7 @@ public class DrawView extends ImageView {
 
     private Canvas _canvas;
     private Paint _paint = new Paint();
+    private PathDrawer _pathDrawer;
     private float _wFactor;
     private float _hFactor;
 
@@ -35,6 +39,8 @@ public class DrawView extends ImageView {
         _paint.setStyle(Paint.Style.FILL_AND_STROKE);
         _paint.setAntiAlias(true);
         _paint.setColor(DEFAULT_COLOR);
+        // _pathDrawer = new LinePathDrawer(EDGE_COLOR, _canvas);
+        _pathDrawer = new HermitianCubicSplinePathDrawer(EDGE_COLOR, canvas);
     }
 
     private Float projectOnY(Float y) {
@@ -57,28 +63,37 @@ public class DrawView extends ImageView {
         _canvas = canvas;
     }
 
-    public void draw(Path path) {
-        _paint.setColor(EDGE_COLOR);
-        Node node = path.getNode();
-        Float x1 = projectOnX(node.getXOnPlan());
-        Float y1 = projectOnY(node.getYOnPlan());
-        node = path.getOppositeNodeOf(node);
-        Float x2 = projectOnX(node.getXOnPlan());
-        Float y2 = projectOnY(node.getYOnPlan());
-        _canvas.drawLine(x1, y1, x2, y2, _paint);
-        this.invalidate();
-    }
-
-    public void draw(Node node) {
+    public Float[] draw(Node node) {
         _paint.setColor(NODE_COLOR);
         Float x = projectOnX(node.getXOnPlan());
         Float y = projectOnY(node.getYOnPlan());
         _canvas.drawCircle(x, y, NODE_RADIUS, _paint);
+
         this.invalidate();
+
+        return new Float[] {x, y};
     }
 
     public void draw(List<Path> pathList) {
-        for(Path path: pathList)
-            draw(path);
+        ArrayList<FloatCouple> nodesList = new ArrayList<>();
+        if(pathList.size() < 1)
+            return;
+        Node node = pathList.get(0).getNode();
+        if(pathList.size() == 1) {
+            nodesList.add(nodeToFloatCouple(node));
+            nodesList.add(nodeToFloatCouple(pathList.get(0).getOppositeNodeOf(node)));
+        } else {
+            if(pathList.get(1).containsNode(node))
+                node = pathList.get(0).getOppositeNodeOf(node);
+            for (Path path : pathList) {
+                nodesList.add(nodeToFloatCouple(node));
+                node = path.getOppositeNodeOf(node);
+            }
+        }
+        _pathDrawer.drawPath(nodesList);
+    }
+
+    public FloatCouple nodeToFloatCouple(Node node) {
+        return new FloatCouple(projectOnX(node.getXOnPlan()), projectOnY(node.getYOnPlan()));
     }
 }

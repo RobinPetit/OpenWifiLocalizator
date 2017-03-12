@@ -6,6 +6,7 @@
 package be.ulb.owl.graph;
 
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.util.Collections;
 import java.util.HashSet;
 
 import be.ulb.owl.MainActivity;
-import be.ulb.owl.Wifi;
+import be.ulb.owl.scanner.Wifi;
 import be.ulb.owl.utils.SQLUtils;
 
 /**
@@ -25,7 +26,7 @@ import be.ulb.owl.utils.SQLUtils;
  */
 public class Plan {
 
-    private final MainActivity main = MainActivity.getInstance();
+    private static final MainActivity main = MainActivity.getInstance();
 
 
     /**
@@ -42,14 +43,15 @@ public class Plan {
     private final String _name;
     private final Campus _parentPlan;
     private HashSet<String> _allAlias; // Cache
-    private ArrayList<Node> _listNode;
+    protected ArrayList<Node> _listNode;
     private HashSet<String> _allBssWifi;
     private InputStream _image;
-    private final String _pathImage;
+    private final String _directoryImage;
     private final float _ppm;  // pixels per metre
     private final float _relativeAngle;
     private final float _xOnParent;
     private final float _yOnParent;
+    private final float _pseudoCount = 0.0001f;
 
 
     /**
@@ -59,7 +61,7 @@ public class Plan {
      * @param name of the plan
      * @param id in the database
      * @param parentPlan the parent plan reference (campus plan)
-     * @param pathImage path to the image (only the folder after IMGMap)
+     * @param directoryImage path to the image (only the folder after IMGMap)
      * @param xOnParent x position on the parent plan
      * @param yOnParent y position on the parent plan
      * @param bgCoordX relative x position of the upper left corner of the image
@@ -67,8 +69,8 @@ public class Plan {
      * @param relativeAngle angle that the plan makes on the parent plan
      * @param distance number of pixel for on meter
      */
-    public Plan(String name, int id, Campus parentPlan, String pathImage, float xOnParent, float yOnParent, float bgCoordX,
-                float bgCoordY, float relativeAngle, float distance) {
+    public Plan(String name, int id, Campus parentPlan, String directoryImage, float xOnParent,
+                float yOnParent, float bgCoordX, float bgCoordY, float relativeAngle, float distance) {
 
         this._name = name;
 
@@ -79,29 +81,30 @@ public class Plan {
         this._bgCoordY = bgCoordY;
         this._relativeAngle = relativeAngle;
         this._ppm = distance;
-        this._pathImage = pathImage;
+        this._directoryImage = directoryImage;
+        this._listNode = new ArrayList<Node>();
+
 
         _listNode = SQLUtils.loadNodes(this, id);
+        Log.i(getClass().getName(), "List node (" + name + "): " + _listNode);
 
         _allBssWifi = new HashSet<String>();
-        _allAlias = new HashSet<String>();
 
+        _allAlias = new HashSet<String>();
         for(Node selectNode : _listNode) {
-            _allBssWifi.addAll(selectNode.getListWifiBSS());
             _allAlias.addAll(selectNode.getAlias());
         }
-
     }
 
 
     /**
-     * TODO add documentation @denis ?
+     * Convert a quality signal in dBm into a values in mW
      *
-     * @param level
-     * @return
+     * @param dBm
+     * @return Signal quality in mW
      */
-    private double getScore(Float level) {
-        return Math.pow((-level+100)/50, 0.6);
+    private double toMWatt(Float dBm) {
+        return Math.pow(10, dBm/10);
     }
 
 
@@ -122,16 +125,18 @@ public class Plan {
         for (int i = 0; i < nodes.size(); i++) { // for each node
             scores.add(0.0);
             ArrayList<Wifi> tmp = nodes.get(i).getWifi();
-            double z = 0.0;
+            double z = 1.0;
             for (Wifi wifi: tmp) {
                 if (wifisStr.contains(wifi.getBSS())) { // has a Wifi with the same BSS
                     Integer offset = wifisStr.indexOf(wifi.getBSS());
-                    z += Math.pow((wifis.get(offset)).getAvg()-wifi.getAvg(), 2)/(wifis.get(offset)).getVariance();
+                    z *= (1/(Math.sqrt(2*Math.PI*(wifis.get(offset)).getVariance())))*Math.pow(Math.E,
+                            Math.pow((wifis.get(offset)).getAvg()-wifi.getAvg(), 2)/2*(wifis.get(offset))
+                                    .getVariance()+_pseudoCount);
                 }
             }
-            scores.set(i, z);
+            scores.set(i, Math.pow(z, 1/tmp.size()));
         }
-        res = nodes.get(scores.indexOf(Collections.min(scores)));
+        res = nodes.get(scores.indexOf(Collections.max(scores)));
         return res;
     }
 
@@ -142,14 +147,43 @@ public class Plan {
      * @throws IOException error with file
      */
     private void loadImage() throws IOException {
+        String imagePath = "";
         try {
-            _image = main.getAssets().open("IMGMap" + File.separator + _pathImage +
-                    File.separator + _name +".png");
+            imagePath = "IMGMap" + File.separator;
+            if(!_directoryImage.equalsIgnoreCase("") && !_directoryImage.equalsIgnoreCase("./")) {
+                imagePath += _directoryImage;
+            }
+            
+            if(!(File.separator.equalsIgnoreCase(imagePath.substring(imagePath.length()-1)))) {
+                imagePath += File.separator;
+            }
+
+            imagePath += _name + ".png";
+            _image = main.getAssets().open(imagePath);
         } catch (IOException e) {
-            throw new IOException("Impossible to load the image of this plan (" + _name + ")");
+            throw new IOException("Impossible to load the image of this plan (" + _name +
+                    " (path: " + imagePath + "))");
         }
     }
 
+    /**
+     * Awful method which aims to return the common elements of two arrays of Wifi
+     *
+     * @param set1 arrayList of Wifi
+     * @param set2 arrayList of Wifi
+     * @return an ArrayList which contains the common Wifi objects between the two arrayList given in param
+     */
+    private ArrayList<Wifi> common (ArrayList<Wifi> set1, ArrayList<Wifi> set2) {
+        ArrayList<Wifi> res = new ArrayList<Wifi>();
+        for (Wifi elem1:set1) {
+            for (Wifi elem2:set2) {
+                if (elem1.equals(elem2)) {
+                    res.add(elem1);
+                }
+            }
+        }
+        return res;
+    }
 
     /**
      * @link _bgCoordX
@@ -172,10 +206,10 @@ public class Plan {
 
 
     /**
-     * Check if the current plan have this name
+     * Check if the current plan has this name
      *
      * @param name the specific name
-     * @return True if this plan have this name
+     * @return True if this plan has this name
      */
     public boolean isName(String name) {
         return _name.equals(name);
@@ -183,7 +217,7 @@ public class Plan {
 
 
     /**
-     * Get the id of the plan
+     * Get the name of the plan
      *
      * @return the name of this plan
      */
@@ -191,6 +225,13 @@ public class Plan {
         return _name;
     }
 
+
+    /**
+     * Get the campus of the plan
+     *
+     * @return the campus of the plan
+     */
+    public Campus getCampus() {return _parentPlan;}
 
     /**
      * Get the x coordinate of the plan on his parent plan
@@ -320,15 +361,11 @@ public class Plan {
      * @return The nearest Node based on the given array of Wifi
      */
     public Node getNode(ArrayList<Wifi> wifis) {
-        ArrayList<String> wifisStr = new ArrayList<String>();
-        for (Wifi wifi : wifis) {
-            wifisStr.add(wifi.getBSS());
-        }
         ArrayList<Node> res = new ArrayList<Node>();
         for (Node node : _listNode) {
-            ArrayList<String> tmp = node.getListWifiBSS();
-            tmp.retainAll(wifisStr);
-            if (3 < tmp.size()){
+            ArrayList<Wifi> tmp = node.getWifi();
+            tmp = this.common(tmp, wifis);
+            if (2 < tmp.size()){
                 res.add(node);
             }
         }
@@ -358,10 +395,24 @@ public class Plan {
     }
 
 
+    public void loadWifi() {
+        for(Node node : _listNode) {
+            node.loadWifi();
+            _allBssWifi.addAll(node.getListWifiBSS());
+        }
+    }
+
+    protected void loadAllPath() {
+        for(Node node : _listNode) {
+            node.loadPath();
+        }
+    }
+
+
     /**
      * Get the image of this map
      *
-     * @return Drawable which represent the image or null if not found
+     * @return Drawable which represents the image or null if not found
      */
     public Drawable getDrawableImage() {
         Drawable res = null;
@@ -396,7 +447,7 @@ public class Plan {
                 distance = node.getDistanceFrom(b);
             }
         }
-        assert(distance > 0);
+        assert distance > 0 || a.isNode(b);
         return distance / _ppm;
     }
 
@@ -406,4 +457,5 @@ public class Plan {
         double yOffset = a.getY() - b.getY();
         return Math.sqrt(xOffset*xOffset + yOffset*yOffset);
     }
+
 }

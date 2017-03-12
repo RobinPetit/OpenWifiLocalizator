@@ -10,8 +10,16 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#607D8B"
+        android:background="#303F9F"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <br.com.mauker.materialsearchview.MaterialSearchView
+        android:id="@+id/search_view"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        style="@style/MaterialSearchViewStyle"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true" />
 
     <RelativeLayout android:id="@+id/frame_layout"
         android:layout_width="wrap_content"
@@ -36,44 +44,45 @@
             android:layout_gravity="center"
             android:adjustViewBounds="false"
             android:scaleType="matrix"
-            android:layout_alignParentBottom="true"
+            android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:id="@+id/changePlan"
+            android:layout_alignParentLeft="false"
+            android:scaleType="fitXY" />
+
+        <Button
+            android:text="@string/rooms_btn_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/local" />
+
+        <ImageButton
+            android:background="@drawable/boussole2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/localizeButton"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true" />
+
     </RelativeLayout>
 
-    <Button
-        android:text="@string/maps_btn_text"
+    <ProgressBar
+        style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:id="@+id/changePlan" />
-
-    <Button
-        android:text="@string/rooms_btn_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/local" />
-
-    <Button
-        android:text="@string/localize_btn_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:id="@+id/progressBar"
+        android:progressDrawable="@drawable/circular_progress_bar"
         android:layout_centerHorizontal="true"
-        android:id="@+id/localizeButton" />
-
-    <br.com.mauker.materialsearchview.MaterialSearchView
-        android:id="@+id/search_view"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        style="@style/MaterialSearchViewStyle"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>

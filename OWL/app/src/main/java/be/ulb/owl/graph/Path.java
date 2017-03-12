@@ -23,13 +23,13 @@ public class Path {
      * @param nodeTwo the second node
      */
     public Path(Node nodeOne, Node nodeTwo) {
-        this(nodeOne, nodeTwo, -1., false);
+        this(nodeOne, nodeTwo, -1., true);
     }
 
     /* SHOULD ONLY BE USED FOR SPECIAL EDGES
     * */
     public Path(Node nodeOne, Node nodeTwo, double distance) {
-        this(nodeOne, nodeTwo, distance, false);
+        this(nodeOne, nodeTwo, distance, true);
     }
 
     /**
@@ -43,7 +43,6 @@ public class Path {
         this._nodeOne = nodeOne;
         this._nodeTwo = nodeTwo;
         this._distance = distance > 0 ? distance : Plan.euclidianDistance(nodeOne, nodeTwo);
-
         if(addPathToNode) {
             nodeOne.addPath(this);
             nodeTwo.addPath(this);
@@ -72,6 +71,8 @@ public class Path {
      */
     public Node getOppositeNodeOf(Node node) {
         // return _nodeOne.equals(node) ? _nodeTwo : _nodeOne;
+        if(!containsNode(node))
+            throw new IllegalArgumentException(node + " is not in the required path!");
         if(_nodeOne.equals(node)) {
             return _nodeTwo;
         }
@@ -89,7 +90,7 @@ public class Path {
 
     @Override
     public String toString() {
-        return "Path of length " + _distance + " between " + _nodeOne.getID() + " and " + _nodeTwo.getID();
+        return "Path of length " + _distance + " between " + _nodeOne + " and " + _nodeTwo;
     }
 
     /**

@@ -1,7 +1,5 @@
 package be.ulb.owl.utils.sql;
 
-import java.util.ArrayList;
-
 /**
  * Created by Detobel36
  */
@@ -12,7 +10,8 @@ public enum WifiTable implements SQLTable {
     BSS("BSS"),
     NODE_ID("NodeId"),
     AVG("Avg"),
-    VARIANCE("Variance");
+    VARIANCE("Variance"),
+    SCANNING_DATA("ScanningDate");
 
 
     private static String _NAME = "Wifi";

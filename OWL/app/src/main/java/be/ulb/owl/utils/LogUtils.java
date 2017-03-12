@@ -16,7 +16,7 @@ import be.ulb.owl.MainActivity;
 public class LogUtils {
 
     private static final long MAXTIMELOG = 3600 * 24 * 3 * 1000;  // 3 Dyas in milliseconds
-    private static final MainActivity main = MainActivity.getInstance();
+    private static MainActivity _main;
 
 
     /**
@@ -60,7 +60,7 @@ public class LogUtils {
      */
     public static void clearLog(float maxTimeLog) {
         File logFolder = new File(Environment.getExternalStorageDirectory() + File.separator +
-                main.getAppName() + File.separator + "log");
+                _main.getAppName() + File.separator + "log");
         if(logFolder.exists()) {
             for (File file : logFolder.listFiles()) {
                 if (file != null && file.exists() && file.isFile() && file.getName().contains("logcat_")) {
@@ -91,12 +91,18 @@ public class LogUtils {
 
     /**
      * Init log système<br/>
-     * Log file will be save in <app name>/log/logcat_<timestamp>.txt
+     * Log file will be save in <app name>/log/logcat_<timestamp>.txt<br />
+     * <br />
+     * Information: https://developer.android.com/studio/command-line/logcat.html
+     *
+     * @param main MainActivity to get context
      */
-    public static void initLogSystem() {
+    public static void initLogSystem(MainActivity main) {
+        _main = main;
+
         if (LogUtils.isExternalStorageWritable() ) {
             File appDirectory = new File( Environment.getExternalStorageDirectory() +
-                    File.separator + main.getAppName());
+                    File.separator + _main.getAppName());
             File logDirectory = new File( appDirectory + "/log" );
             File logFile = new File( logDirectory, "logcat_" + System.currentTimeMillis() + ".txt" );
 
@@ -114,11 +120,14 @@ public class LogUtils {
             try {
                 // clear the previous logcat and then write the new one to the file
                 Runtime.getRuntime().exec( "logcat -c");
+
+                String informationLevel;
                 if(MainActivity.isDebug()) {
-                    Runtime.getRuntime().exec( "logcat -f " + logFile + " *:I");
+                    informationLevel = "*:I";
                 } else {
-                    Runtime.getRuntime().exec( "logcat -f " + logFile + " *:W");
+                    informationLevel = "*:W";
                 }
+                Runtime.getRuntime().exec( "logcat -f " + logFile + " -v time " + informationLevel);
 
             } catch ( IOException e ) {
                 e.printStackTrace();

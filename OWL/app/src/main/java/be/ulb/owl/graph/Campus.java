@@ -15,7 +15,9 @@ import be.ulb.owl.utils.SQLUtils;
 
 public class Campus extends Plan {
 
-    private ArrayList<Plan> _allPlan;
+    private ArrayList<Plan> _allPlan = new ArrayList<Plan>();
+    private final Integer _id;
+    private final String _directoryImage;
 
     /**
      * Constructor<br />
@@ -23,25 +25,48 @@ public class Campus extends Plan {
      *
      * @param name          of the plan
      * @param id            in the database
-     * @param pathImage     path to the image
+     * @param directoryImage     path to the image
      * @param bgCoordX      relative x position of the upper left corner of the image
      * @param bgCoordY      relative y position of the upper left corner of the image
      * @param distance      number of pixel for on meter
      */
-    public Campus(String name, int id, String pathImage, float bgCoordX, float bgCoordY, float distance) {
-        super(name, id, null, pathImage, -1, -1, bgCoordX, bgCoordY, 0, distance);
+    public Campus(String name, int id, String directoryImage, float bgCoordX, float bgCoordY, float distance) {
+        super(name, id, null, directoryImage, -1, -1, bgCoordX, bgCoordY, 0, distance);
 
-        _allPlan = SQLUtils.loadAllPlan(this, id);
+        _id = id;
+        _directoryImage = directoryImage;
+        loadAllPath();
     }
 
+
     /**
-    * Return all node of the Campus
+     * Get the path to the image
+     *
+     * @return the path to the image
+     */
+    public String getDirectoryImage() {return _directoryImage;}
+
+
+    /**
+     * Load all plans and then all paths
+     */
+    public void loadAllPlan() {
+        _allPlan = SQLUtils.loadAllPlan(this, _id);
+
+        for(Plan plan : _allPlan) {
+            plan.loadAllPath();
+        }
+    }
+
+
+    /**
+    * Return all nodes of the Campus
     *
     * @return A list containing every node of the campus
     */
     @Override
     public ArrayList<Node> getAllNodes() {
-        ArrayList<Node> allNodes = new ArrayList<>();
+        ArrayList<Node> allNodes = (ArrayList<Node>) _listNode.clone();
 
         for(Plan plan : _allPlan) {
             allNodes.addAll(plan.getAllNodes());
@@ -50,7 +75,7 @@ public class Campus extends Plan {
     }
 
     /**
-     * Return all plan of this campus
+     * Return all plans of this campus
      *
      * @return all plan
      */
@@ -96,6 +121,10 @@ public class Campus extends Plan {
         }
 
         return resPlan;
+    }
+
+    protected boolean haveId(int id) {
+        return id == _id;
     }
 
     @Override

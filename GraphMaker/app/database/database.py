@@ -23,19 +23,19 @@ class Database:
     
     INSERT_PLAN_QUERY = \
         """
-        INSERT INTO Building(CampusId, Name, Ppm, ImagePath, XOnParent, YOnParent, BgCoordX, BgCoordY, RelativeAngle)
+        INSERT INTO Plan(CampusId, Name, Ppm, ImageDirectory, XOnParent, YOnParent, BgCoordX, BgCoordY, RelativeAngle)
             VALUES (
                 (SELECT id
-                    FROM Building
+                    FROM Plan
                     WHERE CampusId=0 AND Name LIKE ?),
                 ?, ?, ?, ?, ?, ?, ?, ?)
         """
     INSERT_NODE_QUERY = \
         """
-        INSERT INTO Node(buildingId, X, Y)
+        INSERT INTO Node(PlanId, X, Y)
             VALUES(
                 (SELECT id
-                    FROM Building
+                    FROM Plan
                     WHERE Name=?),
                 ?, ?)
         """
@@ -54,8 +54,8 @@ class Database:
         """
     INSERT_ACCESS_POINT_QUERY = \
         """
-        INSERT INTO Wifi(Bss, NodeId, Min, Max, Avg, Variance)
-            VALUES(?, ?, ?, ?, ?, ?)
+        INSERT INTO Wifi(Bss, NodeId, Avg, Variance)
+            VALUES(?, ?, ?, ?)
         """
     INSERT_EDGE_QUERY = \
         """
@@ -67,17 +67,17 @@ class Database:
     
     LOAD_PLAN_QUERY = \
         """
-        SELECT Ppm, XOnParent, YOnParent, BgCoordX, BgCoordY, RelativeAngle
-            FROM Building
+        SELECT Ppm, XOnParent, YOnParent, BgCoordX, BgCoordY, RelativeAngle, ImageDirectory
+            FROM Plan
             WHERE NAME=?
         """
-    LOAD_NODES_FROM_BUILDING_QUERY = \
+    LOAD_NODES_FROM_PLAN_QUERY = \
         """
         SELECT Id, X, Y
             FROM Node
-            WHERE BuildingId=(
+            WHERE PlanId=(
                 SELECT Id
-                    FROM Building
+                    FROM Plan
                     WHERE Name=?)
         """
     LOAD_ALL_ALIASES_QUERY = \
@@ -93,7 +93,7 @@ class Database:
                 ON L.AliasId=A.Id
             WHERE L.NodeId=?
         """
-    LOAD_EDGES_FROM_BUILDING_QUERY = \
+    LOAD_EDGES_FROM_PLAN_QUERY = \
         """
         SELECT E.Id, E.Node1Id, E.Node2Id
             FROM Edge E
@@ -101,10 +101,10 @@ class Database:
                 ON N1.Id=E.Node1Id
             JOIN Node N2
                 ON N2.Id=E.Node2Id
-            WHERE N1.BuildingId=N2.BuildingId
-                AND N1.BuildingId=(
+            WHERE N1.PlanId=N2.PlanId
+                AND N1.PlanId=(
                     SELECT Id
-                        FROM Building
+                        FROM Plan
                         WHERE Name=?)
         """
     LOAD_EXTERNAL_EDGES_FROM_NODE_ID = \
@@ -115,15 +115,15 @@ class Database:
                 ON N1.Id=E.Node1Id
             JOIN Node N2
                 ON N2.Id=E.Node2Id
-            WHERE N1.BuildingId!=N2.BuildingId
+            WHERE N1.PlanId!=N2.PlanId
                 AND (N1.Id=? OR N2.Id=?)
         """
-    LOAD_BUILDING_NAME_FROM_NODE_ID = \
+    LOAD_PLAN_NAME_FROM_NODE_ID = \
         """
-        SELECT B.Name
-            FROM Building B
+        SELECT P.Name
+            FROM Plan P
             JOIN Node N
-                ON N.BuildingId=B.Id
+                ON N.PlanId=P.Id
             WHERE N.Id=?
         """
     
@@ -131,7 +131,7 @@ class Database:
     
     UPDATE_PLAN_QUERY = \
         """
-        UPDATE Building
+        UPDATE Plan
             SET BgCoordX=?, BgCoordY=?
             WHERE Name=?
         """
@@ -189,7 +189,7 @@ class Database:
     CHECK_IF_PLAN_EXISTS_QUERY = \
         """
         SELECT COUNT(id)
-            FROM Building
+            FROM Plan
             WHERE Name=?
         """
     CHECK_IF_NODE_HAS_ACCESS_POINTS_QUERY = \
@@ -216,6 +216,7 @@ class Database:
         # set to False for big updates and only commit at the end
         self.allowed_to_commit = True
         self.all_aliases = self.get_all_aliases()
+        self.disable_counter = 0
 
     def close(self, need_to_commit=False):
         """properly closes the connection to the database"""
@@ -227,6 +228,14 @@ class Database:
         """return a list of all aliases currently in the database"""
         query = Database.LOAD_ALL_ALIASES_QUERY
         return [r[0] for r in self.conn.execute(query).fetchall()]
+        
+    def disable_commit(self):
+        self.disable_counter += 1
+        self.allowed_to_commit = False
+        
+    def enable_commit(self):
+        self.disable_counter -= 1
+        self.allowed_to_commit = self.disable_counter == 0
 
     ##### save functions
 
@@ -234,6 +243,8 @@ class Database:
     def commit(self):
         if self.allowed_to_commit:
             self.conn.commit()
+            if Config.DEBUG:
+                print('commiting change')
 
     def save_plan(self, path, plan_data, bg_coord=(0, 0)):
         """registers a new plan"""
@@ -242,14 +253,12 @@ class Database:
             path[0] + '%',
             path,
             plan_data.ppm,
-            '',
+            plan_data.image_dir,
             plan_data.x,
             plan_data.y,
             bg_coord[0],
             bg_coord[1],
             plan_data.angle))
-        # NOTE: ImagePath is ignored (set to empty string) since it is intended to be removed
-        # then @TODO: update the method when ImagePath is removed from db schematics
         self.commit()
 
     def update_plan(self, bg_coord, filename):
@@ -274,12 +283,14 @@ class Database:
         
     def add_aliases_to_node(self, node_id, aliases):
         """add the given aliases to the given node"""
+        self.disable_commit()
         query = Database.LINK_NODE_TO_ALIAS
         for alias in aliases:
             if not alias in self.all_aliases:
                 self.all_aliases.append(alias)
                 self.add_alias(alias)
             self.conn.execute(query, (node_id, alias))
+        self.enable_commit()
         self.commit()
         
     def add_alias(self, alias):
@@ -294,15 +305,26 @@ class Database:
         self.conn.execute(query, (*center_of_rectangle(node.coord()), node.id()))
         self.commit()
         
+    def update_all_nodes_position(self, nodes_list):
+        """changes the coordinate of every given node"""
+        self.disable_commit()
+        for node in nodes_list:
+            self.update_node_position(node)
+        self.enable_commit()
+        self.commit()
+        
     def update_node_aliases(self, node, removed, added):
         """updates aliases of a node"""
         assert type(removed) is type(added) is set
+        self.disable_commit()
         for alias in removed:
             query = Database.REMOVE_ALIAS_FROM_NODE
             self.conn.execute(query, (alias, node.id(),))
             if self.is_alias_unused(alias):
                 self.remove_alias(alias)
         self.add_aliases_to_node(node.id(), added)
+        self.enable_commit()
+        self.commit()
         
     def set_node_access_points(self, node_id, access_points):
         """set (replaces if exists) the access points linked to a given node"""
@@ -315,8 +337,6 @@ class Database:
             self.conn.execute(query, (
                 ap.get_bss(),
                 node_id,
-                -ap.get_min(),
-                -ap.get_max(),
                 -ap.get_avg(),
                 ap.get_variance())
             )
@@ -353,9 +373,9 @@ class Database:
         query = Database.LOAD_PLAN_QUERY
         cursor = self.conn.execute(query, (filename,))
         plan = cursor.fetchone()
-        return BuildingTable(filename, plan[0], tuple(plan[1:3]), tuple(plan[3:5]), plan[5])
+        return PlanTable(filename, plan[0], tuple(plan[1:3]), tuple(plan[3:5]), plan[5], plan[6])
 
-    def load_nodes_from_building(self, plan_name):
+    def load_nodes_from_plan(self, plan_name):
         """returns a list of tuples (id, coords, aliases, has_ap) of all the
         Nodes on the given plan where:
         + id is the node id
@@ -363,7 +383,7 @@ class Database:
         + aliases are the aliases of the node
         + has_ap tells whether node has already been scanned"""
         nodes = list()
-        query = Database.LOAD_NODES_FROM_BUILDING_QUERY
+        query = Database.LOAD_NODES_FROM_PLAN_QUERY
         nodes_cursor = self.conn.execute(query, (plan_name,))
         for result in nodes_cursor.fetchall():
             node_id = result[0]
@@ -385,9 +405,9 @@ class Database:
         query = Database.LOAD_ALIASES_FROM_NODE_ID_QUERY
         return [r[0] for r in self.conn.execute(query, (node_id,)).fetchall()]
         
-    def load_edges_from_building(self, plan_name):
+    def load_edges_from_plan(self, plan_name):
         """returns a list of (id, id) where ids are nodes ids to draw the edges from/to"""
-        query = Database.LOAD_EDGES_FROM_BUILDING_QUERY
+        query = Database.LOAD_EDGES_FROM_PLAN_QUERY
         return self.conn.execute(query, (plan_name,)).fetchall()
     
     def load_external_edges_from_node(self, node_id):
@@ -397,7 +417,7 @@ class Database:
         
     def get_plan_name_from_node(self, node_id):
         """returns the name of the plan the given ode stands in"""
-        query = Database.LOAD_BUILDING_NAME_FROM_NODE_ID
+        query = Database.LOAD_PLAN_NAME_FROM_NODE_ID
         return self.conn.execute(query, (node_id,)).fetchone()[0]
         
     ##### remove functions

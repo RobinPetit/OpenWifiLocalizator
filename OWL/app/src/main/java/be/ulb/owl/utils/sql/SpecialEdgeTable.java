@@ -12,7 +12,7 @@ public enum SpecialEdgeTable implements SQLTable{
     NODE_2_ID("Node2Id"),
     WEIGHT("Weight");
 
-    private static String _NAME = "SpecialEdge";
+    private static String _NAME = "SpecialEdges ";
 
     private final String _value;
 
