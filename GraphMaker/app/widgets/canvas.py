@@ -343,7 +343,7 @@ class EditableGraphCanvas(GraphCanvas):
                 if self.nodes()[selected].id() in self.edges()[edge_id].get_extremity_ids():
                     self.delete(edge_id)
                     edges_to_remove.append(edge_id)
-            for edge_id in edges_to_remve:
+            for edge_id in edges_to_remove:
                 del self.edges()[edge_id]
             del self.nodes()[selected]
         elif selected in self.edges():
