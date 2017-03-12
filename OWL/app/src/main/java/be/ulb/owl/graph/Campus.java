@@ -44,7 +44,9 @@ public class Campus extends Plan {
      *
      * @return the path to the image
      */
-    public String getDirectoryImage() {return _directoryImage;}
+    public String getDirectoryImage() {
+        return _directoryImage;
+    }
 
 
     /**
@@ -126,15 +128,4 @@ public class Campus extends Plan {
     protected boolean haveId(int id) {
         return id == _id;
     }
-
-    @Override
-    public double getAbsoluteX(float x) {
-        return 0;
-    }
-
-    @Override
-    public double getAbsoluteY(float x) {
-        return 0;
-    }
-
 }

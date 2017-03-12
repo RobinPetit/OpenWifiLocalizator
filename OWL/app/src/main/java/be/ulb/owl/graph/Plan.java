@@ -321,9 +321,13 @@ public class Plan {
      *
      * @return The pseudo-absolute y coordinate of the origin of the plan
      */
-    public double getAbsoluteX(float x) {
-        double originX = getXOnParent() / _parentPlan.getPpm();
-        return originX + Math.cos(Math.PI/180 * _relativeAngle)*x/getPpm();
+    public double getAbsoluteX(Node node) {
+        double angle = Math.PI/180 * _relativeAngle;
+        double originX = getXOnParent();
+        if(_parentPlan != null) {
+            originX /= _parentPlan.getPpm();
+        }
+        return originX + (Math.cos(angle)*node.getXOnPlan() + Math.sin(angle)*node.getY())/getPpm();
     }
 
 
@@ -331,9 +335,13 @@ public class Plan {
      *
      * @return The pseudo-absolute y coordinate of the origin of the plan
      */
-    public double getAbsoluteY(float y) {
-        double originY = getYOnParent() / _parentPlan.getPpm();
-        return originY - Math.sin(Math.PI/180 * _relativeAngle)*y/getPpm();
+    public double getAbsoluteY(Node node) {
+        double angle = Math.PI/180 * _relativeAngle;
+        double originY = getYOnParent();
+        if(_parentPlan != null) {
+            originY /= _parentPlan.getPpm();
+        }
+        return originY + (Math.cos(angle)*node.getYOnPlan() + Math.sin(angle)*node.getXOnPlan())/getPpm();
     }
 
 
