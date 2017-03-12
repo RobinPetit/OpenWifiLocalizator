@@ -20,7 +20,7 @@ public class ShortestPathAStar extends ShortestPathEvaluator {
                                                        // by the algorithm but which haven't been treated yet
     private HashMap<Node, Node> _mostEfficientOrigin;  // maps each node to the node it should come from to be shortest
     private HashMap<Node, Double> _reachingScore;      // contains all the nodes that have already been discovered
-                                                       // by the algorithm but which haven(t been treated yet
+                                                       // by the algorithm but which haven't been treated yet
     private HashMap<Node, Double> _intermediateScore;  // maps each node to the score of the path (from -> to)
                                                        // which contains the given node
 
@@ -64,6 +64,9 @@ public class ShortestPathAStar extends ShortestPathEvaluator {
     @Override
     public ArrayList<Path> find() throws NoPathException {
         super.find();
+        if(!_found) {
+            throw new NoPathException("No path has been found between nodes " + _src + " and " + _dest);
+        }
         ArrayList<Path> path = new ArrayList<>();
         Node current = _dest;
         while(!current.equals(_src)) {
