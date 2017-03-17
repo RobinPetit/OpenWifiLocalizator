@@ -51,7 +51,8 @@ public class Plan {
     private final float _relativeAngle;
     private final float _xOnParent;
     private final float _yOnParent;
-    private final float _pseudoCount = 0.0001f;
+    //private final float _pseudoCount = 0.0001f;
+    private final float _pseudoCount = 1f;
 
 
     /**
@@ -123,19 +124,39 @@ public class Plan {
         Node res;
         ArrayList<Double> scores = new ArrayList<Double>();
         for (int i = 0; i < nodes.size(); i++) { // for each node
-            scores.add(0.0);
             ArrayList<Wifi> tmp = nodes.get(i).getWifi();
             double z = 1.0;
             for (Wifi wifi: tmp) {
                 if (wifisStr.contains(wifi.getBSS())) { // has a Wifi with the same BSS
-                    Integer offset = wifisStr.indexOf(wifi.getBSS());
-                    z *= (1/(Math.sqrt(2*Math.PI*(wifis.get(offset)).getVariance())))*Math.pow(Math.E,
-                            Math.pow((wifis.get(offset)).getAvg()-wifi.getAvg(), 2)/2*(wifis.get(offset))
-                                    .getVariance()+_pseudoCount);
+                    int offset = wifisStr.indexOf(wifi.getBSS());
+                    float variance = (wifis.get(offset)).getVariance();
+                    float avg = (wifis.get(offset)).getAvg();
+
+                    // Caclul des termes
+                    double terme1 = (1+_pseudoCount) / (Math.sqrt(2 * Math.PI * (variance + _pseudoCount)));
+                    double exposant = - ( (Math.pow(avg - wifi.getAvg(), 2)) + _pseudoCount ) / (2*(variance + _pseudoCount));
+                    double terme2 = Math.pow(Math.E, exposant);
+
+                    Log.i(getClass().getName(), "Terme: " + terme1 + " * " + terme2 + " (Exposant: + " + exposant + ")");
+
+                    z *= terme1 * terme2;
+
+//                    z *= (1+_pseudoCount/(Math.sqrt(2 * Math.PI * variance)) + _pseudoCount)
+//                            * Math.pow(
+//                                    Math.E, - Math.pow(avg - wifi.getAvg(), 2) + _pseudoCount/2*(variance+_pseudoCount)
+//                            );
+
+                    Log.i(getClass().getName(), "Score avant: " + i + ": " + z);
                 }
             }
-            scores.set(i, Math.pow(z, 1/tmp.size()));
+            Log.i(getClass().getName(), "Score " + i + ": " + z);
+//            scores.add(Math.pow(z, 1/tmp.size()));
+//            Log.i(getClass().getName(), "Score pow: " + i + ": " + Math.pow(z, 1/tmp.size()));
+            scores.add(z);
         }
+        Log.i(getClass().getName(), "Score node : " + nodes.toString());
+        Log.i(getClass().getName(), "Score score : " + scores.toString());
+
         res = nodes.get(scores.indexOf(Collections.max(scores)));
         return res;
     }
