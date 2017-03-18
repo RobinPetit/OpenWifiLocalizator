@@ -36,7 +36,7 @@ public class Wifi {
      */
     public Wifi(String BSS, float avg, float variance) {
         _BSS = BSS;
-        _avg = avg;
+        _avg = Math.abs(avg);
         _variance = variance;
     }
     

@@ -87,7 +87,6 @@ public class ScanTask extends AsyncTask<Void, Void, HashMap<String, ArrayList<In
     }
 
 
-
     @Override
     protected void onPostExecute(HashMap<String, ArrayList<Integer>> listWifi) {
         if(!isCancelled()) {

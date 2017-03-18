@@ -27,7 +27,7 @@ public class Scanner {
             new HashMap<ScanWifiUpdateEvent, EventPriority>();
 
 
-    private final int SCAN_TIME_INTERVAL = 100;  // in seconds
+    private final int SCAN_TIME_INTERVAL = 10;  // in seconds
 
     private ScanTask _scanTask = null;
 
@@ -137,7 +137,8 @@ public class Scanner {
 
         for(String key : newScan.keySet()) {
             ArrayList<Integer> values = newScan.get(key);
-            temp.add(new Wifi(key, avg(values), -1));
+            int avg = avg(values);
+            temp.add(new Wifi(key, avg, -1));
         }
 
         if(temp.isEmpty()) {

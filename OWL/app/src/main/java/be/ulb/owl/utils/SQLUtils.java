@@ -718,6 +718,7 @@ public class SQLUtils extends SQLiteOpenHelper {
      */
     public static HashSet<Plan> loadSpecificWifi(ArrayList<String> listBSS) {
         HashSet<Plan> res = new HashSet<Plan>();
+        Log.d(SQLUtils.class.getName(), "Begin loadSpecificWifi");
 
         String param = "'" + TextUtils.join("', '", listBSS) + "'";
 
@@ -753,6 +754,11 @@ public class SQLUtils extends SQLiteOpenHelper {
                     node = Graph.getNode(nodeId);
                     cacheNode.put(nodeId, node);
                 }
+
+                if(node == null) {
+                    Log.w(SQLUtils.class.getName(), "Wifi have nodeId: " + nodeId +
+                            " which not exist !");
+                }
                 node.addWifi(new Wifi(bss, avg, variance));
                 res.add(node.getParentPlan());
 
@@ -761,7 +767,6 @@ public class SQLUtils extends SQLiteOpenHelper {
 
         }
         cursor.close();
-
         Log.d(SQLUtils.class.getName(), "Load wifi: " + res.size());
 
         return res;

@@ -51,8 +51,7 @@ public class Plan {
     private final float _relativeAngle;
     private final float _xOnParent;
     private final float _yOnParent;
-    //private final float _pseudoCount = 0.0001f;
-    private final float _pseudoCount = 1f;
+    private final float _pseudoCount = 0.1f;
 
 
     /**
@@ -121,43 +120,51 @@ public class Plan {
         for (Wifi wifi : wifis) {
             wifisStr.add(wifi.getBSS());
         }
+
         Node res;
         ArrayList<Double> scores = new ArrayList<Double>();
         for (int i = 0; i < nodes.size(); i++) { // for each node
             ArrayList<Wifi> tmp = nodes.get(i).getWifi();
-            double z = 1.0;
+
+            double z = 0.0; // 1 if complex
             for (Wifi wifi: tmp) {
                 if (wifisStr.contains(wifi.getBSS())) { // has a Wifi with the same BSS
                     int offset = wifisStr.indexOf(wifi.getBSS());
-                    float variance = (wifis.get(offset)).getVariance();
-                    float avg = (wifis.get(offset)).getAvg();
 
-                    // Caclul des termes
-                    double terme1 = (1+_pseudoCount) / (Math.sqrt(2 * Math.PI * (variance + _pseudoCount)));
-                    double exposant = - ( (Math.pow(avg - wifi.getAvg(), 2)) + _pseudoCount ) / (2*(variance + _pseudoCount));
-                    double terme2 = Math.pow(Math.E, exposant);
+                    float varianceDatabase = wifi.getVariance();
+                    float avgDatabase = wifi.getAvg();
+                    float avgSensed = (wifis.get(offset)).getAvg();
 
-                    Log.i(getClass().getName(), "Terme: " + terme1 + " * " + terme2 + " (Exposant: + " + exposant + ")");
+                    //// Calcul complex ////
+//                    double term1 = (1+_pseudoCount) / (Math.sqrt(2 * Math.PI * (varianceDatabase + _pseudoCount)));
+//                    double exposant = - ( (Math.pow(avgSensed - avgDatabase, 2)) + _pseudoCount ) /
+//                                        (2*(varianceDatabase + _pseudoCount));
+//                    double term2 = Math.pow(Math.E, exposant);
+//
+//                    z *= term1 * term2;
 
-                    z *= terme1 * terme2;
 
-//                    z *= (1+_pseudoCount/(Math.sqrt(2 * Math.PI * variance)) + _pseudoCount)
-//                            * Math.pow(
-//                                    Math.E, - Math.pow(avg - wifi.getAvg(), 2) + _pseudoCount/2*(variance+_pseudoCount)
-//                            );
+                    //// Calcul "simplified" ////
+                    double term = ( (Math.pow(avgSensed - avgDatabase, 2)) + _pseudoCount ) /
+                                        (varianceDatabase + _pseudoCount);
+//                    double term = Math.pow(Math.E, exposant);
 
-                    Log.i(getClass().getName(), "Score avant: " + i + ": " + z);
+                    z += term;
+                    Log.d(getClass().getName(), "Variance: " + (varianceDatabase + _pseudoCount) +
+                            " total: " + term + " z :  "+ z);
                 }
             }
-            Log.i(getClass().getName(), "Score " + i + ": " + z);
 //            scores.add(Math.pow(z, 1/tmp.size()));
-//            Log.i(getClass().getName(), "Score pow: " + i + ": " + Math.pow(z, 1/tmp.size()));
             scores.add(z);
         }
-        Log.i(getClass().getName(), "Score node : " + nodes.toString());
-        Log.i(getClass().getName(), "Score score : " + scores.toString());
+        Log.d(getClass().getName(), "Score node : " + nodes.toString());
+        Log.d(getClass().getName(), "Score score : " + scores.toString());
 
-        res = nodes.get(scores.indexOf(Collections.max(scores)));
+        //// Calcul complex ////
+//        res = nodes.get(scores.indexOf(Collections.max(scores)));
+
+        //// Calcul "simplified" ////
+        res = nodes.get(scores.indexOf(Collections.min(scores)));
         return res;
     }
 
