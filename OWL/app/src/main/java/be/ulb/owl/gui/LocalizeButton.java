@@ -13,6 +13,7 @@ import be.ulb.owl.R;
 import be.ulb.owl.event.EventPriority;
 import be.ulb.owl.event.ScanWifiUpdateEvent;
 import be.ulb.owl.graph.Graph;
+import be.ulb.owl.graph.Plan;
 import be.ulb.owl.scanner.Scanner;
 import be.ulb.owl.scanner.Wifi;
 import be.ulb.owl.utils.DialogUtils;
@@ -109,7 +110,7 @@ public class LocalizeButton implements ScanWifiUpdateEvent {
 
 
     @Override
-    public void scanWifiUpdateEvent(ArrayList<Wifi> listWifi) {
+    public void scanWifiUpdateEvent(ArrayList<Wifi> listWifi, ArrayList<Plan> listPlan) {
         _refreshInProgress = false;
         toggleLoaderAndButton();
         // TODO Detobel si wifi pas trouvé

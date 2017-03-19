@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -362,38 +363,12 @@ public class SQLUtils extends SQLiteOpenHelper {
     }
 
     /**
-     * Get all plan which contains a specific BSS
-     *
-     * @param listBSS list of all linked bss
-     * @return an ArrayList with all plan
-     */
-//    public static ArrayList<Plan> getPlanWithWifi(ArrayList<String> listBSS) {
-//
-//        String param = TextUtils.join("', '", listBSS);
-//
-//        String req = "SELECT DISTINCT " + PlanTable.getName() + ".*" +
-//                        "FROM " + PlanTable.getName() + " " +
-//                            "JOIN " + NodeTable.getName() + " " +
-//                                "ON " + NodeTable.PLAN_ID.getFullCol() + " " +
-//                                    "= " + PlanTable.ID.getFullCol() + " " +
-//                            "JOIN " + WifiTable.getName() + " "+
-//                                "ON " + WifiTable.NODE_ID.getFullCol() + " " +
-//                                    "= " + NodeTable.ID.getFullCol() + " "+
-//                        "WHERE " + WifiTable.BSS.getFullCol() + " IN (?)";
-//
-//        Cursor cursor = getDatabase().rawQuery(req, new String[]{"'"+param+"'"});
-//
-//        return loadAllPlan(cursor);
-//    }
-
-
-    /**
      * Get all plan which contains a specific BSS and load all wifi of specific nodes
      *
      * @param listBSS list of all linked bss
      * @return an ArrayList with all plan ID
      */
-    public static ArrayList<Plan> getPlanWithWifi(ArrayList<String> listBSS) {
+    public static ArrayList<Plan> getPlanWithWifi(Collection<String> listBSS) {
 
         String param = TextUtils.join("', '", listBSS);
 
@@ -468,8 +443,11 @@ public class SQLUtils extends SQLiteOpenHelper {
 
                 cursor.moveToNext(); // next entry
             }
-        } else
-            Log.d("SQLUtils", "No plan on this campus");
+        } else {
+            Log.d("SQLUtils", "No plan on this campus " +
+                    // View campus name if not null
+                    (campus == null ? "" : "(" +  campus.getName() +")") );
+        }
 
         cursor.close(); // end of the request
 

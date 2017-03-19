@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity  {
     // static attributes
     private static MainActivity instance = null;
 
-    private static final boolean DEBUG = false;     // view info message in log (maybe more after)
+    private static final boolean DEBUG = true;     // view info message in log (maybe more after)
     private static final boolean TEST = false;     // active to call test (active also DEBUG)
     private static final boolean DEMO = false;     // active to active
     private static final String[] NOT_SUGGESTED = {"Mystery"};
@@ -317,7 +317,7 @@ public class MainActivity extends AppCompatActivity  {
      */
     private void initSwitchPlanButton() {
         _changePlan = (ImageButton)findViewById(R.id.changePlan);
-        _changePlan.setOnClickListener(new ClickListenerSwitchButton(this, _graph));
+        _changePlan.setOnClickListener(new ClickListenerSwitchButton(this));
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);

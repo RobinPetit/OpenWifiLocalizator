@@ -44,6 +44,4 @@ public class DialogUtils {
         builder.create().show();
     }
 
-
-
 }

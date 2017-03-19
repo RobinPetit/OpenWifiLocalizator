@@ -32,7 +32,6 @@ public class Graph implements ScanWifiUpdateEvent {
     private final MainActivity _main;
 
     private boolean _displayNotFound = false;
-    private boolean _allWifiLoaded = false;
 
     private static ArrayList<Campus> _allCampus;
     private static final int SOLBOSCH_ID = 1;
@@ -205,14 +204,6 @@ public class Graph implements ScanWifiUpdateEvent {
     }
 
 
-    /**
-     * Indicate that all wifi are loaded
-     */
-    public void setAllWifiLoaded() {
-        _allWifiLoaded = true;
-    }
-
-
     /////////////////////////////////////////// LOCALIZE ///////////////////////////////////////////
 
     /**
@@ -221,21 +212,11 @@ public class Graph implements ScanWifiUpdateEvent {
      * @param sensed all detected arround wifi
      * @return The node or null if not found
      */
-    protected Node whereAmI(ArrayList<Wifi> sensed) {
-        ArrayList<String> sensedStr = new ArrayList<String>();
-        for (Wifi wifi : sensed) {
-            sensedStr.add(wifi.getBSS());
-        }
+    protected Node whereAmI(ArrayList<Wifi> sensed, ArrayList<Plan> searchPlan) {
+        HashSet<String> sensedStr = sensedStr = Wifi.wifiListToBssList(sensed);
 
         ArrayList<Plan> res = new ArrayList<Plan>();
         int biggestSetSize = 0;
-
-        ArrayList<Plan> searchPlan;
-        if(!_allWifiLoaded) {
-            searchPlan = getWifiPlan(sensedStr);
-        } else {
-            searchPlan = getAllPlan();
-        }
 
         for (Plan plan : searchPlan) {
             HashSet<String> tmp = plan.getListWifiBSS();
@@ -264,24 +245,16 @@ public class Graph implements ScanWifiUpdateEvent {
         return node;
     }
 
-    /**
-     * Get all plan that contains a specific wifi if all plan aren't loaded
-     *
-     * @param sensedWifi detected wifi
-     * @return an ArrayList with all plan
-     */
-    private ArrayList<Plan> getWifiPlan(ArrayList<String> sensedWifi) {
-        return new ArrayList<Plan>(SQLUtils.loadSpecificWifi(sensedWifi));
-    }
-
 
     /**
      * localizes the user
      *
      * @param displayNotFound Boolean telling whether or not to signal if user is unable to localize
+     * @param sensedWifi list of Wifi which have been capted
+     * @param listPlan list of plan which match with sensed wifi
      */
-    protected void localize(boolean displayNotFound, ArrayList<Wifi> sensedWifi) {
-        Node current = whereAmI(sensedWifi);
+    protected void localize(boolean displayNotFound, ArrayList<Wifi> sensedWifi, ArrayList<Plan> listPlan) {
+        Node current = whereAmI(sensedWifi, listPlan);
 
         boolean haveChange = _main.setCurrentLocation(current);
 
@@ -313,8 +286,8 @@ public class Graph implements ScanWifiUpdateEvent {
 
 
     @Override
-    public void scanWifiUpdateEvent(ArrayList<Wifi> listWifi) {
-        localize(_displayNotFound, listWifi);
+    public void scanWifiUpdateEvent(ArrayList<Wifi> listWifi, ArrayList<Plan> listPlan) {
+        localize(_displayNotFound, listWifi, listPlan);
         _displayNotFound = false;
     }
 

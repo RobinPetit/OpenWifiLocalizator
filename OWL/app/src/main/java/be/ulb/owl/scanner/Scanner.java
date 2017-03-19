@@ -13,6 +13,8 @@ import java.util.List;
 import be.ulb.owl.MainActivity;
 import be.ulb.owl.event.EventPriority;
 import be.ulb.owl.event.ScanWifiUpdateEvent;
+import be.ulb.owl.graph.Plan;
+import be.ulb.owl.utils.SQLUtils;
 
 /**
  * Manage wifi activator and scan task
@@ -148,16 +150,18 @@ public class Scanner {
         _lastWifiAccess = temp;
 
 
+        ArrayList<Plan> listPlan = SQLUtils.getPlanWithWifi(Wifi.wifiListToBssList(temp));
+
         // TODO optimiser (deux boucles pour la même chose)
         for(ScanWifiUpdateEvent event : _eventScanWifiUpdate.keySet()) {
             if(_eventScanWifiUpdate.get(event) == EventPriority.FIRST) {
-                event.scanWifiUpdateEvent(temp);
+                event.scanWifiUpdateEvent(temp, listPlan);
             }
         }
 
         for(ScanWifiUpdateEvent event : _eventScanWifiUpdate.keySet()) {
             if(_eventScanWifiUpdate.get(event) == EventPriority.LAST) {
-                event.scanWifiUpdateEvent(temp);
+                event.scanWifiUpdateEvent(temp, listPlan);
             }
         }
 

@@ -3,10 +3,13 @@ package be.ulb.owl.test;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import be.ulb.owl.MainActivity;
 import be.ulb.owl.graph.Graph;
+import be.ulb.owl.graph.Plan;
 import be.ulb.owl.scanner.Wifi;
+import be.ulb.owl.utils.SQLUtils;
 
 /**
  * Created by Detobel36
@@ -20,7 +23,7 @@ public class GraphTest extends Graph {
 
 
     @Override
-    protected void localize(boolean displayNotFound, ArrayList<Wifi> sensedWifi) {
+    protected void localize(boolean displayNotFound, ArrayList<Wifi> sensedWifi, ArrayList<Plan> listPlan) {
         ArrayList<Wifi> newSensedWifi = new ArrayList<>();
 
         // SCAN 1
@@ -87,7 +90,8 @@ public class GraphTest extends Graph {
 
 
         Log.i(getClass().getName(), "TEST: change sensed wifi: " + newSensedWifi.toString());
-        super.localize(displayNotFound, newSensedWifi);
+        HashSet<String> listBssStr = Wifi.wifiListToBssList(newSensedWifi);
+        super.localize(displayNotFound, newSensedWifi, SQLUtils.getPlanWithWifi(listBssStr));
     }
 
 

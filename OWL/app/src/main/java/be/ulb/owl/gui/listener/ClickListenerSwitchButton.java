@@ -3,7 +3,6 @@ package be.ulb.owl.gui.listener;
 import android.view.View;
 
 import be.ulb.owl.MainActivity;
-import be.ulb.owl.graph.Graph;
 import be.ulb.owl.graph.Plan;
 
 /**
@@ -13,12 +12,9 @@ import be.ulb.owl.graph.Plan;
 public class ClickListenerSwitchButton implements View.OnClickListener {
 
     private final MainActivity _main;
-    private final Graph _graph;
-    private boolean _currentIsShown = true;
 
-    public ClickListenerSwitchButton(MainActivity main, Graph graph) {
+    public ClickListenerSwitchButton(MainActivity main) {
         this._main = main;
-        this._graph = graph;
     }
 
     @Override
@@ -36,7 +32,9 @@ public class ClickListenerSwitchButton implements View.OnClickListener {
             button = _main.getCurrentLocation().getParentPlan(); //current.getCampus();
         }
 
-        if(_main.getCurrentLocation() != null && current != _main.getCurrentLocation().getParentPlan() && button != _main.getCurrentLocation().getParentPlan()) {
+        if(_main.getCurrentLocation() != null &&
+                current != _main.getCurrentLocation().getParentPlan() &&
+                button != _main.getCurrentLocation().getParentPlan())  {
             current = _main.getCurrentLocation().getParentPlan(); //button.getCampus(); // current set as campus because switch
         }
         _main.setCurrentPlan(button);

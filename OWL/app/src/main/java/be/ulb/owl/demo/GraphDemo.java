@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import be.ulb.owl.MainActivity;
 import be.ulb.owl.graph.Graph;
 import be.ulb.owl.graph.Node;
+import be.ulb.owl.graph.Plan;
 import be.ulb.owl.scanner.Wifi;
 
 /**
@@ -21,7 +22,7 @@ public class GraphDemo extends Graph {
 
 
     @Override
-    protected Node whereAmI(ArrayList<Wifi> sensed) {
+    protected Node whereAmI(ArrayList<Wifi> sensed, ArrayList<Plan> searchPlan) {
         Node res = null;
         if(MainActivity.isDemo()) {
             return getCampus("Solbosch").getNode(1);

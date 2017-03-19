@@ -5,6 +5,9 @@
  */
 package be.ulb.owl.scanner;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 /**
  * Information about a wifi scan
  * 
@@ -60,5 +63,22 @@ public class Wifi {
     public float getVariance() {
         return _variance;
     }
-    
+
+
+    /////////////// STATIC ///////////////
+
+    /**
+     * Convert a list of wifi on a list of bss string
+     *
+     * @param listWifi list of wifi which must be convert
+     * @return an HashSet of string with all BSS
+     */
+    public static HashSet<String> wifiListToBssList(ArrayList<Wifi> listWifi) {
+        HashSet<String> allBss = new HashSet<>();
+        for(Wifi wifi : listWifi) {
+            allBss.add(wifi.getBSS());
+        }
+        return allBss;
+    }
+
 }
