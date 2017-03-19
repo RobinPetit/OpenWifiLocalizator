@@ -50,11 +50,15 @@ public class LocalizeButton implements ScanWifiUpdateEvent {
         Display display = _main.getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        _localizeButton.getLayoutParams().height = size.x/7;
-        _localizeButton.getLayoutParams().width = size.x/7;
+        int sizeInt = 100;
+        if(size.x/7 < sizeInt) {
+            sizeInt = size.x/7;
+        }
+        _localizeButton.getLayoutParams().height = sizeInt;
+        _localizeButton.getLayoutParams().width = sizeInt;
         _localizeButton.requestLayout();
-        _loadBar.getLayoutParams().height = size.x/7;
-        _loadBar.getLayoutParams().width = size.x/7;
+        _loadBar.getLayoutParams().height = sizeInt;
+        _loadBar.getLayoutParams().width = sizeInt;
         _loadBar.requestLayout();
     }
 
