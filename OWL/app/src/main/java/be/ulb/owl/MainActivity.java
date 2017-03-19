@@ -380,6 +380,15 @@ public class MainActivity extends AppCompatActivity  {
     public void setSwitchPlanButtonImage(Plan plan) {
         _switchButtonPlan = plan;
         if(_changePlan != null) {
+            Point size = new Point();
+            getWindowManager().getDefaultDisplay().getSize(size);
+            int sizeInt = 100;
+            if(size.x/7 < sizeInt) {
+                sizeInt = size.x/7;
+            }
+            _changePlan.getLayoutParams().height = sizeInt;
+            _changePlan.getLayoutParams().width = sizeInt;
+            _changePlan.requestLayout();
             _changePlan.setVisibility(VISIBLE);
             _changePlan.setImageDrawable(_switchButtonPlan.getDrawableImage());
         }
