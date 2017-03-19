@@ -63,7 +63,7 @@ class ReadableDatabase(AbstractDatabase):
         query = \
             """
             SELECT * FROM Plan
-                WHERE CampusId!=0
+                WHERE CampusId!=0;
             """
         ret = dict()
         for plan in self.connection.execute(query):
@@ -216,12 +216,22 @@ class WritableDatabase(ReadableDatabase):
             INSERT INTO Wifi(BSS, NodeId, Avg, Variance, ScanningDate)
                 VALUES(?, ?, ?, ?, ?)
             """
+        if(len(wifi) == 4 or wifi[4] == None):
+            query = \
+            """
+            INSERT INTO Wifi(BSS, NodeId, Avg, Variance, ScanningDate)
+                VALUES(?, ?, ?, ?, date('now'))
+            """
+            wifi = wifi[:4]
+        print("Wifi: " + str(wifi) + " size: " + str(len(wifi)))
+
         self.connection.execute(query, tuple(wifi))
 
 class DatabasesMerger:
     def __init__(self, write, read):
         self.write_db = write
         self.read_db = read
+        self.plans_id_map = {1: 1, 2: 2}
 
     def convert_plan_id(self, plan_id):
         """return the new id of the plan having given id"""
@@ -250,7 +260,10 @@ class DatabasesMerger:
                 read_plans[plan_id] = None
             else:
                 read_plans[plan_id] = self.write_db.insert_plan(read_plans[plan_id])
-        self.plans_id_map = read_plans
+        mergeDic = dict(self.plans_id_map)
+        mergeDic.update(read_plans)
+        self.plans_id_map = mergeDic
+        print("Plans Id Map " + str(self.plans_id_map))
 
     def merge_nodes(self):
         """copy all nodes from plans which have been copied"""
@@ -292,8 +305,12 @@ class DatabasesMerger:
             if self.nodes_id_map[old_node_id] is not None:
                 # TODO copy wifis
                 wifis = self.read_db.get_wifis_by_node(old_node_id)
+                convertNode = self.convert_node_id(old_node_id)
                 for wifi in wifis:
-                    self.write_db.add_wifi_to_node(wifi)
+                    listWifi = list(wifi)
+                    listWifi[1] = convertNode
+                    print("ListWifi: " + str(listWifi))
+                    self.write_db.add_wifi_to_node(listWifi)
 
     def merge(self):
         # copy all plans and retrieve a dictionary mapping id in read -> id in write
