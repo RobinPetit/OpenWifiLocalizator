@@ -223,7 +223,6 @@ class WritableDatabase(ReadableDatabase):
                 VALUES(?, ?, ?, ?, date('now'))
             """
             wifi = wifi[:4]
-        print("Wifi: " + str(wifi) + " size: " + str(len(wifi)))
 
         self.connection.execute(query, tuple(wifi))
 
@@ -263,7 +262,6 @@ class DatabasesMerger:
         mergeDic = dict(self.plans_id_map)
         mergeDic.update(read_plans)
         self.plans_id_map = mergeDic
-        print("Plans Id Map " + str(self.plans_id_map))
 
     def merge_nodes(self):
         """copy all nodes from plans which have been copied"""
@@ -309,7 +307,6 @@ class DatabasesMerger:
                 for wifi in wifis:
                     listWifi = list(wifi)
                     listWifi[1] = convertNode
-                    print("ListWifi: " + str(listWifi))
                     self.write_db.add_wifi_to_node(listWifi)
 
     def merge(self):
