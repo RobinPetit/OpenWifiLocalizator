@@ -214,7 +214,7 @@ public class Graph implements ScanWifiUpdateEvent {
      * @return The node or null if not found
      */
     protected Node whereAmI(ArrayList<Wifi> sensed, ArrayList<Plan> searchPlan) {
-        HashSet<String> sensedStr = sensedStr = Wifi.wifiListToBssList(sensed);
+        HashSet<String> sensedStr = Wifi.wifiListToBssList(sensed);
 
         ArrayList<Plan> res = new ArrayList<Plan>();
         int biggestSetSize = 0;
