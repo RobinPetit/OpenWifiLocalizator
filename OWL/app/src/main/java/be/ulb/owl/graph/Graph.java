@@ -312,7 +312,7 @@ public class Graph implements ScanWifiUpdateEvent {
         Node src = _main.getCurrentLocation();
 
         if(src != null) {
-            Node closestDestination = getClosestDestination(src);
+            Node closestDestination = getClosestDestination(src, _main.getDestinations());
 
             Log.d(getClass().getName(), "closest destination " + closestDestination);
             // Draw source point on screen
@@ -321,12 +321,6 @@ public class Graph implements ScanWifiUpdateEvent {
             ArrayList<Path> shortestPath = bestPath(src, closestDestination);
             if (shortestPath.size() >= 2) {
                 refinePath(shortestPath, _main.getDestinations());
-            }
-
-            Log.d(getClass().getName(), "Path between " + src.getID() + " and " + closestDestination.getID());
-            for (Path path : shortestPath) {
-                // Log path
-                Log.i(getClass().getName(), path.getNode().getID() + " - " + path.getOppositeNodeOf(path.getNode()).getID());
             }
 
             // Draw path on screen
@@ -342,15 +336,20 @@ public class Graph implements ScanWifiUpdateEvent {
 
     }
 
-    private Node getClosestDestination(Node src) {
+    /**
+     * Find the closest destination node from source in given destinations
+     * @param src the node to minimize distance to
+     * @param destinations list of candidate destinations
+     * @return the element of `destinations` being the closest to `src`
+     */
+    private Node getClosestDestination(Node src, List<Node> destinations) {
         double minHeuristic = Double.POSITIVE_INFINITY;
         Node closestDestination = null;
-        ArrayList<Node> listDestination = _main.getDestinations();
 
-        if(listDestination.isEmpty()) {
+        if(destinations.isEmpty()) {
             Log.e(getClass().getName(), "Unknown destination");
         } else {
-            for (Node node : listDestination) {
+            for (Node node : destinations) {
                 double currentHeuristic = Plan.euclidianDistance(src, node);
                 if (currentHeuristic < minHeuristic) {
                     closestDestination = node;
@@ -393,7 +392,7 @@ public class Graph implements ScanWifiUpdateEvent {
      */
     public ArrayList<Path> bestPath(Node nodeFrom, Node nodeTo) throws NoPathException {
         Log.d(getClass().getName(), "Searching path between: " + nodeFrom + " and " + nodeTo);
-        ShortestPathEvaluator evaluator = new ShortestPathAStar(getAllNodes(), nodeFrom, nodeTo);
+        ShortestPathEvaluator evaluator = new ShortestPathDijkstra(getAllNodes(), nodeFrom, nodeTo);
         return evaluator.find();
     }
 
