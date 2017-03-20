@@ -25,10 +25,15 @@ public class GraphDemo extends Graph {
     protected Node whereAmI(ArrayList<Wifi> sensed, ArrayList<Plan> searchPlan) {
         Node res = null;
         if(MainActivity.isDemo()) {
-            return getCampus("Solbosch").getNode(1);
+            return this.getPlanByName("S_S-SC_2_FOND DE PLAN").getNode(2395);
         }
 
         return res;
+    }
+
+    @Override
+    protected void localize(boolean displayNotFound, ArrayList<Wifi> sensedWifi, ArrayList<Plan> listPlan) {
+        super.localize(false, sensedWifi, listPlan);
     }
 
 }
