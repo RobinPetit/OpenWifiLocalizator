@@ -59,9 +59,9 @@ public class MainActivity extends AppCompatActivity  {
     // static attributes
     private static MainActivity instance = null;
 
-    private static final boolean DEBUG = true;     // view info message in log (maybe more after)
+    private static final boolean DEBUG = false;     // view info message in log (maybe more after)
     private static final boolean TEST = false;     // active to call test (active also DEBUG)
-    private static final boolean DEMO = false;     // active to active
+    private static final boolean DEMO = true;     // active to active
     private static final String[] NOT_SUGGESTED = {"Mystery"};
     private static final String DEFAULT_SEARCH = "Campus";
 
@@ -167,10 +167,7 @@ public class MainActivity extends AppCompatActivity  {
         super.onStart();
 
         // Set default plan
-        if (isDemo()) {
-            setCurrentPlan(_graph.getPlanByName("P.F"));
-
-        } else if(isTest()) {
+        if(isTest()) {
             // TODO change plan... if we make automatic test ? :/
             /*setCurrentPlan(_graph.getPlanByName("P.F"));
 
@@ -262,8 +259,11 @@ public class MainActivity extends AppCompatActivity  {
                 _searchView.openSearch();
                 _searchView.setQuery(DEFAULT_SEARCH, false);
                 Log.d("Main", "onClick");
+
+                forceFullScreen();
             }
         });
+        forceFullScreen();
 
         return true;
     }
@@ -311,14 +311,9 @@ public class MainActivity extends AppCompatActivity  {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-
+        if(isDemo()) {
+            forceFullScreen();
+        }
     }
 
 
@@ -486,6 +481,19 @@ public class MainActivity extends AppCompatActivity  {
         TouchListener.setNewCoordZoom(matrixView, _imageDraw, _imageView);
     }
 
+    /**
+     * Force the application to be on full screen
+     */
+    private void forceFullScreen() {
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+    }
+
 
     ///////////////////////////////////// GETTER AND SETTER /////////////////////////////////////
 
@@ -510,7 +518,10 @@ public class MainActivity extends AppCompatActivity  {
         }
 
         Log.i(getClass().getName(), "Set destination: " + dest +
-                " (nbr node: " + _destinationNodes.size() + ")");
+                " (nbr node: " + _destinationNodes.size() + " - " +
+                (_destinationNodes.size() == 0 ? "" :
+                        "id: " + _destinationNodes.get(0).getID()) + ")");
+
         if(!_destinationNodes.isEmpty()) {
             _graph.findPath();
         }
@@ -605,11 +616,14 @@ public class MainActivity extends AppCompatActivity  {
 
     protected void displayPlan() {
         _layout.setVisibility(VISIBLE);
+        forceFullScreen();
     }
 
     protected void hidePlan() {
         _layout.setVisibility(View.GONE);
+        forceFullScreen();
     }
+
 
     /////////////////////////////////////////// STATIC ///////////////////////////////////////////
 

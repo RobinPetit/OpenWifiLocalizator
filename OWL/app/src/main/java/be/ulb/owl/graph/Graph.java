@@ -213,7 +213,7 @@ public class Graph implements ScanWifiUpdateEvent {
      * @return The node or null if not found
      */
     protected Node whereAmI(ArrayList<Wifi> sensed, ArrayList<Plan> searchPlan) {
-        HashSet<String> sensedStr = sensedStr = Wifi.wifiListToBssList(sensed);
+        HashSet<String> sensedStr = Wifi.wifiListToBssList(sensed);
 
         ArrayList<Plan> res = new ArrayList<Plan>();
         int biggestSetSize = 0;
@@ -255,7 +255,7 @@ public class Graph implements ScanWifiUpdateEvent {
      */
     protected void localize(boolean displayNotFound, ArrayList<Wifi> sensedWifi, ArrayList<Plan> listPlan) {
         Node current = whereAmI(sensedWifi, listPlan);
-
+        Log.d(getClass().getName(), "Current Node:  " + (current == null ? "?" : current.getID()));
         boolean haveChange = _main.setCurrentLocation(current);
 
         if(current != null) {
@@ -350,13 +350,16 @@ public class Graph implements ScanWifiUpdateEvent {
         if(listDestination.isEmpty()) {
             Log.e(getClass().getName(), "Unknown destination");
         } else {
-            for (Node node : listDestination) {
+            // DEBUG REMY
+            closestDestination = listDestination.get(0);
+            /*for (Node node : listDestination) {
                 double currentHeuristic = Plan.euclidianDistance(src, node);
+                Log.d(getClass().getName(), "Node: " + node.getID() + " - " + currentHeuristic);
                 if (currentHeuristic < minHeuristic) {
                     closestDestination = node;
                     minHeuristic = currentHeuristic;
                 }
-            }
+            }*/
         }
         if(closestDestination == null) {
             throw new AssertionError("No closest destination");

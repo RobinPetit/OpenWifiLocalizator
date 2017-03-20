@@ -380,7 +380,7 @@ public class SQLUtils extends SQLiteOpenHelper {
                 "WHERE " + WifiTable.BSS.getFullCol() + " IN (?)";
 
         Cursor cursor = getDatabase().rawQuery(req, new String[]{"'"+param+"'"});
-
+        Log.d(SQLUtils.class.getName(), "getPlanWithWifi cursor: " + cursor.getCount());
 
         // TODO read data
         return loadAllPlan(cursor);
@@ -453,7 +453,6 @@ public class SQLUtils extends SQLiteOpenHelper {
 
         return res;
     }
-
 
 
     /**

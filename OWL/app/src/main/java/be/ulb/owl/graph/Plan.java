@@ -487,8 +487,10 @@ public class Plan {
         return distance / _ppm;
     }
 
-    static public double euclidianDistance(Node a, Node b) {
-        assert(a.getParentPlan() == b.getParentPlan());
+    public static double euclidianDistance(Node a, Node b) {
+//        assert(a.getParentPlan() == b.getParentPlan());
+        if (a.getParentPlan() != b.getParentPlan()) throw new AssertionError(
+                "Parent plan are not the same (" + a.getID() + " - " + b.getID() + ")");
         double xOffset = a.getX() - b.getX();
         double yOffset = a.getY() - b.getY();
         return Math.sqrt(xOffset*xOffset + yOffset*yOffset);
