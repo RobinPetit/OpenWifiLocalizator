@@ -18,7 +18,7 @@ import be.ulb.owl.graph.Path;
 import be.ulb.owl.gui.pathdrawing.HermitianCubicSplinePathDrawer;
 import be.ulb.owl.gui.pathdrawing.PathDrawer;
 
-public class DrawView extends ImageView {
+public class DrawView extends android.support.v7.widget.AppCompatImageView {
     private static final Integer NODE_RADIUS = 10;  // in pixels
     private static final Integer NODE_COLOR = Color.rgb(0xeb, 0x9c, 0x31);
     private static final Integer EDGE_COLOR = Color.BLUE;
