@@ -51,7 +51,7 @@ public class Plan {
     private final float _relativeAngle;
     private final float _xOnParent;
     private final float _yOnParent;
-    private final float _pseudoCount = 0.1f;
+    private static final float VARIANCE_PSEUDO_COUNT = 0.1f;
 
 
     /**
@@ -67,11 +67,13 @@ public class Plan {
      * @param bgCoordX relative x position of the upper left corner of the image
      * @param bgCoordY relative y position of the upper left corner of the image
      * @param relativeAngle angle that the plan makes on the parent plan
-     * @param distance number of pixel for on meter
+     * @param pixelsPerMetre number of pixel for on meter
      */
     public Plan(String name, int id, Campus parentPlan, String directoryImage, float xOnParent,
-                float yOnParent, float bgCoordX, float bgCoordY, float relativeAngle, float distance) {
-
+                float yOnParent, float bgCoordX, float bgCoordY, float relativeAngle, float pixelsPerMetre) {
+        if(pixelsPerMetre < 0) {
+            throw new IllegalArgumentException("A plan's ppm can not be zero!");
+        }
         this._name = name;
 
         this._parentPlan = parentPlan;
@@ -80,33 +82,21 @@ public class Plan {
         this._bgCoordX = bgCoordX;
         this._bgCoordY = bgCoordY;
         this._relativeAngle = relativeAngle;
-        this._ppm = distance;
+        this._ppm = pixelsPerMetre;
         this._directoryImage = directoryImage;
-        this._listNode = new ArrayList<Node>();
+        this._listNode = new ArrayList<>();
 
 
         _listNode = SQLUtils.loadNodes(this, id);
         Log.i(getClass().getName(), "List node (" + name + "): " + _listNode);
 
-        _allBssWifi = new HashSet<String>();
+        _allBssWifi = new HashSet<>();
 
-        _allAlias = new HashSet<String>();
+        _allAlias = new HashSet<>();
         for(Node selectNode : _listNode) {
             _allAlias.addAll(selectNode.getAlias());
         }
     }
-
-
-    /**
-     * Convert a quality signal in dBm into a values in mW
-     *
-     * @param dBm
-     * @return Signal quality in mW
-     */
-    private double toMWatt(Float dBm) {
-        return Math.pow(10, dBm/10);
-    }
-
 
     /**
      * Get the node with a minimal difference between its avg dbm and the avg dbm of th sensed wifi
@@ -116,13 +106,13 @@ public class Plan {
      * @return the good node
      */
     private Node collisionManager(ArrayList<Wifi> wifis, ArrayList<Node> nodes) {
-        ArrayList<String> wifisStr = new ArrayList<String>();
+        ArrayList<String> wifisStr = new ArrayList<>();
         for (Wifi wifi : wifis) {
             wifisStr.add(wifi.getBSS());
         }
 
         Node res;
-        ArrayList<Double> scores = new ArrayList<Double>();
+        ArrayList<Double> scores = new ArrayList<>();
         for (int i = 0; i < nodes.size(); i++) { // for each node
             ArrayList<Wifi> tmp = nodes.get(i).getWifi();
 
@@ -136,21 +126,21 @@ public class Plan {
                     float avgSensed = (wifis.get(offset)).getAvg();
 
                     //// Calcul complex ////
-//                    double term1 = (1+_pseudoCount) / (Math.sqrt(2 * Math.PI * (varianceDatabase + _pseudoCount)));
-//                    double exposant = - ( (Math.pow(avgSensed - avgDatabase, 2)) + _pseudoCount ) /
-//                                        (2*(varianceDatabase + _pseudoCount));
+//                    double term1 = (1+VARIANCE_PSEUDO_COUNT) / (Math.sqrt(2 * Math.PI * (varianceDatabase + VARIANCE_PSEUDO_COUNT)));
+//                    double exposant = - ( (Math.pow(avgSensed - avgDatabase, 2)) + VARIANCE_PSEUDO_COUNT ) /
+//                                        (2*(varianceDatabase + VARIANCE_PSEUDO_COUNT));
 //                    double term2 = Math.pow(Math.E, exposant);
 //
 //                    z *= term1 * term2;
 
 
                     //// Calcul "simplified" ////
-                    double term = ( (Math.pow(avgSensed - avgDatabase, 2)) + _pseudoCount ) /
-                                        (varianceDatabase + _pseudoCount);
+                    double term = ( (Math.pow(avgSensed - avgDatabase, 2)) + VARIANCE_PSEUDO_COUNT ) /
+                                        (varianceDatabase + VARIANCE_PSEUDO_COUNT);
 //                    double term = Math.pow(Math.E, exposant);
 
                     z += term;
-                    Log.d(getClass().getName(), "Variance: " + (varianceDatabase + _pseudoCount) +
+                    Log.d(getClass().getName(), "Variance: " + (varianceDatabase + VARIANCE_PSEUDO_COUNT) +
                             " total: " + term + " z :  "+ z);
                 }
             }
