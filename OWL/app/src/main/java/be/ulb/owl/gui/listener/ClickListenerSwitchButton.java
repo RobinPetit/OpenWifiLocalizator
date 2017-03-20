@@ -3,6 +3,7 @@ package be.ulb.owl.gui.listener;
 import android.view.View;
 
 import be.ulb.owl.MainActivity;
+import be.ulb.owl.graph.Node;
 import be.ulb.owl.graph.Plan;
 
 /**
@@ -26,19 +27,31 @@ public class ClickListenerSwitchButton implements View.OnClickListener {
      * Switch between the two different global plans
      */
     private void switchPlan() {
-        Plan current = _main.getCurrentPlan();
-        Plan button = _main.getSwitchPlanButton();
-        if(button == null) {
-            button = _main.getCurrentLocation().getParentPlan(); //current.getCampus();
+        Plan currentPlanLocation = null;
+        Node currentNode = _main.getCurrentLocation();
+        if(currentNode != null) {
+            currentPlanLocation = currentNode.getParentPlan();
         }
 
-        if(_main.getCurrentLocation() != null &&
-                current != _main.getCurrentLocation().getParentPlan() &&
-                button != _main.getCurrentLocation().getParentPlan())  {
-            current = _main.getCurrentLocation().getParentPlan(); //button.getCampus(); // current set as campus because switch
+        if(currentPlanLocation != null && currentPlanLocation != _main.getCurrentPlan()) {
+            _main.setCurrentPlan(currentPlanLocation);
         }
-        _main.setCurrentPlan(button);
-        _main.setSwitchPlanButtonImage(current);
+
+        // Current plan view
+//        Plan current = _main.getCurrentPlan();
+//        // New plan which must be viewed
+//        Plan button = _main.getSwitchPlanButton();
+//        if(button == null) {
+//            button = _main.getCurrentLocation().getParentPlan(); //current.getCampus();
+//        }
+//
+//        if(_main.getCurrentLocation() != null &&
+//                current != _main.getCurrentLocation().getParentPlan() &&
+//                button != _main.getCurrentLocation().getParentPlan())  {
+//            current = _main.getCurrentLocation().getParentPlan(); //button.getCampus(); // current set as campus because switch
+//        }
+//        _main.setCurrentPlan(button);
+//        _main.setSwitchPlanButtonImage(current);
     }
 
 }

@@ -3,20 +3,17 @@ package be.ulb.owl;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -33,8 +30,8 @@ import be.ulb.owl.graph.Path;
 import be.ulb.owl.graph.Plan;
 import be.ulb.owl.gui.DrawView;
 import be.ulb.owl.gui.LocalizeButton;
+import be.ulb.owl.gui.SwitchButton;
 import be.ulb.owl.gui.listener.ClickListenerChoseLocal;
-import be.ulb.owl.gui.listener.ClickListenerSwitchButton;
 import be.ulb.owl.gui.listener.QueryTextListener;
 import be.ulb.owl.gui.listener.TouchListener;
 import be.ulb.owl.scanner.Scanner;
@@ -43,7 +40,6 @@ import be.ulb.owl.utils.LogUtils;
 import be.ulb.owl.utils.SQLUtils;
 import br.com.mauker.materialsearchview.MaterialSearchView;
 
-import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
 /**
@@ -70,14 +66,14 @@ public class MainActivity extends AppCompatActivity  {
     private ImageView _imageDraw;
     private Canvas _canvas = null;
     private MaterialSearchView _searchView = null;  // the widget with the searchbar and autocompletion
-    private ImageButton _changePlan;
+    private SwitchButton _switchButton;
+
     private RelativeLayout _layout;
 
     // private attributes
     private Graph _graph = null;
     private Scanner _scanner = null;
     private Plan _currentPlan = null;
-    private Plan _switchButtonPlan = null;
     private Node _currentPosition;
     private ArrayList<Node> _destinationNodes =  new ArrayList<Node>();
     private DrawView _drawer;
@@ -143,8 +139,8 @@ public class MainActivity extends AppCompatActivity  {
             setCurrentPlan(_graph.getDefaultCampus());
 
             // Init buttons listener
-            initSwitchPlanButton();
             initChoseLocalButton();
+            _switchButton = new SwitchButton(this);
             new LocalizeButton(this, _scanner, _graph);
             Log.i(getClass().getName(), "[V] Button loaded !");
 
@@ -167,10 +163,7 @@ public class MainActivity extends AppCompatActivity  {
         super.onStart();
 
         // Set default plan
-        if (isDemo()) {
-            setCurrentPlan(_graph.getPlanByName("P.F"));
-
-        } else if(isTest()) {
+        if(isTest()) {
             // TODO change plan... if we make automatic test ? :/
             /*setCurrentPlan(_graph.getPlanByName("P.F"));
 
@@ -282,7 +275,10 @@ public class MainActivity extends AppCompatActivity  {
             _searchView.closeSearch();
             displayPlan();
         } else {
-            //super.onBackPressed();
+            Campus parentCampus = getCurrentPlan().getCampus();
+            if(parentCampus != null) {
+                setCurrentPlan(parentCampus);
+            }
         }
     }
 
@@ -309,30 +305,7 @@ public class MainActivity extends AppCompatActivity  {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        setFullScreen();
-    }
-
-
     ///////////////////////////////////// INIT ANDROID VIEW /////////////////////////////////////
-
-    /**
-     * Initialize the "switch plan" button<br />
-     * To switch between the campus
-     */
-    private void initSwitchPlanButton() {
-        _changePlan = (ImageButton)findViewById(R.id.changePlan);
-        _changePlan.setOnClickListener(new ClickListenerSwitchButton(this));
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        _changePlan.getLayoutParams().height = size.x/5;
-        _changePlan.getLayoutParams().width= size.x/5;
-        _changePlan.requestLayout();
-        _changePlan.setVisibility(INVISIBLE);
-    }
 
     /**
      * Initialize the "chose local" button<br />
@@ -378,27 +351,6 @@ public class MainActivity extends AppCompatActivity  {
             res = trueHeight / effectiveHeight;
         }
         return res;
-    }
-
-    public Plan getSwitchPlanButton() {
-        return _switchButtonPlan;
-    }
-
-    public void setSwitchPlanButtonImage(Plan plan) {
-        _switchButtonPlan = plan;
-        if(_changePlan != null) {
-            Point size = new Point();
-            getWindowManager().getDefaultDisplay().getSize(size);
-            int sizeInt = 100;
-            if(size.x/7 < sizeInt) {
-                sizeInt = size.x/7;
-            }
-            _changePlan.getLayoutParams().height = sizeInt;
-            _changePlan.getLayoutParams().width = sizeInt;
-            _changePlan.requestLayout();
-            _changePlan.setVisibility(VISIBLE);
-            _changePlan.setImageDrawable(_switchButtonPlan.getDrawableImage());
-        }
     }
 
     private void setSearchSuggestions() {
@@ -480,22 +432,6 @@ public class MainActivity extends AppCompatActivity  {
         TouchListener.setNewCoordZoom(matrixView, _imageDraw, _imageView);
     }
 
-    /**
-     * Set application on full screen IF debug mode is on
-     */
-    private void setFullScreen() {
-        if(isDemo()) {
-            getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-        }
-    }
-
-
     ///////////////////////////////////// GETTER AND SETTER /////////////////////////////////////
 
     /**
@@ -564,10 +500,9 @@ public class MainActivity extends AppCompatActivity  {
         if(newCurrentPlan != null && (_currentPlan == null ||
                 !newCurrentPlan.getName().equalsIgnoreCase(_currentPlan.getName())) ) {
 
-            if(_switchButtonPlan == null || (_currentPosition != null &&_switchButtonPlan == _currentPosition.getParentPlan())) { // _switchButtonPlan.getCampus() != null
-                setSwitchPlanButtonImage(newCurrentPlan.getCampus());
+            if(_switchButton != null) {
+                _switchButton.updateSwitchButton(newCurrentPlan);
             }
-
             Log.d(getClass().getName(), "New plan: " + newCurrentPlan.getName());
 
             _currentPlan = newCurrentPlan;
@@ -614,7 +549,6 @@ public class MainActivity extends AppCompatActivity  {
 
     protected void displayPlan() {
         _layout.setVisibility(VISIBLE);
-        setFullScreen();
     }
 
     protected void hidePlan() {
