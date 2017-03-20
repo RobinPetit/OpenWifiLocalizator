@@ -67,7 +67,7 @@
             android:id="@+id/local" />
 
         <ImageButton
-            android:background="@drawable/boussole2"
+            android:background="@drawable/boussole"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/localizeButton"
