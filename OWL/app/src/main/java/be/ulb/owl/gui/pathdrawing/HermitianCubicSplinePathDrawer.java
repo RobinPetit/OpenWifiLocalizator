@@ -15,7 +15,7 @@ public class HermitianCubicSplinePathDrawer extends PathDrawer {
      * cubic curves are not drawn directly by a canvas function. Then the function must
      * be evaluated in a given amount of points to be displayed in order to mimic such a curve.
      */
-    static private int NB_POINTS_PER_SEGMENT = 25;
+    static private int NB_POINTS_PER_SEGMENT = 10;
 
     /**
      * dimension of the interpolation curve (here 3 since curves are cubic)
@@ -63,7 +63,7 @@ public class HermitianCubicSplinePathDrawer extends PathDrawer {
      */
     @Override
     public void drawPath(List<FloatCouple> points) {
-        super.drawPath(points);
+        // super.drawPath(points);
         int N = points.size();
         setNumberOfPoints(N);
         _alpha = new FloatCouple[N][DIMENSION+1];
@@ -80,11 +80,16 @@ public class HermitianCubicSplinePathDrawer extends PathDrawer {
         int N = getNumberOfPoints();
         // for each sub curve
         for(int i = 0; i < N-1; ++i) {
+            float prevX = evaluateX(i, 0.f);
+            float prevY = evaluateY(i, 0.f);
             // mimic a cubic curve by drawing several points of the cubic curve
-            for(int step = 0; step < NB_POINTS_PER_SEGMENT+1; ++step) {
+            for(int step = 1; step < NB_POINTS_PER_SEGMENT+1; ++step) {
                 float x = evaluateX(i, step/(float)NB_POINTS_PER_SEGMENT);
                 float y = evaluateY(i, step/(float)NB_POINTS_PER_SEGMENT);
-                _canvas.drawPoint(x, y, _pathColor);
+                _canvas.drawLine(prevX, prevY, x, y, _pathColor);
+                prevX = x;
+                prevY = y;
+                //_canvas.drawPoint(x, y, _pathColor);
             }
         }
     }
