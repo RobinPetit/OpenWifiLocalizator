@@ -66,7 +66,7 @@ CREATE TABLE "Plan" (
 	`Id`             INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 	`CampusId`       INTEGER,
 	`Name`           TEXT,
-	`Ppm`            REAL,
+	`Ppm`            REAL NOT NULL CHECK (Ppm > 0.0),
 	`ImageDirectory` TEXT,
 	`XOnParent`      REAL DEFAULT 0.0,
 	`YOnParent`      REAL DEFAULT 0.0,
