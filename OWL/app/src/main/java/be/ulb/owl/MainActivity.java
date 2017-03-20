@@ -162,18 +162,8 @@ public class MainActivity extends AppCompatActivity  {
         Log.d(getClass().getName(), "[DEBUG] OnStart");
         super.onStart();
 
-        // Set default plan
-        if(isTest()) {
-            // TODO change plan... if we make automatic test ? :/
-            /*setCurrentPlan(_graph.getPlanByName("P.F"));
-
-            Test.testBestPath();
-            Test.testWifi();*/
-
-        } else {
-            setCurrentPlan(_currentPlan);
-
-        }
+        // Force to see the current plan
+        setCurrentPlan(_currentPlan);
 
         // Start scan
         _graph.setDisplayNotFound(true);
@@ -388,6 +378,16 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
 
+    /**
+     * Draw the "currentLocation" node (if not null) if we are
+     * on the current plan node
+     */
+    public void draw() {
+        Node currentLocation = getCurrentLocation();
+        if(currentLocation != null && currentLocation.getParentPlan() == this.getCurrentPlan()) {
+            draw(currentLocation);
+        }
+    }
 
     /**
      * Draw a node on the current plan
@@ -507,6 +507,7 @@ public class MainActivity extends AppCompatActivity  {
 
             _currentPlan = newCurrentPlan;
             cleanCanvas();
+            draw();
             _imageView.setImageDrawable(_currentPlan.getDrawableImage());
             _imageView.setScaleType(ImageView.ScaleType.MATRIX);
 

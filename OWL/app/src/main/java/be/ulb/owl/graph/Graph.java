@@ -261,7 +261,7 @@ public class Graph implements ScanWifiUpdateEvent {
         if(current != null) {
             _main.setCurrentPlan(current.getParentPlan());
             if(haveChange) {
-                _main.cleanCanvas();
+//                _main.cleanCanvas();
 
                 ArrayList<Node> destinationNodes = _main.getDestinations();
                 if(!destinationNodes.isEmpty()) {
@@ -274,7 +274,7 @@ public class Graph implements ScanWifiUpdateEvent {
                     }
 
                 } else {
-                    _main.draw(current);
+//                    _main.draw(current);
                 }
 
             }
@@ -330,8 +330,8 @@ public class Graph implements ScanWifiUpdateEvent {
             Node dest = _main.getDestinations().get(0);
             _main.setCurrentPlan(dest.getParentPlan());
             Log.d(getClass().getName(), "Set current and draw");
-            _main.cleanCanvas();
-            _main.draw(dest);
+//            _main.cleanCanvas();
+//            _main.draw(dest);
         }
 
     }
