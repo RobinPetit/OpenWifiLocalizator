@@ -59,9 +59,9 @@ public class MainActivity extends AppCompatActivity  {
     // static attributes
     private static MainActivity instance = null;
 
-    private static final boolean DEBUG = true;     // view info message in log (maybe more after)
+    private static final boolean DEBUG = false;     // view info message in log (maybe more after)
     private static final boolean TEST = false;     // active to call test (active also DEBUG)
-    private static final boolean DEMO = false;     // active to active
+    private static final boolean DEMO = true;     // active to active
     private static final String[] NOT_SUGGESTED = {"Mystery"};
     private static final String DEFAULT_SEARCH = "Campus";
 
@@ -252,6 +252,7 @@ public class MainActivity extends AppCompatActivity  {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 _searchView.setQuery(_searchView.getSuggestionAtPosition(position), true);
                 displayPlan();
+                Log.d(getClass().getName(), "onClick item Search");
             }
         });
 
@@ -261,7 +262,7 @@ public class MainActivity extends AppCompatActivity  {
                 hidePlan();
                 _searchView.openSearch();
                 _searchView.setQuery(DEFAULT_SEARCH, false);
-                Log.d("Main", "onClick");
+                Log.d(getClass().getName(), "onClick Search");
             }
         });
 
@@ -485,12 +486,12 @@ public class MainActivity extends AppCompatActivity  {
     private void setFullScreen() {
         if(isDemo()) {
             getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         }
     }
 
@@ -613,6 +614,7 @@ public class MainActivity extends AppCompatActivity  {
 
     protected void displayPlan() {
         _layout.setVisibility(VISIBLE);
+        setFullScreen();
     }
 
     protected void hidePlan() {

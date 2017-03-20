@@ -14,7 +14,6 @@ import java.util.List;
 import be.ulb.owl.MainActivity;
 import be.ulb.owl.R;
 import be.ulb.owl.event.ScanWifiUpdateEvent;
-import be.ulb.owl.graph.shortestpath.ShortestPathAStar;
 import be.ulb.owl.graph.shortestpath.ShortestPathDijkstra;
 import be.ulb.owl.graph.shortestpath.ShortestPathEvaluator;
 import be.ulb.owl.scanner.Scanner;
