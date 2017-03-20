@@ -31,9 +31,9 @@ public class GraphDemo extends Graph {
         return res;
     }
 
-    @Override
-    protected void localize(boolean displayNotFound, ArrayList<Wifi> sensedWifi, ArrayList<Plan> listPlan) {
-        super.localize(false, sensedWifi, listPlan);
-    }
+//    @Override
+//    protected void localize(boolean displayNotFound, ArrayList<Wifi> sensedWifi, ArrayList<Plan> listPlan) {
+//        super.localize(false, sensedWifi, listPlan);
+//    }
 
 }

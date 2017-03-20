@@ -259,7 +259,11 @@ public class Graph implements ScanWifiUpdateEvent {
         boolean haveChange = _main.setCurrentLocation(current);
 
         if(current != null) {
-            _main.setCurrentPlan(current.getParentPlan());
+
+            if(displayNotFound) {
+                _main.setCurrentPlan(current.getParentPlan());
+            }
+
             if(haveChange) {
 //                _main.cleanCanvas();
 

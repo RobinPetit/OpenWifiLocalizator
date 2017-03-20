@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity  {
     private Plan _currentPlan = null;
     private Node _currentPosition;
     private ArrayList<Node> _destinationNodes =  new ArrayList<Node>();
+    private List<Path> _lastPathList; // Save the last path to the destination
     private DrawView _drawer;
 
 
@@ -358,6 +359,14 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     /**
+     * Draw the last path which have been calculate
+     */
+    private void drawPath() {
+        drawPath(_lastPathList);
+    }
+
+
+    /**
      * Draws the given path on the plan on the screen
      *
      * @param pathList An ArrayList of Path representing the nodes to pass by
@@ -365,7 +374,8 @@ public class MainActivity extends AppCompatActivity  {
     public void drawPath(List<Path> pathList) {
         cleanCanvas();
         draw(_currentPosition);
-        _drawer.draw(pathList);
+        _lastPathList = pathList;
+        _drawer.draw(pathList, getCurrentPlan());
     }
 
 
@@ -382,10 +392,21 @@ public class MainActivity extends AppCompatActivity  {
      * Draw the "currentLocation" node (if not null) if we are
      * on the current plan node
      */
-    public void draw() {
+    public void refreshDraw() {
         Node currentLocation = getCurrentLocation();
-        if(currentLocation != null && currentLocation.getParentPlan() == this.getCurrentPlan()) {
-            draw(currentLocation);
+        Log.d(getClass().getName(), "Refresh draw !");
+
+        if(currentLocation != null) {
+            Log.d(getClass().getName(), "Refresh draw condition 1 ! (" + getDestinations().size() + ")");
+
+            if(!getDestinations().isEmpty()) {
+                Log.d(getClass().getName(), "Refresh draw DrawPath !");
+                drawPath();
+
+            } else {
+                draw(currentLocation);
+            }
+
         }
     }
 
@@ -406,14 +427,16 @@ public class MainActivity extends AppCompatActivity  {
      * @param cleanBefore True if the plan must be clean before
      */
     public void draw(Node node, boolean cleanBefore) {
-        if(cleanBefore) {
-            cleanCanvas();
-        }
-        Float[] coord = _drawer.draw(node);
-        _imageDraw.invalidate();
-        _imageView.invalidate();
+        if(node.getParentPlan() == getCurrentPlan()) {
+            if (cleanBefore) {
+                cleanCanvas();
+            }
+            Float[] coord = _drawer.draw(node);
+            _imageDraw.invalidate();
+            _imageView.invalidate();
 
-        moveToPoint(coord[0], coord[1]);
+            moveToPoint(coord[0], coord[1]);
+        }
     }
 
     /**
@@ -507,9 +530,9 @@ public class MainActivity extends AppCompatActivity  {
 
             _currentPlan = newCurrentPlan;
             cleanCanvas();
-            draw();
             _imageView.setImageDrawable(_currentPlan.getDrawableImage());
             _imageView.setScaleType(ImageView.ScaleType.MATRIX);
+            refreshDraw();
 
         } else if(newCurrentPlan == null) {
             Log.w(this.getClass().getName(), "New plan is null");

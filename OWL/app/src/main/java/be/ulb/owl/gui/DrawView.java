@@ -8,13 +8,13 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import be.ulb.owl.graph.Node;
 import be.ulb.owl.graph.Path;
+import be.ulb.owl.graph.Plan;
 import be.ulb.owl.gui.pathdrawing.HermitianCubicSplinePathDrawer;
 import be.ulb.owl.gui.pathdrawing.PathDrawer;
 
@@ -74,19 +74,25 @@ public class DrawView extends android.support.v7.widget.AppCompatImageView {
         return new Float[] {x, y};
     }
 
-    public void draw(List<Path> pathList) {
+    public void draw(List<Path> pathList, Plan currentPlan) {
         ArrayList<FloatCouple> nodesList = new ArrayList<>();
         if(pathList.size() < 1)
             return;
+
         Node node = pathList.get(0).getNode();
         if(pathList.size() == 1) {
             nodesList.add(nodeToFloatCouple(node));
             nodesList.add(nodeToFloatCouple(pathList.get(0).getOppositeNodeOf(node)));
+
         } else {
-            if(pathList.get(1).containsNode(node))
+            if (pathList.get(1).containsNode(node)) {
                 node = pathList.get(0).getOppositeNodeOf(node);
+            }
+
             for (Path path : pathList) {
-                nodesList.add(nodeToFloatCouple(node));
+                if(node.getParentPlan() == currentPlan) {
+                    nodesList.add(nodeToFloatCouple(node));
+                }
                 node = path.getOppositeNodeOf(node);
             }
         }
