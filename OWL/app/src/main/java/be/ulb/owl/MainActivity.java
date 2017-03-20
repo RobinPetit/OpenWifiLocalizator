@@ -236,7 +236,6 @@ public class MainActivity extends AppCompatActivity  {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 _searchView.setQuery(_searchView.getSuggestionAtPosition(position), true);
                 displayPlan();
-                Log.d(getClass().getName(), "onClick item Search");
             }
         });
 
@@ -246,7 +245,6 @@ public class MainActivity extends AppCompatActivity  {
                 hidePlan();
                 _searchView.openSearch();
                 _searchView.setQuery(DEFAULT_SEARCH, false);
-                Log.d(getClass().getName(), "onClick Search");
             }
         });
 
@@ -394,13 +392,10 @@ public class MainActivity extends AppCompatActivity  {
      */
     public void refreshDraw() {
         Node currentLocation = getCurrentLocation();
-        Log.d(getClass().getName(), "Refresh draw !");
 
         if(currentLocation != null) {
-            Log.d(getClass().getName(), "Refresh draw condition 1 ! (" + getDestinations().size() + ")");
 
             if(!getDestinations().isEmpty()) {
-                Log.d(getClass().getName(), "Refresh draw DrawPath !");
                 drawPath();
 
             } else {
