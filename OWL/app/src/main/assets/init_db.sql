@@ -89,8 +89,8 @@ INSERT INTO Plan(CampusId, Name, Ppm, ImageDirectory) VALUES (0, 'Plaine', 2.69,
 INSERT INTO Plan(CampusId, Name, Ppm, ImageDirectory) VALUES (0, 'Solbosch', 2.97, '');
 
 CREATE TABLE `AliasesLink` (
-	`NodeId`  INTEGER,
-	`AliasId` INTEGER
+	`NodeId`  INTEGER NOT NULL,
+	`AliasId` INTEGER NOT NULL
 );
 
 CREATE TABLE "Aliases" (
