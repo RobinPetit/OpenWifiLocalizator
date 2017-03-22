@@ -478,7 +478,7 @@ public class Plan {
     }
 
     static public double euclidianDistance(Node a, Node b) {
-        assert(a.getParentPlan() == b.getParentPlan());
+        assert(a.getParentPlan().getCampus() == b.getParentPlan().getCampus());
         double xOffset = a.getX() - b.getX();
         double yOffset = a.getY() - b.getY();
         return Math.sqrt(xOffset*xOffset + yOffset*yOffset);

@@ -366,20 +366,27 @@ public class Graph implements ScanWifiUpdateEvent {
 
 
     /**
-     * TODO Robin possible d'ajouter de la doc ?
+     * Rearrange the path from src to dest by stopping at the first node of the path having a label
+     * mathcing the desired alias
      *
-     * @param overallPath
-     * @param listDestination
+     * @param overallPath the path from src to dest
+     * @param listDestination the list of nodes in the graph having the right alias
      */
     private void refinePath(ArrayList<Path> overallPath, ArrayList<Node> listDestination) {
-        int firstOccurrenceOfDestination = overallPath.size() - 1;
-        Node commonNode = overallPath.get(firstOccurrenceOfDestination).getIntersectionWith(overallPath.get(firstOccurrenceOfDestination-1));
-        Log.d(getClass().getName(), overallPath.size() + " nodes were found, and after refinment:");
+        int lastOccurrenceOfDestination = overallPath.size() - 1;
+        Path lastPath = overallPath.get(lastOccurrenceOfDestination);
+        Node commonNode = lastPath.getIntersectionWith(overallPath.get(lastOccurrenceOfDestination-1));
+        int initialPathSize = overallPath.size();
+        Log.d(getClass().getName(), initialPathSize + " nodes were found, and after refinment:");
+        // remind which is the last one which is removed in order to re-add it in the end
+        lastPath = overallPath.get(overallPath.size()-1);
         while (overallPath.size() > 0 && listDestination.contains(commonNode)) {
-            firstOccurrenceOfDestination--;
-            commonNode = overallPath.get(firstOccurrenceOfDestination).getOppositeNodeOf(commonNode);
-            overallPath.remove(firstOccurrenceOfDestination+1);
+            lastOccurrenceOfDestination--;
+            commonNode = overallPath.get(lastOccurrenceOfDestination).getOppositeNodeOf(commonNode);
+            overallPath.remove(lastOccurrenceOfDestination+1);
         }
+        if(overallPath.size() < initialPathSize)
+            overallPath.add(lastPath);
         Log.d(getClass().getName(), "only " + overallPath.size() + " are left: " + overallPath);
     }
 
