@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity  {
 
     private static final boolean DEBUG = true;     // view info message in log (maybe more after)
     private static final boolean TEST = false;     // active to call test (active also DEBUG)
-    private static final boolean DEMO = false;     // active to active
+    private static final boolean DEMO = true;     // active to active
     private static final String[] NOT_SUGGESTED = {"Mystery"};
     private static final String DEFAULT_SEARCH = "Campus";
 
@@ -506,7 +506,7 @@ public class MainActivity extends AppCompatActivity  {
     public void setDestination(String dest) throws NoPathException {
         _destinationNodes = _currentPlan.searchNode(dest);
         if(_destinationNodes.isEmpty()) {
-            _destinationNodes = _graph.searchNode(dest);
+            _destinationNodes = _graph.getAllNodesWithAlias(dest);
         }
 
         Log.i(getClass().getName(), "Set destination: " + dest +

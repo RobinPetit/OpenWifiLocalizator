@@ -52,9 +52,6 @@ public class ShortestPathDijkstra extends ShortestPathEvaluator {
     @Override
     public ArrayList<Path> find() throws NoPathException {
         super.find();
-        if(!_found) {
-            throw new NoPathException("No path has been found between nodes " + _src + " and " + _dest);
-        }
         ArrayList<Path> path = new ArrayList<>();
         Node current = _dest;
         while(!current.isNode(_src)) {
