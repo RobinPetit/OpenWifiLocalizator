@@ -61,6 +61,11 @@ public class Campus extends Plan {
     }
 
 
+    @Override
+    public Campus getCampus() {
+        return this;
+    }
+
     /**
     * Return all nodes of the Campus
     *
