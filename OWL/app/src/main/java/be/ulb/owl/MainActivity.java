@@ -469,7 +469,7 @@ public class MainActivity extends AppCompatActivity  {
     public void setDestination(String dest) throws NoPathException {
         _destinationNodes = _currentPlan.searchNode(dest);
         if(_destinationNodes.isEmpty()) {
-            _destinationNodes = _graph.searchNode(dest);
+            _destinationNodes = _graph.getAllNodesWithAlias(dest);
         }
 
         Log.i(getClass().getName(), "Set destination: " + dest +

@@ -35,6 +35,7 @@ public class Graph implements ScanWifiUpdateEvent {
 
     private static ArrayList<Campus> _allCampus;
     private static final int SOLBOSCH_ID = 1;
+    private static final int DEFAULT_PLAN_ID = SOLBOSCH_ID;
 
 
     /**
@@ -46,7 +47,7 @@ public class Graph implements ScanWifiUpdateEvent {
     public Graph(MainActivity main) {
         _main = main;
 
-        _allCampus = new ArrayList<Campus>();
+        _allCampus = new ArrayList<>();
         loadAllPlan();
 
         if(_allCampus.isEmpty()) {
@@ -118,7 +119,7 @@ public class Graph implements ScanWifiUpdateEvent {
      * @return all alias name
      */
     public List<String> getAllAlias() {
-        HashSet<String> allAlias = new HashSet<String>();
+        HashSet<String> allAlias = new HashSet<>();
         Log.d(getClass().getName(), "all plans of graph: " + getAllPlan());
         for(Plan plan : getAllPlan()) {
             allAlias.addAll(plan.getAllAlias());
@@ -148,7 +149,7 @@ public class Graph implements ScanWifiUpdateEvent {
      * @param name the name (alias) of this nodes
      * @return an ArrayList of Node
      */
-    public ArrayList<Node> searchNode(String name) {
+    public ArrayList<Node> getAllNodesWithAlias(String name) {
         ArrayList<Node> listeNode = new ArrayList<Node>();
         for(Plan plan : getAllPlan()) {
             listeNode.addAll(plan.searchNode(name));
@@ -179,7 +180,7 @@ public class Graph implements ScanWifiUpdateEvent {
      * @return the default Campus
      */
     public Campus getDefaultCampus() {
-        return getAllCampus().get(SOLBOSCH_ID);
+        return getAllCampus().get(DEFAULT_PLAN_ID);
     }
 
 
@@ -209,7 +210,7 @@ public class Graph implements ScanWifiUpdateEvent {
     /**
      * Find the node where the user is
      *
-     * @param sensed all detected arround wifi
+     * @param sensed all detected around wifi
      * @return The node or null if not found
      */
     protected Node whereAmI(ArrayList<Wifi> sensed, ArrayList<Plan> searchPlan) {
@@ -247,40 +248,21 @@ public class Graph implements ScanWifiUpdateEvent {
 
 
     /**
-     * localizes the user
+     * localize the user
      *
      * @param displayNotFound Boolean telling whether or not to signal if user is unable to localize
      * @param sensedWifi list of Wifi which have been capted
      * @param listPlan list of plan which match with sensed wifi
      */
     protected void localize(boolean displayNotFound, ArrayList<Wifi> sensedWifi, ArrayList<Plan> listPlan) {
-        Node current = whereAmI(sensedWifi, listPlan);
+        Node currentNode = whereAmI(sensedWifi, listPlan);
 
-        boolean haveChange = _main.setCurrentLocation(current);
-
-        if(current != null) {
-
-            if(displayNotFound) {
-                _main.setCurrentPlan(current.getParentPlan());
-            }
-
-            if(haveChange) {
-//                _main.cleanCanvas();
-
-                ArrayList<Node> destinationNodes = _main.getDestinations();
-                if(!destinationNodes.isEmpty()) {
-                    try {
-                        findPath();
-                    } catch (NoPathException e) {
-                        Log.e(getClass().getName(), "Error: should have found an alternative for a " +
-                                "path between " + current.getID() + " and " +
-                                destinationNodes.get(0).getAlias().toString());
-                    }
-
-                } else {
-//                    _main.draw(current);
-                }
-
+        boolean hasPositionChanged = _main.setCurrentLocation(currentNode);
+        if(currentNode != null) {
+            _main.setCurrentPlan(currentNode.getParentPlan());
+            if(hasPositionChanged) {
+                _main.cleanCanvas();
+                displayNewPath(currentNode);
             }
 
         } else if (displayNotFound) {
@@ -288,6 +270,21 @@ public class Graph implements ScanWifiUpdateEvent {
         }
     }
 
+    private void displayNewPath(Node currentNode) {
+        ArrayList<Node> destinationNodes = _main.getDestinations();
+        if(!destinationNodes.isEmpty()) {
+            try {
+                findPath();
+            } catch (NoPathException e) {
+                Log.e(getClass().getName(), "Error: should have found an alternative for a " +
+                        "path between " + currentNode.getID() + " and " +
+                        destinationNodes.get(0).getAlias().toString());
+            }
+
+        } else {
+            // _main.draw(currentNode);
+        }
+    }
 
     @Override
     public void scanWifiUpdateEvent(ArrayList<Wifi> listWifi, ArrayList<Plan> listPlan) {

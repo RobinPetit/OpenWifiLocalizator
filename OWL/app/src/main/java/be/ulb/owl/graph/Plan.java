@@ -345,7 +345,7 @@ public class Plan {
         if(_parentPlan != null) {
             originX /= _parentPlan.getPpm();
         }
-        return originX + (Math.cos(angle)*node.getXOnPlan() + Math.sin(angle)*node.getY())/getPpm();
+        return originX + (Math.cos(angle)*node.getXOnPlan() + Math.sin(angle)*node.getYOnPlan())/getPpm();
     }
 
 
@@ -481,6 +481,8 @@ public class Plan {
         assert(a.getParentPlan().getCampus() == b.getParentPlan().getCampus());
         double xOffset = a.getX() - b.getX();
         double yOffset = a.getY() - b.getY();
+        if(xOffset == 0 && yOffset == 0)
+            Log.w("Plan", "for nodes " + a + " and " + b + ": distance == 0");
         return Math.sqrt(xOffset*xOffset + yOffset*yOffset);
     }
 
