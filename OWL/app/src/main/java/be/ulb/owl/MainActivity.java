@@ -480,16 +480,41 @@ public class MainActivity extends AppCompatActivity  {
      * @param dest Name of the destination
      */
     public void setDestination(String dest) throws NoPathException {
+        // check first if user asks for a definite campus
+        if(isCampus(dest)) {
+            return;
+        }
+        // first look if such a destination can be found on plan
         _destinationNodes = _currentPlan.searchNode(dest);
-        if(_destinationNodes.isEmpty()) {
+        // if not
+        if (_destinationNodes.isEmpty()) {
+            // then look for it in the whole graph
             _destinationNodes = _graph.getAllNodesWithAlias(dest);
         }
 
         Log.i(getClass().getName(), "Set destination: " + dest +
                 " (nbr node: " + _destinationNodes.size() + ")");
-        if(!_destinationNodes.isEmpty()) {
+        if (!_destinationNodes.isEmpty()) {
             _graph.findPath();
         }
+    }
+
+    /**
+     * Check if asked destination is a campus. If so, set the associated plan
+     * @param dest the asked destination
+     * @return true if a campus has been set as plan, and false otherwise
+     */
+    private boolean isCampus(String dest) {
+        if(dest.contains("Campus")) {
+            dest = dest.substring("Campus".length()+1);
+            for (Campus campus : _graph.getAllCampus()) {
+                if(dest.equals(campus.getName())) {
+                    setCurrentPlan(campus);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
