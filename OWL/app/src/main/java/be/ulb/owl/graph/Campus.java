@@ -35,7 +35,6 @@ public class Campus extends Plan {
 
         _id = id;
         _directoryImage = directoryImage;
-        loadAllPath();
     }
 
 

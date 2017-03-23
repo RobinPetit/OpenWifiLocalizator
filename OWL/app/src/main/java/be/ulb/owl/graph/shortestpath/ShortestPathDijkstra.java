@@ -1,5 +1,7 @@
 package be.ulb.owl.graph.shortestpath;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +34,8 @@ public class ShortestPathDijkstra extends ShortestPathEvaluator {
             Node currentNode = getLowestDistance();
             assert(_nodesSet.contains(currentNode));
             _nodesSet.remove(currentNode);
+            if(_distance.get(currentNode) == Float.POSITIVE_INFINITY)
+                throw new AssertionError("lowest distance node cannot be at infinite distance!");
             if(currentNode.isNode(_dest)) {
                 _found = true;
                 break;
@@ -45,7 +49,8 @@ public class ShortestPathDijkstra extends ShortestPathEvaluator {
                 }
             }
         }
-
+        if(!_predecessor.containsKey(_dest))
+            throw new AssertionError("Destination node should have been visited at least once");
         _executed = true;
     }
 
@@ -71,6 +76,17 @@ public class ShortestPathDijkstra extends ShortestPathEvaluator {
                 toReturn = node;
             }
         }
+        Log.d(getClass().getName(), "distance info: " + getDebugDistancesString());
+        Log.d(getClass().getName(), "Lowest distance: " + minDistance + " implies node: " + toReturn);
         return toReturn;
+    }
+
+    private String getDebugDistancesString() {
+        String ret =  "";
+        for(Node node : _distance.keySet()) {
+            if(_distance.get(node) != Float.POSITIVE_INFINITY && _nodesSet.contains(node))
+                ret += "  " + node + ": " + _distance.get(node);
+        }
+        return ret;
     }
 }

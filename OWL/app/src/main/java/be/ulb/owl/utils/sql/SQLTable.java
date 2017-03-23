@@ -1,7 +1,5 @@
 package be.ulb.owl.utils.sql;
 
-import java.util.ArrayList;
-
 /**
  * Interface to have same function in all Table object
  *

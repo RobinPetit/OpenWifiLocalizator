@@ -1,7 +1,5 @@
 package be.ulb.owl.utils.sql;
 
-import java.util.ArrayList;
-
 /**
  * Created by robin on 04/02/17.
  */

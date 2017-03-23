@@ -66,6 +66,8 @@ public class Graph implements ScanWifiUpdateEvent {
 
         for(Campus campus : _allCampus) {
             campus.loadAllPlan();
+            // load paths on the campus after each plan is loaded (in order to have functional external edges)
+            campus.loadAllPath();
         }
 
         // TODO DEBUG load wifi
