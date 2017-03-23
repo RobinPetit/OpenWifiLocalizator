@@ -89,11 +89,16 @@ public class DrawView extends android.support.v7.widget.AppCompatImageView {
                 node = pathList.get(0).getOppositeNodeOf(node);
             }
 
+            Node lastNodeToDraw = null;
             for (Path path : pathList) {
                 if(node.getParentPlan() == currentPlan) {
                     nodesList.add(nodeToFloatCouple(node));
+                    lastNodeToDraw = node;
                 }
                 node = path.getOppositeNodeOf(node);
+            }
+            if(node.hasNeighbour(lastNodeToDraw)) {
+                nodesList.add(nodeToFloatCouple(node));
             }
         }
         _pathDrawer.drawPath(nodesList);
