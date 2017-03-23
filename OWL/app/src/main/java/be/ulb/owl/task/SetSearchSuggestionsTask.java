@@ -5,8 +5,6 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
-import br.com.mauker.materialsearchview.MaterialSearchView;
-
 /**
  * Created by robin on 23/03/17.
  */

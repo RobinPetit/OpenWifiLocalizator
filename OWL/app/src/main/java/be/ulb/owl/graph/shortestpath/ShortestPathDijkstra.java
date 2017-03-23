@@ -68,7 +68,7 @@ public class ShortestPathDijkstra extends ShortestPathEvaluator {
     }
 
     private Node getLowestDistance() {
-        Float minDistance = Float.POSITIVE_INFINITY;
+        float minDistance = Float.POSITIVE_INFINITY;
         Node toReturn = null;
         for(final Node node : _nodesSet) {
             if(_distance.get(node) <= minDistance) {
@@ -76,9 +76,13 @@ public class ShortestPathDijkstra extends ShortestPathEvaluator {
                 toReturn = node;
             }
         }
+        // showDebugInformation(minDistance, toReturn);
+        return toReturn;
+    }
+
+    private void showDebugInformation(float minDistance, Node toReturn) {
         Log.d(getClass().getName(), "distance info: " + getDebugDistancesString());
         Log.d(getClass().getName(), "Lowest distance: " + minDistance + " implies node: " + toReturn);
-        return toReturn;
     }
 
     private String getDebugDistancesString() {
