@@ -282,7 +282,7 @@ public class Graph implements ScanWifiUpdateEvent {
             }
 
         } else {
-            // _main.draw(currentNode);
+            _main.draw(currentNode);
         }
     }
 

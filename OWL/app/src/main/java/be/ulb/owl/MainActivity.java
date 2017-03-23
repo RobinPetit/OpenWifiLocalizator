@@ -370,7 +370,9 @@ public class MainActivity extends AppCompatActivity  {
      * Draw the last path which have been calculate
      */
     private void drawPath() {
-        drawPath(_lastPathList);
+        if(_lastPathList != null) {
+            drawPath(_lastPathList);
+        }
     }
 
 
@@ -380,6 +382,7 @@ public class MainActivity extends AppCompatActivity  {
      * @param pathList An ArrayList of Path representing the nodes to pass by
      */
     public void drawPath(List<Path> pathList) {
+        if(pathList == null)
         cleanCanvas();
         draw(_currentPosition);
         _lastPathList = pathList;

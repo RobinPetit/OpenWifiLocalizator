@@ -5,6 +5,7 @@
  */
 package be.ulb.owl.graph;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import be.ulb.owl.utils.SQLUtils;
  * 
  * @author Detobel36
  */
-public class Node {
+public class Node implements Comparable<Node> {
     
     private final Plan _parentPlan;
     private final float _x;
@@ -231,5 +232,10 @@ public class Node {
     @Override
     public String toString() {
         return getID().toString();
+    }
+
+    @Override
+    public int compareTo(@NonNull Node node) {
+        return getID() - node.getID();
     }
 }
