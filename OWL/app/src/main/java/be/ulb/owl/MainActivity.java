@@ -35,6 +35,8 @@ import be.ulb.owl.gui.listener.ClickListenerChoseLocal;
 import be.ulb.owl.gui.listener.QueryTextListener;
 import be.ulb.owl.gui.listener.TouchListener;
 import be.ulb.owl.scanner.Scanner;
+import be.ulb.owl.task.SetSearchSuggestionsTask;
+import be.ulb.owl.task.SetSearchSuggestionsTaskParam;
 import be.ulb.owl.test.GraphTest;
 import be.ulb.owl.utils.LogUtils;
 import be.ulb.owl.utils.SQLUtils;
@@ -347,9 +349,17 @@ public class MainActivity extends AppCompatActivity  {
         for(final Campus campus : _graph.getAllCampus()) {
             _searchView.addSuggestion("Campus " + campus.getName());
         }
+        addSuggestions();
+    }
+
+    /**
+     * Start a new task to add all suggestions to the searchbar
+     */
+    private void addSuggestions() {
         ArrayList<String> aliases = new ArrayList<>(_graph.getAllAlias());
         Collections.sort(aliases);
-        _searchView.addSuggestions(aliases);
+        SetSearchSuggestionsTaskParam param = new SetSearchSuggestionsTaskParam(_searchView, aliases);
+        new SetSearchSuggestionsTask().execute(param);
 
         for (String suggestion : NOT_SUGGESTED) {
             _searchView.removeSuggestion(suggestion);

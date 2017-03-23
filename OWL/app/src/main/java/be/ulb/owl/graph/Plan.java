@@ -88,7 +88,6 @@ public class Plan {
 
 
         _listNode = SQLUtils.loadNodes(this, id);
-        Log.i(getClass().getName(), "List node (" + name + "): " + _listNode);
 
         _allBssWifi = new HashSet<>();
 

@@ -803,7 +803,7 @@ public class SQLUtils extends SQLiteOpenHelper {
 
                 if(idOne != nodeID) { // We check that node one has the good id
                     // If not, create an error !
-                    Log.e(SQLUtils.class.getName(), "The SQL response is not valide (Search edge with " +
+                    Log.e(SQLUtils.class.getName(), "The SQL response is not valid (Search edge with " +
                             "node: " + nodeID + " and return: " + idOne + " & " + idTwo + ")");
                     cursor.moveToNext();
                     continue; // next !
@@ -819,10 +819,10 @@ public class SQLUtils extends SQLiteOpenHelper {
                     nodeTwo = Graph.getNode(idTwo); // Search in all plans
                 }
 
-                if(nodeTwo != null && !nodeOne.hasNeighbour(nodeTwo)) { // If found :)
+                if(nodeTwo != null && !nodeOne.hasNeighbour(nodeTwo)) { // If found
                     res.add(new Path(nodeOne, nodeTwo));
                 } else {
-                    Log.w(SQLUtils.class.getName(), "Path not created " + nodeID + " & " + idTwo);
+                    Log.w(SQLUtils.class.getName(), "Path not created: " + nodeID + " & " + idTwo);
                 }
 
                 cursor.moveToNext();

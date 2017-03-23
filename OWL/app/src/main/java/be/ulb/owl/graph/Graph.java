@@ -122,11 +122,9 @@ public class Graph implements ScanWifiUpdateEvent {
      */
     public List<String> getAllAlias() {
         HashSet<String> allAlias = new HashSet<>();
-        Log.d(getClass().getName(), "all plans of graph: " + getAllPlan());
         for(Plan plan : getAllPlan()) {
             allAlias.addAll(plan.getAllAlias());
         }
-
         return new ArrayList<String>(allAlias);
     }
 
