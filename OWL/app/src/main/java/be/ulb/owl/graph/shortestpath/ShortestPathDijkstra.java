@@ -40,18 +40,25 @@ public class ShortestPathDijkstra extends ShortestPathEvaluator {
                 _found = true;
                 break;
             }
-
-            for(final Node neighbour : currentNode.getNeighbours()) {
-                Float newDistance = _distance.get(currentNode) + (float)(neighbour.getDistanceFrom(currentNode));
-                if(newDistance < _distance.get(neighbour)) {
-                    _distance.put(neighbour, newDistance);
-                    _predecessor.put(neighbour, currentNode);
-                }
-            }
+            exploreNeighbours(currentNode);
         }
         if(!_predecessor.containsKey(_dest))
             throw new AssertionError("Destination node should have been visited at least once");
         _executed = true;
+    }
+
+    /**
+     * explore all non-explored yet neighbours of current node
+     * @param current the node to look at the neighbours of
+     */
+    private void exploreNeighbours(Node current) {
+        for(final Node neighbour : current.getNeighbours()) {
+            Float newDistance = _distance.get(current) + (float)(neighbour.getDistanceFrom(current));
+            if(newDistance < _distance.get(neighbour)) {
+                _distance.put(neighbour, newDistance);
+                _predecessor.put(neighbour, current);
+            }
+        }
     }
 
     @Override
