@@ -324,6 +324,7 @@ public class Graph implements ScanWifiUpdateEvent {
                 refinePath(shortestPath, _main.getDestinations());
             }
 
+            _main.setCurrentPlan(src.getParentPlan());
             // Draw path on screen
             _main.drawPath(shortestPath);
 
