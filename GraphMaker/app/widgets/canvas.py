@@ -188,16 +188,16 @@ class GraphCanvas(t.Canvas):
         self.set_position_on_parent(plan.on_parent)
         self.set_bg_image(App.App.ALPHA_INITIAL_VALUE, background_file_name)
         self.set_bg_coord(plan.bg_coord)
-        for node_id, x, y, aliases, has_ap in self.database.load_nodes_from_plan(filename):
-            self.create_node_from_db(x, y, aliases, has_ap, node_id)
+        for node_id, x, y, aliases, has_ap, has_ext_edge in self.database.load_nodes_from_plan(filename):
+            self.create_node_from_db(x, y, aliases, has_ap, has_ext_edge, node_id)
         for edge in self.database.load_edges_from_plan(filename):
             self.create_edge_from_db(*edge)
 
-    def create_node_from_db(self, x, y, aliases, has_ap, db_id):
+    def create_node_from_db(self, x, y, aliases, has_ap, has_ext_edge, db_id):
         node_coord = (x-App.App.NODE_SIZE, y-App.App.NODE_SIZE,
                       x+App.App.NODE_SIZE, y+App.App.NODE_SIZE)
-        # node_id = self.create_oval(*node_coord, fill='green' if has_ap else 'red')
-        node_id = self.create_oval(*node_coord, fill=Config.COLOR_VALID if has_ap else 'red')
+        outline = Config.NODES_EXTERNAL_EDGE_COLOR if has_ext_edge else 'black'
+        node_id = self.create_oval(*node_coord, fill=Config.COLOR_VALID if has_ap else 'red', outline=outline, width=2)
         self.add_node(node_id, [], aliases=aliases, node_name=db_id)
 
     def create_edge_from_db(self, nb, id1, id2):

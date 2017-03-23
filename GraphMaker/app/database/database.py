@@ -198,6 +198,16 @@ class Database:
             FROM Wifi
             WHERE NodeId=?
         """
+    CHECK_IF_NODE_HAS_EXTERNAL_EDGES_QUERY = \
+        """
+        SELECT COUNT(E.id)
+            FROM Edge E
+            JOIN Node N1
+                ON N1.Id=E.Node1Id
+            JOIN Node N2
+                ON N2.Id=E.Node2Id
+            WHERE (N1.PlanId!=N2.PlanId) AND (N1.Id=? OR N2.Id=?)
+        """
     CHECK_IF_ALIAS_IS_UNUSED = \
         """
         SELECT COUNT(L.NodeId)
@@ -381,7 +391,8 @@ class Database:
         + id is the node id
         + coords are the coordinates of the node
         + aliases are the aliases of the node
-        + has_ap tells whether node has already been scanned"""
+        + has_ap tells whether node has already been scanned
+        + has_ext_edge tells whether node has external edges"""
         nodes = list()
         query = Database.LOAD_NODES_FROM_PLAN_QUERY
         nodes_cursor = self.conn.execute(query, (plan_name,))
@@ -390,16 +401,23 @@ class Database:
             coords = result[1:3]
             has_ap = self.node_has_access_point(node_id)
             aliases = self.load_aliases_of_node(node_id)
+            has_ext_edge = self.node_has_external_edges(node_id)
             ## create node
-            nodes.append((node_id, *coords, aliases, has_ap))
+            nodes.append((node_id, *coords, aliases, has_ap, has_ext_edge))
         return nodes
-            
+
+    def node_has_external_edges(self, node_id):
+        """ returns True if node has external edges"""
+        query = Database.CHECK_IF_NODE_HAS_EXTERNAL_EDGES_QUERY
+        cursor = self.conn.execute(query, (node_id, node_id))
+        return cursor.fetchone()[0] > 0
+
     def node_has_access_point(self, node_id):
         """returns True if node has scanned wifis"""
         query = Database.CHECK_IF_NODE_HAS_ACCESS_POINTS_QUERY
         cursor = self.conn.execute(query, (node_id,))
         return cursor.fetchone()[0] > 0
-    
+
     def load_aliases_of_node(self, node_id):
         """returns a list sof aliases for a given node"""
         query = Database.LOAD_ALIASES_FROM_NODE_ID_QUERY
