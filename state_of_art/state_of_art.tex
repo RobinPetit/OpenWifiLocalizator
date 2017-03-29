@@ -60,7 +60,7 @@
 	  Le concept de cet algorithme est détaillé en annexe A.
     \subsubsection{A*}
 	  L'algorithme A* est un descendant de l'algorithme de Dijkstra dans le sens où le concept dérive directement de Dijkstra à une différence près~:
-	  l'algorithme A* utilise une \textit{heuristique}, c-à-d une fonction $h : V \to \R$ donnant une estimation du coût entre chaque nœud et le nœud
+	  l'algorithme A* utilise une \textit{heuristique}, c'est-à-dire une fonction $h : V \to \R$ donnant une estimation du coût entre chaque nœud et le nœud
 	  de destination, afin d'alléger la complexité de l'algorithme dans le pire des cas : l'algorithme A* est en $O(\abs E)$. L'utilisation de cette
 	  heuristique permet également d'adopter plusieurs fonctions de coût différente, et donc permet d'adapter la notion de \textit{plus court chemin} en fonction
 	  de ce qui est recherché.
@@ -77,7 +77,7 @@
   \subsection{Problème rencontrer par l'utilisation des Wifi}
     Ce qui distingue la localisation via \textit{Wifi} des autres types de localisation est le caractère imprévisible de la propagation des ondes.
 	En effet, bien que la propagation dans un espace ouvert suit une fonction donnée, la propagation des ondes au sein d'un bâtiment est plus complexe
-	à cause de la réflexion de l'atténuation des ondes survenant au contact des murs. De plus, l'environnement n'est pas la seule source d'altération
+	à cause de la réflexion et de l'atténuation des ondes survenant au contact des murs. De plus, l'environnement n'est pas la seule source d'altération
 	du signal. En effet, un signal peut subir une détérioration de sa qualité de l'ordre de $-3.5 \dBm$ si une personne se trouve entre l'émetteur et le
 	récepteur \cite{ETH}. Le signal peut aussi être détérioré par des interférences dont les sources peuvent être multiple. La difficulté repose dans
 	ces deux derniers points car ceux-ci surviennent le plus souvent de manière inopinée.
@@ -94,11 +94,12 @@
 	\textit{Wifi} qui seront utilisés ainsi que sur la qualité du signal que reçoit l'utilisateur pour pouvoir déterminer la position exacte de ce dernier.
 
     Les méthodes de la deuxième catégorie parviennent, quand à elle, à localiser l'utilisateur en calculant la similarité entre une mesure (ensemble de
-	\textit{Wifi}) donnée et une mesure présente en base de données et qui a été faite ultérieurement.\\  % ultérieurement ? Pas précédemment ?
+	\textit{Wifi}) donnée et une mesure présente en base de données, qui a été faite ultérieurement.\\  % ultérieurement ? Pas précédemment ? (+1 deto)
     Ces méthodes seront discutées et expliquées dans les deux sous-sections suivante.
 
     \subsubsection{Trilatération}
-      La trilatération est une méthode mathématique permettant de trouver une coordonnée \textit{consensus} qui sera contenu dans l'intersection de trois
+      La trilatération est une méthode mathématique permettant de trouver une coordonnée \textit{consensus} qui sera contenu % deto: c'est pas contenuE ?
+	  dans l'intersection de trois
 	  cercles. À la différence de la triangulation, la trilatération est basée sur l'utilisation de trois distances alors que la triangulation utilise
 	  trois angles donnés. Le schéma typique d'une trilatération est représenté par la figure~\ref{fig:trilatération}.
 
@@ -109,7 +110,7 @@
 
 	  Plus formellement, pour déterminer la position d'un utilisateur sur un plan cartésien, nous devons disposer des coordonnées cartésiennes du centre
 	  de chaque cercle ainsi que de la distance entre l'utilisateur et ces centres comme mentionné plus haut. L'obtention des coordonnées cartésiennes
-	  de l'utilisateur est réalisée via les formules suivante (voir annexe+NUMÉRO pour le développement détaillé)~:
+	  de l'utilisateur est réalisée via les formules suivante (voir annexe+NUMÉRO pour le développement détaillé)~: % deto: NUMERO ?  Pas compris :/
       \begin{equation}
         x = \frac{CE-BF}{EA-BD}
       \end{equation}
@@ -146,13 +147,13 @@
         \caption{Répartition de la qualité de signal en fonction de la distance.}
       \end{figure}
 
-	  L'utilisation d'une telle fonction donne de bons résultats dans un environnement ouvert ou les obstacles sont rares. Comme démontré par \cite{Roumanie},
+	  L'utilisation d'une telle fonction donne de bons résultats dans un environnement ouvert où les obstacles sont rares. Comme démontré par \cite{Roumanie},
 	  la précision de la localisation est situé entre $2$ et $2.5$ mètres. Néanmoins, dans le cas contraire, la fonction d'évaluation de la distance ne prenant
 	  pas en compte les obstacles, les estimations de distance s'en retrouvent biaisées et les coordonnées supposées de l'utilisateur aussi. De manière à résoudre
 	  ce problème, il est possible de remplacer la constante dans la formule~\eqref{eq:distance function from signal} par une formule prenant en compte les éléments
 	  composant l'environnement. Cette formule est définie comme suit~:
       \begin{equation}
-        \text{PLACER QQCH ICI}
+        \text{PLACER QQCH ICI} % TODO
       \end{equation}
 
 	  Cette modification de la trilatération implique de disposer de plus de connaissance sur l'environnement. Collecter ces données demande du temps et même en
@@ -164,12 +165,13 @@
 	  position désirée, les identifiants (\textit{BSS}) et les qualités de signal des points d'accès \textit{Wifi} couvrant cette position.
 
 	  \paragraph{Méthode utilisant les processus Gaussiens}
+	    % TODO
 
 	  \paragraph{Méthode utilisant les maximum de vraisemblance}
         Comme mentionné plus haut, on va faire un ensemble de mesures pour chaque point du graphe et ainsi construire la base de données sur laquelle se basera notre
 		méthode de localisation. Pour la méthode présente, on notera une mesure comme suit~:
         \begin{equation}
-          S^{(i)}=\{b_{1}, b_{2}, ..., b_{n}\} \hspace{1cm} \forall j \in [1, k],  % soucis d'indices... Qu'est-ce que $j$ ?
+          S^{(i)}=\{b_{1}, b_{2}, ..., b_{n}\} \hspace{1cm} \forall j \in [1, k]  % soucis d'indices... Qu'est-ce que $j$ ?
         \end{equation}
         où :
         \begin{itemize}
@@ -178,8 +180,7 @@
 		  et la qualité de signal perçue.
         \end{itemize}
 
-        On prend plusieurs mesures pour un même point car il existe des variations de qualité de signal au cours du temps. En faisant de la sorte, on se donne une idée de
-		la qualité d'un signal à un point du graphe. On notera ces «~mesures moyennes~» comme suit~:
+        On prend plusieurs mesures pour un même point car il existe des variations de qualité de signal au cours du temps. En faisant de la sorte, on se donne une idée de la qualité d'un signal à un point du graphe. On notera ces «~mesures moyennes~» comme suit~:
         \begin{equation}
           \bar{S} = \{(a_{1}, \bar{S}_{1}), ..., (a_{n}, \bar{S}_{n})\},
         \end{equation}
@@ -189,6 +190,7 @@
         \end{itemize}
 
 		Cependant, considérer seulement la moyenne comme utile statistique n'est pas suffisant à cause du bruit et des interférences pouvant survenir (voir section précédente).
+		% deto: c'est pas ``palier *à* qqch'' ? 
 		Pour palier ce problème, on calcule aussi la variance (notée $v$) pour chaque point du graphe. Ainsi, on obtiendra une nouvelle forme appelée ensemble caractéristique
 		qui est définit comme suit :
         \begin{equation}
@@ -205,20 +207,23 @@
         \end{equation}
         où :
         \begin{itemize}
-          \item $\dim(L_{i})$, le nombre de points d'accès à cette position, est noté $n_{i}$
+          \item $\dim(L_{i})$, le nombre de points d'accès à cette position, est noté $n_{i}$; % deto: on utilise jamais n_i ? et la on donne juste la définition de la dimention de L_i non ?
           \item $S_{i}^{*}$ est l'ensemble caractéristique de $L_{i}$
         \end{itemize}
 
         Une fois la base de données remplie, on peut passer à l'étape dite d'exploitation. Il s'agit du processus qui sera utilisé par une personne pour pouvoir se localiser.
         Le processus va déduire la position de l'utilisateur sur base de la base de données préalablement créée (notée $\mathcal{D}$) et sur base d'une mesure qu'il aura effectuée
-		(notée $S'$). La nature de cette mesure pouvant soit être de la forme (1) ou (2).
-
+		(notée $S'$). La nature de cette mesure pouvant soit être de la forme (1) ou (2). % deto: je vois pas à quoi tu fais référence par (1) et (2) :/ (c'est probablement pas une faute mais je le note parce qu'il faudrait que je comprenne xD)
+	
+	% deto: Manque pas un ``à'' entre L et D (phrase ci-dessous)
         Le processus va déterminer une position $\hat{L}$ appartenant $\mathcal{D}$ pour laquelle la probabilité que l'utilisateur se trouve proche de ce point est la plus grande.
 		Pour ce faire, on va calculer, pour chaque élément appartenant à $\mathcal{D}$, un score noté $Z$ et considérer, comme solution à notre problème, le point correspondant
-		au score $Z$ minimal car le score $Z$ minimal représente la vraisemblance maximale comme prouvé dans l'article (Mettre référence). Le score $Z$ est définit comme suit~:
+		au score $Z$ minimal car le score $Z$ minimal représente la vraisemblance maximale comme prouvé dans l'article (Mettre référence). % TODO
+		Le score $Z$ est définit comme suit~:
         \begin{equation}
           Z_{i} = \sum\limits_{j = 1}^{n_{i}}\bigg(\frac{(\bar{S}_{ij}-S'_{j})^{2}}{v_{ij}}\bigg),
         \end{equation}
+        % deto: manque pas de nouveau la définition de ``i'' ?  A moins que ça soit la même que précédemment ?
         où :
         \begin{itemize}
           \item $\bar{S}_{ij}$ est la moyenne de la qualité de signal du $j^{eme}$ point d'accès~;
@@ -234,8 +239,11 @@
         \end{tcolorbox}
 
       \paragraph{Monte Carlo}
+	% TODO
       \paragraph{Amélioration par l'utilisation de filtres}
+	% TODO
       \paragraph{Amélioration par l'estimation de qualité de signal}
+	% TODO
 
 \section{Interpolation}
   \subsection{Principe}
@@ -255,11 +263,13 @@
     L'interpolation par morceaux (\textit{piece-wise interpolation} en anglais) est un moyen d'interpoler les $N+1$ points de contrôle par une courbe étant déterminée
 	par une union de courbes définies chacune sur un segment $[x_j, x_{j+1}]$.
     \subsubsection{Interpolation par splines polynômiales}
-      Si $f : [x_0, x_N] \to \R$ est la fonction d'interpolation, et si on considère que $f(x) = f_i(x)$ pour $x \in [x_i, x_{i+1})$, alors on cherche les
+      Si $f : [x_0, x_N] \to \R$ est la fonction d'interpolation, et si on considère que $f(x) = f_i(x)$ pour $x \in [x_i, x_{i+1})$, % deto: c'est pas un ] ici à la place de la parenthèse ?
+	  alors on cherche les
 	  $f_i : [x_i, x_{i+1}] \to \R$ sous forme de polynôme. Il faut alors introduire un certain nombre de contraintes afin de pouvoir déterminer les coefficients de
 	  ces $N$ fonctions.
 
-	  Il est commun d'imposer que ces fonctions soient cubiques, et d'imposer une continuité en $C^2$, i.e. que les dérivées secondes des $f_i$ soient continues aux
+	  Il est commun d'imposer que ces fonctions soient cubiques, et d'imposer une continuité en $C^2$, i.e. % deto: c'est pas mieux de mettre ``par exemple'' en toute lettre ?
+	  que les dérivées secondes des $f_i$ soient continues aux
 	  points de contrôle.
     \subsubsection{Interpolation par une courbe paramétrique}
 	  La sous-section précédente ne concerne que le cas où tous les $x_i$ sont distincts deux à deux, et donc où il existe une fonction $F$ telle que pour tout $i$,
@@ -276,7 +286,8 @@
 	  $N$ fonctions $\gamma_i : [0, 1] \to \R^2 : t \mapsto (x_i(t), y_i(t))$ où $x_i, y_i : [0, 1] \to \R$ sont deux fonction polynômiales cubiques.
 
 	  $x_i$ et $y_i$ sont deux fonctions cubiques, donc chacune déterminées par 4 coefficients, et on cherche $N$ telles fonctions. Il faut alors $4N$ contraintes
-	  pour déterminer ces coefficients. On impose donc $\gamma_i(0) = (x_i, y_i)$ et $\gamma_i(1) = x_{i+1}, y_{i+1})$ pour $i = 0, \ldots, {N-1}$, ce qui donne $2(N-1)$
+	  pour déterminer ces coefficients. On impose donc $\gamma_i(0) = (x_i, y_i)$ et $\gamma_i(1) = x_{i+1}, y_{i+1})$ % deto: il y a une femeture de parenthèse mais pas d'ouverture... xD
+	  pour $i = 0, \ldots, {N-1}$, ce qui donne $2(N-1)$
 	  contraintes. Il en reste $2(N+1)$ à déterminer. Pour cela, seule une continuité $C^1$ est demandée, et on impose~:
 	  \begin{equation}
 	  	\forall i \in \{1, \ldots, N-1\} : \od {\gamma_i}t(0) = \frac 12\left(x_{i+1}-x_{i-1}, y_{i+1}-y_{i-1}\right).
