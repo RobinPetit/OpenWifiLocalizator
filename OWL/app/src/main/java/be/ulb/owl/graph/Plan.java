@@ -42,6 +42,7 @@ public class Plan {
 
     private final String _name;
     private final Campus _parentPlan;
+    private int _id;
     private HashSet<String> _allAlias; // Cache
     protected ArrayList<Node> _listNode;
     private HashSet<String> _allBssWifi;
@@ -75,6 +76,7 @@ public class Plan {
             throw new IllegalArgumentException("A plan's ppm can not be zero!");
         }
         this._name = name;
+        this._id = id;
 
         this._parentPlan = parentPlan;
         this._xOnParent = xOnParent;
@@ -240,6 +242,16 @@ public class Plan {
      */
     public String getName() {
         return _name;
+    }
+
+    /**
+     * Test if the current Plan have a specific id
+     *
+     * @param id the id which must be tested
+     * @return True if it's the good id
+     */
+    public boolean isId(int id) {
+        return this._id == id;
     }
 
 

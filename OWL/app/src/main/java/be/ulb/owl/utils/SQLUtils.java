@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import be.ulb.owl.MainActivity;
 import be.ulb.owl.graph.Campus;
 import be.ulb.owl.graph.Graph;
 import be.ulb.owl.graph.Node;
@@ -372,18 +373,26 @@ public class SQLUtils extends SQLiteOpenHelper {
 
         String param = TextUtils.join("', '", listBSS);
 
-        String req = "SELECT DISTINCT " + NodeTable.getName() + ".* " +
+        String req = "SELECT DISTINCT " + NodeTable.PLAN_ID.getFullCol() + " " +
                 "FROM " + NodeTable.getName() + " " +
                     "JOIN " + WifiTable.getName() + " "+
                         "ON " + WifiTable.NODE_ID.getFullCol() + " " +
                             "= " + NodeTable.ID.getFullCol() + " "+
-                "WHERE " + WifiTable.BSS.getFullCol() + " IN (?)";
-
-        Cursor cursor = getDatabase().rawQuery(req, new String[]{"'"+param+"'"});
+                "WHERE " + WifiTable.BSS.getFullCol() + " IN ('" + param + "');";
 
 
-        // TODO read data
-        return loadAllPlan(cursor);
+        Cursor cursor = getDatabase().rawQuery(req, new String[]{});
+
+        ArrayList<Plan> res = new ArrayList<Plan>();
+        cursor.moveToFirst();
+        while(!cursor.isAfterLast()) {
+            int planId = getInt(cursor, NodeTable.PLAN_ID.getCol());
+
+            res.add(MainActivity.getInstance().getGraph().getPlanById(planId));
+            cursor.moveToNext();
+        }
+
+        return res;
     }
 
 
@@ -409,7 +418,7 @@ public class SQLUtils extends SQLiteOpenHelper {
         ArrayList<Plan> res = new ArrayList<Plan>();
 
         int id;
-        int campusID;
+        int campusID = -1;
         String planName;
         String directoryImage;
         float xOnParent;
@@ -443,6 +452,7 @@ public class SQLUtils extends SQLiteOpenHelper {
 
                 cursor.moveToNext(); // next entry
             }
+
         } else {
             Log.d("SQLUtils", "No plan on this campus " +
                     // View campus name if not null

@@ -157,6 +157,25 @@ public class Graph implements ScanWifiUpdateEvent {
         return listeNode;
     }
 
+
+    /**
+     * Get a plan
+     *
+     * @param planId id of the plan
+     * @return the Plan object
+     */
+    public Plan getPlanById(int planId) {
+        for(Plan plan: getAllPlan()) {
+            if (plan.isId(planId)) {
+                return plan;
+            }
+        }
+
+        return null;
+    }
+
+
+
     /**
      * Get a plan
      *

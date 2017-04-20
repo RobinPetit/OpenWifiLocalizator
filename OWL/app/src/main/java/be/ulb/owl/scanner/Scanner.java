@@ -151,6 +151,7 @@ public class Scanner {
 
 
         ArrayList<Plan> listPlan = SQLUtils.getPlanWithWifi(Wifi.wifiListToBssList(temp));
+        Log.d(Scanner.class.getName(), "Liste de plan: " + listPlan.toString());
 
         // TODO optimiser (deux boucles pour la même chose)
         for(ScanWifiUpdateEvent event : _eventScanWifiUpdate.keySet()) {
